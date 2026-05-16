@@ -11,7 +11,7 @@
 - [ ] Codespace opens and Firebase CLI is available (`firebase --version`)
 - [ ] Firebase Emulator Suite starts without errors
 - [ ] Vite dev server starts and app loads on port 5173
-- [ ] `deploy-dev.yml` triggers on push and deploys to `rpd-pawn-shop-dev`
+- [ ] `deploy-dev.yml` triggers on push and deploys to `nats-rack`
 - [ ] GitHub Secrets set (14 Actions secrets + 6 Codespaces secrets)
 - [ ] `.env.local` populated from Codespaces Secrets and excluded from git
 - [ ] Firestore rules and indexes deployed to both projects

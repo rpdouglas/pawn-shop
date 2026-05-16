@@ -1,7 +1,7 @@
 {
   "projects": {
-    "default": "rpd-pawn-shop-dev",
-    "dev":     "rpd-pawn-shop-dev",
-    "prod":    "rpd-pawn-shop"
+    "default": "nats-rack",
+    "dev":     "nats-rack",
+    "prod":    "the-addicts-agenda"
   }
 }

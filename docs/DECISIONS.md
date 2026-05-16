@@ -20,7 +20,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-16 — Firestore prefix tokens (`searchTokens[]`) for search instead of Algolia. Revisit if search UX becomes a problem.
 
-2026-05-16 — Two Firebase projects: `rpd-pawn-shop-dev` (dev) and `rpd-pawn-shop` (prod). No staging — overkill for one developer.
+2026-05-16 — Two Firebase projects: `nats-rack` (dev) and `the-addicts-agenda` (prod). No staging — overkill for one developer.
 
 2026-05-16 — GitHub Issues as a simple numbered task list. No labels, no milestones, no Projects board.
 

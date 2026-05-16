@@ -23,7 +23,7 @@ Brand voice: **"Dapper. Debonair. Distinctly Akwesasne."**
 ## Stack
 
 - **Frontend:** React 18 + Vite + TypeScript + Tailwind v4
-- **Database:** Cloud Firestore (`rpd-pawn-shop-dev` / `rpd-pawn-shop`)
+- **Database:** Cloud Firestore (`nats-rack` / `the-addicts-agenda`)
 - **Auth:** Firebase Auth (email/password + Google SSO)
 - **Functions:** Cloud Functions v2 (Node/TypeScript) in `/functions`
 - **Hosting:** Firebase Hosting

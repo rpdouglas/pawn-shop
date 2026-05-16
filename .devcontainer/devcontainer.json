@@ -44,6 +44,6 @@
   },
 
   "remoteEnv": {
-    "FIREBASE_PROJECT": "rpd-pawn-shop-dev"
+    "FIREBASE_PROJECT": "nats-rack"
   }
 }

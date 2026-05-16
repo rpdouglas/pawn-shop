@@ -92,7 +92,7 @@ FILES[".devcontainer/devcontainer.json"] = """\
   },
 
   "remoteEnv": {
-    "FIREBASE_PROJECT": "rpd-pawn-shop-dev"
+    "FIREBASE_PROJECT": "nats-rack"
   }
 }
 """
@@ -101,9 +101,9 @@ FILES[".devcontainer/devcontainer.json"] = """\
 FILES[".firebaserc"] = """\
 {
   "projects": {
-    "default": "rpd-pawn-shop-dev",
-    "dev":     "rpd-pawn-shop-dev",
-    "prod":    "rpd-pawn-shop"
+    "default": "nats-rack",
+    "dev":     "nats-rack",
+    "prod":    "the-addicts-agenda"
   }
 }
 """
@@ -487,7 +487,7 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}
-          projectId: rpd-pawn-shop-dev
+          projectId: nats-rack
           channelId: live
 """
 
@@ -533,7 +533,7 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}
-          projectId: rpd-pawn-shop
+          projectId: the-addicts-agenda
           channelId: live
 """
 
@@ -554,7 +554,7 @@ Open the Codespace → two terminal tabs:
 
 ```bash
 # Tab 1 — Firebase emulators
-firebase emulators:start --project rpd-pawn-shop-dev
+firebase emulators:start --project nats-rack
 
 # Tab 2 — Vite dev server
 npm run dev
@@ -568,8 +568,8 @@ Then open the **Ports** panel and click the link for port 5173.
 
 | | Firebase project | Deploy trigger |
 |---|---|---|
-| **Dev** | `rpd-pawn-shop-dev` | Auto on push to `main` |
-| **Prod** | `rpd-pawn-shop` | Actions → Deploy → Prod → type `DEPLOY` |
+| **Dev** | `nats-rack` | Auto on push to `main` |
+| **Prod** | `the-addicts-agenda` | Actions → Deploy → Prod → type `DEPLOY` |
 
 ---
 
@@ -633,7 +633,7 @@ Brand voice: **"Dapper. Debonair. Distinctly Akwesasne."**
 ## Stack
 
 - **Frontend:** React 18 + Vite + TypeScript + Tailwind v4
-- **Database:** Cloud Firestore (`rpd-pawn-shop-dev` / `rpd-pawn-shop`)
+- **Database:** Cloud Firestore (`nats-rack` / `the-addicts-agenda`)
 - **Auth:** Firebase Auth (email/password + Google SSO)
 - **Functions:** Cloud Functions v2 (Node/TypeScript) in `/functions`
 - **Hosting:** Firebase Hosting
@@ -824,7 +824,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-16 — Firestore prefix tokens (`searchTokens[]`) for search instead of Algolia. Revisit if search UX becomes a problem.
 
-2026-05-16 — Two Firebase projects: `rpd-pawn-shop-dev` (dev) and `rpd-pawn-shop` (prod). No staging — overkill for one developer.
+2026-05-16 — Two Firebase projects: `nats-rack` (dev) and `the-addicts-agenda` (prod). No staging — overkill for one developer.
 
 2026-05-16 — GitHub Issues as a simple numbered task list. No labels, no milestones, no Projects board.
 
@@ -860,7 +860,7 @@ FILES["docs/EPICS.md"] = """\
 - [ ] Codespace opens and Firebase CLI is available (`firebase --version`)
 - [ ] Firebase Emulator Suite starts without errors
 - [ ] Vite dev server starts and app loads on port 5173
-- [ ] `deploy-dev.yml` triggers on push and deploys to `rpd-pawn-shop-dev`
+- [ ] `deploy-dev.yml` triggers on push and deploys to `nats-rack`
 - [ ] GitHub Secrets set (14 Actions secrets + 6 Codespaces secrets)
 - [ ] `.env.local` populated from Codespaces Secrets and excluded from git
 - [ ] Firestore rules and indexes deployed to both projects
