@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "rpd-pawn-shop-dev",
+    "dev":     "rpd-pawn-shop-dev",
+    "prod":    "rpd-pawn-shop"
+  }
+}

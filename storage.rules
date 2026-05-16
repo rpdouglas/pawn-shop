@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Item images — public read, staff write
+    match /items/{itemId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && (request.auth.token.admin == true
+                    || request.auth.token.manager == true
+                    || request.auth.token.inventory_staff == true);
+    }
+
+    // Pawn request attachments — authenticated read/write
+    match /pawn-requests/{requestId}/{allPaths=**} {
+      allow read:  if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Deny everything else
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

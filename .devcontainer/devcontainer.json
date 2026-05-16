@@ -1,0 +1,49 @@
+{
+  "name": "The Pawn Shop — Dev",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17"
+    }
+  },
+
+  "forwardPorts": [5173, 9099, 8080, 9199, 5001, 4000],
+
+  "portsAttributes": {
+    "5173": { "label": "Vite Dev Server",        "onAutoForward": "openBrowserOnce" },
+    "4000": { "label": "Firebase Emulator UI",   "onAutoForward": "notify" },
+    "8080": { "label": "Firestore Emulator",     "onAutoForward": "silent" },
+    "9099": { "label": "Auth Emulator",          "onAutoForward": "silent" },
+    "9199": { "label": "Storage Emulator",       "onAutoForward": "silent" },
+    "5001": { "label": "Functions Emulator",     "onAutoForward": "silent" }
+  },
+
+  "postCreateCommand": "npm install -g firebase-tools@latest",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "firebase.vscode-firebase-tools",
+        "GoogleCloudTools.cloudcode",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "bradlc.vscode-tailwindcss",
+        "christian-kohler.path-intellisense",
+        "formulahendry.auto-rename-tag",
+        "ms-vscode.vscode-typescript-next",
+        "GitHub.vscode-pull-request-github",
+        "google.geminicodeassist"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "typescript.preferences.importModuleSpecifier": "relative"
+      }
+    }
+  },
+
+  "remoteEnv": {
+    "FIREBASE_PROJECT": "rpd-pawn-shop-dev"
+  }
+}

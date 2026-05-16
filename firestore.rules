@@ -1,0 +1,119 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function hasRole(role) {
+      return isSignedIn() && request.auth.token[role] == true;
+    }
+
+    function isStaff() {
+      return hasRole('admin') || hasRole('manager') || hasRole('inventory_staff');
+    }
+
+    function isAdmin() {
+      return hasRole('admin');
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ── items/{id} ────────────────────────────────────────────────────────────
+    // Public read when active and no police hold. Staff write. Admin for sensitive fields.
+
+    match /items/{itemId} {
+      allow read: if resource.data.status == 'active'
+                     && resource.data.policeHold != true;
+      allow read: if isStaff();
+      allow create, update: if isStaff()
+                               && !request.resource.data.diff(resource.data).affectedKeys()
+                                   .hasAny(['policeHold', 'serialBlacklistFlag'])
+                            || isAdmin();
+      allow delete: if isAdmin();
+      // aiDescription is never readable by customers
+      allow read: if isStaff() || resource.data.keys().hasAll(['aiDescription']) == false;
+    }
+
+    // ── pawnRequests/{id} ─────────────────────────────────────────────────────
+    match /pawnRequests/{reqId} {
+      allow create: if isSignedIn();
+      allow read, update: if isStaff();
+      allow delete: if isAdmin();
+    }
+
+    // ── reservations/{id} ────────────────────────────────────────────────────
+    match /reservations/{resId} {
+      allow create: if isSignedIn();
+      allow read, update: if isStaff() || isOwner(resource.data.uid);
+      allow delete: if isAdmin();
+    }
+
+    // ── users/{uid} ──────────────────────────────────────────────────────────
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid)
+                       && !request.resource.data.diff(resource.data).affectedKeys()
+                           .hasAny(['role', 'vipFlag', 'resellerTier', 'lifetimeValue'])
+                    || isAdmin();
+    }
+
+    // ── auditLogs/{id} — immutable, no delete ever ───────────────────────────
+    match /auditLogs/{logId} {
+      allow create: if isSignedIn();
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ── serialBlacklist/{id} ─────────────────────────────────────────────────
+    match /serialBlacklist/{serialId} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
+
+    // ── campaigns/{id} ───────────────────────────────────────────────────────
+    match /campaigns/{campaignId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // ── savedSearches/{id} ───────────────────────────────────────────────────
+    match /savedSearches/{searchId} {
+      allow read, write: if isOwner(resource.data.uid);
+      allow read: if isStaff();
+    }
+
+    // ── disputes/{id} ────────────────────────────────────────────────────────
+    match /disputes/{disputeId} {
+      allow create: if isSignedIn();
+      allow read, update: if isStaff() || isOwner(resource.data.uid);
+      allow delete: if isAdmin();
+    }
+
+    // ── articles/{id} ────────────────────────────────────────────────────────
+    match /articles/{articleId} {
+      allow read: if resource.data.status == 'published';
+      allow read: if isStaff() || hasRole('marketing_staff');
+      allow write: if isAdmin() || hasRole('marketing_staff');
+    }
+
+    // ── preorders/{id} ───────────────────────────────────────────────────────
+    match /preorders/{preorderId} {
+      allow create: if isSignedIn();
+      allow read, update: if isStaff() || isOwner(resource.data.uid);
+      allow delete: if isAdmin();
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
