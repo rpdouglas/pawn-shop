@@ -2,186 +2,366 @@
 
 > Build roadmap. Work top to bottom — each phase unblocks the next.
 > Tick tasks as you go. Open a GitHub Issue when you start each epic.
+>
+> **Persona tags** appear after each task in `[brackets]`.
+> Every task serves at least one persona. See `docs/PERSONAS.md` for full profiles.
+> Run the Persona Gate (listed under each epic) before starting work on that epic.
+
+---
+
+## Persona Tag Key
+
+| Tag | Persona | Primary view |
+|---|---|---|
+| `[Mak]` | Makoonsii — The Reserve Regular | Pawn |
+| `[Dale]` | Dale — The Cross-Border Bargain Hunter | Pawn |
+| `[Tan]` | Tanya — The Seasonal Celebrator | Fireworks |
+| `[Marie]` | Marie — The Wellness Seeker | Cannabis |
+| `[Kev]` | Kevin — The Reseller & Picker | Pawn |
+| `[San]` | Sandra — The Curious Passerby | Pawn |
+| `[Jord]` | Jordan — The Lifestyle Connoisseur | All views |
+| `[Marc]` | Marcus — The Dapper Connoisseur | All views |
+| `[Staff]` | Internal staff — admin, manager, inventory_staff | Admin UI |
+| `[Comp]` | Compliance requirement — no persona ships without this | All views |
+| `[All]` | All personas benefit | All views |
 
 ---
 
 ## Phase 1 — Foundation
 
 ### E01 · Dev Environment Setup
-- [ ] Codespace opens and Firebase CLI is available (`firebase --version`)
-- [ ] Firebase Emulator Suite starts without errors
-- [ ] Vite dev server starts and app loads on port 5173
-- [ ] `deploy-dev.yml` triggers on push and deploys to `nats-rack`
-- [ ] GitHub Secrets set (14 Actions secrets + 6 Codespaces secrets)
-- [ ] `.env.local` populated from Codespaces Secrets and excluded from git
-- [ ] Firestore rules and indexes deployed to both projects
+
+> **Persona Gate:** Infrastructure epic. No customer-facing persona directly served.
+> However: if the emulator doesn't run cleanly, no feature can be tested to persona standards.
+> This is the floor everything else is built on.
+
+- [ ] Codespace opens and Firebase CLI is available (`firebase --version`) `[All]`
+- [ ] Firebase Emulator Suite starts without errors `[All]`
+- [ ] Vite dev server starts and app loads on port 5173 `[All]`
+- [ ] `deploy-dev.yml` triggers on push and deploys to `nats-rack` `[All]`
+- [ ] GitHub Secrets set (14 Actions secrets + 6 Codespaces secrets) `[All]`
+- [ ] `.env.local` populated from Codespaces Secrets and excluded from git `[All]`
+- [ ] Firestore rules and indexes deployed to both projects `[Comp]`
+
+---
 
 ### E02 · Three-View Design System
-- [ ] Tailwind v4 `@theme` tokens — Pawn (`#C8A14A` / `#080706`)
-- [ ] Tailwind v4 `@theme` tokens — Cannabis (`#7B4FA0` / `#1A0D2E`)
-- [ ] Tailwind v4 `@theme` tokens — Fireworks (`#C0392B` / `#1A0A0A`)
-- [ ] `ViewContext` provider reads URL prefix, injects `.view-*` CSS class on root
-- [ ] Core components: Button, Badge, Card, Modal, Input, Table (Pawn base)
-- [ ] Cannabis component variants (cinematic hero, mood card, luxury product card)
-- [ ] Fireworks component variants (countdown timer, bundle card, urgency badge)
-- [ ] WCAG AA contrast passes on all three palettes (run axe-core in browser)
-- [ ] PWA manifest configured (per-view icons + theme colours)
+
+> **Persona Gate — E02:**
+> - **Makoonsii:** Touch targets ≥48px. IM Fell English body font legible at 16px minimum. High contrast on `#080706` background.
+> - **Marie:** `.view-cannabis` dark luxury aesthetic matches premium wellness brand standards. Cormorant Garamond renders at correct weights.
+> - **Tanya:** `.view-fireworks` high-energy palette and Bebas Neue headline render correctly on mobile.
+> - **Marcus (Photography Test):** Every `.view-*` layout must frame product photography correctly — dark backgrounds, macro-scale presentation. No layout that crops or clips the primary image.
+> - **All:** WCAG AA contrast passes on all three palettes before any view ships.
+
+- [ ] Tailwind v4 `@theme` tokens — Pawn (`#C8A14A` primary / `#080706` bg) `[Mak]` `[Dale]` `[Kev]` `[San]`
+- [ ] Tailwind v4 `@theme` tokens — Cannabis (`#7B4FA0` primary / `#1A0D2E` bg) `[Marie]`
+- [ ] Tailwind v4 `@theme` tokens — Fireworks (`#C0392B` primary / `#1A0A0A` bg) `[Tan]`
+- [ ] `ViewContext` provider reads URL prefix, injects `.view-*` CSS class on root `[All]`
+- [ ] Core components: Button, Badge, Card, Modal, Input, Table (Pawn base) `[Mak]` `[Dale]`
+- [ ] Cannabis component variants (cinematic hero, mood card, luxury product card) `[Marie]`
+- [ ] Fireworks component variants (countdown timer, bundle card, urgency badge) `[Tan]`
+- [ ] WCAG AA contrast passes on all three palettes (run axe-core in browser) `[Mak]` `[Comp]`
+- [ ] PWA manifest configured (per-view icons + theme colours) `[Jord]` `[Marc]`
+
+---
 
 ### E03 · Auth & Staff Roles
-- [ ] Firebase Auth: email/password + Google SSO
-- [ ] Five custom claims: `admin` `manager` `inventory_staff` `marketing_staff` `customer`
-- [ ] Cloud Function to assign/revoke roles
-- [ ] `AuthContext` and `ProtectedRoute` components
-- [ ] MFA enforced for all staff — TOTP mandatory (**hard compliance requirement**)
-- [ ] MFA bypass tested and confirmed impossible
-- [ ] `auditLogs` writing: `login` `logout` `role_change` `mfa_enrolled`
+
+> **Persona Gate — E03:**
+> - **Marie (Compliance Anchor):** MFA for staff is non-negotiable. A staff account without MFA that can access customer cannabis purchase data is a compliance failure.
+> - **Kevin:** Role system enables VIP tier management (E15). Staff must be able to set `vipFlag` — that requires the role system to work.
+> - **Makoonsii:** Auth must not create friction for customers. Guest browse must be possible without account creation. Account creation must be simple, large-target, plain-language.
+> - **All staff flows:** `auditLogs` events for `login`, `logout`, `role_change`, `mfa_enrolled` are compliance requirements — not optional.
+
+- [ ] Firebase Auth: email/password + Google SSO `[All]`
+- [ ] Five custom claims: `admin` `manager` `inventory_staff` `marketing_staff` `customer` `[Staff]` `[Comp]`
+- [ ] Cloud Function to assign/revoke roles `[Staff]`
+- [ ] `AuthContext` and `ProtectedRoute` components `[All]`
+- [ ] MFA enforced for all staff — TOTP mandatory (**hard compliance requirement**) `[Comp]` `[Marie]`
+- [ ] MFA bypass tested and confirmed impossible `[Comp]`
+- [ ] `auditLogs` writing: `login` `logout` `role_change` `mfa_enrolled` `[Comp]`
 
 ---
 
 ## Phase 2 — Core Product
 
 ### E04 · Inventory Schema & Intake
-- [ ] `items/{id}` v3 schema documented in `firestore-schema.md` (update file first)
-- [ ] Admin intake form: receive → condition grade → photo upload → pricing → publish
-- [ ] Multi-image upload to Firebase Storage (watermark via Cloud Function, not client-side)
-- [ ] Hold system: status → `reserved` + `holdExpiresAt`
-- [ ] `resetExpiredHolds` Cloud Function (scheduled, every 30 min)
-- [ ] QR label generation per item
-- [ ] `searchTokens[]` array built from title + category on every write
-- [ ] Firestore rules: public read only when `status == 'active'` and `policeHold != true`
+
+> **Persona Gate — E04:**
+> - **Dale:** `searchTokens[]` accuracy directly determines how fast he finds and verifies items. Poor tokenisation = slow search = Dale leaves.
+> - **Kevin:** `searchTokens[]` accuracy also determines alert matching quality. A badly tokenised item means Kevin's saved search misses it.
+> - **Marcus:** `provenanceNotes` field must exist and be staff-writable before any high-value item can be presented to his standard. `merchandisingTags[]` controls `rare-find` — staff-set only, enforced by rule.
+> - **Comp:** `policeHold: true` must hide item from all public reads immediately on write. Verify in emulator before this epic closes.
+
+- [ ] `items/{id}` v3 schema documented in `firestore-schema.md` (update file first) `[All]`
+- [ ] Admin intake form: receive → condition grade → photo upload → pricing → publish `[Staff]`
+- [ ] Multi-image upload to Firebase Storage (watermark via Cloud Function, not client-side) `[Marc]` `[Jord]` `[Staff]`
+- [ ] Hold system: status → `reserved` + `holdExpiresAt` `[Dale]` `[Kev]`
+- [ ] `resetExpiredHolds` Cloud Function (scheduled, every 30 min) `[Dale]` `[Kev]`
+- [ ] QR label generation per item `[Staff]`
+- [ ] `searchTokens[]` array built from title + category on every write `[Dale]` `[Kev]`
+- [ ] Firestore rules: public read only when `status == 'active'` and `policeHold != true` `[Comp]`
+
+---
 
 ### E05 · Three-View Storefronts
-- [ ] `/pawn` `/cannabis` `/fireworks` routes with correct ViewContext theme
-- [ ] Homepage per view: hero, featured items, search bar
-- [ ] Shop/listing page with prefix search (via `searchTokens`)
-- [ ] Item detail page: image gallery, condition, price, enquiry CTA
-- [ ] Age gate at route level: `/cannabis` (19+) `/fireworks` (18+)
-- [ ] Every age gate pass/fail logged to `auditLogs`
-- [ ] Mobile-responsive across all three views
+
+> **Persona Gate — E05:**
+> - **Sandra (Primary — Pawn homepage):** Pawn homepage uses masonry grid, not standard grid. If it renders as a uniform list, the Sandra experience fails and the feature does not ship.
+> - **Marie (Primary — Cannabis):** Age gate at `/cannabis` route level before any cannabis data renders. 19+ modal is full-screen, session-scoped. Every pass/fail logged to `auditLogs`.
+> - **Tanya (Primary — Fireworks):** Age gate at `/fireworks` route level. 18+ enforced. Every pass/fail logged.
+> - **Makoonsii:** Mobile-responsive Pawn view with large touch targets and high-contrast text.
+> - **All views:** Mobile-responsive across all three before any view ships to dev.
+
+- [ ] `/pawn` `/cannabis` `/fireworks` routes with correct ViewContext theme `[All]`
+- [ ] Homepage per view: hero, featured items, search bar `[Mak]` `[Marie]` `[Tan]`
+- [ ] Shop/listing page with prefix search (via `searchTokens`) `[Dale]` `[Kev]`
+- [ ] Item detail page: image gallery, condition, price, enquiry CTA `[Dale]` `[Marc]`
+- [ ] Masonry grid layout on Pawn homepage `[San]`
+- [ ] Age gate at route level: `/cannabis` (19+) — full-screen, session-scoped `[Marie]` `[Comp]`
+- [ ] Age gate at route level: `/fireworks` (18+) — full-screen, session-scoped `[Tan]` `[Comp]`
+- [ ] Every age gate pass/fail logged to `auditLogs` `[Comp]`
+- [ ] Mobile-responsive across all three views `[Mak]` `[All]`
+
+---
 
 ### E07 · Pawn Form & Inbox
-- [ ] Customer pawn enquiry form (item description, photos, contact info)
-- [ ] `onPawnRequestCreate` Cloud Function: serial blacklist check, police hold flag if match, admin alert
-- [ ] `pawnRequests/{id}` collection written on submit
-- [ ] Staff admin inbox: view requests, update status, add notes
+
+> **Persona Gate — E07:**
+> - **Makoonsii:** Pawn form must be completable one-handed, in portrait mode, with large touch targets. Plain-language field labels. No jargon.
+> - **Dale:** Serial blacklist check gives Dale confidence that the platform takes item integrity seriously — it builds trust in the overall pricing model.
+> - **Compliance:** Every pawn form submission triggers a serial blacklist check. A match sets `serialBlacklistFlag: true` and fires an admin alert. This is not optional.
+
+- [ ] Customer pawn enquiry form (item description, photos, contact info) `[Mak]` `[Dale]`
+- [ ] `onPawnRequestCreate` Cloud Function: serial blacklist check, police hold flag if match, admin alert `[Comp]` `[Staff]`
+- [ ] `pawnRequests/{id}` collection written on submit `[Mak]` `[Dale]`
+- [ ] Staff admin inbox: view requests, update status, add notes `[Staff]`
+
+---
 
 ### E08 · Click & Collect / Contact
-- [ ] Click-and-collect request form on item detail pages
-- [ ] `reservations/{id}` collection + status flow (pending → confirmed → completed)
-- [ ] Staff confirms/declines pickup window
-- [ ] Contact page with form routing to staff email
-- [ ] Google Maps embed (store location)
+
+> **Persona Gate — E08:**
+> - **Tanya (Primary):** Click-and-collect confirmation must arrive via SMS within 60 seconds of `reservations/{id}` creation. Pickup window must be a specific time slot — "we'll call you" fails the Tanya spec.
+> - **Sandra:** Click-and-collect CTA on item detail page must be reachable in ≤3 taps from the Pawn homepage.
+> - **Makoonsii:** Contact page must include Google Maps embed (store location on Cornwall Island) with large, accessible tap targets for directions.
+
+- [ ] Click-and-collect request form on item detail pages `[Tan]` `[San]`
+- [ ] `reservations/{id}` collection + status flow (pending → confirmed → completed) `[Tan]`
+- [ ] Staff confirms/declines pickup window `[Staff]`
+- [ ] SMS confirmation fires within 60 seconds of reservation creation `[Tan]` `[Comp]`
+- [ ] Contact page with form routing to staff email `[Mak]`
+- [ ] Google Maps embed (store location) `[Mak]`
 
 ---
 
 ## Phase 3 — Discovery & Merchandising
 
 ### E13 · Merchandising Engine
-- [ ] Staff picks admin UI
-- [ ] `calculateTrendingScore` Cloud Function (view + save + enquiry count)
-- [ ] Auto-tagging: `just-arrived` (< 48h), `rare-find` (staff-set only)
-- [ ] Collection pages per view (Cannabis: Relax/Focus/Social/Ceremony; Fireworks: bundles)
-- [ ] Quick-view modal (pre-fetch on hover)
-- [ ] Related items on detail page (same category + view, sorted by trending score)
-- [ ] Masonry grid on Pawn homepage; vertical video on Cannabis + Fireworks pages
-- [ ] Search decision: keep Firestore prefix tokens or add Algolia — log in `DECISIONS.md`
+
+> **Persona Gate — E13:**
+> - **Sandra (Primary):** Staff Picks are editorial endorsements — first-person curator voice, not algorithmic bullets. Quick-view modals open within 200ms. Masonry grid: non-uniform layout required.
+> - **Marie:** Mood Collections for cannabis (Relax/Focus/Social/Ceremony) are the navigation system for this view. Marie does not browse by SKU.
+> - **Marcus:** `rare-find` tag may only appear when genuinely rare — staff confirms. Quick-view photography must meet dark luxury standard.
+> - **Dale + Kevin:** Search decision (Firestore prefix tokens vs Algolia) must be documented in `DECISIONS.md`. Sub-300ms response is the target.
+
+- [ ] Staff picks admin UI `[San]` `[Marc]` `[Staff]`
+- [ ] `calculateTrendingScore` Cloud Function (view + save + enquiry count) `[San]` `[Kev]`
+- [ ] Auto-tagging: `just-arrived` (< 48h), `rare-find` (staff-set only) `[Marc]` `[Kev]` `[Comp]`
+- [ ] Collection pages per view (Cannabis: Relax/Focus/Social/Ceremony; Fireworks: bundles) `[Marie]` `[Tan]`
+- [ ] Quick-view modal (pre-fetch on hover, opens within 200ms) `[San]`
+- [ ] Related items on detail page (same category + view, sorted by trending score) `[Jord]` `[Marc]`
+- [ ] Masonry grid on Pawn homepage; vertical video on Cannabis + Fireworks pages `[San]` `[Marie]` `[Tan]`
+- [ ] Search decision: keep Firestore prefix tokens or add Algolia — log in `DECISIONS.md` `[Dale]` `[Kev]`
+
+---
 
 ### E06 · eBay Cross-Posting
-- [ ] Push item to eBay from admin (Cloud Function — API key never on client)
-- [ ] `ebayListingId` stored on `items/{id}`
-- [ ] Status sync: sold on eBay → item sold in Firestore
-- [ ] Basic eBay category mapping per `viewTag`
+
+> **Persona Gate — E06:**
+> - **Dale (Primary):** eBay status sync (`sold on eBay → item sold in Firestore`) directly prevents the worst Dale experience: arriving at the store for an item sold online. This task is a trust feature, not an ops feature.
+> - **Kevin:** Real-time `ebayListingId` sync means Kevin's saved search alerts are accurate — no alerts fire for items already listed and moving on eBay.
+> - **Staff:** eBay push must go through a Cloud Function. API key never on client.
+
+- [ ] Push item to eBay from admin (Cloud Function — API key never on client) `[Staff]` `[Comp]`
+- [ ] `ebayListingId` stored on `items/{id}` `[Dale]` `[Kev]`
+- [ ] Status sync: sold on eBay → item `status: 'sold'` in Firestore immediately `[Dale]` `[Kev]`
+- [ ] Basic eBay category mapping per `viewTag` `[Staff]`
+
+---
 
 ### E09 · Quality, Security & Accessibility
-- [ ] Firestore security rules audit (all collections)
-- [ ] `purgeExpiredData` Cloud Function — PIPEDA retention schedule
-- [ ] Serial blacklist admin management UI
-- [ ] Keyboard navigability audit across all three views
-- [ ] axe-core clean (no failures in browser dev tools)
-- [ ] `/accessibility` page live
-- [ ] Lighthouse: ≥90 performance, ≥90 accessibility, ≥95 SEO (run in Codespace browser)
-- [ ] Kanien'keha copy community-reviewed before any publication
+
+> **Persona Gate — E09:**
+> - **Makoonsii (Primary):** This is the Makoonsii epic. axe-core clean, keyboard navigability, WCAG AA, VoiceOver spot-check — Makoonsii is the standard setter for the platform's accessibility floor. If she can't use it, it doesn't ship.
+> - **Compliance:** Firestore security rules audit is a compliance requirement. `purgeExpiredData` schedule must be documented in `DECISIONS.md` before prod.
+> - **Jordan + Marcus:** Lighthouse ≥90 performance and ≥95 SEO are Jordan and Marcus's PWA quality bar.
+> - **Kanien'kéha:** Any Kanien'kéha in the codebase at this point must be flagged for community review before the `/accessibility` page goes live.
+
+- [ ] Firestore security rules audit (all collections) `[Comp]`
+- [ ] `purgeExpiredData` Cloud Function — PIPEDA retention schedule `[Comp]` `[Marie]`
+- [ ] Serial blacklist admin management UI `[Staff]` `[Comp]`
+- [ ] Keyboard navigability audit across all three views `[Mak]` `[Comp]`
+- [ ] axe-core clean (no failures in browser dev tools) `[Mak]` `[Comp]`
+- [ ] `/accessibility` page live `[Mak]` `[Comp]`
+- [ ] Lighthouse: ≥90 performance, ≥90 accessibility, ≥95 SEO `[Jord]` `[Marc]`
+- [ ] Kanien'kéha copy community-reviewed before any publication `[Mak]` `[Marc]` `[Comp]`
 
 ---
 
 ## Phase 4 — Conversion & Admin Intelligence
 
 ### E10 · Analytics, Feature Flags & Admin Dashboard
-- [ ] GA4 custom events: page views per view, item views, enquiry submits, age-gate events, pawn form submits
-- [ ] Firebase Remote Config for feature flags
-- [ ] Admin dashboard: inventory counts by status + view, pawn request volume, top items
-- [ ] `policeHold` flag management in admin (admin-only)
-- [ ] UTM parameters captured per session
+
+> **Persona Gate — E10:**
+> - **All personas — No PII:** Every GA4 custom event must exclude PII. No names, emails, or UIDs in Analytics event parameters.
+> - **Kevin:** `policeHold` flag management must be admin-only and immediately hide the item from all public views — including any real-time analytics feeds.
+> - **Dale:** Pawn request volume in the admin dashboard helps staff understand demand — which informs pricing and sourcing decisions that Dale eventually benefits from.
+
+- [ ] GA4 custom events: page views per view, item views, enquiry submits, age-gate events, pawn form submits `[All]` `[Comp]`
+- [ ] Firebase Remote Config for feature flags `[All]`
+- [ ] Admin dashboard: inventory counts by status + view, pawn request volume, top items `[Staff]`
+- [ ] `policeHold` flag management in admin (admin-only) `[Staff]` `[Comp]`
+- [ ] UTM parameters captured per session `[All]`
+
+---
 
 ### E17 · Conversion Optimisation
-- [ ] Recently sold strip on homepage (sourced from `onItemSold` Firestore events)
-- [ ] Years in business badge + testimonials module
-- [ ] Privacy-safe live activity feed (city-level only, rate-limited, no PII)
-- [ ] `limited-edition` / `rare-find` display (staff-set only — never manufactured)
-- [ ] Hold countdown badge on reserved items
+
+> **Persona Gate — E17:**
+> - **Sandra (Primary):** Live activity feed must be privacy-safe (city-level only, rate-limited, no PII). A live feed that surfaces identifiable information is a compliance failure and an anti-persona design.
+> - **Marcus:** `limited-edition` and `rare-find` display is authentic only. Any display of these tags must source from staff-set `merchandisingTags[]` — never from inventory age or quantity calculations.
+> - **Makoonsii:** "Years in business" badge and testimonials module build the trust signal she needs. Copy must be warm, community-rooted — not generic.
+> - **Dale:** Recently sold strip validates deal quality. Real data only — `onItemSold` events, not manufactured.
+
+- [ ] Recently sold strip on homepage (sourced from `onItemSold` Firestore events — real data only) `[Dale]` `[San]`
+- [ ] Years in business badge + testimonials module `[Mak]`
+- [ ] Privacy-safe live activity feed (city-level only, rate-limited, no PII) `[San]` `[Comp]`
+- [ ] `limited-edition` / `rare-find` display (staff-set only — never manufactured) `[Marc]` `[Comp]`
+- [ ] Hold countdown badge on reserved items `[Kev]` `[Dale]`
+
+---
 
 ### E14 · Seasonal Campaign Scheduler
-- [ ] `campaigns/{id}` collection
-- [ ] `activateCampaign` + `deactivateCampaign` Cloud Functions (scheduled)
-- [ ] Admin campaign calendar UI
-- [ ] Countdown timer component for active campaigns
-- [ ] Fireworks pre-order: `preorders/{id}`, payment-on-pickup flow
+
+> **Persona Gate — E14:**
+> - **Tanya (Primary):** This entire epic is built for Tanya. Countdown timers must display real campaign end dates from `campaigns/{id}.endDate` — never a fake countdown. Fireworks season is a curated event, not a manufactured urgency play.
+> - **Makoonsii:** Campaign banners should use the brand voice — not aggressive retail copy.
+> - **Marie:** Cannabis seasonal campaigns must still pass the Marie Discretion Test. No category disclosure in any campaign CRM communications.
+
+- [ ] `campaigns/{id}` collection `[Tan]`
+- [ ] `activateCampaign` + `deactivateCampaign` Cloud Functions (scheduled) `[Tan]` `[Staff]`
+- [ ] Admin campaign calendar UI `[Tan]` `[Staff]`
+- [ ] Countdown timer component for active campaigns (real dates only) `[Tan]` `[Comp]`
+- [ ] Fireworks pre-order: `preorders/{id}`, payment-on-pickup flow `[Tan]`
+
+---
 
 ### E11 · Compliance Programme
-- [ ] Age gate audit log entries confirmed working for all gate events
-- [ ] `purgeExpiredData` schedule documented in `DECISIONS.md`
-- [ ] Jurisdiction legal review scheduled (get counsel before launch)
-- [ ] NVDA + VoiceOver spot-check on all three storefronts
-- [ ] `/accessibility` page confirmed live
+
+> **Persona Gate — E11:**
+> - **Marie (Primary):** This epic's age gate audit, PIPEDA retention, and anonymous enquiry feature are built primarily for Marie. If the cannabis view fails the compliance programme audit, it does not ship to prod.
+> - **Tanya:** Fireworks age gate (18+) included in the same audit.
+> - **Makoonsii:** NVDA + VoiceOver spot-check is Makoonsii's accessibility audit. She is the accessibility standard.
+> - **All:** Get legal counsel before launch. This is not a suggestion.
+
+- [ ] Age gate audit log entries confirmed working for all gate events `[Marie]` `[Tan]` `[Comp]`
+- [ ] `purgeExpiredData` schedule documented in `DECISIONS.md` `[Comp]` `[Marie]`
+- [ ] Jurisdiction legal review scheduled (get counsel before launch) `[Comp]`
+- [ ] NVDA + VoiceOver spot-check on all three storefronts `[Mak]` `[Comp]`
+- [ ] `/accessibility` page confirmed live `[Mak]` `[Comp]`
 
 ---
 
 ## Phase 5 — Retention & Post-Sale
 
 ### E15 · CRM & Retention
-- [ ] `users/{uid}` CRM fields: `purchaseHistory[]` `inquiryHistory[]` `lifetimeValue` `segments[]`
-- [ ] VIP flag + reseller tiers (bronze/silver/gold) — staff-set only
-- [ ] Automated follow-ups: 48h staff reminder on pending pawn requests; 72h customer follow-up on quoted items
-- [ ] `/admin/crm` dashboard: customer profile view, engagement score
-- [ ] Cross-view browsing flag (`crossViewFlag`) tracking
+
+> **Persona Gate — E15:**
+> - **Kevin (Primary):** VIP tier (`vipFlag`, `resellerTier`) is the retention mechanism built for Kevin. Engagement scoring surfaces candidates — staff confirms. Never auto-assigned.
+> - **Marcus:** Cross-view browsing (`crossViewFlag`) enables the lifestyle CRM journey that keeps Marcus engaged across all three views. VIP early access is Marcus's reward.
+> - **Marie:** All CRM automations must pass the Marie Discretion Test before activating. Automated follow-up for cannabis/fireworks views must use generic language.
+> - **Kevin:** 48h staff reminder on pending pawn requests — this is the Kevin conversion trigger. A pawn request that goes unresponded for 48h means Kevin (or Dale) has moved on.
+
+- [ ] `users/{uid}` CRM fields: `purchaseHistory[]` `inquiryHistory[]` `lifetimeValue` `segments[]` `[All]`
+- [ ] VIP flag + reseller tiers (bronze/silver/gold) — staff-set only `[Kev]` `[Marc]` `[Comp]`
+- [ ] Automated follow-ups: 48h staff reminder on pending pawn requests; 72h customer follow-up on quoted items `[Kev]` `[Dale]`
+- [ ] `/admin/crm` dashboard: customer profile view, engagement score `[Staff]`
+- [ ] Cross-view browsing flag (`crossViewFlag`) tracking `[Jord]` `[Marc]`
+
+---
 
 ### E12 · Alerts & Notifications
-- [ ] `savedSearches/{id}` collection + customer UI to save searches
-- [ ] Favourites/wishlist on item detail pages
-- [ ] `onItemCreated` Cloud Function: match saved searches, dispatch SMS (Twilio) or email (SendGrid) within 60s
-- [ ] In-app notification centre (mark as read)
-- [ ] Seasonal reminders + pickup confirmation SMS
-- [ ] CASL: `alertOptIn == true` checked before every send
-- [ ] Weekly digest email per view
+
+> **Persona Gate — E12:**
+> - **Kevin (Primary):** The 60-second alert SLA is not a target — it is a pass/fail requirement. Test it in the Firebase emulator: create a matching item, confirm the Cloud Function dispatches within 60 seconds. If it doesn't, the epic is not done.
+> - **Marie:** CASL `alertOptIn == true` checked before every send. No exceptions. Any alert that fires without this check is a compliance failure.
+> - **Marie (Discretion):** Weekly digest email per view must use generic "The Pawn Shop Update" language. No category words in subject lines.
+> - **Tanya:** Seasonal reminders for fireworks (Canada Day, Victoria Day) are the Tanya retention mechanism. Pickup confirmation SMS uses specific time slots.
+
+- [ ] `savedSearches/{id}` collection + customer UI to save searches `[Kev]`
+- [ ] Favourites/wishlist on item detail pages `[San]` `[Marc]`
+- [ ] `onItemCreated` Cloud Function: match saved searches, dispatch SMS (Twilio) or email (SendGrid) within 60 seconds `[Kev]` `[Comp]`
+- [ ] In-app notification centre (mark as read) `[Kev]` `[San]`
+- [ ] Seasonal reminders + pickup confirmation SMS `[Tan]`
+- [ ] CASL: `alertOptIn == true` checked before every send `[Marie]` `[Kev]` `[Comp]`
+- [ ] Weekly digest email per view (generic subject line — no category disclosure) `[Jord]` `[Marc]` `[Marie]`
+
+---
 
 ### E16 · Post-Sale Operations
-- [ ] Return/dispute ticket form (customer or staff)
-- [ ] `disputes/{id}` collection: status, refund log, staff notes
-- [ ] eBay disputes pulled from API and manageable in admin
-- [ ] Resolving a return updates `items/{id}.status` if item is restocked
+
+> **Persona Gate — E16:**
+> - **Makoonsii:** Return/dispute form must be simple, plain-language, accessible — one-handed mobile usable.
+> - **Dale:** eBay disputes pulled from API and manageable in admin — Dale's cross-border purchases sometimes require post-sale resolution. A broken dispute flow ends his trust in the platform.
+> - **Staff:** Resolving a return that restocks an item must update `items/{id}.status` immediately — so Kevin's alerts work correctly on restocked items.
+
+- [ ] Return/dispute ticket form (customer or staff) `[Mak]` `[Dale]`
+- [ ] `disputes/{id}` collection: status, refund log, staff notes `[Dale]` `[Comp]`
+- [ ] eBay disputes pulled from API and manageable in admin `[Dale]` `[Staff]`
+- [ ] Resolving a return updates `items/{id}.status` if item is restocked `[Kev]` `[Staff]`
 
 ---
 
 ## Phase 6 — AI & Editorial
 
 ### E18 · AI Assistant (Staff-Facing)
-- [ ] `generateAIDescription` Cloud Function (callable, Claude or Gemini, staff review gate — no auto-publish)
-  - High-value items: prompt includes provenance, cultural context, scarcity
-  - Draft saved to `aiDescription` only — Firestore rule prevents customer read
-- [ ] eBay title optimiser (AI suggests, staff accepts/edits)
-- [ ] Auto-tagging: min 3 suggestions per item, staff confirms
-- [ ] Price suggestion: eBay sold comps range, guidance only, never a published price
-- [ ] Duplicate detection: alert before publishing if similar item exists
+
+> **Persona Gate — E18:**
+> - **Jordan + Marcus (Primary quality drivers):** AI descriptions must go beyond condition grade into provenance, cultural context, and collecting significance where applicable. Marcus reads the full description. If it reads like a product datasheet, it fails.
+> - **Dale:** AI-informed pricing (eBay sold comps) must be accurate enough that Dale's cross-reference check confirms the listing price is credible.
+> - **Staff review gate (Compliance):** Every Gemini output is a draft. It saves to `aiDescription` only. Staff must explicitly promote to `description`. No exceptions. This is enforced at the Cloud Function level, the Firestore rule level, and the UI level.
+> - **Kanien'kéha Rule:** AI must never generate Kanien'kéha. Embed this constraint in every Gemini system prompt. See `docs/prompts/GEMINI_INITIALIZATION.md`.
+
+- [ ] `generateAIDescription` Cloud Function (callable, Gemini, staff review gate — no auto-publish) `[Jord]` `[Marc]` `[Comp]`
+  - High-value items: prompt includes provenance, cultural context, scarcity `[Marc]`
+  - Draft saved to `aiDescription` only — Firestore rule prevents customer read `[Comp]`
+- [ ] eBay title optimiser (AI suggests 3 variants, staff selects) `[Dale]` `[Staff]`
+- [ ] Auto-tagging: min 3 suggestions per item, staff confirms each `[All]` `[Comp]`
+- [ ] Price suggestion: eBay sold comps range, guidance only, never a published price `[Dale]` `[Comp]`
+- [ ] Duplicate detection: alert before publishing if similar item exists `[Staff]`
+
+---
 
 ### E19 · Editorial CMS & Brand Narrative
-- [ ] `articles/{id}` collection + admin editor + public article pages per view
-- [ ] About page + founder story + Akwesasne identity section
-- [ ] Warriors of Akwesasne series — first edition
-  - **Kanien'keha phrases: community review required — no AI generation**
-- [ ] Finds of the Week — first edition, templated for non-technical staff
-- [ ] Local SEO landing pages (≥6) with JSON-LD LocalBusiness schema
-- [ ] FAQ engine — admin-editable Q&A
+
+> **Persona Gate — E19:**
+> - **Makoonsii + Marcus (Primary):** This is the most persona-critical epic in the entire roadmap. The Akwesasne identity, the Warriors of Akwesasne series, and the Kanien'kéha integration are the reason Makoonsii trusts The Pawn Shop and the reason Marcus shares it.
+> - **Kanien'kéha (Hard rule):** No Kanien'kéha phrase enters any article, heading, or collection name without community review and `indigenousLanguageReviewed: true` set on the article. Every single instance. No shortcuts.
+> - **Sandra + Jordan:** Finds of the Week is the editorial hook that brings Sandra back and keeps Jordan engaged. It must be photographed to dark luxury standard (Marcus Photography Test) before publishing.
+
+- [ ] `articles/{id}` collection + admin editor + public article pages per view `[Jord]` `[Marc]` `[Mak]`
+- [ ] About page + founder story + Akwesasne identity section `[Mak]` `[Marc]`
+- [ ] Warriors of Akwesasne series — first edition `[Mak]` `[Marc]` `[Jord]`
+  - **Kanien'kéha phrases: community review required — no AI generation** `[Comp]`
+  - `indigenousLanguageReviewed: true` must be set before publishing any article with Kanien'kéha `[Comp]`
+- [ ] Finds of the Week — first edition, templated for non-technical staff `[San]` `[Marc]` `[Jord]`
+  - Must pass Marcus Photography Test before each edition is published `[Marc]`
+- [ ] Local SEO landing pages (≥6) with JSON-LD LocalBusiness schema `[Dale]`
+- [ ] FAQ engine — admin-editable Q&A `[Mak]`
 
 ---
 
 *The Pawn Shop · Cornwall Island, Akwesasne*
+*Dapper. Debonair. Distinctly Akwesasne.*
