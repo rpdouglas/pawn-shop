@@ -54,6 +54,16 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-17 — MfaEnrollPage is not wrapped in ProtectedRoute (E03). Wrapping it causes an infinite redirect loop: staff without MFA → /auth/mfa-enroll → ProtectedRoute checks mfaEnrolled → redirect back to /auth/mfa-enroll. The page handles its own auth guard inline instead.
 
+2026-05-17 — items/{id}.status adds 'draft' value (E04). Intake form creates items as draft before staff publish. Existing Firestore public read rule (status == 'active' && policeHold != true) already excludes draft items — no rule change required.
+
+2026-05-17 — auditLogs adds hold_set and hold_expired event types (E04). Written by setHold and resetExpiredHolds Cloud Functions respectively. Schema updated to list approved values. Details map is {itemId, fromStatus, toStatus} — no PII.
+
+2026-05-17 — publishItem CF skips Kevin alert dispatch when policeHold: true (E04). Item is hidden from public reads by the Firestore rule; alerting customers about an item they cannot see would be a compliance violation.
+
+2026-05-17 — createDraftItem is a Cloud Function, not a direct client write (E04). Firestore rules block client-side creates on items/ because resource.data is null for creates, making diff() fail. Admin SDK (CF) bypasses rules — the correct pattern for any collection where staff create documents.
+
+2026-05-17 — processImageUpload watches items/{itemId}/uploads/* staging path (E04). Processed images land at items/{itemId}/images/*. Separate paths prevent the trigger from re-firing on its own output, avoiding an infinite loop.
+
 ---
 
 *Add new entries above this line.*

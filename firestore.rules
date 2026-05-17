@@ -34,7 +34,7 @@ service cloud.firestore {
       allow read: if isStaff();
       allow create, update: if isStaff()
                                && !request.resource.data.diff(resource.data).affectedKeys()
-                                   .hasAny(['policeHold', 'serialBlacklistFlag'])
+                                   .hasAny(['policeHold', 'serialBlacklistFlag', 'publishedBy'])
                             || isAdmin();
       allow delete: if isAdmin();
 

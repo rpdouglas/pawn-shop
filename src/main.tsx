@@ -24,6 +24,7 @@ import FireworksPage from './pages/FireworksPage.tsx'
 import LoginPage from './pages/auth/LoginPage.tsx'
 import SignUpPage from './pages/auth/SignUpPage.tsx'
 import MfaEnrollPage from './pages/auth/MfaEnrollPage.tsx'
+import IntakePage from './pages/admin/IntakePage.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 
 const router = createBrowserRouter([
@@ -39,6 +40,9 @@ const router = createBrowserRouter([
       { path: 'signup',    element: <SignUpPage /> },
       { path: 'auth', children: [
         { path: 'mfa-enroll', element: <MfaEnrollPage /> },
+      ]},
+      { path: 'admin', children: [
+        { path: 'intake', element: <IntakePage /> },
       ]},
     ],
   },

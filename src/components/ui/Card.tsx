@@ -11,6 +11,7 @@ const CONDITION_LABELS: Record<ConditionGrade, string> = {
 }
 
 const STATUS_LABELS: Record<ItemStatus, string> = {
+  draft:    'Draft',
   active:   'Available',
   reserved: 'Reserved',
   sold:     'Sold',

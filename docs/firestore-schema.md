@@ -15,7 +15,7 @@
 | `category` | string | e.g. `electronics`, `jewellery`, `cannabis-flower` |
 | `viewTag` | string | Primary view: `pawn` \| `cannabis` \| `fireworks` |
 | `viewTags` | array\<string\> | Multi-view items |
-| `status` | string | `active` \| `reserved` \| `sold` \| `archived` |
+| `status` | string | `draft` \| `active` \| `reserved` \| `sold` \| `archived` |
 | `price` | number | CAD cents (e.g. 1999 = $19.99) |
 | `condition` | string | `new` \| `like-new` \| `good` \| `fair` \| `poor` |
 | `images` | array\<string\> | Firebase Storage URLs (WebP/AVIF, watermarked) |
@@ -108,7 +108,7 @@
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` |
+| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` |
 | `uid` | string | Actor UID |
 | `targetId` | string | Optional — item/user being acted on |
 | `details` | map | Context. **Never include PII** |

@@ -94,14 +94,14 @@
 > - **Marcus:** `provenanceNotes` field must exist and be staff-writable before any high-value item can be presented to his standard. `merchandisingTags[]` controls `rare-find` — staff-set only, enforced by rule.
 > - **Comp:** `policeHold: true` must hide item from all public reads immediately on write. Verify in emulator before this epic closes.
 
-- [ ] `items/{id}` v3 schema documented in `firestore-schema.md` (update file first) `[All]`
-- [ ] Admin intake form: receive → condition grade → photo upload → pricing → publish `[Staff]`
-- [ ] Multi-image upload to Firebase Storage (watermark via Cloud Function, not client-side) `[Marc]` `[Jord]` `[Staff]`
-- [ ] Hold system: status → `reserved` + `holdExpiresAt` `[Dale]` `[Kev]`
-- [ ] `resetExpiredHolds` Cloud Function (scheduled, every 30 min) `[Dale]` `[Kev]`
-- [ ] QR label generation per item `[Staff]`
-- [ ] `searchTokens[]` array built from title + category on every write `[Dale]` `[Kev]`
-- [ ] Firestore rules: public read only when `status == 'active'` and `policeHold != true` `[Comp]`
+- [x] `items/{id}` v3 schema documented in `firestore-schema.md` (update file first) `[All]`
+- [x] Admin intake form: receive → condition grade → photo upload → pricing → publish `[Staff]`
+- [x] Multi-image upload to Firebase Storage (watermark via Cloud Function, not client-side) `[Marc]` `[Jord]` `[Staff]`
+- [x] Hold system: status → `reserved` + `holdExpiresAt` `[Dale]` `[Kev]`
+- [x] `resetExpiredHolds` Cloud Function (scheduled, every 30 min) `[Dale]` `[Kev]`
+- [x] QR label generation per item `[Staff]`
+- [x] `searchTokens[]` array built from title + category on every write `[Dale]` `[Kev]`
+- [x] Firestore rules: public read only when `status == 'active'` and `policeHold != true` `[Comp]`
 
 ---
 
