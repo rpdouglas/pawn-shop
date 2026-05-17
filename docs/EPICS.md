@@ -35,13 +35,13 @@
 > However: if the emulator doesn't run cleanly, no feature can be tested to persona standards.
 > This is the floor everything else is built on.
 
-- [ ] Codespace opens and Firebase CLI is available (`firebase --version`) `[All]`
-- [ ] Firebase Emulator Suite starts without errors `[All]`
-- [ ] Vite dev server starts and app loads on port 5173 `[All]`
-- [ ] `deploy-dev.yml` triggers on push and deploys to `nats-rack` `[All]`
-- [ ] GitHub Secrets set (14 Actions secrets + 6 Codespaces secrets) `[All]`
-- [ ] `.env.local` populated from Codespaces Secrets and excluded from git `[All]`
-- [ ] Firestore rules and indexes deployed to both projects `[Comp]`
+- [x] Codespace opens and Firebase CLI is available (`firebase --version`) `[All]`
+- [x] Firebase Emulator Suite starts without errors `[All]`
+- [x] Vite dev server starts and app loads on port 5173 `[All]`
+- [x] `deploy-dev.yml` triggers on push and deploys to `nats-rack` `[All]`
+- [x] GitHub Secrets set (14 Actions secrets + 6 Codespaces secrets) `[All]`
+- [x] `.env.local` populated from Codespaces Secrets and excluded from git `[All]`
+- [x] Firestore rules and indexes deployed to both projects `[Comp]`
 
 ---
 

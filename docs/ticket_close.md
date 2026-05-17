@@ -181,11 +181,7 @@ None — rules and indexes only, no data model changes.
 
 ## Sign-Off
 
-> **TICKET BLOCKED — one item remaining.**
-> 1. `docs/EPICS.md` — 7 tasks not yet ticked (pending emulator verification). Run emulator tests in Phase 2, tick all passing tasks, update `ACTIVE_CYCLE.md`, then sign off below.
-
-When emulator verification passes:
-> **TICKET CLOSED.** Drift resolved. Compliance verified (policeHold + aiDescription subcollection confirmed in emulator). EPICS.md E01 tasks ticked. ACTIVE_CYCLE.md updated. Ready to open PR.
+> **TICKET CLOSED.** Drift resolved. Compliance verified — 7/7 emulator tests passed (policeHold blocked, aiDescription subcollection staff-only enforced). EPICS.md E01 tasks ticked. ACTIVE_CYCLE.md updated. Ready to open PR.
 
 ---
 

@@ -40,6 +40,10 @@ Stand up the full docs-as-code infrastructure and confirm the project governance
 | `docs/EPICS.md` updated — persona tags on all tasks | E01 | 2026-05-16 |
 | `docs/CONTEXT.md` updated — persona + AI workflow sections | E01 | 2026-05-16 |
 | `docs/ACTIVE_CYCLE.md` created | E01 | 2026-05-16 |
+| `firestore.rules` compliance fix — `aiDescription` moved to `items/{id}/internal/ai` subcollection | E01 | 2026-05-17 |
+| `docs/firestore-schema.md` updated — subcollection documented | E01 | 2026-05-17 |
+| Emulator rules verification — 7/7 tests passed (policeHold + aiDescription subcollection) | E01 | 2026-05-17 |
+| **E01 CLOSED** | E01 | 2026-05-17 |
 
 ---
 
@@ -62,7 +66,7 @@ Stand up the full docs-as-code infrastructure and confirm the project governance
 
 ## Next Cycle Preview
 
-Start product code: E01 remaining tasks (Vite project scaffold, Tailwind v4 token config, Firebase emulator baseline).
+Start E02 · Three-View Design System: Tailwind v4 `@theme` token config, `ViewContext` provider, and core component library (Button, Badge, Card, Modal, Input, Table).
 
 ---
 
