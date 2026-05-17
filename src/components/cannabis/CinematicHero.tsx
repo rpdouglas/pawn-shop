@@ -20,10 +20,10 @@ export default function CinematicHero({
   return (
     <section style={{
       position: 'relative',
-      minHeight: '100vh',
+      minHeight: '20vh',
       display: 'flex',
-      alignItems: 'flex-end',
-      padding: '64px 32px',
+      alignItems: 'center',
+      padding: '12px 32px',
       backgroundColor: 'var(--color-bg)',
       overflow: 'hidden',
     }}>

@@ -10,7 +10,7 @@ export default function App() {
         <nav style={{
           display: 'flex',
           gap: '24px',
-          padding: '16px 32px',
+          padding: '4px 32px',
           borderBottom: '1px solid var(--color-border)',
           backgroundColor: 'var(--color-surface)',
         }}>
