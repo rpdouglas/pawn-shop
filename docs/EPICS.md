@@ -184,10 +184,10 @@
 > - **Kevin:** Real-time `ebayListingId` sync means Kevin's saved search alerts are accurate — no alerts fire for items already listed and moving on eBay.
 > - **Staff:** eBay push must go through a Cloud Function. API key never on client.
 
-- [ ] Push item to eBay from admin (Cloud Function — API key never on client) `[Staff]` `[Comp]`
-- [ ] `ebayListingId` stored on `items/{id}` `[Dale]` `[Kev]`
-- [ ] Status sync: sold on eBay → item `status: 'sold'` in Firestore immediately `[Dale]` `[Kev]`
-- [ ] Basic eBay category mapping per `viewTag` `[Staff]`
+- [x] Push item to eBay from admin (Cloud Function — API key never on client) `[Staff]` `[Comp]`
+- [x] `ebayListingId` stored on `items/{id}` `[Dale]` `[Kev]`
+- [x] Status sync: sold on eBay → item `status: 'sold'` in Firestore immediately `[Dale]` `[Kev]`
+- [x] Basic eBay category mapping per `viewTag` `[Staff]`
 
 ---
 

@@ -153,9 +153,42 @@ Produce a PR description based on what was delivered:
 
 ---
 
+## Phase 5 — Cycle Update
+
+Run this phase whenever an epic closes (all tasks in `docs/EPICS.md` are `[x]`).
+
+### 5.1 Close the current cycle
+
+Update `docs/ACTIVE_CYCLE.md`:
+- Move the completed epic's tasks to **Previous Cycle Summary** with completion dates.
+- Add `**[EPIC ID] CLOSED**` as the final row. If any task was deferred, note it with the reason.
+- Clear **In Progress** and **Completed This Cycle** tables.
+- Increment **Cycle** number.
+- Set the new **Cycle Goal** to the next epic in `docs/EPICS.md` (next unchecked epic, top to bottom).
+- Update **Next Cycle Preview** to the epic after that.
+
+### 5.2 Update the project spec
+
+In `docs/projects/[ID]_[FEATURE].md`, update the **Status** line:
+```
+**Status:** Done — YYYY-MM-DD
+```
+If any tasks were deferred, note them:
+```
+**Status:** Done — YYYY-MM-DD (deferred: [item] — [reason], target: [when])
+```
+
+### 5.3 Add a deferred items entry (if applicable)
+
+If any tasks were deferred rather than completed, add them to the **Deferred / Blocked** table in `ACTIVE_CYCLE.md` with a target cycle.
+
+> **Result:** Cycle updated | No epic closed this ticket (skip Phase 5)
+
+---
+
 ## Sign-Off
 
-After all four phases are complete:
+After all applicable phases are complete:
 
 > **TICKET CLOSED.** Drift resolved. Compliance verified. EPICS.md updated. Ready to open PR.
 

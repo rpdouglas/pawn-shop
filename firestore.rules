@@ -45,8 +45,10 @@ service cloud.firestore {
     }
 
     // ── pawnRequests/{id} ─────────────────────────────────────────────────────
+    // Creates go through submitPawnRequest CF (Admin SDK — bypasses rules).
+    // Client-side creates are blocked to guarantee serialBlacklistHit is always set.
     match /pawnRequests/{reqId} {
-      allow create: if isSignedIn();
+      allow create: if false;
       allow read, update: if isStaff();
       allow delete: if isAdmin();
     }

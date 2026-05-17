@@ -1,6 +1,9 @@
+import { useNavigate } from 'react-router-dom'
 import Button from '../ui/Button'
 
 export default function PawnHero() {
+  const navigate = useNavigate()
+
   const scrollToDiscovery = () => {
     document.getElementById('masonry-section')?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -78,7 +81,7 @@ export default function PawnHero() {
           <Button variant="primary" size="lg" onClick={scrollToDiscovery}>
             Browse Inventory
           </Button>
-          <Button variant="secondary" size="lg">
+          <Button variant="secondary" size="lg" onClick={() => navigate('/pawn/sell')}>
             Pawn or Sell
           </Button>
         </div>

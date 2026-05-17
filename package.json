@@ -9,7 +9,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "emulate": "firebase emulators:start --import=./emulator-data --export-on-exit=./emulator-data",
-    "dev:full": "concurrently \"npm run dev\" \"npm run emulate\""
+    "dev:full": "concurrently \"npm run dev\" \"npm run emulate\"",
+    "guide:dev": "vitepress dev user-guide",
+    "guide:build": "vitepress build user-guide",
+    "guide:preview": "vitepress preview user-guide"
   },
   "dependencies": {
     "@fontsource/bebas-neue": "^5.2.7",
@@ -41,6 +44,8 @@
     "tailwindcss": "^4.3.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.34"
   }
 }

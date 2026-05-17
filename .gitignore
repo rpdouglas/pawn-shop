@@ -24,3 +24,7 @@ functions/lib/
 *.njsproj
 *.sln
 *.sw?
+
+# VitePress
+user-guide/.vitepress/dist
+user-guide/.vitepress/cache

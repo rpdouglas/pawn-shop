@@ -25,6 +25,8 @@ import LoginPage from './pages/auth/LoginPage.tsx'
 import SignUpPage from './pages/auth/SignUpPage.tsx'
 import MfaEnrollPage from './pages/auth/MfaEnrollPage.tsx'
 import IntakePage from './pages/admin/IntakePage.tsx'
+import PawnInboxPage from './pages/admin/PawnInboxPage.tsx'
+import SellPage from './pages/pawn/SellPage.tsx'
 import AgeGate from './components/age-gate/AgeGate.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 
@@ -35,6 +37,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/pawn" replace /> },
       { path: 'pawn',      element: <PawnPage /> },
+      { path: 'pawn/sell', element: <SellPage /> },
       { path: 'cannabis',  element: <AgeGate minAge={19} viewTag="cannabis"><CannabisPage /></AgeGate> },
       { path: 'fireworks', element: <AgeGate minAge={18} viewTag="fireworks"><FireworksPage /></AgeGate> },
       { path: 'login',     element: <LoginPage /> },
@@ -43,7 +46,8 @@ const router = createBrowserRouter([
         { path: 'mfa-enroll', element: <MfaEnrollPage /> },
       ]},
       { path: 'admin', children: [
-        { path: 'intake', element: <IntakePage /> },
+        { path: 'intake',      element: <IntakePage /> },
+        { path: 'pawn-inbox', element: <PawnInboxPage /> },
       ]},
     ],
   },

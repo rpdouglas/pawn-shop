@@ -1,6 +1,6 @@
 # Project E04: Inventory Schema & Intake
 
-**Status:** Planned
+**Status:** Done — 2026-05-17
 **Epic:** E04 — Inventory Schema & Intake
 **Phase:** Phase 2 — Core Product
 **Primary Persona:** Dale (search accuracy determines his speed; searchTokens[] quality is the core E04 deliverable)

@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 02
+**Cycle:** 04
 **Started:** 2026-05-17
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E03 · Auth & Staff Roles: Firebase Auth (email/password + Google SSO), five custom claims, MFA enforcement for staff, `AuthContext`, `ProtectedRoute`, and `auditLogs` events for auth actions.
+Deliver E07 · Pawn Form & Inbox: customer pawn enquiry form, `onPawnRequestCreate` Cloud Function with serial blacklist check (sets `serialBlacklistFlag: true` and fires admin alert on match), and staff admin inbox to view/update requests.
 
 ---
 
@@ -41,6 +41,9 @@ Deliver E03 · Auth & Staff Roles: Firebase Auth (email/password + Google SSO), 
 | Item | Reason | Target cycle |
 |---|---|---|
 | WCAG AA axe-core browser verification | Requires running browser session on `/pawn`, `/cannabis`, `/fireworks` | Before E02 fully closes |
+| MFA bypass confirmed impossible | Requires Identity Platform upgrade — pre-prod compliance gate | Before prod deploy (E09/E11) |
+| eBay developer account setup (webhook URL registration, notification subscription) | Requires eBay seller account and developer credentials — outside codebase scope | Before E06 deploys to prod |
+| axe-core browser run on admin intake success view (EbayPushButton) | Requires live browser session | Post-E06 merge verification |
 
 ---
 
@@ -55,41 +58,22 @@ Deliver E03 · Auth & Staff Roles: Firebase Auth (email/password + Google SSO), 
 
 ## Previous Cycle Summary
 
-**Cycle 01** (2026-05-16 → 2026-05-17) — Closed E01 (dev environment) and E02 (three-view design system).
+**Cycle 03** (2026-05-17 → 2026-05-17) — Closed E06 · eBay Cross-Posting.
 
 | Task | Epic | Completed |
 |---|---|---|
-| Firebase project setup verified (nats-rack / the-addicts-agenda) | E01 | 2026-05-16 |
-| `docs/PERSONAS.md` created — all 8 personas | E01 | 2026-05-16 |
-| `docs/AI_WORKFLOW.md` created | E01 | 2026-05-16 |
-| `docs/prompts/` created — 10 prompt files | E01 | 2026-05-16 |
-| `docs/projects/00_TEMPLATE.md` created | E01 | 2026-05-16 |
-| `docs/EPICS.md` updated — persona tags on all tasks | E01 | 2026-05-16 |
-| `docs/CONTEXT.md` updated — persona + AI workflow sections | E01 | 2026-05-16 |
-| `docs/ACTIVE_CYCLE.md` created | E01 | 2026-05-16 |
-| `firestore.rules` compliance fix — `aiDescription` moved to `items/{id}/internal/ai` subcollection | E01 | 2026-05-17 |
-| `docs/firestore-schema.md` updated — subcollection documented | E01 | 2026-05-17 |
-| Emulator rules verification — 7/7 tests passed | E01 | 2026-05-17 |
-| **E01 CLOSED** | E01 | 2026-05-17 |
-| Tailwind v4 token system — all three view palettes | E02 | 2026-05-17 |
-| `ViewContext` + `ViewLayout` — URL-driven, injects `.view-*` class | E02 | 2026-05-17 |
-| `react-router-dom` route structure (`/pawn`, `/cannabis`, `/fireworks`) | E02 | 2026-05-17 |
-| Self-hosted fonts via @fontsource (6 typefaces) | E02 | 2026-05-17 |
-| Core component library: Button, Badge, Card, Modal, Input, Table | E02 | 2026-05-17 |
-| Cannabis variants: CinematicHero, MoodCard, LuxuryProductCard | E02 | 2026-05-17 |
-| Fireworks variants: CountdownTimer, BundleCard, UrgencyBadge | E02 | 2026-05-17 |
-| PWA manifest with per-view shortcuts and theme colours | E02 | 2026-05-17 |
-| `src/lib/types.ts` — shared TypeScript types | E02 | 2026-05-17 |
-| `src/lib/format.ts` — `formatPrice()` CAD cents utility | E02 | 2026-05-17 |
-| QA fixes: input focus-visible, table keyboard nav, interactive card focus | E02 | 2026-05-17 |
-| `docs/projects/E02_Three_View_Design_System.md` — project spec created | E02 | 2026-05-17 |
-| **E02 CLOSED** (pending axe-core browser run) | E02 | 2026-05-17 |
+| `docs/projects/E06_eBay_Cross_Posting.md` spec drafted | E06 | 2026-05-17 |
+| `pushToEbay` callable CF — three-step eBay Sell Inventory API flow | E06 | 2026-05-17 |
+| `ebayWebhook` HTTP CF — HMAC-verified real-time sold sync | E06 | 2026-05-17 |
+| `EbayPushButton` admin component + CSS | E06 | 2026-05-17 |
+| `auditLogs` event types `ebay_push` and `ebay_sync_sold` added to schema | E06 | 2026-05-17 |
+| **E06 CLOSED** (eBay developer account setup required before prod deploy — see Deferred) | E06 | 2026-05-17 |
 
 ---
 
 ## Next Cycle Preview
 
-Start E03 · Auth & Staff Roles. The `react-router-dom` router and `ViewContext` are already in place — `ProtectedRoute` can be built immediately using `useLocation` and `useView`. Begin with Firebase Auth setup, then custom claims Cloud Function, then `AuthContext` and `ProtectedRoute`.
+After E07 closes: E08 · Click & Collect / Contact — click-and-collect request form, `reservations/{id}` collection, SMS confirmation within 60 seconds, contact page with Google Maps embed.
 
 ---
 

@@ -78,6 +78,22 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-17 — E05: ItemQuickView is a standalone createPortal component, not an extension of Modal.tsx. Modal.tsx has a CSS max-width of 560px hardcoded in index.css; the quick-view spec requires 640px. Standalone component keeps E05 scope contained without modifying a shared UI primitive.
 
+2026-05-17 — eBay REST Sell Inventory API chosen over legacy Trading API (XML) for E06. REST is the current eBay developer standard; Trading API is in maintenance mode and being deprecated. Three-step flow: create inventory item (PUT) → create offer (POST) → publish offer (POST → listingId).
+
+2026-05-17 — pushToEbay CF scoped to admin and manager claims only, not inventory_staff (E06). eBay listing is a commercial publishing action with business implications beyond intake; inventory_staff handles receiving and grading, not external marketplace decisions.
+
+2026-05-17 — ebayWebhook sends HTTP 200 before processing the sold notification (E06). eBay requires acknowledgment within 3 seconds; Firestore writes can exceed that under load. Response is sent synchronously; processEbayNotification runs asynchronously after. Any processing error is logged via console.error — it cannot be surfaced to eBay.
+
+2026-05-17 — No ebayListingStatus field added to items/{id} (E06). For MVP, ebayListingId presence implies an active listing; status: 'sold' implies it sold. A separate eBay-specific status field adds schema complexity without actionable benefit at current scale. Revisit in E16 if relist workflows require it.
+
+2026-05-17 — auditLogs adds ebay_push and ebay_sync_sold event types (E06). Written by pushToEbay and ebayWebhook Cloud Functions respectively. Details map is {itemId, ebayListingId, viewTag} — no PII.
+
+2026-05-17 — Cannabis and fireworks items are blocked from eBay push at the Cloud Function level (E06). eBay prohibits cannabis listings and heavily restricts/prohibits fireworks. pushToEbay validates viewTag == 'pawn' before calling eBay API — not a UI concern, enforced server-side.
+
+2026-05-17 — pawnRequests allow create: if false in Firestore rules (E07). All creates go through submitPawnRequest callable CF (Admin SDK bypasses rules). Blocks client-side writes to guarantee serialBlacklistHit is always set before staff reads the document.
+
+2026-05-17 — auditLogs adds pawn_request_submit and serial_blacklist_hit event types (E07). Written by submitPawnRequest Cloud Function. Details map is {requestId, viewTag} for submit and {requestId, serialNumber} for blacklist hit — no PII in details; name/email/phone stay in pawnRequests/{id} only.
+
 ---
 
 *Add new entries above this line.*

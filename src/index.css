@@ -848,6 +848,48 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
   }
 
+/* ── eBay push button + listing badge — admin intake success view ── */
+  .ebay-push-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .ebay-push-error {
+    font-family: var(--font-body);
+    font-size: var(--text-small);
+    color: var(--color-danger);
+    text-align: center;
+    margin: 0;
+    max-width: 320px;
+  }
+
+  .ebay-listing-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  .ebay-listing-label {
+    font-family: var(--font-body);
+    font-size: var(--text-small);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .ebay-listing-id {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
 /* ── Responsive — 2-column intake row on tablet+ ── */
 @media (min-width: 768px) {
   .intake-row-2 {
@@ -969,4 +1011,211 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   /* fast open — must be < 200ms per Marcus quick-view requirement */
   animation: quick-view-open var(--motion-speed-fast) var(--motion-easing) both;
+}
+
+/* ── Pawn Enquiry Form (E07) ── */
+
+.pawn-enquiry-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.pawn-form-section {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pawn-form-legend {
+  font-family: var(--font-display);
+  font-size: var(--text-subheading);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+  padding: 0;
+  float: left;
+  width: 100%;
+}
+
+.pawn-form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.pawn-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 480px) {
+  .pawn-form-row { grid-template-columns: 1fr; }
+}
+
+.pawn-form-hint {
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.pawn-photo-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-4) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pawn-photo-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  min-height: 48px;
+}
+
+.pawn-photo-name {
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  color: var(--color-text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pawn-upload-progress {
+  flex: 1;
+  height: 4px;
+  background-color: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pawn-upload-bar {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: 2px;
+  transition: width var(--motion-speed-base) linear;
+}
+
+.pawn-signin-prompt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.pawn-submit-error {
+  margin-bottom: 0;
+}
+
+.pawn-submit-btn {
+  align-self: flex-start;
+}
+
+.pawn-form-success {
+  text-align: center;
+  padding: var(--space-16) var(--space-8);
+}
+
+.pawn-form-success-check {
+  font-size: var(--text-display);
+  color: var(--color-primary);
+  margin-bottom: var(--space-6);
+  line-height: 1;
+}
+
+/* ── Pawn Admin Inbox (E07) ── */
+
+.pawn-inbox {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+}
+
+.pawn-inbox-filters {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6);
+}
+
+.pawn-inbox-row--flagged td {
+  background-color: color-mix(in srgb, var(--color-danger) 6%, transparent);
+}
+
+.pawn-inbox-detail-cell {
+  padding: 0 !important;
+}
+
+.pawn-inbox-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background-color: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+}
+
+.pawn-detail-field {
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.pawn-detail-description {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-text);
+  white-space: pre-wrap;
+  margin: 0;
+  padding: var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.pawn-detail-photos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pawn-detail-photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pawn-detail-thumb {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  transition: opacity var(--motion-speed-fast) var(--motion-easing);
+}
+
+.pawn-detail-thumb:hover {
+  opacity: 0.85;
+}
+
+.pawn-detail-update {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
 }

@@ -7,6 +7,7 @@ import ConditionSelector from './ConditionSelector'
 import MerchandisingTagSelector from './MerchandisingTagSelector'
 import ImageUploadZone from './ImageUploadZone'
 import QRLabel from './QRLabel'
+import EbayPushButton from './EbayPushButton'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 
@@ -193,6 +194,7 @@ export default function IntakeForm() {
             price={priceCents}
             viewTag={formState.viewTag as ViewType}
           />
+          <EbayPushButton itemId={itemId} viewTag={formState.viewTag} />
           <Button
             type="button"
             variant="secondary"

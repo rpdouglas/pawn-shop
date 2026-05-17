@@ -1,6 +1,6 @@
 # Project E03: Auth & Staff Roles
 
-**Status:** Active
+**Status:** Done — 2026-05-17 (MFA bypass enforcement deferred to Identity Platform upgrade — pre-prod gate, logged in DECISIONS.md)
 **Epic:** E03 — Auth & Staff Roles
 **Phase:** Phase 1 — Foundation
 **Primary Persona:** Marie (compliance anchor — MFA), Makoonsii (customer UX anchor)

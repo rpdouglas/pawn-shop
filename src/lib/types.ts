@@ -1,4 +1,5 @@
 export type ViewType = 'pawn' | 'cannabis' | 'fireworks'
+export type PawnRequestStatus = 'pending' | 'reviewed' | 'quoted' | 'declined' | 'completed'
 export type ConditionGrade = 'new' | 'like-new' | 'good' | 'fair' | 'poor'
 export type ItemStatus = 'draft' | 'active' | 'reserved' | 'sold' | 'archived'
 export type MerchandisingTag = 'just-arrived' | 'rare-find' | 'limited-edition' | 'staff-pick'
@@ -16,6 +17,21 @@ export interface AuthUser {
   isMfaEnrolled: boolean
   isStaff: boolean
   isAdmin: boolean
+}
+
+export interface PawnRequest {
+  id: string
+  uid: string | null
+  name: string
+  email: string
+  phone?: string
+  itemDescription: string
+  serialNumber?: string
+  images: string[]
+  status: PawnRequestStatus
+  staffNotes?: string
+  serialBlacklistHit: boolean
+  createdAt: Date
 }
 
 // Firestore Timestamps are converted to Date before being assigned here
