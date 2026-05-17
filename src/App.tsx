@@ -16,19 +16,19 @@ export default function App() {
         }}>
           <Link
             to="/pawn"
-            style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontFamily: 'var(--font-body)', fontSize: '14px' }}
+            style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontFamily: 'var(--font-body)', fontSize: '17.5px' }}
           >
             Pawn
           </Link>
           <Link
             to="/cannabis"
-            style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontFamily: 'var(--font-body)', fontSize: '14px' }}
+            style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontFamily: 'var(--font-body)', fontSize: '17.5px' }}
           >
             Cannabis
           </Link>
           <Link
             to="/fireworks"
-            style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontFamily: 'var(--font-body)', fontSize: '14px' }}
+            style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontFamily: 'var(--font-body)', fontSize: '17.5px' }}
           >
             Fireworks
           </Link>
