@@ -34,7 +34,7 @@ export default function MoodCard({ mood, itemCount, onClick }: MoodCardProps) {
         borderRadius: 'var(--radius-md)',
         padding: '32px 24px',
         cursor: isInteractive ? 'pointer' : 'default',
-        transition: 'border-color 0.2s ease, background-color 0.2s ease',
+        transition: 'border-color var(--motion-speed-fast) var(--motion-easing), background-color var(--motion-speed-fast) var(--motion-easing)',
       }}
       onMouseEnter={isInteractive ? (e) => {
         (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-primary)'

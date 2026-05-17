@@ -36,6 +36,10 @@ Do not proceed if any of these would be violated.
 **Styling:**
 - Never hardcode hex values. Use `var(--color-primary)`.
 - Never use JS conditionals for view theming. Use `.view-*` CSS class from `ViewContext`.
+- Never hardcode font sizes. Use `--text-*` scale tokens (`--text-hero` → `--text-xs`).
+- Never hardcode spacing values. Use `--space-*` tokens (`--space-1` → `--space-24`).
+- Cannabis view: `--color-primary` (`#7B4FA0`) on `--color-bg` is only 2.8:1 contrast — use at `--text-subheading` (24px) or larger only. Never for body copy or labels.
+- Motion: use only the approved patterns in `docs/design-system.md §4`. Bounce, particle effects, and constant micro-animations are prohibited and are a QA blocker.
 
 **Compliance — hard stops:**
 - Age gates at router level. Every pass/fail logged to `auditLogs`.
@@ -79,6 +83,7 @@ Eight personas govern all UX decisions. Full profiles in `docs/PERSONAS.md`.
 - `docs/DECISIONS.md` — closed decisions; do not re-litigate
 - `docs/ACTIVE_CYCLE.md` — current sprint priorities
 - `docs/firestore-schema.md` — the only source of truth for field names
+- `docs/design-system.md` — CSS tokens, motion rules, component specs, photography standard, spacing, breakpoints. Read before planning any UI feature.
 
 ---
 

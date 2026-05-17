@@ -147,6 +147,25 @@ Does any proposed `auditLogs` entry, analytics event, or console output include 
 **6. The Age Gate Bypass Trap**
 Is any age-gated route (cannabis, fireworks) protected at the router level, or only at the component level? Component-level gates are insufficient — enforcement must be at the router.
 
+**7. The Motion Trap**
+Does any proposed UI component include animation or transition? If yes, verify against `docs/design-system.md §4`:
+- Only approved patterns (slow fade, cinematic reveal, ambient glow, smooth hover, staggered grid, quick-view open) — nothing else.
+- Timing must use `--motion-speed-*` tokens, not hardcoded `ms` values.
+- Prohibited: bounce, particle effects, constant micro-animations, slide-in-from-sides.
+If a proposed animation is not on the approved list, remove it or flag it for design review before proceeding.
+
+**8. The Typography Scale Trap**
+Does any proposed UI component set a font size? Verify:
+- All sizes use `--text-*` tokens — never hardcoded `px` or `rem`.
+- Display font (`--font-display`) is used for headings/product names; body font (`--font-body`) for copy, labels, inputs.
+- Cannabis view: `--color-primary` on `--color-bg` must only appear at `--text-subheading` (24px) or larger.
+
+**9. The Brand Voice Trap**
+Does any proposed feature introduce copy, labels, or CTA text? Check against `docs/design-system.md §8`:
+- Prohibited vocabulary: Cheap, Junk, BUY NOW!!!, SALE, Clearance, Liquidation, Budget.
+- Cannabis copy: zero medical claims, zero clinical terminology, zero youth-oriented language.
+- CRM / notifications: generic "The Pawn Shop Update" — cannabis category never disclosed.
+
 ---
 
 ## Output Format

@@ -50,19 +50,11 @@ export default function Card({
       }
       aria-label={`${title} — ${formatPrice(price)}`}
     >
-      {/* Image area — dark background frames photography (Marcus Photography Test) */}
-      <div style={{
-        backgroundColor: 'var(--color-bg)',
-        aspectRatio: '4/3',
-        position: 'relative',
-        overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      {/* Image area — CSS class handles aspect ratio, dark bg, and hover scale */}
+      <div className="card-image">
         {imageUrl
-          ? <img src={imageUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <span style={{ color: 'var(--color-text-muted)', fontSize: '13px' }}>No image</span>
+          ? <img src={imageUrl} alt={title} />
+          : <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>No image</span>
         }
         {merchandisingTags.length > 0 && (
           <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
@@ -87,8 +79,8 @@ export default function Card({
         </h3>
 
         <div style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '20px',
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--text-lead)',
           fontWeight: 700,
           color: 'var(--color-primary)',
           marginBottom: '12px',

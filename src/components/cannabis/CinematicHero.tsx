@@ -20,7 +20,7 @@ export default function CinematicHero({
   return (
     <section style={{
       position: 'relative',
-      minHeight: '60vh',
+      minHeight: '100vh',
       display: 'flex',
       alignItems: 'flex-end',
       padding: '64px 32px',
@@ -54,8 +54,8 @@ export default function CinematicHero({
         }}
       />
 
-      {/* Content */}
-      <div style={{ position: 'relative', maxWidth: '720px' }}>
+      {/* Content — fade-up uses view-scoped --motion-speed (600ms cannabis, 400ms pawn) */}
+      <div className="cinematic-hero-content" style={{ position: 'relative', maxWidth: '720px' }}>
         <h1 style={{
           fontFamily: 'var(--font-display)',
           fontSize: 'clamp(40px, 6vw, 80px)',

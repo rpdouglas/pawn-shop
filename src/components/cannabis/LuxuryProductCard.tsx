@@ -47,7 +47,7 @@ export default function LuxuryProductCard({
         borderRadius: 'var(--radius-md)',
         overflow: 'hidden',
         cursor: isInteractive ? 'pointer' : 'default',
-        transition: 'border-color 0.2s ease',
+        transition: 'border-color var(--motion-speed-fast) var(--motion-easing)',
       }}
     >
       {/* Full-bleed image — dark bg for dark luxury standard */}

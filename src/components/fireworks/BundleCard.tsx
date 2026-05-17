@@ -26,7 +26,7 @@ export default function BundleCard({
         borderRadius: 'var(--radius-md)',
         overflow: 'hidden',
         opacity: isAvailable ? 1 : 0.6,
-        transition: 'border-color 0.2s ease',
+        transition: 'border-color var(--motion-speed-fast) var(--motion-easing)',
       }}
     >
       {/* Image */}

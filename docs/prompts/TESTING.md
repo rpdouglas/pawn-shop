@@ -144,11 +144,54 @@ For every `auditLogs` entry written by this feature:
 
 ---
 
-## Part 5 — QA Sign-Off
+## Part 5 — Design System Verification
+
+Reference: `docs/design-system.md`. Check every new UI component delivered in this cycle.
+
+### Tokens & Typography
+
+- [ ] All font sizes use `--text-*` tokens — no hardcoded `px` or `rem` values.
+- [ ] All spacing uses `--space-*` tokens — no hardcoded pixel values in style props or CSS.
+- [ ] Display font (`--font-display`) used for headings and product names; body font (`--font-body`) for copy, labels, inputs.
+- [ ] **Cannabis contrast check:** Any `--color-primary` text in the cannabis view is at `--text-subheading` (24px) or larger only. Not used for body copy, captions, or labels. (`#7B4FA0` on `#1A0D2E` = 2.8:1 — fails WCAG AA at body size.)
+- [ ] All colour references use CSS tokens — no hardcoded hex values anywhere in new code.
+
+### Motion
+
+- [ ] Any new animation uses only an approved pattern from `docs/design-system.md §4.2`.
+- [ ] Transition timing uses `--motion-speed-*` tokens — not hardcoded `ms` values.
+- [ ] **Prohibited pattern check:** No bounce, no particle effects, no slide-in-from-sides, no constant micro-animations present in delivered code. (These are QA blockers.)
+- [ ] Quick-view modal (if present): opens in **< 200ms**. Verify with browser Performance tab.
+
+### Component Specifications
+
+- [ ] Product Card image ratio: 4:3 standard · 16:9 for Marcus Standard items.
+- [ ] Product Card hover: `scale(1.02)` over 300ms — not a larger scale, not a shorter duration.
+- [ ] Marcus Standard items: all five shot types present before publishing (Hero, Detail, Texture, Lifestyle, Scale). Missing shots are a publishing blocker.
+- [ ] Navigation header: 64px desktop · 56px mobile. Verified in DevTools.
+- [ ] All primary and secondary buttons: **44px min-height** (48px for Makoonsii primary flows).
+
+### Brand Voice
+
+- [ ] No prohibited vocabulary in any new copy: Cheap, Junk, BUY NOW!!!, SALE, Clearance, Liquidation, Budget bin.
+- [ ] Cannabis copy check: zero medical claims, zero clinical terminology, zero youth-oriented language.
+- [ ] CRM / notification text (if any): generic "The Pawn Shop Update" — cannabis category never in subject line, SMS body, or push preview.
+
+### Photography (if this feature surfaces images to customers)
+
+- [ ] No flat white backgrounds or unedited supplier images.
+- [ ] Hero images: ≥1600px wide · product cards: ≥800px · thumbnails: ≥400px.
+- [ ] Alt text present and descriptive on every product image.
+
+> **Design System Result:** Pass | **Fail — list each item with file:line reference**
+
+---
+
+## Part 6 — QA Sign-Off
 
 If all checks pass, reply:
 
-> **QA PASSED.** Feature: [name]. Persona: [name]. Build: clean. Compliance: verified. Smoke tests: passed. Ready for `TICKET_CLOSE.md`.
+> **QA PASSED.** Feature: [name]. Persona: [name]. Build: clean. Compliance: verified. Smoke tests: passed. Design system: verified. Ready for `TICKET_CLOSE.md`.
 
 If any check fails, list the failures in a numbered list and do not sign off until each is resolved:
 

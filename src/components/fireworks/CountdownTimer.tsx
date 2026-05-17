@@ -97,16 +97,20 @@ export default function CountdownTimer({ targetDate, label }: CountdownTimerProp
                     :
                   </span>
                 )}
-                <span style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '48px',
-                  fontWeight: 400,
-                  color: 'var(--color-text)',
-                  lineHeight: 1,
-                  letterSpacing: '-0.02em',
-                  minWidth: '2ch',
-                  textAlign: 'center',
-                }}>
+                <span
+                  key={value}
+                  className="countdown-digit"
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '48px',
+                    fontWeight: 400,
+                    color: 'var(--color-text)',
+                    lineHeight: 1,
+                    letterSpacing: '-0.02em',
+                    minWidth: '2ch',
+                    textAlign: 'center',
+                  }}
+                >
                   {pad(value)}
                 </span>
                 <span style={{
