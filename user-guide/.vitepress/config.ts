@@ -13,6 +13,14 @@ export default defineConfig({
         items: [
           { text: 'Welcome', link: '/' }
         ]
+      },
+      {
+        text: 'Inventory System',
+        items: [
+          { text: 'Overview', link: '/inventory/' },
+          { text: 'Item Lifecycle', link: '/inventory/lifecycle' },
+          { text: 'Intake Process', link: '/inventory/intake' }
+        ]
       }
     ]
   }
