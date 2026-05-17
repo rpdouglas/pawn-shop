@@ -64,6 +64,20 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-17 — processImageUpload watches items/{itemId}/uploads/* staging path (E04). Processed images land at items/{itemId}/images/*. Separate paths prevent the trigger from re-firing on its own output, avoiding an infinite loop.
 
+2026-05-17 — E05: logAgeGate CF uses invoker: 'public' so anonymous users can log age gate events. Admin SDK write bypasses the auditLogs Firestore rule (allow create: isSignedIn()), which correctly prevents anonymous client writes. CF write is the authoritative path.
+
+2026-05-17 — E05: Fireworks age gate set to 18+ per EPICS.md and E05 project spec. design-system.md §10 lists 19+ for fireworks — discrepancy noted; EPICS.md treated as the functional requirement. Confirm with business owner before prod.
+
+2026-05-17 — E05: Cannabis mood filter (Relax/Focus/Social/Ceremony) maps to Firestore category field values (cannabis-indica, cannabis-sativa, cannabis-hybrid, cannabis-premium) and filters client-side. Cannabis inventory is small; avoids a composite index on category + viewTag + status. Revisit in E13 if performance becomes a concern.
+
+2026-05-17 — E05: CountdownTimer on Fireworks page uses hardcoded Canada Day 2026 date. E14 will wire it to campaigns/{id} with countdownEnabled: true. Kept as a named constant to make the E14 wiring point obvious.
+
+2026-05-17 — E05: useItemSearch uses expanding-limit onSnapshot for infinite scroll (not cursor pagination with getDocs). Limit increments of 20 trigger a new subscription; React cleanup unsubscribes the previous one. Accepted brief loading flash on page boundary as the tradeoff for simpler real-time updates.
+
+2026-05-17 — E05: MasonryGrid builds item cards inline (MasonryCard) rather than reusing Card component. Card.tsx forces aspect-ratio: 4/3 on the image; masonry requires natural image height (never force-cropped per §6.5). Avoids modifying Card.tsx outside E05 scope.
+
+2026-05-17 — E05: ItemQuickView is a standalone createPortal component, not an extension of Modal.tsx. Modal.tsx has a CSS max-width of 560px hardcoded in index.css; the quick-view spec requires 640px. Standalone component keeps E05 scope contained without modifying a shared UI primitive.
+
 ---
 
 *Add new entries above this line.*

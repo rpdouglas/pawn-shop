@@ -883,3 +883,90 @@ h1, h2, h3, h4, h5, h6 {
 .countdown-digit {
   animation: digit-flip var(--motion-speed-fast) var(--motion-easing) both;
 }
+
+/* Pawn hero content — staggered cinematic reveal (approved pattern §4.2) */
+.pawn-hero-content {
+  animation: fade-up var(--motion-speed-standard) var(--motion-easing) both;
+}
+
+/* ── Age Gate overlay — full-screen, no bypass path ── */
+.age-gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background-color: var(--color-bg);
+  text-align: center;
+  animation: fade-up var(--motion-speed-standard) var(--motion-easing) both;
+}
+
+/* ── Masonry discovery grid — CSS Columns, variable card height (Sandra §6.5) ── */
+.masonry-grid {
+  columns: 2;
+  column-gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .masonry-grid {
+    columns: 3;
+    column-gap: var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .masonry-grid {
+    columns: 4;
+    column-gap: var(--space-6);
+  }
+}
+
+/* Masonry item — break-inside: avoid keeps card in one column; stagger via CSS var */
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--motion-speed-fast) var(--motion-easing);
+  animation: fade-up var(--motion-speed-standard) var(--motion-easing) both;
+  animation-delay: var(--masonry-delay, 0ms);
+}
+
+.masonry-item:hover { border-color: var(--color-primary); }
+.masonry-item:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-color: var(--color-primary); }
+
+/* ── ItemQuickView portal — wider than standard Modal (max 640px per spec §7.4) ── */
+
+@keyframes quick-view-open {
+  from { opacity: 0; transform: scale(0.97) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.item-qv-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  z-index: 60;
+}
+
+.item-qv-panel {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  /* fast open — must be < 200ms per Marcus quick-view requirement */
+  animation: quick-view-open var(--motion-speed-fast) var(--motion-easing) both;
+}

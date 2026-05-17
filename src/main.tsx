@@ -25,6 +25,7 @@ import LoginPage from './pages/auth/LoginPage.tsx'
 import SignUpPage from './pages/auth/SignUpPage.tsx'
 import MfaEnrollPage from './pages/auth/MfaEnrollPage.tsx'
 import IntakePage from './pages/admin/IntakePage.tsx'
+import AgeGate from './components/age-gate/AgeGate.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 
 const router = createBrowserRouter([
@@ -34,8 +35,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/pawn" replace /> },
       { path: 'pawn',      element: <PawnPage /> },
-      { path: 'cannabis',  element: <CannabisPage /> },
-      { path: 'fireworks', element: <FireworksPage /> },
+      { path: 'cannabis',  element: <AgeGate minAge={19} viewTag="cannabis"><CannabisPage /></AgeGate> },
+      { path: 'fireworks', element: <AgeGate minAge={18} viewTag="fireworks"><FireworksPage /></AgeGate> },
       { path: 'login',     element: <LoginPage /> },
       { path: 'signup',    element: <SignUpPage /> },
       { path: 'auth', children: [

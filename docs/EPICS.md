@@ -114,15 +114,15 @@
 > - **Makoonsii:** Mobile-responsive Pawn view with large touch targets and high-contrast text.
 > - **All views:** Mobile-responsive across all three before any view ships to dev.
 
-- [ ] `/pawn` `/cannabis` `/fireworks` routes with correct ViewContext theme `[All]`
-- [ ] Homepage per view: hero, featured items, search bar `[Mak]` `[Marie]` `[Tan]`
-- [ ] Shop/listing page with prefix search (via `searchTokens`) `[Dale]` `[Kev]`
-- [ ] Item detail page: image gallery, condition, price, enquiry CTA `[Dale]` `[Marc]`
-- [ ] Masonry grid layout on Pawn homepage `[San]`
-- [ ] Age gate at route level: `/cannabis` (19+) — full-screen, session-scoped `[Marie]` `[Comp]`
-- [ ] Age gate at route level: `/fireworks` (18+) — full-screen, session-scoped `[Tan]` `[Comp]`
-- [ ] Every age gate pass/fail logged to `auditLogs` `[Comp]`
-- [ ] Mobile-responsive across all three views `[Mak]` `[All]`
+- [x] `/pawn` `/cannabis` `/fireworks` routes with correct ViewContext theme `[All]`
+- [x] Homepage per view: hero, featured items, search bar `[Mak]` `[Marie]` `[Tan]`
+- [x] Shop/listing page with prefix search (via `searchTokens`) `[Dale]` `[Kev]`
+- [x] Item detail page: image gallery, condition, price, enquiry CTA `[Dale]` `[Marc]`
+- [x] Masonry grid layout on Pawn homepage `[San]`
+- [x] Age gate at route level: `/cannabis` (19+) — full-screen, session-scoped `[Marie]` `[Comp]`
+- [x] Age gate at route level: `/fireworks` (18+) — full-screen, session-scoped `[Tan]` `[Comp]`
+- [x] Every age gate pass/fail logged to `auditLogs` `[Comp]`
+- [x] Mobile-responsive across all three views `[Mak]` `[All]`
 
 ---
 

@@ -1,62 +1,172 @@
 import CountdownTimer from '../components/fireworks/CountdownTimer'
 import BundleCard from '../components/fireworks/BundleCard'
 import UrgencyBadge from '../components/fireworks/UrgencyBadge'
+import { useItems } from '../hooks/useItems'
 
+// Hardcoded fallback — E14 will wire this to campaigns/{id}.endDate
 const CANADA_DAY_2026 = new Date('2026-07-01T00:00:00')
 
-const DEMO_BUNDLES = [
-  { id: '1', title: 'The Patriot Pack',   price: 14900, itemCount: 12, isAvailable: true  },
-  { id: '2', title: 'Family Celebration', price:  8900, itemCount:  8, isAvailable: true  },
-  { id: '3', title: 'Grand Finale',       price: 29900, itemCount: 24, isAvailable: false },
-]
-
 export default function FireworksPage() {
+  const { items, loading, error } = useItems('fireworks')
+
   return (
-    <div style={{ padding: '48px 32px', maxWidth: '1024px', margin: '0 auto' }}>
-      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '64px', letterSpacing: '0.02em', marginBottom: '8px', textTransform: 'uppercase' }}>
-        Fireworks
-      </h1>
-      <p style={{ color: 'var(--color-text-muted)', marginBottom: '48px' }}>
-        E02 component scaffold — Fireworks view
-      </p>
+    <div>
+      {/* Countdown hero — full-width event focus (Tanya persona) */}
+      <section
+        aria-label="Countdown to next event"
+        style={{
+          minHeight: '60vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 'var(--space-24) var(--space-6)',
+          textAlign: 'center',
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--text-small)',
+          color: 'var(--color-text-muted)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+          marginBottom: 'var(--space-4)',
+        }}>
+          The Pawn Shop
+        </p>
 
-      {/* Countdown */}
-      <section style={{ marginBottom: '56px' }}>
-        <h2 style={{ marginBottom: '24px', fontSize: '18px', fontFamily: 'var(--font-body)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          Canada Day countdown
-        </h2>
-        <CountdownTimer targetDate={CANADA_DAY_2026} label="Until July 1st" />
+        <h1 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-hero)',
+          color: 'var(--color-text)',
+          letterSpacing: '0.04em',
+          marginBottom: 'var(--space-6)',
+          textTransform: 'uppercase',
+          lineHeight: 1,
+        }}>
+          Fireworks
+        </h1>
+
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--text-lead)',
+          color: 'var(--color-text-muted)',
+          marginBottom: 'var(--space-12)',
+          maxWidth: '480px',
+        }}>
+          Celebrate the moment properly.
+        </p>
+
+        <CountdownTimer targetDate={CANADA_DAY_2026} label="Until Canada Day" />
       </section>
 
-      {/* Urgency badges */}
-      <section style={{ marginBottom: '48px' }}>
-        <h2 style={{ marginBottom: '16px', fontSize: '18px', fontFamily: 'var(--font-body)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          Urgency badges
+      {/* Bundle showcase */}
+      <section
+        aria-labelledby="bundles-heading"
+        style={{ padding: 'var(--space-12) var(--space-6)', maxWidth: '1280px', margin: '0 auto' }}
+      >
+        <h2
+          id="bundles-heading"
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-heading)',
+            color: 'var(--color-text)',
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase',
+            marginBottom: 'var(--space-8)',
+          }}
+        >
+          Season Bundles
         </h2>
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <UrgencyBadge type="low-stock"   label="Low stock" />
-          <UrgencyBadge type="last-chance" label="Last chance" />
-          <UrgencyBadge type="seasonal"    label="Canada Day special" />
-        </div>
+
+        {error && (
+          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)', fontSize: 'var(--text-small)' }}>
+            Unable to load bundles.
+          </p>
+        )}
+
+        {loading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                aria-hidden="true"
+                style={{
+                  backgroundColor: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  aspectRatio: '16/9',
+                  opacity: 0.5,
+                }}
+              />
+            ))}
+          </div>
+        ) : items.length === 0 ? (
+          <p style={{
+            fontFamily: 'var(--font-body)',
+            color: 'var(--color-text-muted)',
+            fontStyle: 'italic',
+            fontSize: 'var(--text-body)',
+          }}>
+            New bundles arriving for the season.
+          </p>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+            {items.map((item) => (
+              <div key={item.id} style={{ position: 'relative' }}>
+                {/* Seasonal urgency badge overlay — isSeasonalItem flag from staff */}
+                {item.isSeasonalItem && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 'var(--space-2)',
+                    right: 'var(--space-2)',
+                    zIndex: 1,
+                  }}>
+                    <UrgencyBadge type="seasonal" label="Seasonal" />
+                  </div>
+                )}
+                <BundleCard
+                  title={item.title}
+                  price={item.price}
+                  itemCount={item.bundleIds?.length ?? 1}
+                  imageUrl={item.images[0]}
+                  isAvailable={item.status === 'active'}
+                  onClick={item.status === 'active' ? () => {} : undefined}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* Bundle cards */}
-      <section>
-        <h2 style={{ marginBottom: '24px', fontSize: '18px', fontFamily: 'var(--font-body)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          Season bundles
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
-          {DEMO_BUNDLES.map((bundle) => (
-            <BundleCard
-              key={bundle.id}
-              title={bundle.title}
-              price={bundle.price}
-              itemCount={bundle.itemCount}
-              isAvailable={bundle.isAvailable}
-              onClick={bundle.isAvailable ? () => {} : undefined}
-            />
-          ))}
-        </div>
+      {/* Pickup scheduling notice — Tanya persona requirement (E08 will add full flow) */}
+      <section
+        aria-label="Pickup information"
+        style={{
+          padding: 'var(--space-12) var(--space-6)',
+          textAlign: 'center',
+          borderTop: '1px solid var(--color-border)',
+        }}
+      >
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--text-body)',
+          color: 'var(--color-text-muted)',
+          maxWidth: '480px',
+          margin: '0 auto',
+          lineHeight: 1.6,
+        }}>
+          All orders are pickup only. Reserve your bundle and we will confirm your specific pickup window within 60 minutes.
+        </p>
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--text-xs)',
+          color: 'var(--color-text-muted)',
+          marginTop: 'var(--space-8)',
+        }}>
+          Built with Canadian privacy standards.
+        </p>
       </section>
     </div>
   )
