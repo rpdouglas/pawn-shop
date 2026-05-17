@@ -6,7 +6,10 @@ on:
     paths:
       - 'src/**'
       - 'public/**'
+      - 'functions/**'
+      - '.github/workflows/**'
       - 'package.json'
+      - 'package-lock.json'
       - 'vite.config.ts'
       - 'index.html'
       - 'firebase.json'
