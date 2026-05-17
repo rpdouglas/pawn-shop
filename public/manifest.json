@@ -1,0 +1,38 @@
+{
+  "name": "The Pawn Shop",
+  "short_name": "Pawn Shop",
+  "description": "Pawn & Resale, Cannabis Wellness, and Fireworks — Cornwall Island, Akwesasne. Dapper. Debonair. Distinctly Akwesasne.",
+  "start_url": "/pawn",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#C8A14A",
+  "background_color": "#080706",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Pawn & Resale",
+      "short_name": "Pawn",
+      "url": "/pawn",
+      "description": "Browse pawn and resale inventory"
+    },
+    {
+      "name": "Cannabis Wellness",
+      "short_name": "Wellness",
+      "url": "/cannabis",
+      "description": "Curated wellness products"
+    },
+    {
+      "name": "Fireworks",
+      "short_name": "Fireworks",
+      "url": "/fireworks",
+      "description": "Seasonal fireworks and bundles"
+    }
+  ]
+}

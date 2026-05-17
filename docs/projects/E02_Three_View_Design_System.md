@@ -1,6 +1,6 @@
 # Project E02: Three-View Design System
 
-**Status:** Active
+**Status:** Done
 **Epic:** E02 — Three-View Design System
 **Phase:** Phase 1 — Foundation
 **Primary Persona:** Makoonsii (Pawn), Marie (Cannabis), Tanya (Fireworks) — each view has a primary anchor

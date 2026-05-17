@@ -1,0 +1,6 @@
+export type ViewType = 'pawn' | 'cannabis' | 'fireworks'
+export type ConditionGrade = 'new' | 'like-new' | 'good' | 'fair' | 'poor'
+export type ItemStatus = 'active' | 'reserved' | 'sold' | 'archived'
+export type MoodCategory = 'relax' | 'focus' | 'social' | 'ceremony'
+export type ResellerTier = 'bronze' | 'silver' | 'gold'
+export type AlertMethod = 'sms' | 'email' | 'none'

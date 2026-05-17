@@ -54,15 +54,15 @@
 > - **Marcus (Photography Test):** Every `.view-*` layout must frame product photography correctly — dark backgrounds, macro-scale presentation. No layout that crops or clips the primary image.
 > - **All:** WCAG AA contrast passes on all three palettes before any view ships.
 
-- [ ] Tailwind v4 `@theme` tokens — Pawn (`#C8A14A` primary / `#080706` bg) `[Mak]` `[Dale]` `[Kev]` `[San]`
-- [ ] Tailwind v4 `@theme` tokens — Cannabis (`#7B4FA0` primary / `#1A0D2E` bg) `[Marie]`
-- [ ] Tailwind v4 `@theme` tokens — Fireworks (`#C0392B` primary / `#1A0A0A` bg) `[Tan]`
-- [ ] `ViewContext` provider reads URL prefix, injects `.view-*` CSS class on root `[All]`
-- [ ] Core components: Button, Badge, Card, Modal, Input, Table (Pawn base) `[Mak]` `[Dale]`
-- [ ] Cannabis component variants (cinematic hero, mood card, luxury product card) `[Marie]`
-- [ ] Fireworks component variants (countdown timer, bundle card, urgency badge) `[Tan]`
+- [x] Tailwind v4 `@theme` tokens — Pawn (`#C8A14A` primary / `#080706` bg) `[Mak]` `[Dale]` `[Kev]` `[San]`
+- [x] Tailwind v4 `@theme` tokens — Cannabis (`#7B4FA0` primary / `#1A0D2E` bg) `[Marie]`
+- [x] Tailwind v4 `@theme` tokens — Fireworks (`#C0392B` primary / `#1A0A0A` bg) `[Tan]`
+- [x] `ViewContext` provider reads URL prefix, injects `.view-*` CSS class on root `[All]`
+- [x] Core components: Button, Badge, Card, Modal, Input, Table (Pawn base) `[Mak]` `[Dale]`
+- [x] Cannabis component variants (cinematic hero, mood card, luxury product card) `[Marie]`
+- [x] Fireworks component variants (countdown timer, bundle card, urgency badge) `[Tan]`
 - [ ] WCAG AA contrast passes on all three palettes (run axe-core in browser) `[Mak]` `[Comp]`
-- [ ] PWA manifest configured (per-view icons + theme colours) `[Jord]` `[Marc]`
+- [x] PWA manifest configured (per-view icons + theme colours) `[Jord]` `[Marc]`
 
 ---
 

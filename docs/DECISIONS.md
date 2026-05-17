@@ -42,6 +42,14 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-17 — aiDescription and aiPriceSuggestion moved to items/{id}/internal/ai subcollection. Firestore rules are document-level — field-level hiding on the parent document is not enforceable at the rules layer.
 
+2026-05-17 — View-scoped CSS tokens defined as custom properties on `.view-*` selectors, not in Tailwind `@theme` (E02). `@theme` defines globally-fixed values — putting `--color-primary` there would mean one value for the entire app. `.view-*` selectors allow the same token name to cascade differently per view at runtime without JavaScript.
+
+2026-05-17 — Self-hosted fonts via @fontsource npm packages (E02). No CDN requests at runtime. Fonts bundled with the Vite build. Packages: playfair-display, im-fell-english, cormorant-garamond, dm-sans, bebas-neue, oswald.
+
+2026-05-17 — react-router-dom installed in E02, not deferred to E03. ViewContext uses useLocation() — building on window.location would require rewrite when ProtectedRoute (E03) needs the router.
+
+2026-05-17 — PWA manifest uses a single manifest.json with per-view shortcuts. Dynamic per-view theme-color is handled by ViewLayout updating the <meta name="theme-color"> tag on route change. Full per-view manifest files (Strategy C) deferred until brand icon assets exist.
+
 ---
 
 *Add new entries above this line.*
