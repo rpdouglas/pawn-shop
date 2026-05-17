@@ -21,6 +21,10 @@ import App from './App.tsx'
 import PawnPage from './pages/PawnPage.tsx'
 import CannabisPage from './pages/CannabisPage.tsx'
 import FireworksPage from './pages/FireworksPage.tsx'
+import LoginPage from './pages/auth/LoginPage.tsx'
+import SignUpPage from './pages/auth/SignUpPage.tsx'
+import MfaEnrollPage from './pages/auth/MfaEnrollPage.tsx'
+import { AuthProvider } from './context/AuthContext.tsx'
 
 const router = createBrowserRouter([
   {
@@ -31,12 +35,19 @@ const router = createBrowserRouter([
       { path: 'pawn',      element: <PawnPage /> },
       { path: 'cannabis',  element: <CannabisPage /> },
       { path: 'fireworks', element: <FireworksPage /> },
+      { path: 'login',     element: <LoginPage /> },
+      { path: 'signup',    element: <SignUpPage /> },
+      { path: 'auth', children: [
+        { path: 'mfa-enroll', element: <MfaEnrollPage /> },
+      ]},
     ],
   },
 ])
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 )

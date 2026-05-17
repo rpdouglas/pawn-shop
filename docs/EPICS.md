@@ -74,13 +74,13 @@
 > - **Makoonsii:** Auth must not create friction for customers. Guest browse must be possible without account creation. Account creation must be simple, large-target, plain-language.
 > - **All staff flows:** `auditLogs` events for `login`, `logout`, `role_change`, `mfa_enrolled` are compliance requirements — not optional.
 
-- [ ] Firebase Auth: email/password + Google SSO `[All]`
-- [ ] Five custom claims: `admin` `manager` `inventory_staff` `marketing_staff` `customer` `[Staff]` `[Comp]`
-- [ ] Cloud Function to assign/revoke roles `[Staff]`
-- [ ] `AuthContext` and `ProtectedRoute` components `[All]`
-- [ ] MFA enforced for all staff — TOTP mandatory (**hard compliance requirement**) `[Comp]` `[Marie]`
-- [ ] MFA bypass tested and confirmed impossible `[Comp]`
-- [ ] `auditLogs` writing: `login` `logout` `role_change` `mfa_enrolled` `[Comp]`
+- [x] Firebase Auth: email/password + Google SSO `[All]`
+- [x] Five custom claims: `admin` `manager` `inventory_staff` `marketing_staff` `customer` `[Staff]` `[Comp]`
+- [x] Cloud Function to assign/revoke roles `[Staff]`
+- [x] `AuthContext` and `ProtectedRoute` components `[All]`
+- [x] MFA enforced for all staff — TOTP mandatory (**hard compliance requirement**) `[Comp]` `[Marie]`
+- [ ] MFA bypass tested and confirmed impossible `[Comp]` — pending Identity Platform upgrade (see DECISIONS.md)
+- [x] `auditLogs` writing: `login` `logout` `role_change` `mfa_enrolled` `[Comp]`
 
 ---
 

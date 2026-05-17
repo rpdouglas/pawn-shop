@@ -50,6 +50,10 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-17 — PWA manifest uses a single manifest.json with per-view shortcuts. Dynamic per-view theme-color is handled by ViewLayout updating the <meta name="theme-color"> tag on route change. Full per-view manifest files (Strategy C) deferred until brand icon assets exist.
 
+2026-05-17 — TOTP MFA requires Firebase Identity Platform upgrade before production staff accounts are created (E03). TotpMultiFactorGenerator is available in firebase/auth v12 SDK but server-side TOTP enforcement (bypass-impossible) requires Identity Platform. Client-side ProtectedRoute gate and enrollment UI are in place; Identity Platform upgrade is a pre-prod compliance gate (E09/E11).
+
+2026-05-17 — MfaEnrollPage is not wrapped in ProtectedRoute (E03). Wrapping it causes an infinite redirect loop: staff without MFA → /auth/mfa-enroll → ProtectedRoute checks mfaEnrolled → redirect back to /auth/mfa-enroll. The page handles its own auth guard inline instead.
+
 ---
 
 *Add new entries above this line.*
