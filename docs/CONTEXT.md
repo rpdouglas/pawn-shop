@@ -89,9 +89,42 @@ Staff = admin | manager | inventory_staff. MFA mandatory for all staff roles.
 
 ---
 
+## Personas (8 anchors — see `docs/PERSONAS.md`)
+
+| Tag | Persona | Primary vertical | Hard rule |
+|---|---|---|---|
+| Mak | Makoonsii — The Reserve Regular | Pawn | All touch targets ≥48px; plain language only; ≤3 taps |
+| Dale | Dale — The Cross-Border Bargain Hunter | Pawn | CAD price must be primary; never USD-first |
+| Tan | Tanya — The Seasonal Celebrator | Fireworks / Cannabis | Age gate always before product reveal |
+| Marie | Marie — The Wellness Seeker | Cannabis | No category disclosure in any outbound comms |
+| Kev | Kevin — The Reseller & Picker | Pawn | Alerts within 60 seconds of `status: 'active'`; CASL opt-in required |
+| San | Sandra — The Curious Passerby | All | Grid layout must be scannable at a glance; no jargon |
+| Jord | Jordan — The Lifestyle Connoisseur | Cannabis | Product pages must feel editorial, not transactional |
+| Marc | Marcus — The Dapper Connoisseur | Pawn | Dark-luxury macro photography; no placeholder images |
+
+**Persona checks run before every feature ships.** The Makoonsii Trust Test always runs. See `docs/PERSONAS.md §0` for the full check ritual.
+
+---
+
+## AI Workflow (see `docs/AI_WORKFLOW.md`)
+
+Two AI systems — completely separate roles:
+
+| System | Role | Invoked by |
+|---|---|---|
+| **Claude** | Development workflow — planning, coding, review, docs | Developer session |
+| **Gemini** | Runtime E18 staff feature — descriptions, pricing, tags | Staff in admin UI |
+
+**Start every Claude session with `docs/prompts/INITIALIZATION.md`.**
+Full prompt library: `docs/prompts/` — INITIALIZATION, PLANNING, APPROVAL, FIX, READ_STATE, TESTING, TICKET_CLOSE, POST_SPRINT_AUDIT, CODEBASE_AUDIT, GEMINI_INITIALIZATION.
+
+---
+
 ## AI Assistant Rules
 
 - Schema is in `docs/firestore-schema.md`. Do not invent fields.
 - Styling uses CSS tokens. Do not use inline JS conditionals for view theming.
 - Note tech choices in `docs/DECISIONS.md` when a decision is made.
 - Flag compliance-sensitive features for human review before deploying to prod.
+- Gemini output saves to `aiDescription` only — never auto-promote to `description`.
+- Never generate Kanien'kéha. Community review required before any Mohawk language ships.
