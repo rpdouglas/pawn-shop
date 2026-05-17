@@ -1240,7 +1240,7 @@ FILES["docs/firestore-schema.md"] = """\
 
 def main():
     print(f"\n{BOLD}The Pawn Shop — Scaffold{RESET}")
-    print("Creating project structure...\n")
+    print("Creating project structure for pawn shop...\n")
 
     # Confirm we're in the right place (repo root should have .git or be empty)
     cwd = os.getcwd()
