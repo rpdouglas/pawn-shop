@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "node scripts/verify-e01-rules.mjs",
+    "start:all": "npm run lint && npm run test && npm run build && concurrently \"npm run dev\" \"npm run guide:dev\" \"npm run emulate\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
