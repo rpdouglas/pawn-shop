@@ -12,7 +12,6 @@
 |-------|------|-------|
 | `title` | string | Display title |
 | `description` | string | Staff-written, customer-visible |
-| `aiDescription` | string | AI draft — **never show to customers** |
 | `category` | string | e.g. `electronics`, `jewellery`, `cannabis-flower` |
 | `viewTag` | string | Primary view: `pawn` \| `cannabis` \| `fireworks` |
 | `viewTags` | array\<string\> | Multi-view items |
@@ -31,13 +30,23 @@
 | `bundleIds` | array\<string\> | Related `items/{id}` for bundles |
 | `merchandisingTags` | array\<string\> | `just-arrived` \| `rare-find` \| `limited-edition` \| `staff-pick` |
 | `provenanceNotes` | string | Cultural/historical context for high-value items |
-| `aiPriceSuggestion` | map | `{ low: number, high: number, source: string }` |
 | `trendingScore` | number | Computed by Cloud Function |
 | `viewCount` | number | Incremented server-side |
 | `ebayListingId` | string | Set when pushed to eBay |
 | `createdAt` | timestamp | Server timestamp |
 | `updatedAt` | timestamp | Server timestamp |
 | `publishedBy` | string | UID of staff who published |
+
+---
+
+## `items/{id}/internal/ai` — staff-only subcollection
+
+> Firestore rules are document-level. Fields that must never reach customers are stored here, not on the parent document. Read/write restricted to staff custom claims.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `aiDescription` | string | Gemini draft — staff must promote to `items/{id}.description` before publishing |
+| `aiPriceSuggestion` | map | `{ low: number, high: number, source: string }` — guidance only, never a published price |
 
 ---
 

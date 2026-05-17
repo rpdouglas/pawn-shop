@@ -36,6 +36,12 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-16 — firebase.json emulators bound to `0.0.0.0` so they are reachable from Codespaces port forwarding.
 
+2026-05-17 — Vite chosen as the build tool. Fast HMR, native ESM, TypeScript out of the box — no CRA or Next.js overhead needed for this app's routing model.
+
+2026-05-17 — deploy-dev.yml skips all steps when package.json is absent. Prevents CI failures before the Vite app is scaffolded.
+
+2026-05-17 — aiDescription and aiPriceSuggestion moved to items/{id}/internal/ai subcollection. Firestore rules are document-level — field-level hiding on the parent document is not enforceable at the rules layer.
+
 ---
 
 *Add new entries above this line.*

@@ -37,8 +37,11 @@ service cloud.firestore {
                                    .hasAny(['policeHold', 'serialBlacklistFlag'])
                             || isAdmin();
       allow delete: if isAdmin();
-      // aiDescription is never readable by customers
-      allow read: if isStaff() || resource.data.keys().hasAll(['aiDescription']) == false;
+
+      // AI drafts are staff-only — stored in subcollection, never on the parent document
+      match /internal/{doc} {
+        allow read, write: if isStaff();
+      }
     }
 
     // ── pawnRequests/{id} ─────────────────────────────────────────────────────
