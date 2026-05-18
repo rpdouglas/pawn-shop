@@ -114,6 +114,18 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — E08: Google Maps embed uses static iframe Share/Embed URL (no API key). Avoids client-side Maps JavaScript API key exposure. Sufficient for a single store location display.
 
+2026-05-18 — E09: auditLogs Firestore rule tightened from `if isSignedIn()` to `if false`. All auditLog writes go through Cloud Functions using Admin SDK — the client rule was never the intended write path. Tightening removes a potential surface for client-side auditLog injection.
+
+2026-05-18 — E09: savedSearches create rule corrected from `resource.data.uid` to `request.resource.data.uid`. `resource.data` is null on creates; the previous rule was silently denying all new savedSearch creates from non-staff clients. Bug introduced in schema, not yet user-impacting since E12 (Alerts) is undelivered.
+
+2026-05-18 — E09: campaigns write rule left as `isStaff()` (includes inventory_staff, manager, admin). Campaigns are time-sensitive marketing objects; restricting to admin-only would block managers from scheduling promotions during peak periods. Decision: manager-level write is acceptable and intentional.
+
+2026-05-18 — E09: preorders create rule left as `isSignedIn()`. Preorders are customer-initiated — any authenticated customer should be able to create one. No PII exposure risk; records are staff-readable. No change required.
+
+2026-05-18 — E09: PIPEDA data retention schedule — pawnRequests and reservations with terminal status (declined, completed) purged after 730 days (2 years). auditLogs never purged (immutable compliance record). Retention window configurable via PURGE_RETENTION_DAYS env var (default: 730). Schedule: Sunday 02:00 UTC weekly via Cloud Scheduler.
+
+2026-05-18 — E09: Kanien'kéha codebase scan complete. Two references to "Akwesasne" found (ContactPage.tsx:46, PawnHero.tsx:53) — both are English-language proper noun place name usage, not Kanien'kéha language content. No language strings, grammar, or vocabulary present. Codebase clean; no community review required for existing content.
+
 ---
 
 *Add new entries above this line.*

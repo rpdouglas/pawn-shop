@@ -6,34 +6,37 @@ export default function App() {
   return (
     <ViewProvider>
       <ViewLayout>
+        {/* Skip to main content — keyboard navigation requirement */}
+        <a href="#main-content" className="skip-to-content">
+          Skip to main content
+        </a>
+
         {/* Dev nav — replaced by per-view navigation in E05 */}
         <nav style={{
           display: 'flex',
-          gap: '24px',
-          padding: '4px 32px',
+          gap: 'var(--space-6)',
+          padding: 'var(--space-1) var(--space-8)',
           borderBottom: '1px solid var(--color-border)',
           backgroundColor: 'var(--color-surface)',
         }}>
-          <Link
-            to="/pawn"
-            style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontFamily: 'var(--font-body)', fontSize: '17.5px' }}
-          >
-            Pawn
-          </Link>
-          <Link
-            to="/cannabis"
-            style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontFamily: 'var(--font-body)', fontSize: '17.5px' }}
-          >
-            Cannabis
-          </Link>
-          <Link
-            to="/fireworks"
-            style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontFamily: 'var(--font-body)', fontSize: '17.5px' }}
-          >
-            Fireworks
-          </Link>
+          <Link to="/pawn"      className="site-nav-link">Pawn</Link>
+          <Link to="/cannabis"  className="site-nav-link">Cannabis</Link>
+          <Link to="/fireworks" className="site-nav-link">Fireworks</Link>
         </nav>
-        <Outlet />
+
+        <main id="main-content">
+          <Outlet />
+        </main>
+
+        <footer className="site-footer">
+          <nav aria-label="Footer navigation">
+            <Link to="/contact"       className="site-footer-link">Contact</Link>
+            <Link to="/accessibility" className="site-footer-link">Accessibility</Link>
+          </nav>
+          <p className="site-footer-copy">
+            © {new Date().getFullYear()} The Pawn Shop · Cornwall Island, Akwesasne
+          </p>
+        </footer>
       </ViewLayout>
     </ViewProvider>
   )

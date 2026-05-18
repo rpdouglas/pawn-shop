@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 06
+**Cycle:** 07
 **Started:** 2026-05-18
 **Target close:** TBD
 **Deploy target:** dev
@@ -40,8 +40,9 @@ Deliver E13 · Merchandising Engine — staff picks admin UI, `calculateTrending
 
 | Item | Reason | Target cycle |
 |---|---|---|
+| Lighthouse ≥90 performance, ≥90 accessibility, ≥95 SEO | Requires deployed URL + Chrome DevTools — cannot run in Codespaces terminal | Before E13 ships to dev |
 | WCAG AA axe-core browser verification | Requires running browser session on `/pawn`, `/cannabis`, `/fireworks` | Before E02 fully closes |
-| MFA bypass confirmed impossible | Requires Identity Platform upgrade — pre-prod compliance gate | Before prod deploy (E09/E11) |
+| MFA bypass confirmed impossible | Requires Identity Platform upgrade — pre-prod compliance gate | Before prod deploy (E11) |
 | eBay developer account setup (webhook URL registration, notification subscription) | Requires eBay seller account and developer credentials — outside codebase scope | Before E06 deploys to prod |
 | axe-core browser run on admin intake success view (EbayPushButton) | Requires live browser session | Post-E06 merge verification |
 
@@ -51,12 +52,30 @@ Deliver E13 · Merchandising Engine — staff picks admin UI, `calculateTrending
 
 | Question | Context | Urgency |
 |---|---|---|
-| Legal counsel on cannabis/fireworks regulation | Required before E09/E11 features ship to prod | Before prod deploy |
+| Legal counsel on cannabis/fireworks regulation | Required before E11 features ship to prod | Before prod deploy |
 | Kanien'kéha community review process | Required before E19 (Akwesasne Identity System) begins | Before E19 starts |
 
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 06** (2026-05-18 → 2026-05-18) — Closed E09 · Quality, Security & Accessibility.
+
+| Task | Epic | Completed |
+|---|---|---|
+| Firestore security rules audit — all 13 rule blocks reviewed | E09 | 2026-05-18 |
+| `auditLogs` create rule tightened: `isSignedIn()` → `if false` | E09 | 2026-05-18 |
+| `savedSearches` create rule fixed: `resource.data.uid` → `request.resource.data.uid` | E09 | 2026-05-18 |
+| `purgeExpiredData` scheduled CF — PIPEDA 730-day retention, weekly Sunday 02:00 UTC | E09 | 2026-05-18 |
+| `addSerialToBlacklist` / `removeSerialFromBlacklist` callable CFs (admin-only) | E09 | 2026-05-18 |
+| `SerialBlacklistManager` admin UI — real-time list, add form, confirm-before-remove | E09 | 2026-05-18 |
+| `/accessibility` statement page — WCAG 2.1 AA commitment, known limitations, contact | E09 | 2026-05-18 |
+| Skip-to-content link + `<main id="main-content">` landmark + site footer | E09 | 2026-05-18 |
+| Global `a:focus-visible`, `select:focus-visible`, `cc-slot-btn:focus-visible` CSS | E09 | 2026-05-18 |
+| Kanien'kéha codebase scan — clean; two Akwesasne proper noun refs documented | E09 | 2026-05-18 |
+| **E09 CLOSED** (deferred: Lighthouse score — requires deployed URL, target: before E13 ships) | E09 | 2026-05-18 |
+
+---
 
 **Cycle 05** (2026-05-18 → 2026-05-18) — Closed E08 · Click & Collect / Contact.
 
@@ -102,7 +121,7 @@ Deliver E13 · Merchandising Engine — staff picks admin UI, `calculateTrending
 
 ## Next Cycle Preview
 
-After E13 closes: E09 · Customer Accounts — purchase history, saved searches with CASL-compliant alert opt-in, account settings, reseller tier display.
+After E13 closes: E10 · Analytics, Feature Flags & Admin Dashboard — GA4 custom events, Firebase Remote Config, admin dashboard inventory counts, policeHold flag management UI.
 
 ---
 

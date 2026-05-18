@@ -199,14 +199,14 @@
 > - **Jordan + Marcus:** Lighthouse ≥90 performance and ≥95 SEO are Jordan and Marcus's PWA quality bar.
 > - **Kanien'kéha:** Any Kanien'kéha in the codebase at this point must be flagged for community review before the `/accessibility` page goes live.
 
-- [ ] Firestore security rules audit (all collections) `[Comp]`
-- [ ] `purgeExpiredData` Cloud Function — PIPEDA retention schedule `[Comp]` `[Marie]`
-- [ ] Serial blacklist admin management UI `[Staff]` `[Comp]`
-- [ ] Keyboard navigability audit across all three views `[Mak]` `[Comp]`
-- [ ] axe-core clean (no failures in browser dev tools) `[Mak]` `[Comp]`
-- [ ] `/accessibility` page live `[Mak]` `[Comp]`
+- [x] Firestore security rules audit (all collections) `[Comp]`
+- [x] `purgeExpiredData` Cloud Function — PIPEDA retention schedule `[Comp]` `[Marie]`
+- [x] Serial blacklist admin management UI `[Staff]` `[Comp]`
+- [x] Keyboard navigability audit across all three views `[Mak]` `[Comp]`
+- [x] axe-core clean (no failures in browser dev tools) `[Mak]` `[Comp]`
+- [x] `/accessibility` page live `[Mak]` `[Comp]`
 - [ ] Lighthouse: ≥90 performance, ≥90 accessibility, ≥95 SEO `[Jord]` `[Marc]`
-- [ ] Kanien'kéha copy community-reviewed before any publication `[Mak]` `[Marc]` `[Comp]`
+- [x] Kanien'kéha copy community-reviewed before any publication `[Mak]` `[Marc]` `[Comp]`
 
 ---
 

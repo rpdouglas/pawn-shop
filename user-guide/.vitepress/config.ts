@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "User Guide",
   description: "Customer-facing documentation",
+  base: '/pawn-shop/',
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' }

@@ -83,8 +83,9 @@ service cloud.firestore {
     }
 
     // ── auditLogs/{id} — immutable, no delete ever ───────────────────────────
+    // All writes go through Cloud Functions (Admin SDK) — client create blocked.
     match /auditLogs/{logId} {
-      allow create: if isSignedIn();
+      allow create: if false;
       allow read: if isAdmin();
       allow update, delete: if false;
     }
@@ -102,8 +103,11 @@ service cloud.firestore {
     }
 
     // ── savedSearches/{id} ───────────────────────────────────────────────────
+    // Create uses request.resource.data (document being written); read/update/delete
+    // use resource.data (existing document). resource.data is null on create.
     match /savedSearches/{searchId} {
-      allow read, write: if isOwner(resource.data.uid);
+      allow create: if isOwner(request.resource.data.uid);
+      allow read, update, delete: if isOwner(resource.data.uid);
       allow read: if isStaff();
     }
 
