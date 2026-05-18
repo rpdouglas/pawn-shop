@@ -201,6 +201,7 @@ export const publishItem = onCall<PublishItemData>({ cors: true }, async (reques
     policeHold: item['policeHold'] ?? false,
     searchTokens,
     publishedBy: request.auth.uid,
+    merchandisingTags: FieldValue.arrayUnion('just-arrived'),
     updatedAt: FieldValue.serverTimestamp(),
   })
 

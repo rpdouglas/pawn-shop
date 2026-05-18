@@ -38,6 +38,8 @@ export function docToItem(doc: DocumentSnapshot): Item {
     provenanceNotes: d['provenanceNotes'] as string | undefined,
     trendingScore: d['trendingScore'] as number | undefined,
     viewCount: d['viewCount'] as number | undefined,
+    enquiryCount: d['enquiryCount'] as number | undefined,
+    staffPickNote: d['staffPickNote'] as string | undefined,
     ebayListingId: d['ebayListingId'] as string | undefined,
     createdAt: (d['createdAt'] as Timestamp | undefined)?.toDate(),
     updatedAt: (d['updatedAt'] as Timestamp | undefined)?.toDate(),

@@ -126,6 +126,18 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — E09: Kanien'kéha codebase scan complete. Two references to "Akwesasne" found (ContactPage.tsx:46, PawnHero.tsx:53) — both are English-language proper noun place name usage, not Kanien'kéha language content. No language strings, grammar, or vocabulary present. Codebase clean; no community review required for existing content.
 
+2026-05-18 — E13: enquiryCount field added to items/{id}. Counter incremented by createReservation CF via FieldValue.increment(1). Input to calculateTrendingScore. Avoids expensive per-item reservation count query in scheduled CF.
+
+2026-05-18 — E13: staffPickNote field added to items/{id}. Staff-written curator note (max 280 chars) written by updateMerchandisingTags CF when staff-pick tag is added. Customer-visible on StaffPicksSection and ItemQuickView.
+
+2026-05-18 — E13: trendingScore formula = viewCount + (enquiryCount * 5). No time decay at MVP scale — small inventory doesn't benefit from decay complexity. Staff picks and just-arrived tags provide editorial and recency signals independently. Revisit if trending accuracy becomes a concern in E17.
+
+2026-05-18 — E13: calculateTrendingScore and removeJustArrivedTags scheduled every 30 minutes (co-located in merchandising.ts, separate exports). Matches resetExpiredHolds schedule. Batch-writes in groups of 500 (Firestore batch limit).
+
+2026-05-18 — E13: StaffPicksSection queries via useStaffPicks hook with array-contains on merchandisingTags. Composite index added: viewTag + status + policeHold + merchandisingTags (CONTAINS). Same pattern as existing searchTokens index.
+
+2026-05-18 — E13: Search decision — Firestore prefix tokens retained (no Algolia). Current inventory scale and response times are within Dale's 300ms requirement. Algolia evaluation deferred until production traffic data shows degradation. Decision logged to close EPICS.md open search decision task.
+
 ---
 
 *Add new entries above this line.*

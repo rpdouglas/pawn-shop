@@ -166,14 +166,14 @@
 > - **Marcus:** `rare-find` tag may only appear when genuinely rare — staff confirms. Quick-view photography must meet dark luxury standard.
 > - **Dale + Kevin:** Search decision (Firestore prefix tokens vs Algolia) must be documented in `DECISIONS.md`. Sub-300ms response is the target.
 
-- [ ] Staff picks admin UI `[San]` `[Marc]` `[Staff]`
-- [ ] `calculateTrendingScore` Cloud Function (view + save + enquiry count) `[San]` `[Kev]`
-- [ ] Auto-tagging: `just-arrived` (< 48h), `rare-find` (staff-set only) `[Marc]` `[Kev]` `[Comp]`
-- [ ] Collection pages per view (Cannabis: Relax/Focus/Social/Ceremony; Fireworks: bundles) `[Marie]` `[Tan]`
-- [ ] Quick-view modal (pre-fetch on hover, opens within 200ms) `[San]`
-- [ ] Related items on detail page (same category + view, sorted by trending score) `[Jord]` `[Marc]`
-- [ ] Masonry grid on Pawn homepage; vertical video on Cannabis + Fireworks pages `[San]` `[Marie]` `[Tan]`
-- [ ] Search decision: keep Firestore prefix tokens or add Algolia — log in `DECISIONS.md` `[Dale]` `[Kev]`
+- [x] Staff picks admin UI `[San]` `[Marc]` `[Staff]`
+- [x] `calculateTrendingScore` Cloud Function (view + save + enquiry count) `[San]` `[Kev]`
+- [x] Auto-tagging: `just-arrived` (< 48h), `rare-find` (staff-set only) `[Marc]` `[Kev]` `[Comp]`
+- [x] Collection pages per view (Cannabis: Relax/Focus/Social/Ceremony; Fireworks: bundles) `[Marie]` `[Tan]`
+- [x] Quick-view modal (pre-fetch on hover, opens within 200ms) `[San]`
+- [x] Related items on detail page (same category + view, sorted by trending score) `[Jord]` `[Marc]`
+- [ ] Vertical video on Cannabis + Fireworks pages (masonry grid: done E05; video: content dependency — deferred) `[San]` `[Marie]` `[Tan]`
+- [x] Search decision: keep Firestore prefix tokens or add Algolia — log in `DECISIONS.md` `[Dale]` `[Kev]`
 
 ---
 

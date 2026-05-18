@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 07
+**Cycle:** 08
 **Started:** 2026-05-18
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E13 · Merchandising Engine — staff picks admin UI, `calculateTrendingScore` Cloud Function, mood collections per view, quick-view modal (≤200ms), related items by trending score.
+Deliver E10 · Analytics, Feature Flags & Admin Dashboard — GA4 custom events (page views per view, item views, enquiry submits, age-gate events, pawn form submits), Firebase Remote Config feature flags, admin dashboard inventory counts by status + view, `policeHold` flag management UI.
 
 ---
 
@@ -45,6 +45,7 @@ Deliver E13 · Merchandising Engine — staff picks admin UI, `calculateTrending
 | MFA bypass confirmed impossible | Requires Identity Platform upgrade — pre-prod compliance gate | Before prod deploy (E11) |
 | eBay developer account setup (webhook URL registration, notification subscription) | Requires eBay seller account and developer credentials — outside codebase scope | Before E06 deploys to prod |
 | axe-core browser run on admin intake success view (EbayPushButton) | Requires live browser session | Post-E06 merge verification |
+| Vertical video on Cannabis + Fireworks pages | Content dependency — no video assets available | E17 or when assets supplied |
 
 ---
 
@@ -58,6 +59,39 @@ Deliver E13 · Merchandising Engine — staff picks admin UI, `calculateTrending
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 07** (2026-05-18 → 2026-05-18) — Closed E13 · Merchandising Engine.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `docs/projects/E13_Merchandising_Engine.md` spec drafted | E13 | 2026-05-18 |
+| `enquiryCount` + `staffPickNote` fields added to `firestore-schema.md` | E13 | 2026-05-18 |
+| `staff_pick_set` / `staff_pick_removed` event types added to auditLogs schema | E13 | 2026-05-18 |
+| 6 DECISIONS.md entries: enquiryCount rationale, trendingScore formula, scheduling, StaffPicksSection query, search decision | E13 | 2026-05-18 |
+| `updateMerchandisingTags` callable CF — staff auth, manager+ gate for rare-find/limited-edition, auditLogs | E13 | 2026-05-18 |
+| `calculateTrendingScore` scheduled CF — every 30 min, viewCount + enquiryCount×5, batch-writes | E13 | 2026-05-18 |
+| `removeJustArrivedTags` scheduled CF — every 30 min, memory-filters createdAt < 48h | E13 | 2026-05-18 |
+| `publishItem` CF updated: `FieldValue.arrayUnion('just-arrived')` on publish | E13 | 2026-05-18 |
+| `createReservation` CF updated: `FieldValue.increment(1)` on `enquiryCount` | E13 | 2026-05-18 |
+| `functions/src/index.ts` updated: exports merchandising CFs | E13 | 2026-05-18 |
+| `Item` interface + `useItems` hook: `enquiryCount`, `staffPickNote` fields | E13 | 2026-05-18 |
+| `MerchandisingBadge` component — 4 tag variants, CSS custom property tokens | E13 | 2026-05-18 |
+| `StaffPicksSection` component — onSnapshot query, curator note, quick-view CTA | E13 | 2026-05-18 |
+| `RelatedItems` component — trending-sorted, category-filtered horizontal strip | E13 | 2026-05-18 |
+| `ItemQuickView` updated: `MerchandisingBadge`, staffPickNote display, RelatedItems | E13 | 2026-05-18 |
+| `MasonryGrid` updated: `MerchandisingBadge`, `onHover` prop for prefetch trigger | E13 | 2026-05-18 |
+| `PawnPage` updated: `prefetchCache` ref, hover prefetch, `StaffPicksSection`, `onSelectRelated` | E13 | 2026-05-18 |
+| `StaffPicksManager` admin component — view tabs, item table, tag add/remove, curator note | E13 | 2026-05-18 |
+| `StaffPicksPage` admin page + `/admin/staff-picks` route | E13 | 2026-05-18 |
+| `MoodCollectionPage` — Cannabis mood nav strip + category-filtered grid, contrast fix | E13 | 2026-05-18 |
+| `BundleCollectionPage` — Fireworks bundle/limited-edition filter + ClickCollectModal | E13 | 2026-05-18 |
+| `main.tsx` routes: cannabis collections, fireworks bundles, admin staff-picks | E13 | 2026-05-18 |
+| `firestore.indexes.json`: composite index for `merchandisingTags array-contains` | E13 | 2026-05-18 |
+| `src/index.css`: merch-badge tokens + component styles (QA fixes: class names, contrast) | E13 | 2026-05-18 |
+| Badge color CSS tokens promoted to `:root` custom properties (tech debt resolved) | E13 | 2026-05-18 |
+| **E13 CLOSED** (deferred: vertical video — content dependency, target: E17) | E13 | 2026-05-18 |
+
+---
 
 **Cycle 06** (2026-05-18 → 2026-05-18) — Closed E09 · Quality, Security & Accessibility.
 
@@ -121,7 +155,7 @@ Deliver E13 · Merchandising Engine — staff picks admin UI, `calculateTrending
 
 ## Next Cycle Preview
 
-After E13 closes: E10 · Analytics, Feature Flags & Admin Dashboard — GA4 custom events, Firebase Remote Config, admin dashboard inventory counts, policeHold flag management UI.
+After E10 closes: E17 · Conversion Optimisation — recently sold strip, years-in-business badge, privacy-safe live activity feed, limited-edition/rare-find display, hold countdown badge.
 
 ---
 

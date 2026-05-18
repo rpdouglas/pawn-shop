@@ -29,9 +29,12 @@ import PawnInboxPage from './pages/admin/PawnInboxPage.tsx'
 import ReservationsPage from './pages/admin/ReservationsPage.tsx'
 import StoreHoursPage from './pages/admin/StoreHoursPage.tsx'
 import SerialBlacklistPage from './pages/admin/SerialBlacklistPage.tsx'
+import StaffPicksPage from './pages/admin/StaffPicksPage.tsx'
 import ContactPage from './pages/ContactPage.tsx'
 import AccessibilityPage from './pages/AccessibilityPage.tsx'
 import SellPage from './pages/pawn/SellPage.tsx'
+import MoodCollectionPage from './pages/cannabis/MoodCollectionPage.tsx'
+import BundleCollectionPage from './pages/fireworks/BundleCollectionPage.tsx'
 import AgeGate from './components/age-gate/AgeGate.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 
@@ -44,7 +47,9 @@ const router = createBrowserRouter([
       { path: 'pawn',      element: <PawnPage /> },
       { path: 'pawn/sell', element: <SellPage /> },
       { path: 'cannabis',  element: <AgeGate minAge={19} viewTag="cannabis"><CannabisPage /></AgeGate> },
+      { path: 'cannabis/collections/:mood', element: <AgeGate minAge={19} viewTag="cannabis"><MoodCollectionPage /></AgeGate> },
       { path: 'fireworks', element: <AgeGate minAge={18} viewTag="fireworks"><FireworksPage /></AgeGate> },
+      { path: 'fireworks/collections/bundles', element: <AgeGate minAge={18} viewTag="fireworks"><BundleCollectionPage /></AgeGate> },
       { path: 'login',     element: <LoginPage /> },
       { path: 'signup',    element: <SignUpPage /> },
       { path: 'auth', children: [
@@ -58,6 +63,7 @@ const router = createBrowserRouter([
         { path: 'reservations',      element: <ReservationsPage /> },
         { path: 'store-hours',       element: <StoreHoursPage /> },
         { path: 'serial-blacklist',  element: <SerialBlacklistPage /> },
+        { path: 'staff-picks',       element: <StaffPicksPage /> },
       ]},
     ],
   },

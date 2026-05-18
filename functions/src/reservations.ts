@@ -116,6 +116,11 @@ export const createReservation = onCall<CreateReservationData>({ cors: true }, a
     createdAt: now,
   })
 
+  // Increment enquiryCount on the item — feeds calculateTrendingScore CF
+  await db.collection('items').doc(itemId.trim()).update({
+    enquiryCount: FieldValue.increment(1),
+  })
+
   // Inline SMS dispatch — no Firestore trigger — guarantees 60-second SLA
   try {
     const sent = await dispatchSms(

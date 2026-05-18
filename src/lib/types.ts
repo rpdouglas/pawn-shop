@@ -92,6 +92,8 @@ export interface Item {
   provenanceNotes?: string
   trendingScore?: number
   viewCount?: number
+  enquiryCount?: number
+  staffPickNote?: string
   ebayListingId?: string
   createdAt?: Date
   updatedAt?: Date

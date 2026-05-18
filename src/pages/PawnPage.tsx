@@ -1,17 +1,37 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../lib/firebase'
 import PawnHero from '../components/pawn/PawnHero'
 import FeaturedItems from '../components/pawn/FeaturedItems'
 import MasonryGrid from '../components/pawn/MasonryGrid'
 import ItemQuickView from '../components/pawn/ItemQuickView'
 import ClickCollectModal from '../components/pawn/ClickCollectModal'
+import StaffPicksSection from '../components/StaffPicksSection'
 import Input from '../components/ui/Input'
 import { useItemSearch } from '../hooks/useItemSearch'
+import { docToItem } from '../hooks/useItems'
 import type { Item } from '../lib/types'
 
 export default function PawnPage() {
   const { items, loading, hasMore, loadMore, searchValue, setSearchValue } = useItemSearch('pawn')
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
   const [collectItem, setCollectItem]   = useState<Item | null>(null)
+
+  // Pre-fetch cache: hover triggers getDoc so click opens modal with fresh data
+  const prefetchCache = useRef<Map<string, Item>>(new Map())
+
+  const handleItemHover = useCallback((item: Item) => {
+    if (prefetchCache.current.has(item.id)) return
+    getDoc(doc(db, 'items', item.id))
+      .then((snap) => {
+        if (snap.exists()) prefetchCache.current.set(item.id, docToItem(snap))
+      })
+      .catch(() => { /* silent — fall back to in-state item on click */ })
+  }, [])
+
+  const handleItemSelect = useCallback((item: Item) => {
+    setSelectedItem(prefetchCache.current.get(item.id) ?? item)
+  }, [])
 
   return (
     <div>
@@ -29,6 +49,11 @@ export default function PawnPage() {
             type="search"
           />
         </section>
+
+        {/* Staff Picks — editorial curation by staff (Sandra persona) */}
+        {!searchValue && (
+          <StaffPicksSection onItemSelect={handleItemSelect} />
+        )}
 
         {/* Featured inventory — only visible when no search is active */}
         {!searchValue && (
@@ -69,12 +94,13 @@ export default function PawnPage() {
             loading={loading}
             hasMore={hasMore}
             onLoadMore={loadMore}
-            onItemSelect={setSelectedItem}
+            onItemSelect={handleItemSelect}
+            onItemHover={handleItemHover}
           />
         </section>
       </div>
 
-      {/* Quick-view modal — opens in < 200ms (no network request, data already in state) */}
+      {/* Quick-view modal — data pre-fetched on hover; opens in < 200ms */}
       {selectedItem && (
         <ItemQuickView
           item={selectedItem}
@@ -83,6 +109,7 @@ export default function PawnPage() {
             setCollectItem(selectedItem)
             setSelectedItem(null)
           }}
+          onSelectRelated={handleItemSelect}
         />
       )}
 

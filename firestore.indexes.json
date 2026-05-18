@@ -34,6 +34,16 @@
       "collectionGroup": "items",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "viewTag",             "order": "ASCENDING" },
+        { "fieldPath": "status",              "order": "ASCENDING" },
+        { "fieldPath": "policeHold",          "order": "ASCENDING" },
+        { "fieldPath": "merchandisingTags",   "arrayConfig": "CONTAINS" }
+      ]
+    },
+    {
+      "collectionGroup": "items",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "policeHold", "order": "ASCENDING" },
         { "fieldPath": "status",     "order": "ASCENDING" }
       ]

@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom'
 import { useView } from '../../context/ViewContext'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
+import MerchandisingBadge from '../MerchandisingBadge'
+import RelatedItems from '../RelatedItems'
 import { formatPrice } from '../../lib/format'
 import type { Item, ConditionGrade } from '../../lib/types'
 
@@ -25,9 +27,10 @@ interface ItemQuickViewProps {
   item: Item
   onClose: () => void
   onCollect?: () => void
+  onSelectRelated?: (item: Item) => void
 }
 
-export default function ItemQuickView({ item, onClose, onCollect }: ItemQuickViewProps) {
+export default function ItemQuickView({ item, onClose, onCollect, onSelectRelated }: ItemQuickViewProps) {
   const { view } = useView()
   const panelRef = useRef<HTMLDivElement>(null)
   const [imageIndex, setImageIndex] = useState(0)
@@ -200,7 +203,7 @@ export default function ItemQuickView({ item, onClose, onCollect }: ItemQuickVie
                 label={CONDITION_LABELS[item.condition]}
               />
               {item.merchandisingTags?.map((tag) => (
-                <Badge key={tag} variant="tag" label={tag.replace(/-/g, ' ')} />
+                <MerchandisingBadge key={tag} tag={tag} />
               ))}
             </div>
 
@@ -250,6 +253,38 @@ export default function ItemQuickView({ item, onClose, onCollect }: ItemQuickVie
               </div>
             )}
 
+            {/* Staff curator note — only visible when staff-pick tag is set */}
+            {item.staffPickNote && item.merchandisingTags?.includes('staff-pick') && (
+              <div style={{
+                padding: 'var(--space-4)',
+                backgroundColor: 'var(--color-surface)',
+                borderRadius: 'var(--radius-md)',
+                borderLeft: '3px solid var(--color-primary)',
+                marginBottom: 'var(--space-4)',
+              }}>
+                <p style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--color-primary)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  marginBottom: 'var(--space-1)',
+                }}>
+                  ★ Staff Pick
+                </p>
+                <p style={{
+                  fontFamily: 'var(--font-body)',
+                  fontStyle: 'italic',
+                  fontSize: 'var(--text-small)',
+                  color: 'var(--color-text)',
+                  lineHeight: 1.6,
+                  margin: 0,
+                }}>
+                  {item.staffPickNote}
+                </p>
+              </div>
+            )}
+
             {/* CTAs */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               <Button variant="primary" size="lg">
@@ -264,6 +299,11 @@ export default function ItemQuickView({ item, onClose, onCollect }: ItemQuickVie
                 Close
               </Button>
             </div>
+
+            {/* Related items by trending score — same category + view */}
+            {onSelectRelated && (
+              <RelatedItems currentItem={item} onSelect={onSelectRelated} />
+            )}
           </div>
         </div>
       </div>

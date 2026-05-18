@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import Badge from '../ui/Badge'
+import MerchandisingBadge from '../MerchandisingBadge'
 import { formatPrice } from '../../lib/format'
 import type { Item, ConditionGrade } from '../../lib/types'
 
@@ -15,9 +16,10 @@ interface MasonryCardProps {
   item: Item
   index: number
   onClick: () => void
+  onHover?: () => void
 }
 
-function MasonryCard({ item, index, onClick }: MasonryCardProps) {
+function MasonryCard({ item, index, onClick, onHover }: MasonryCardProps) {
   const staggerDelay = Math.min(index * 50, 600)
 
   return (
@@ -25,6 +27,8 @@ function MasonryCard({ item, index, onClick }: MasonryCardProps) {
       className="masonry-item"
       style={{ '--masonry-delay': `${staggerDelay}ms` } as React.CSSProperties}
       onClick={onClick}
+      onMouseEnter={onHover}
+      onFocus={onHover}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick() }}
       role="button"
       tabIndex={0}
@@ -60,7 +64,7 @@ function MasonryCard({ item, index, onClick }: MasonryCardProps) {
         {item.merchandisingTags && item.merchandisingTags.length > 0 && (
           <div style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', display: 'flex', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
             {item.merchandisingTags.map((tag) => (
-              <Badge key={tag} variant="tag" label={tag.replace(/-/g, ' ')} />
+              <MerchandisingBadge key={tag} tag={tag} />
             ))}
           </div>
         )}
@@ -108,6 +112,7 @@ interface MasonryGridProps {
   hasMore: boolean
   onLoadMore: () => void
   onItemSelect: (item: Item) => void
+  onItemHover?: (item: Item) => void
 }
 
 export default function MasonryGrid({
@@ -116,6 +121,7 @@ export default function MasonryGrid({
   hasMore,
   onLoadMore,
   onItemSelect,
+  onItemHover,
 }: MasonryGridProps) {
   const sentinelRef = useRef<HTMLDivElement>(null)
 
@@ -157,6 +163,7 @@ export default function MasonryGrid({
             item={item}
             index={index}
             onClick={() => onItemSelect(item)}
+            onHover={onItemHover ? () => onItemHover(item) : undefined}
           />
         ))}
       </div>
