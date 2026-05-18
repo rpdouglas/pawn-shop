@@ -137,6 +137,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!authLoading && user && (user.isAdmin || user.role === 'manager')) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       loadStats()
     }
   }, [authLoading, user, loadStats])

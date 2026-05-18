@@ -154,6 +154,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — E10: DashboardPage auth gate: admin or manager role. PoliceHoldManager sub-section additionally restricted to isAdmin only (managers can view the dashboard but cannot set holds).
 
+2026-05-18 — Remote Config fetch errors (403 Forbidden) caught and logged as descriptive warnings in `src/lib/featureFlags.ts`. Prevents console noise in dev while informing the user about necessary GCP Installations API permissions.
+
 ---
 
 *Add new entries above this line.*

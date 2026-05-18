@@ -22,7 +22,14 @@ export function useFeatureFlags(): FeatureFlags {
   useEffect(() => {
     fetchAndActivate(remoteConfig)
       .then(() => setFlags(readFlags()))
-      .catch(() => { /* use defaults — Remote Config unreachable */ });
+      .catch((err) => {
+        console.warn(
+          'Remote Config fetch failed. Using local default flags. ' +
+          'If you see a 403 error, ensure the "Firebase Installations API" is enabled ' +
+          'and allowed on your API Key in Google Cloud Console.',
+          err
+        );
+      });
   }, []);
 
   return flags;

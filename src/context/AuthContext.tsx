@@ -1,24 +1,29 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { onAuthStateChanged, getIdTokenResult, multiFactor } from 'firebase/auth'
+import { onAuthStateChanged, getIdTokenResult, multiFactor, signOut } from 'firebase/auth'
+import { httpsCallable } from 'firebase/functions'
 import type { User } from 'firebase/auth'
-import { auth } from '../lib/firebase'
+import { auth, functions } from '../lib/firebase'
 import type { AuthUser, StaffRole } from '../lib/types'
 
 interface AuthContextValue {
   user: AuthUser | null
   loading: boolean
   refreshUser: () => Promise<void>
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
   refreshUser: async () => {},
+  logout: async () => {},
 })
 
 const STAFF_ROLES: readonly StaffRole[] = ['admin', 'manager', 'inventory_staff', 'marketing_staff']
 const ALL_ROLES: readonly StaffRole[] = [...STAFF_ROLES, 'customer']
+
+const recordLogoutFn = httpsCallable(functions, 'recordLogout')
 
 async function buildAuthUser(firebaseUser: User): Promise<AuthUser> {
   const tokenResult = await getIdTokenResult(firebaseUser)
@@ -67,8 +72,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (reloaded) setUser(await buildAuthUser(reloaded))
   }, [])
 
+  const logout = useCallback(async () => {
+    try {
+      await recordLogoutFn()
+    } catch (e) {
+      console.error('Failed to record logout event', e)
+    }
+    await signOut(auth)
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ user, loading, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, refreshUser, logout }}>
       {children}
     </AuthContext.Provider>
   )
