@@ -94,9 +94,7 @@ export default function InventoryPage() {
                       <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>{item.category}</div>
                     </td>
                     <td style={{ padding: 'var(--space-4)' }}>
-                      <Badge variant={item.status === 'active' ? 'success' : 'secondary'}>
-                        {item.status}
-                      </Badge>
+                      <Badge variant={item.status} label={item.status} />
                       {item.policeHold && (
                         <span style={{ marginLeft: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-error)', fontWeight: 'bold' }}>
                           HOLD
