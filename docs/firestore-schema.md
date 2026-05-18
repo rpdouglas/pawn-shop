@@ -75,9 +75,32 @@
 | `uid` | string | Customer UID |
 | `itemId` | string | Reference to `items/{id}` |
 | `status` | string | `pending` \| `confirmed` \| `declined` \| `completed` |
-| `pickupWindow` | string | e.g. `"2026-06-01 14:00-16:00"` |
-| `staffNotes` | string | Internal |
-| `createdAt` | timestamp | |
+| `pickupWindow` | string | Format: `"YYYY-MM-DD HH:MM–HH:MM"` e.g. `"2026-07-01 14:00–14:30"` |
+| `customerName` | string | Display name for staff inbox — never in `auditLogs` |
+| `customerPhone` | string | Phone number for Twilio SMS — never in `auditLogs` |
+| `viewTag` | string | `pawn` \| `fireworks` — determines SMS language guard |
+| `smsDeliveredAt` | timestamp | Set by CF after Twilio API call; null if delivery failed |
+| `staffNotes` | string | Internal — never shown to customer |
+| `createdAt` | timestamp | Server timestamp |
+| `updatedAt` | timestamp | Set by confirmReservation and completeReservation CFs on status transition |
+
+---
+
+## `config/storeHours` — single document, admin-only write
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `monday` | map | `{ open: string (HH:MM 24h), close: string (HH:MM 24h), closed: boolean }` |
+| `tuesday` | map | Same structure as `monday` |
+| `wednesday` | map | Same structure as `monday` |
+| `thursday` | map | Same structure as `monday` |
+| `friday` | map | Same structure as `monday` |
+| `saturday` | map | Same structure as `monday` |
+| `sunday` | map | Same structure as `monday` |
+| `updatedBy` | string | UID of admin who last modified |
+| `updatedAt` | timestamp | Server timestamp |
+
+Slot intervals are computed at runtime: `open` → `close − 30 min` in 30-minute steps. Slot format stored in `reservations/{id}.pickupWindow`: `"YYYY-MM-DD HH:MM–HH:MM"`. Read access: any authenticated user. Write access: `admin` custom claim only via `updateStoreHours` CF.
 
 ---
 
@@ -108,7 +131,7 @@
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` `ebay_push` `ebay_sync_sold` `pawn_request_submit` `serial_blacklist_hit` |
+| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` `ebay_push` `ebay_sync_sold` `pawn_request_submit` `serial_blacklist_hit` `reservation_created` `reservation_confirmed` `reservation_declined` `reservation_completed` `store_hours_updated` |
 | `uid` | string | Actor UID |
 | `targetId` | string | Optional — item/user being acted on |
 | `details` | map | Context. **Never include PII** |

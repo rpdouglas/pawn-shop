@@ -147,12 +147,12 @@
 > - **Sandra:** Click-and-collect CTA on item detail page must be reachable in ≤3 taps from the Pawn homepage.
 > - **Makoonsii:** Contact page must include Google Maps embed (store location on Cornwall Island) with large, accessible tap targets for directions.
 
-- [ ] Click-and-collect request form on item detail pages `[Tan]` `[San]`
-- [ ] `reservations/{id}` collection + status flow (pending → confirmed → completed) `[Tan]`
-- [ ] Staff confirms/declines pickup window `[Staff]`
-- [ ] SMS confirmation fires within 60 seconds of reservation creation `[Tan]` `[Comp]`
-- [ ] Contact page with form routing to staff email `[Mak]`
-- [ ] Google Maps embed (store location) `[Mak]`
+- [x] Click-and-collect request form on item detail pages `[Tan]` `[San]`
+- [x] `reservations/{id}` collection + status flow (pending → confirmed → completed) `[Tan]`
+- [x] Staff confirms/declines pickup window `[Staff]`
+- [x] SMS confirmation fires within 60 seconds of reservation creation `[Tan]` `[Comp]`
+- [x] Contact page with form routing to staff email `[Mak]`
+- [x] Google Maps embed (store location) `[Mak]`
 
 ---
 

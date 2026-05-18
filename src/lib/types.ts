@@ -1,4 +1,5 @@
 export type ViewType = 'pawn' | 'cannabis' | 'fireworks'
+export type ReservationStatus = 'pending' | 'confirmed' | 'declined' | 'completed'
 export type PawnRequestStatus = 'pending' | 'reviewed' | 'quoted' | 'declined' | 'completed'
 export type ConditionGrade = 'new' | 'like-new' | 'good' | 'fair' | 'poor'
 export type ItemStatus = 'draft' | 'active' | 'reserved' | 'sold' | 'archived'
@@ -17,6 +18,38 @@ export interface AuthUser {
   isMfaEnrolled: boolean
   isStaff: boolean
   isAdmin: boolean
+}
+
+export interface Reservation {
+  id: string
+  uid: string
+  itemId: string
+  status: ReservationStatus
+  pickupWindow: string         // "YYYY-MM-DD HH:MM–HH:MM"
+  customerName: string
+  customerPhone: string
+  viewTag: ViewType
+  smsDeliveredAt: Date | null
+  staffNotes?: string
+  createdAt: Date
+}
+
+export interface StoreHoursDay {
+  open: string    // HH:MM 24h
+  close: string   // HH:MM 24h
+  closed: boolean
+}
+
+export interface StoreHours {
+  monday:    StoreHoursDay
+  tuesday:   StoreHoursDay
+  wednesday: StoreHoursDay
+  thursday:  StoreHoursDay
+  friday:    StoreHoursDay
+  saturday:  StoreHoursDay
+  sunday:    StoreHoursDay
+  updatedBy?: string
+  updatedAt?: Date
 }
 
 export interface PawnRequest {

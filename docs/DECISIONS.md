@@ -98,6 +98,22 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — PawnInbox uses onSnapshot instead of getDocs + manual refresh (E07). Real-time subscription means new submissions appear immediately without staff action. Expanded row closes automatically if the document leaves the current filter view after a status update.
 
+2026-05-18 — E08: reservations/{id} extended with customerName, customerPhone, viewTag, smsDeliveredAt. Required for Twilio SMS dispatch and staff inbox display. PII fields (customerName, customerPhone) never appear in auditLogs.
+
+2026-05-18 — E08: config/storeHours added as new single-document collection. Admin-only write via updateStoreHours CF. Authenticated read for slot picker. Slot intervals computed at runtime (open→close−30min in 30-min steps). Not stored in Firestore per-slot — computed from the config document.
+
+2026-05-18 — E08: auditLogs adds reservation_created, reservation_confirmed, reservation_declined, reservation_completed, store_hours_updated event types. Details map: {itemId, reservationId, viewTag} for reservation events; {daysModified: string[]} for store_hours_updated — no PII in any details map.
+
+2026-05-18 — E08: SMS dispatch in createReservation is inline (not via Firestore trigger) to guarantee 60-second SLA. Firestore triggers can queue under load; inline Twilio call within the CF execution window is deterministic.
+
+2026-05-18 — E08: confirmReservation and completeReservation are callable CFs (not direct client Firestore writes) because both trigger side effects — confirmReservation sets items/{id}.status='reserved' and fires a confirmation SMS; completeReservation sets items/{id}.status='sold'. Side-effect operations belong in CFs, not client-side updateDoc.
+
+2026-05-18 — E08: sendContactEmail CF writes no Firestore document and no auditLogs entry. Contact form collects PII (name, email, message) that cannot appear in auditLogs.details. Email-only routing satisfies the requirement without creating a PII-bearing collection.
+
+2026-05-18 — E08: Click-and-collect CTA hidden on cannabis items. Cannabis view discretion (Marie persona) requires no persistent reservation records at this stage. Cannabis enquiry path remains the existing WhatsApp deep-link (E11).
+
+2026-05-18 — E08: Google Maps embed uses static iframe Share/Embed URL (no API key). Avoids client-side Maps JavaScript API key exposure. Sufficient for a single store location display.
+
 ---
 
 *Add new entries above this line.*

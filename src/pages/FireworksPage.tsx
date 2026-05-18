@@ -1,13 +1,17 @@
+import { useState } from 'react'
 import CountdownTimer from '../components/fireworks/CountdownTimer'
 import BundleCard from '../components/fireworks/BundleCard'
 import UrgencyBadge from '../components/fireworks/UrgencyBadge'
+import ClickCollectModal from '../components/pawn/ClickCollectModal'
 import { useItems } from '../hooks/useItems'
+import type { Item } from '../lib/types'
 
 // Hardcoded fallback — E14 will wire this to campaigns/{id}.endDate
 const CANADA_DAY_2026 = new Date('2026-07-01T00:00:00')
 
 export default function FireworksPage() {
   const { items, loading, error } = useItems('fireworks')
+  const [collectItem, setCollectItem] = useState<Item | null>(null)
 
   return (
     <div>
@@ -132,7 +136,7 @@ export default function FireworksPage() {
                   itemCount={item.bundleIds?.length ?? 1}
                   imageUrl={item.images[0]}
                   isAvailable={item.status === 'active'}
-                  onClick={item.status === 'active' ? () => {} : undefined}
+                  onClick={item.status === 'active' && !item.policeHold ? () => setCollectItem(item) : undefined}
                 />
               </div>
             ))}
@@ -140,7 +144,7 @@ export default function FireworksPage() {
         )}
       </section>
 
-      {/* Pickup scheduling notice — Tanya persona requirement (E08 will add full flow) */}
+      {/* Pickup information */}
       <section
         aria-label="Pickup information"
         style={{
@@ -157,17 +161,16 @@ export default function FireworksPage() {
           margin: '0 auto',
           lineHeight: 1.6,
         }}>
-          All orders are pickup only. Reserve your bundle and we will confirm your specific pickup window within 60 minutes.
-        </p>
-        <p style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 'var(--text-xs)',
-          color: 'var(--color-text-muted)',
-          marginTop: 'var(--space-8)',
-        }}>
-          Built with Canadian privacy standards.
+          All orders are pickup only. Select your bundle and choose a pickup window — we will confirm by SMS within 60 minutes.
         </p>
       </section>
+
+      {collectItem && (
+        <ClickCollectModal
+          item={collectItem}
+          onClose={() => setCollectItem(null)}
+        />
+      )}
     </div>
   )
 }

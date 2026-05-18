@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 05
+**Cycle:** 06
 **Started:** 2026-05-18
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E08 · Click & Collect / Contact: click-and-collect request form on item detail pages, `reservations/{id}` collection with status flow (pending → confirmed → completed), SMS confirmation within 60 seconds, contact page with Google Maps embed (store location, Cornwall Island).
+Deliver E13 · Merchandising Engine — staff picks admin UI, `calculateTrendingScore` Cloud Function, mood collections per view, quick-view modal (≤200ms), related items by trending score.
 
 ---
 
@@ -58,6 +58,22 @@ Deliver E08 · Click & Collect / Contact: click-and-collect request form on item
 
 ## Previous Cycle Summary
 
+**Cycle 05** (2026-05-18 → 2026-05-18) — Closed E08 · Click & Collect / Contact.
+
+| Task | Epic | Completed |
+|---|---|---|
+| Click-and-collect request form on Pawn + Fireworks item pages (`ClickCollectModal`) | E08 | 2026-05-18 |
+| `reservations/{id}` collection + status flow (pending → confirmed → declined → completed) | E08 | 2026-05-18 |
+| `createReservation` / `confirmReservation` / `completeReservation` callable CFs | E08 | 2026-05-18 |
+| SMS confirmation inline in CF — guarantees 60-second SLA (Twilio) | E08 | 2026-05-18 |
+| `ReservationInbox` admin component — real-time onSnapshot, confirm/decline/complete | E08 | 2026-05-18 |
+| `updateStoreHours` CF + `StoreHoursEditor` admin component — 30-min slot generation | E08 | 2026-05-18 |
+| `sendContactEmail` CF (SendGrid) + `ContactPage` with Google Maps iframe | E08 | 2026-05-18 |
+| Firestore rules — reservations client write blocked; `config/{docId}` read: signed-in only | E08 | 2026-05-18 |
+| **E08 CLOSED** | E08 | 2026-05-18 |
+
+---
+
 **Cycle 04** (2026-05-17 → 2026-05-18) — Closed E07 · Pawn Form & Inbox.
 
 | Task | Epic | Completed |
@@ -86,7 +102,7 @@ Deliver E08 · Click & Collect / Contact: click-and-collect request form on item
 
 ## Next Cycle Preview
 
-After E08 closes: E13 · Merchandising Engine — staff picks admin UI, `calculateTrendingScore` Cloud Function, mood collections per view, quick-view modal (≤200ms), related items by trending score.
+After E13 closes: E09 · Customer Accounts — purchase history, saved searches with CASL-compliant alert opt-in, account settings, reseller tier display.
 
 ---
 

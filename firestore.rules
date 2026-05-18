@@ -57,10 +57,19 @@ service cloud.firestore {
     }
 
     // ── reservations/{id} ────────────────────────────────────────────────────
+    // All writes go through Cloud Functions (Admin SDK) to ensure slot validation,
+    // item-status side effects, and SMS dispatch. Client cannot create or update directly.
     match /reservations/{resId} {
-      allow create: if isSignedIn();
-      allow read, update: if isStaff() || isOwner(resource.data.uid);
+      allow create, update: if false;
+      allow read: if isStaff() || isOwner(resource.data.uid);
       allow delete: if isAdmin();
+    }
+
+    // ── config/{docId} ───────────────────────────────────────────────────────
+    // storeHours is read by authenticated users (slot picker). Writes via CF only.
+    match /config/{docId} {
+      allow read: if isSignedIn();
+      allow write: if false;
     }
 
     // ── users/{uid} ──────────────────────────────────────────────────────────

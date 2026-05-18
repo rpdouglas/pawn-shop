@@ -24,9 +24,10 @@ const FOCUSABLE = [
 interface ItemQuickViewProps {
   item: Item
   onClose: () => void
+  onCollect?: () => void
 }
 
-export default function ItemQuickView({ item, onClose }: ItemQuickViewProps) {
+export default function ItemQuickView({ item, onClose, onCollect }: ItemQuickViewProps) {
   const { view } = useView()
   const panelRef = useRef<HTMLDivElement>(null)
   const [imageIndex, setImageIndex] = useState(0)
@@ -254,6 +255,11 @@ export default function ItemQuickView({ item, onClose }: ItemQuickViewProps) {
               <Button variant="primary" size="lg">
                 Enquire about this item
               </Button>
+              {onCollect && item.status === 'active' && item.viewTag !== 'cannabis' && !item.policeHold && (
+                <Button variant="secondary" size="md" onClick={() => { onClose(); onCollect() }}>
+                  Reserve for Collection
+                </Button>
+              )}
               <Button variant="ghost" size="md" onClick={onClose}>
                 Close
               </Button>

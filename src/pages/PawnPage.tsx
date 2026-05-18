@@ -3,6 +3,7 @@ import PawnHero from '../components/pawn/PawnHero'
 import FeaturedItems from '../components/pawn/FeaturedItems'
 import MasonryGrid from '../components/pawn/MasonryGrid'
 import ItemQuickView from '../components/pawn/ItemQuickView'
+import ClickCollectModal from '../components/pawn/ClickCollectModal'
 import Input from '../components/ui/Input'
 import { useItemSearch } from '../hooks/useItemSearch'
 import type { Item } from '../lib/types'
@@ -10,6 +11,7 @@ import type { Item } from '../lib/types'
 export default function PawnPage() {
   const { items, loading, hasMore, loadMore, searchValue, setSearchValue } = useItemSearch('pawn')
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
+  const [collectItem, setCollectItem]   = useState<Item | null>(null)
 
   return (
     <div>
@@ -77,6 +79,17 @@ export default function PawnPage() {
         <ItemQuickView
           item={selectedItem}
           onClose={() => setSelectedItem(null)}
+          onCollect={() => {
+            setCollectItem(selectedItem)
+            setSelectedItem(null)
+          }}
+        />
+      )}
+
+      {collectItem && (
+        <ClickCollectModal
+          item={collectItem}
+          onClose={() => setCollectItem(null)}
         />
       )}
     </div>
