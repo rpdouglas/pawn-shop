@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 12
+**Cycle:** 13
 **Started:** 2026-05-18
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E14 · Seasonal Campaign Scheduler — `campaigns/{id}` collection, `activateCampaign` + `deactivateCampaign` Cloud Functions (scheduled), admin campaign calendar UI, real-date countdown timer component, Fireworks pre-order flow.
+Deliver E11 · Compliance Programme — PIPEDA consent management, cannabis/fireworks legal disclosures, Identity Platform MFA enforcement (server-side bypass prevention), legal counsel integration.
 
 ---
 
@@ -47,6 +47,7 @@ Deliver E14 · Seasonal Campaign Scheduler — `campaigns/{id}` collection, `act
 | MFA bypass confirmed impossible | Requires Identity Platform upgrade — pre-prod compliance gate | Before prod deploy (E11) |
 | eBay developer account setup (webhook URL registration, notification subscription) | Requires eBay seller account and developer credentials — outside codebase scope | Before E06 deploys to prod |
 | axe-core browser run on admin intake success view (EbayPushButton) | Requires live browser session | Post-E06 merge verification |
+| axe-core browser run on E14 components (PreorderModal, PreorderInboxPage, CampaignBanner, CampaignAdminPage) | Requires live browser session | Post-E14 merge verification |
 | Vertical video on Cannabis + Fireworks pages | Content dependency — no video assets available | When assets supplied |
 | `config/shopInfo` document creation | Requires admin to create via Firebase console (`foundedYear: <year>`) — no admin UI in E17 | Before E17 deploys to dev |
 
@@ -62,6 +63,27 @@ Deliver E14 · Seasonal Campaign Scheduler — `campaigns/{id}` collection, `act
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 12** (2026-05-18 → 2026-05-18) — Closed E14 · Seasonal Campaign Scheduler.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `campaigns/{id}` collection + schema | E14 | 2026-05-18 |
+| `activateCampaigns` + `deactivateCampaigns` scheduled CFs (every 5 min) | E14 | 2026-05-18 |
+| `CampaignAdminPage` — create/list/group campaigns; `/admin/campaigns` route | E14 | 2026-05-18 |
+| `CampaignBanner` component — cross-view, filters by viewTag or 'all' | E14 | 2026-05-18 |
+| `CountdownTimer` wired to real `campaigns/{id}.endDate` — hardcoded date removed | E14 | 2026-05-18 |
+| `createPreorder` + `confirmPreorder` + `markPreorderReady` + `collectPreorder` + `cancelPreorder` callable CFs | E14 | 2026-05-18 |
+| `PreorderModal` customer-facing component — auth-gated, inline validation | E14 | 2026-05-18 |
+| `PreorderInboxPage` staff inbox — real-time onSnapshot, per-status filters, action buttons | E14 | 2026-05-18 |
+| `FireworksPage` rewritten: `PreorderModal` replaces `ClickCollectModal`, `CampaignBanner` added | E14 | 2026-05-18 |
+| `PawnPage` + `CannabisPage`: `CampaignBanner` wired | E14 | 2026-05-18 |
+| `firestore.indexes.json`: 2 new composite indexes (campaigns, preorders) | E14 | 2026-05-18 |
+| 9 `DECISIONS.md` entries (3 schema, 6 implementation) | E14 | 2026-05-18 |
+| `docs/firestore-schema.md` updated: campaigns + preorders collections, 7 new auditLog event types | E14 | 2026-05-18 |
+| **E14 CLOSED** | E14 | 2026-05-18 |
+
+---
 
 **Cycle 11** (2026-05-18 → 2026-05-18) — Closed E17 · Conversion Optimisation.
 
@@ -235,7 +257,7 @@ Deliver E14 · Seasonal Campaign Scheduler — `campaigns/{id}` collection, `act
 
 ## Next Cycle Preview
 
-After E14 closes: E11 · Compliance Programme — PIPEDA consent management, cannabis/fireworks legal disclosures, Identity Platform MFA enforcement (server-side bypass prevention), legal counsel integration.
+After E11 closes: E15 · CRM & Retention — VIP tier, engagement scoring, cross-view browsing flag, CASL-compliant CRM sends.
 
 ---
 

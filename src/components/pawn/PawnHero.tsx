@@ -18,7 +18,7 @@ export default function PawnHero() {
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'flex-end',
-        padding: 'var(--space-24) var(--space-8)',
+        padding: 'var(--space-12) var(--space-8)',
         backgroundColor: 'var(--color-bg)',
         overflow: 'hidden',
       }}

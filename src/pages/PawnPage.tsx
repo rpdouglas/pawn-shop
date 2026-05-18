@@ -11,6 +11,7 @@ import RecentlySoldStrip from '../components/pawn/RecentlySoldStrip'
 import YearsInBusinessBadge from '../components/pawn/YearsInBusinessBadge'
 import TestimonialsModule from '../components/pawn/TestimonialsModule'
 import ActivityFeed from '../components/pawn/ActivityFeed'
+import CampaignBanner from '../components/CampaignBanner'
 import Input from '../components/ui/Input'
 import { useItemSearch } from '../hooks/useItemSearch'
 import { docToItem } from '../hooks/useItems'
@@ -71,6 +72,9 @@ export default function PawnPage() {
 
         {/* Privacy-safe live activity feed (Sandra persona) */}
         {!searchValue && <ActivityFeed />}
+
+        {/* Campaign banner — any active pawn promotion */}
+        {!searchValue && <CampaignBanner />}
 
         {/* Prefix search bar — Dale and Kevin requirement */}
         <section aria-label="Search inventory" style={{ marginBottom: 'var(--space-12)' }}>

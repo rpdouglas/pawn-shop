@@ -176,7 +176,7 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` `ebay_push` `ebay_sync_sold` `pawn_request_submit` `serial_blacklist_hit` `reservation_created` `reservation_confirmed` `reservation_declined` `reservation_completed` `store_hours_updated` `serial_blacklist_add` `serial_blacklist_remove` `data_purged` `staff_pick_set` `staff_pick_removed` |
+| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` `ebay_push` `ebay_sync_sold` `pawn_request_submit` `serial_blacklist_hit` `reservation_created` `reservation_confirmed` `reservation_declined` `reservation_completed` `store_hours_updated` `serial_blacklist_add` `serial_blacklist_remove` `data_purged` `staff_pick_set` `staff_pick_removed` `campaign_activated` `campaign_deactivated` `preorder_created` `preorder_confirmed` `preorder_ready` `preorder_collected` `preorder_cancelled` |
 | `uid` | string | Actor UID |
 | `targetId` | string | Optional — item/user being acted on |
 | `details` | map | Context. **Never include PII** |
@@ -203,10 +203,12 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | `viewTag` | string | `pawn` \| `cannabis` \| `fireworks` \| `all` |
 | `startDate` | timestamp | |
 | `endDate` | timestamp | |
-| `active` | boolean | Managed by Cloud Function |
+| `active` | boolean | Managed by Cloud Function — set true when now ≥ startDate; false when now > endDate |
 | `discountRule` | map | `{ type: 'percent'\|'fixed', value: number }` |
 | `bannerCopy` | string | |
 | `countdownEnabled` | boolean | |
+| `createdBy` | string | UID of staff member who created the campaign |
+| `updatedAt` | timestamp | Server timestamp. Set by CF on activate/deactivate. |
 | `createdAt` | timestamp | |
 
 ---
@@ -263,9 +265,16 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `uid` | string | |
-| `itemId` | string | |
+| `uid` | string | Customer UID |
+| `itemId` | string | Reference to `items/{id}` |
 | `status` | string | `pending` \| `confirmed` \| `ready` \| `collected` \| `cancelled` |
 | `quantity` | number | |
-| `staffNotes` | string | |
-| `createdAt` | timestamp | |
+| `customerName` | string | Display name for staff inbox — never in `auditLogs` |
+| `customerPhone` | string | Phone number for Twilio SMS — never in `auditLogs` |
+| `viewTag` | string | `fireworks` — determines SMS language guard and age-gate verification |
+| `pickupWindow` | string | Format: `"YYYY-MM-DD HH:MM–HH:MM"` — confirmed by staff on status→ready |
+| `smsDeliveredAt` | timestamp | Set by CF after Twilio API call; null if not yet sent or delivery failed |
+| `campaignId` | string | Optional. Reference to `campaigns/{id}` if preorder placed during a campaign |
+| `staffNotes` | string | Internal — never shown to customer |
+| `updatedAt` | timestamp | Set by CF on every status transition (confirm, ready, collect, cancel) |
+| `createdAt` | timestamp | Server timestamp |

@@ -42,6 +42,7 @@
 - [x] GitHub Secrets set (14 Actions secrets + 6 Codespaces secrets) `[All]`
 - [x] `.env.local` populated from Codespaces Secrets and excluded from git `[All]`
 - [x] Firestore rules and indexes deployed to both projects `[Comp]`
+- [x] Docs-as-Code Planning workflow: plans saved to `docs/plans/` `[Staff]`
 
 ---
 
@@ -266,11 +267,11 @@
 > - **Makoonsii:** Campaign banners should use the brand voice — not aggressive retail copy.
 > - **Marie:** Cannabis seasonal campaigns must still pass the Marie Discretion Test. No category disclosure in any campaign CRM communications.
 
-- [ ] `campaigns/{id}` collection `[Tan]`
-- [ ] `activateCampaign` + `deactivateCampaign` Cloud Functions (scheduled) `[Tan]` `[Staff]`
-- [ ] Admin campaign calendar UI `[Tan]` `[Staff]`
-- [ ] Countdown timer component for active campaigns (real dates only) `[Tan]` `[Comp]`
-- [ ] Fireworks pre-order: `preorders/{id}`, payment-on-pickup flow `[Tan]`
+- [x] `campaigns/{id}` collection `[Tan]`
+- [x] `activateCampaign` + `deactivateCampaign` Cloud Functions (scheduled) `[Tan]` `[Staff]`
+- [x] Admin campaign calendar UI `[Tan]` `[Staff]`
+- [x] Countdown timer component for active campaigns (real dates only) `[Tan]` `[Comp]`
+- [x] Fireworks pre-order: `preorders/{id}`, payment-on-pickup flow `[Tan]`
 
 ---
 

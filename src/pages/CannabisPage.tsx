@@ -3,6 +3,7 @@ import CinematicHero from '../components/cannabis/CinematicHero'
 import MoodCard from '../components/cannabis/MoodCard'
 import LuxuryProductCard from '../components/cannabis/LuxuryProductCard'
 import Button from '../components/ui/Button'
+import CampaignBanner from '../components/CampaignBanner'
 import { useItems } from '../hooks/useItems'
 import type { MoodCategory } from '../lib/types'
 import { Analytics } from '../lib/analytics'
@@ -62,6 +63,8 @@ export default function CannabisPage() {
         aria-labelledby="mood-heading"
         style={{ padding: 'var(--space-12) var(--space-6)', maxWidth: '1280px', margin: '0 auto' }}
       >
+        <CampaignBanner />
+
         <h2
           id="mood-heading"
           style={{

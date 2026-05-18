@@ -13,6 +13,12 @@ State which strategy was approved (A, B, or C) and summarise what it involves in
 
 > "Strategy B was approved: [one sentence summary]."
 
+**CRITICAL:** Before proceeding, you must read the approved plan file located in `docs/plans/` to load the exact schema audit, compliance checks, and anti-regression protocols into your context.
+
+---
+
+*The Pawn Shop · docs/prompts/APPROVAL.md · v1.1*
+
 ### Gate 2 — File Verification (The Read Gate)
 
 For every file you intend to modify:

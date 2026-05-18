@@ -33,6 +33,8 @@ import SerialBlacklistPage from './pages/admin/SerialBlacklistPage.tsx'
 import StaffPicksPage from './pages/admin/StaffPicksPage.tsx'
 import StaffManagementPage from './pages/admin/StaffManagementPage.tsx'
 import SchedulingPage from './pages/admin/SchedulingPage.tsx'
+import PreorderInboxPage from './pages/admin/PreorderInboxPage.tsx'
+import CampaignAdminPage from './pages/admin/CampaignAdminPage.tsx'
 import ContactPage from './pages/ContactPage.tsx'
 import AccessibilityPage from './pages/AccessibilityPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
@@ -82,6 +84,8 @@ const router = createBrowserRouter([
         { path: 'staff',             element: <StaffManagementPage /> },
         { path: 'scheduling',        element: <SchedulingPage /> },
         { path: 'dashboard',         element: <DashboardPage /> },
+        { path: 'preorders',         element: <PreorderInboxPage /> },
+        { path: 'campaigns',         element: <CampaignAdminPage /> },
       ]},
       { path: '*', element: <NotFoundPage /> },
     ],

@@ -170,6 +170,26 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — E17: config/shopInfo public read allowed via Firestore rule (docId == 'shopInfo' OR isSignedIn()). YearsInBusinessBadge on public PawnPage requires unauthenticated read. storeHours remains signed-in only. Splitting by docId avoids exposing storeHours to anonymous users.
 
+2026-05-18 — E14: campaigns/{id} extended with createdBy (staff UID) and updatedAt (server timestamp). createdBy enables auditability without a separate auditLogs entry for campaign edits. updatedAt set by activateCampaigns/deactivateCampaigns CFs on each status transition.
+
+2026-05-18 — E14: preorders/{id} extended with customerName, customerPhone, viewTag, pickupWindow, smsDeliveredAt, campaignId. Mirrors the reservations/{id} PII pattern — customerName and customerPhone stay in the preorder document only, never in auditLogs.details. viewTag enables SMS language guard (fireworks-specific phrasing). campaignId is optional, set only when a preorder is placed during an active campaign.
+
+2026-05-18 — E14: auditLogs.eventType union extended with campaign_activated, campaign_deactivated, preorder_created, preorder_confirmed, preorder_ready, preorder_collected, preorder_cancelled. Details maps: campaign events use {campaignId, viewTag}; preorder events use {preorderId, viewTag} — no PII in either details map.
+
+2026-05-18 — E14: CountdownTimer hardcoded Canada Day date removed. FireworksPage queries active campaigns on mount (getDocs, single call); filters for countdownEnabled: true + viewTag fireworks|all. Timer renders only when a real campaign is found — returns nothing if no active countdown campaign exists. No fake fallback date.
+
+2026-05-18 — E14: CampaignBanner placed in src/components/ (shared) not src/components/fireworks/. Used by PawnPage, CannabisPage, FireworksPage — cross-view scope requires shared location. Queries all active campaigns (where active==true, limit 20) and filters viewTag client-side to cover 'all' campaigns without a second query.
+
+2026-05-18 — E14: createPreorder CF validates viewTag=='fireworks' server-side. Pre-orders are fireworks-only in E14. SMS is not sent at creation — staff confirmPreorder CF triggers the first SMS (60-second SLA applies to confirmPreorder, not createPreorder). This matches Tanya's expectation: confirmation is deliberate, not automatic.
+
+2026-05-18 — E14: Campaign creation is a direct client-side addDoc write (staff custom claim allows it per Firestore rules). No CF required — no server-side side effects needed on create. activateCampaigns/deactivateCampaigns scheduled CFs handle the active flag transitions. No campaign_created auditLog event defined — creation is auth-protected at the Firestore rule level.
+
+2026-05-18 — E14: FireworksPage replaces ClickCollectModal with PreorderModal for bundle card clicks. ClickCollectModal creates a reservation (status→reserved, immediate SMS). PreorderModal creates a preorder (status=pending, no SMS on create). Two different flows serve different semantics: reservation is a time-slot commitment, preorder is a seasonal intent signal.
+
+2026-05-18 — Hero section top padding reduced from `var(--space-24)` to `var(--space-12)` in Pawn and Fireworks views. Resolves "dead space" between navigation and content while maintaining appropriate scale for large hero elements.
+
+2026-05-18 — Implementation plans generated via `@docs/prompts/PLANNING.md` are now saved as permanent Markdown files in `docs/plans/`. This improves context preservation across sessions and creates a durable historical record of architectural choices.
+
 ---
 
 *Add new entries above this line.*

@@ -138,3 +138,42 @@ export interface ActivityFeedEntry {
   displayCity: string
   createdAt: Date
 }
+
+export type CampaignViewTag = ViewType | 'all'
+export type PreorderStatus = 'pending' | 'confirmed' | 'ready' | 'collected' | 'cancelled'
+
+export interface DiscountRule {
+  type: 'percent' | 'fixed'
+  value: number  // percent: 0–100, fixed: CAD cents
+}
+
+export interface Campaign {
+  id: string
+  title: string
+  viewTag: CampaignViewTag
+  startDate: Date
+  endDate: Date
+  active: boolean
+  discountRule: DiscountRule
+  bannerCopy: string
+  countdownEnabled: boolean
+  createdBy?: string
+  updatedAt?: Date
+  createdAt: Date
+}
+
+export interface Preorder {
+  id: string
+  uid: string
+  itemId: string
+  status: PreorderStatus
+  quantity: number
+  customerName: string
+  customerPhone: string
+  viewTag: ViewType
+  pickupWindow?: string
+  smsDeliveredAt?: Date | null
+  campaignId?: string
+  staffNotes?: string
+  createdAt: Date
+}

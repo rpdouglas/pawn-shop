@@ -168,14 +168,25 @@ Does any proposed feature introduce copy, labels, or CTA text? Check against `do
 
 ---
 
-## Output Format
+## Phase 5 — Output & Storage
 
-1. Phase 1 result: persona statement + compliance gate checklist
-2. Phase 2 result: schema audit table
-3. Phase 3 result: three strategies in the format above
-4. Phase 4 result: anti-regression checklist — each item addressed
-5. **STOP.** Wait for approval via `APPROVAL.md`. Do not write code.
+Do not output the full plan into the chat. Instead:
+
+1. Create a new file at `docs/plans/[ID]_[FEATURE]_PLAN.md`.
+2. Write the results of Phases 1 through 4 into this file using clear markdown headings.
+3. In the chat, output ONLY the following summary block:
+
+> "I have drafted the implementation plan and saved it to `docs/plans/[ID]_[FEATURE]_PLAN.md`.
+> 
+> **Proposed Strategies:**
+> - **Strategy A:** [One sentence summary]
+> - **Strategy B:** [One sentence summary] (Recommended)
+> - **Strategy C:** [One sentence summary]
+> 
+> Please review the markdown file and reply with your approved strategy."
+
+4. **STOP.** Wait for approval via `APPROVAL.md`. Do not write code.
 
 ---
 
-*The Pawn Shop · docs/prompts/PLANNING.md · v1.0*
+*The Pawn Shop · docs/prompts/PLANNING.md · v1.1*

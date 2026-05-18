@@ -1,30 +1,68 @@
 import { useState, useEffect } from 'react'
+import { collection, query, where, limit, getDocs } from 'firebase/firestore'
+import { db } from '../lib/firebase'
 import CountdownTimer from '../components/fireworks/CountdownTimer'
 import BundleCard from '../components/fireworks/BundleCard'
 import UrgencyBadge from '../components/fireworks/UrgencyBadge'
-import ClickCollectModal from '../components/pawn/ClickCollectModal'
+import CampaignBanner from '../components/CampaignBanner'
+import PreorderModal from '../components/fireworks/PreorderModal'
 import { useItems } from '../hooks/useItems'
-import type { Item } from '../lib/types'
+import type { Item, Campaign, CampaignViewTag } from '../lib/types'
 import { Analytics } from '../lib/analytics'
 
-// Hardcoded fallback — E14 will wire this to campaigns/{id}.endDate
-const CANADA_DAY_2026 = new Date('2026-07-01T00:00:00')
+function docToCampaign(doc: { id: string; data: () => Record<string, unknown> }): Campaign {
+  const d = doc.data()
+  return {
+    id: doc.id,
+    title:            String(d['title'] ?? ''),
+    viewTag:          (d['viewTag'] as CampaignViewTag) ?? 'fireworks',
+    startDate:        (d['startDate'] as { toDate(): Date }).toDate(),
+    endDate:          (d['endDate'] as { toDate(): Date }).toDate(),
+    active:           Boolean(d['active']),
+    discountRule:     (d['discountRule'] as Campaign['discountRule']) ?? { type: 'fixed', value: 0 },
+    bannerCopy:       String(d['bannerCopy'] ?? ''),
+    countdownEnabled: Boolean(d['countdownEnabled']),
+    createdBy:        d['createdBy'] != null ? String(d['createdBy']) : undefined,
+    updatedAt:        d['updatedAt'] != null ? (d['updatedAt'] as { toDate(): Date }).toDate() : undefined,
+    createdAt:        (d['createdAt'] as { toDate(): Date }).toDate(),
+  }
+}
 
 export default function FireworksPage() {
   const { items, loading, error } = useItems('fireworks')
-  const [collectItem, setCollectItem] = useState<Item | null>(null)
+  const [preorderItem, setPreorderItem] = useState<Item | null>(null)
+  // undefined = loading, null = no active countdown campaign, Campaign = found
+  const [countdownCampaign, setCountdownCampaign] = useState<Campaign | null | undefined>(undefined)
 
   useEffect(() => {
     Analytics.pageView({ view: 'fireworks', page_path: '/fireworks' })
   }, [])
 
+  useEffect(() => {
+    const q = query(
+      collection(db, 'campaigns'),
+      where('active', '==', true),
+      limit(20),
+    )
+    getDocs(q)
+      .then((snap) => {
+        const match = snap.docs
+          .map(docToCampaign)
+          .find((c) => (c.viewTag === 'fireworks' || c.viewTag === 'all') && c.countdownEnabled)
+        setCountdownCampaign(match ?? null)
+      })
+      .catch(() => { setCountdownCampaign(null) })
+  }, [])
+
+  const showCountdown = countdownCampaign != null
+
   return (
     <div>
-      {/* Countdown hero — full-width event focus (Tanya persona) */}
+      {/* Countdown hero — real campaign endDate only (Tanya persona) */}
       <section
         aria-label="Countdown to next event"
         style={{
-          minHeight: '60vh',
+          minHeight: showCountdown ? '60vh' : '30vh',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -61,13 +99,18 @@ export default function FireworksPage() {
           fontFamily: 'var(--font-body)',
           fontSize: 'var(--text-lead)',
           color: 'var(--color-text-muted)',
-          marginBottom: 'var(--space-12)',
+          marginBottom: showCountdown ? 'var(--space-12)' : 0,
           maxWidth: '480px',
         }}>
           Celebrate the moment properly.
         </p>
 
-        <CountdownTimer targetDate={CANADA_DAY_2026} label="Until Canada Day" />
+        {showCountdown && countdownCampaign && (
+          <CountdownTimer
+            targetDate={countdownCampaign.endDate}
+            label={countdownCampaign.title}
+          />
+        )}
       </section>
 
       {/* Bundle showcase */}
@@ -75,6 +118,8 @@ export default function FireworksPage() {
         aria-labelledby="bundles-heading"
         style={{ padding: 'var(--space-12) var(--space-6)', maxWidth: '1280px', margin: '0 auto' }}
       >
+        <CampaignBanner />
+
         <h2
           id="bundles-heading"
           style={{
@@ -124,7 +169,6 @@ export default function FireworksPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
             {items.map((item) => (
               <div key={item.id} style={{ position: 'relative' }}>
-                {/* Seasonal urgency badge overlay — isSeasonalItem flag from staff */}
                 {item.isSeasonalItem && (
                   <div style={{
                     position: 'absolute',
@@ -141,7 +185,7 @@ export default function FireworksPage() {
                   itemCount={item.bundleIds?.length ?? 1}
                   imageUrl={item.images[0]}
                   isAvailable={item.status === 'active'}
-                  onClick={item.status === 'active' && !item.policeHold ? () => setCollectItem(item) : undefined}
+                  onClick={item.status === 'active' && !item.policeHold ? () => setPreorderItem(item) : undefined}
                 />
               </div>
             ))}
@@ -166,14 +210,14 @@ export default function FireworksPage() {
           margin: '0 auto',
           lineHeight: 1.6,
         }}>
-          All orders are pickup only. Select your bundle and choose a pickup window — we will confirm by SMS within 60 minutes.
+          All orders are pickup only. Place your pre-order and we'll confirm by SMS — your pickup window will be set when your order is ready.
         </p>
       </section>
 
-      {collectItem && (
-        <ClickCollectModal
-          item={collectItem}
-          onClose={() => setCollectItem(null)}
+      {preorderItem && (
+        <PreorderModal
+          item={preorderItem}
+          onClose={() => setPreorderItem(null)}
         />
       )}
     </div>
