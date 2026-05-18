@@ -25,6 +25,7 @@ import LoginPage from './pages/auth/LoginPage.tsx'
 import SignUpPage from './pages/auth/SignUpPage.tsx'
 import MfaEnrollPage from './pages/auth/MfaEnrollPage.tsx'
 import IntakePage from './pages/admin/IntakePage.tsx'
+import InventoryPage from './pages/admin/InventoryPage.tsx'
 import PawnInboxPage from './pages/admin/PawnInboxPage.tsx'
 import ReservationsPage from './pages/admin/ReservationsPage.tsx'
 import StoreHoursPage from './pages/admin/StoreHoursPage.tsx'
@@ -32,6 +33,7 @@ import SerialBlacklistPage from './pages/admin/SerialBlacklistPage.tsx'
 import StaffPicksPage from './pages/admin/StaffPicksPage.tsx'
 import ContactPage from './pages/ContactPage.tsx'
 import AccessibilityPage from './pages/AccessibilityPage.tsx'
+import NotFoundPage from './pages/NotFoundPage.tsx'
 import SellPage from './pages/pawn/SellPage.tsx'
 import MoodCollectionPage from './pages/cannabis/MoodCollectionPage.tsx'
 import BundleCollectionPage from './pages/fireworks/BundleCollectionPage.tsx'
@@ -47,6 +49,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    errorElement: <NotFoundPage />,
     children: [
       { index: true, element: <Navigate to="/pawn" replace /> },
       { path: 'pawn',      element: <PawnPage /> },
@@ -64,6 +67,7 @@ const router = createBrowserRouter([
       { path: 'accessibility', element: <AccessibilityPage /> },
       { path: 'admin', children: [
         { path: 'intake',            element: <IntakePage /> },
+        { path: 'inventory',         element: <InventoryPage /> },
         { path: 'pawn-inbox',        element: <PawnInboxPage /> },
         { path: 'reservations',      element: <ReservationsPage /> },
         { path: 'store-hours',       element: <StoreHoursPage /> },
@@ -71,6 +75,7 @@ const router = createBrowserRouter([
         { path: 'staff-picks',       element: <StaffPicksPage /> },
         { path: 'dashboard',         element: <DashboardPage /> },
       ]},
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])

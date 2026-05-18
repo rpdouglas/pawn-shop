@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 09
+**Cycle:** 10
 **Started:** 2026-05-18
 **Target close:** TBD
 **Deploy target:** dev
@@ -60,6 +60,19 @@ Deliver E17 · Conversion Optimisation — recently sold strip (real data, `onIt
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 09** (2026-05-18 → 2026-05-18) — Closed Firebase 403 Fix & Inventory/404 Implementation.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `src/lib/featureFlags.ts` updated with descriptive 403 console warning | E10 | 2026-05-18 |
+| Manual GCP instructions provided for Installations API permissions | E10 | 2026-05-18 |
+| `InventoryPage.tsx` + `/admin/inventory` route implemented | E10 | 2026-05-18 |
+| `NotFoundPage.tsx` + global `errorElement` + `*` catch-all route implemented | E10 | 2026-05-18 |
+| `DECISIONS.md` updated with 403 diagnostic and Inventory/404 rationale | E10 | 2026-05-18 |
+| **Cycle 09 CLOSED** | E10 | 2026-05-18 |
+
+---
 
 **Cycle 08** (2026-05-18 → 2026-05-18) — Closed E10 · Analytics, Feature Flags & Admin Dashboard.
 

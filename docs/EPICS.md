@@ -224,6 +224,7 @@
 - [x] Admin dashboard: inventory counts by status + view, pawn request volume, top items `[Staff]`
 - [x] `policeHold` flag management in admin (admin-only) `[Staff]` `[Comp]`
 - [x] UTM parameters captured per session `[All]`
+- [x] Inventory Management page (`/admin/inventory`) and branded 404 handler `[Staff]` `[Comp]`
 
 ---
 

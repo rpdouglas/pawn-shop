@@ -156,6 +156,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — Remote Config fetch errors (403 Forbidden) caught and logged as descriptive warnings in `src/lib/featureFlags.ts`. Prevents console noise in dev while informing the user about necessary GCP Installations API permissions.
 
+2026-05-18 — Inventory Management page (`/admin/inventory`) and branded `NotFoundPage` (404) implemented. Solves missing route 404s and provides staff with a real-time list of all items across statuses and views. Global `*` route and `errorElement` added to `main.tsx`.
+
 ---
 
 *Add new entries above this line.*
