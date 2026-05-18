@@ -13,7 +13,7 @@ interface SubmitPawnRequestData {
 // Callable — any user (authenticated or guest). uid is null for guest submissions.
 // Blacklist check always runs before the document is written to Firestore, ensuring
 // serialBlacklistHit is set before staff can read the request (compliance requirement).
-export const submitPawnRequest = onCall<SubmitPawnRequestData>(async (request) => {
+export const submitPawnRequest = onCall<SubmitPawnRequestData>({ cors: true }, async (request) => {
   const { name, email, phone, itemDescription, serialNumber, imageUrls } = request.data
 
   if (!name?.trim())

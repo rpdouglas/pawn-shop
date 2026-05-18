@@ -23,7 +23,7 @@ function hashIp(rawIp: string): string {
 }
 
 // Assigns or changes a user's role. Admin-only. Writes role_change auditLog.
-export const assignRole = onCall<AssignRoleData>(async (request) => {
+export const assignRole = onCall<AssignRoleData>({ cors: true }, async (request) => {
   if (!request.auth || request.auth.token['admin'] !== true) {
     throw new HttpsError('permission-denied', 'Admin role required')
   }
@@ -51,7 +51,7 @@ export const assignRole = onCall<AssignRoleData>(async (request) => {
 
 // Called by the client after every successful sign-in.
 // Creates users/{uid} on first login. Hashes IP before writing. Writes login auditLog.
-export const recordLogin = onCall<RecordLoginData>(async (request) => {
+export const recordLogin = onCall<RecordLoginData>({ cors: true }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Sign in required')
   }
@@ -101,7 +101,7 @@ export const recordLogin = onCall<RecordLoginData>(async (request) => {
 })
 
 // Called by the client before signOut(). Writes logout auditLog.
-export const recordLogout = onCall(async (request) => {
+export const recordLogout = onCall({ cors: true }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Sign in required')
   }
@@ -118,7 +118,7 @@ export const recordLogout = onCall(async (request) => {
 
 // Called by the client after successful TOTP enrollment.
 // Sets users/{uid}.mfaEnrolled = true and writes mfa_enrolled auditLog.
-export const recordMfaEnrolled = onCall(async (request) => {
+export const recordMfaEnrolled = onCall({ cors: true }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Sign in required')
   }

@@ -13,7 +13,7 @@ const VALID_VIEWS: ReadonlyArray<LogAgeGateData['viewTag']> = ['cannabis', 'fire
 // Public invoker — anonymous users must be able to log age gate events without signing in.
 // Admin SDK write bypasses Firestore rules (auditLogs allow create: isSignedIn() is for clients only).
 export const logAgeGate = onCall<LogAgeGateData>(
-  { invoker: 'public' },
+  { invoker: 'public', cors: true },
   async (request) => {
     const { eventType, viewTag, policyVersion } = request.data
 

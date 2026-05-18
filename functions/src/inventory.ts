@@ -71,7 +71,7 @@ interface CreateDraftItemData {
   viewTag: string
 }
 
-export const createDraftItem = onCall<CreateDraftItemData>(async (request) => {
+export const createDraftItem = onCall<CreateDraftItemData>({ cors: true }, async (request) => {
   if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
     throw new HttpsError('permission-denied', 'Staff role required')
   }
@@ -106,39 +106,53 @@ const WATERMARK_SVG = Buffer.from(
     <text x="6" y="26" font-family="sans-serif" font-size="16"
           fill="white" fill-opacity="0.60" font-weight="bold">© The Pawn Shop</text>
   </svg>`
+);
+
+export const processImageUpload = onObjectFinalized(
+  {
+    region: "us-east1"
+  },
+  async (event) => {
+    const filePath = event.data.name;
+    if (!filePath) return;
+
+    const match = filePath.match(/^items\/([^/]+)\/uploads\/([^/]+)$/);
+    if (!match) return;
+
+    const [, itemId, filename] = match;
+    const bucket = getStorage().bucket(event.data.bucket);
+    const tempFile = bucket.file(filePath);
+
+    // Ingest the raw temporary artifact
+    const [buffer] = await tempFile.download();
+
+    // Process processing operations via Sharp
+    const watermarked = await sharp(buffer)
+      .composite([{ input: WATERMARK_SVG, gravity: "southeast" }])
+      .webp({ quality: 85 })
+      .toBuffer();
+
+    const finalPath = `items/${itemId}/images/${path.parse(filename).name}.webp`;
+    const finalFile = bucket.file(finalPath);
+    
+    // Save the finalized client-ready production WebP back to the Cloud Storage bucket
+    await finalFile.save(watermarked, {
+      contentType: "image/webp",
+      public: true,
+    });
+
+    const finalUrl = finalFile.publicUrl();
+
+    // Append the direct URL destination string array element securely inside Firestore
+    await getFirestore().collection("items").doc(itemId).update({
+      images: FieldValue.arrayUnion(finalUrl),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    // Clean up the temporary original upload object path safely
+    await tempFile.delete();
+  }
 )
-
-export const processImageUpload = onObjectFinalized(async (event) => {
-  const filePath = event.data.name
-  if (!filePath) return
-
-  const match = filePath.match(/^items\/([^/]+)\/uploads\/([^/]+)$/)
-  if (!match) return
-
-  const [, itemId, filename] = match
-  const bucket = getStorage().bucket(event.data.bucket)
-  const tempFile = bucket.file(filePath)
-
-  const [buffer] = await tempFile.download()
-
-  const watermarked = await sharp(buffer)
-    .composite([{ input: WATERMARK_SVG, gravity: 'southeast' }])
-    .webp({ quality: 85 })
-    .toBuffer()
-
-  const finalPath = `items/${itemId}/images/${path.parse(filename).name}.webp`
-  const finalFile = bucket.file(finalPath)
-  await finalFile.save(watermarked, { contentType: 'image/webp', public: true })
-
-  const finalUrl = finalFile.publicUrl()
-
-  await getFirestore().collection('items').doc(itemId).update({
-    images: FieldValue.arrayUnion(finalUrl),
-    updatedAt: FieldValue.serverTimestamp(),
-  })
-
-  await tempFile.delete()
-})
 
 // ── publishItem ───────────────────────────────────────────────────────────────
 // Validates required fields, generates searchTokens, transitions draft → active,
@@ -148,7 +162,7 @@ interface PublishItemData {
   itemId: string
 }
 
-export const publishItem = onCall<PublishItemData>(async (request) => {
+export const publishItem = onCall<PublishItemData>({ cors: true }, async (request) => {
   if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
     throw new HttpsError('permission-denied', 'Staff role required')
   }
@@ -213,7 +227,7 @@ interface SetHoldData {
 
 const HOLD_DURATION_MS = 48 * 60 * 60 * 1000
 
-export const setHold = onCall<SetHoldData>(async (request) => {
+export const setHold = onCall<SetHoldData>({ cors: true }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Sign in required')
   }

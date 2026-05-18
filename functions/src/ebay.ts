@@ -85,6 +85,7 @@ interface PushToEbayResult {
 }
 
 export const pushToEbay = onCall<PushToEbayData, Promise<PushToEbayResult>>(
+  { cors: true },
   async (request) => {
     if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
       throw new HttpsError('permission-denied', 'Admin or manager role required')
