@@ -37,6 +37,11 @@ import MoodCollectionPage from './pages/cannabis/MoodCollectionPage.tsx'
 import BundleCollectionPage from './pages/fireworks/BundleCollectionPage.tsx'
 import AgeGate from './components/age-gate/AgeGate.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
+import DashboardPage from './pages/admin/DashboardPage.tsx'
+import { captureUtm } from './lib/utm.ts'
+
+// Capture UTM params from landing URL into sessionStorage on first load
+captureUtm()
 
 const router = createBrowserRouter([
   {
@@ -64,6 +69,7 @@ const router = createBrowserRouter([
         { path: 'store-hours',       element: <StoreHoursPage /> },
         { path: 'serial-blacklist',  element: <SerialBlacklistPage /> },
         { path: 'staff-picks',       element: <StaffPicksPage /> },
+        { path: 'dashboard',         element: <DashboardPage /> },
       ]},
     ],
   },

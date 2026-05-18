@@ -7,6 +7,7 @@ import MerchandisingBadge from '../MerchandisingBadge'
 import RelatedItems from '../RelatedItems'
 import { formatPrice } from '../../lib/format'
 import type { Item, ConditionGrade } from '../../lib/types'
+import { Analytics } from '../../lib/analytics'
 
 const CONDITION_LABELS: Record<ConditionGrade, string> = {
   'new':      'New',
@@ -34,6 +35,11 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
   const { view } = useView()
   const panelRef = useRef<HTMLDivElement>(null)
   const [imageIndex, setImageIndex] = useState(0)
+
+  // Fires once per item open — item_id is pseudonymous Firestore doc ID, not PII
+  useEffect(() => {
+    Analytics.itemView({ item_id: item.id, view: item.viewTag, category: item.category })
+  }, [item.id, item.viewTag, item.category])
 
   // Body scroll lock
   useEffect(() => {

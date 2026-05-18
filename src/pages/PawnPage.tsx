@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import PawnHero from '../components/pawn/PawnHero'
@@ -11,11 +11,18 @@ import Input from '../components/ui/Input'
 import { useItemSearch } from '../hooks/useItemSearch'
 import { docToItem } from '../hooks/useItems'
 import type { Item } from '../lib/types'
+import { Analytics } from '../lib/analytics'
+import { useFeatureFlags } from '../lib/featureFlags'
 
 export default function PawnPage() {
   const { items, loading, hasMore, loadMore, searchValue, setSearchValue } = useItemSearch('pawn')
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
   const [collectItem, setCollectItem]   = useState<Item | null>(null)
+  const { showStaffPicks, showRelatedItems } = useFeatureFlags()
+
+  useEffect(() => {
+    Analytics.pageView({ view: 'pawn', page_path: '/pawn' })
+  }, [])
 
   // Pre-fetch cache: hover triggers getDoc so click opens modal with fresh data
   const prefetchCache = useRef<Map<string, Item>>(new Map())
@@ -51,7 +58,7 @@ export default function PawnPage() {
         </section>
 
         {/* Staff Picks — editorial curation by staff (Sandra persona) */}
-        {!searchValue && (
+        {!searchValue && showStaffPicks && (
           <StaffPicksSection onItemSelect={handleItemSelect} />
         )}
 
@@ -109,7 +116,7 @@ export default function PawnPage() {
             setCollectItem(selectedItem)
             setSelectedItem(null)
           }}
-          onSelectRelated={handleItemSelect}
+          onSelectRelated={showRelatedItems ? handleItemSelect : undefined}
         />
       )}
 

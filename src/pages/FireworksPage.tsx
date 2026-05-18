@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import CountdownTimer from '../components/fireworks/CountdownTimer'
 import BundleCard from '../components/fireworks/BundleCard'
 import UrgencyBadge from '../components/fireworks/UrgencyBadge'
 import ClickCollectModal from '../components/pawn/ClickCollectModal'
 import { useItems } from '../hooks/useItems'
 import type { Item } from '../lib/types'
+import { Analytics } from '../lib/analytics'
 
 // Hardcoded fallback — E14 will wire this to campaigns/{id}.endDate
 const CANADA_DAY_2026 = new Date('2026-07-01T00:00:00')
@@ -12,6 +13,10 @@ const CANADA_DAY_2026 = new Date('2026-07-01T00:00:00')
 export default function FireworksPage() {
   const { items, loading, error } = useItems('fireworks')
   const [collectItem, setCollectItem] = useState<Item | null>(null)
+
+  useEffect(() => {
+    Analytics.pageView({ view: 'fireworks', page_path: '/fireworks' })
+  }, [])
 
   return (
     <div>

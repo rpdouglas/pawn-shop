@@ -219,11 +219,11 @@
 > - **Kevin:** `policeHold` flag management must be admin-only and immediately hide the item from all public views — including any real-time analytics feeds.
 > - **Dale:** Pawn request volume in the admin dashboard helps staff understand demand — which informs pricing and sourcing decisions that Dale eventually benefits from.
 
-- [ ] GA4 custom events: page views per view, item views, enquiry submits, age-gate events, pawn form submits `[All]` `[Comp]`
-- [ ] Firebase Remote Config for feature flags `[All]`
-- [ ] Admin dashboard: inventory counts by status + view, pawn request volume, top items `[Staff]`
-- [ ] `policeHold` flag management in admin (admin-only) `[Staff]` `[Comp]`
-- [ ] UTM parameters captured per session `[All]`
+- [x] GA4 custom events: page views per view, item views, enquiry submits, age-gate events, pawn form submits `[All]` `[Comp]`
+- [x] Firebase Remote Config for feature flags `[All]`
+- [x] Admin dashboard: inventory counts by status + view, pawn request volume, top items `[Staff]`
+- [x] `policeHold` flag management in admin (admin-only) `[Staff]` `[Comp]`
+- [x] UTM parameters captured per session `[All]`
 
 ---
 

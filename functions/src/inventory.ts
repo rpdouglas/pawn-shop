@@ -271,6 +271,50 @@ export const setHold = onCall<SetHoldData>({ cors: true }, async (request) => {
   return { success: true, holdExpiresAt: holdExpiresAt.toDate().toISOString() }
 })
 
+// ── setPoliceHold ─────────────────────────────────────────────────────────────
+// Admin-only. Sets or clears the policeHold flag on an item. policeHold: true
+// removes the item from all public Firestore reads immediately (Firestore rule
+// enforced). Writes a police_hold_set auditLog entry on every call.
+
+interface SetPoliceHoldData {
+  itemId: string
+  hold: boolean
+}
+
+export const setPoliceHold = onCall<SetPoliceHoldData>({ cors: true }, async (request) => {
+  const token = request.auth?.token as Record<string, unknown> | undefined
+  if (!request.auth || token?.['admin'] !== true) {
+    throw new HttpsError('permission-denied', 'Admin role required')
+  }
+
+  const { itemId, hold } = request.data
+  if (!itemId) throw new HttpsError('invalid-argument', 'itemId is required')
+  if (typeof hold !== 'boolean') throw new HttpsError('invalid-argument', 'hold must be boolean')
+
+  const db = getFirestore()
+  const itemRef = db.collection('items').doc(itemId)
+  const snap = await itemRef.get()
+
+  if (!snap.exists) throw new HttpsError('not-found', `Item ${itemId} not found`)
+
+  const previousValue: boolean = snap.data()!['policeHold'] ?? false
+
+  await itemRef.update({
+    policeHold: hold,
+    updatedAt: FieldValue.serverTimestamp(),
+  })
+
+  await db.collection('auditLogs').add({
+    eventType: 'police_hold_set',
+    uid: request.auth.uid,
+    targetId: itemId,
+    details: { itemId, previousValue, newValue: hold },
+    createdAt: FieldValue.serverTimestamp(),
+  })
+
+  return { success: true }
+})
+
 // ── resetExpiredHolds ─────────────────────────────────────────────────────────
 // Scheduled every 30 minutes. Resets any reserved items whose holdExpiresAt has passed.
 

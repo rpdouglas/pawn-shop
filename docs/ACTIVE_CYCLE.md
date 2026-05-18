@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 08
+**Cycle:** 09
 **Started:** 2026-05-18
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E10 · Analytics, Feature Flags & Admin Dashboard — GA4 custom events (page views per view, item views, enquiry submits, age-gate events, pawn form submits), Firebase Remote Config feature flags, admin dashboard inventory counts by status + view, `policeHold` flag management UI.
+Deliver E17 · Conversion Optimisation — recently sold strip (real data, `onItemSold` events), years-in-business badge + testimonials module, privacy-safe live activity feed (city-level only, rate-limited, no PII), `limited-edition`/`rare-find` display (staff-set only), hold countdown badge on reserved items.
 
 ---
 
@@ -42,6 +42,7 @@ Deliver E10 · Analytics, Feature Flags & Admin Dashboard — GA4 custom events 
 |---|---|---|
 | Lighthouse ≥90 performance, ≥90 accessibility, ≥95 SEO | Requires deployed URL + Chrome DevTools — cannot run in Codespaces terminal | Before E13 ships to dev |
 | WCAG AA axe-core browser verification | Requires running browser session on `/pawn`, `/cannabis`, `/fireworks` | Before E02 fully closes |
+| axe-core browser run on admin dashboard + PoliceHoldManager | Requires live browser session | Post-E10 merge verification |
 | MFA bypass confirmed impossible | Requires Identity Platform upgrade — pre-prod compliance gate | Before prod deploy (E11) |
 | eBay developer account setup (webhook URL registration, notification subscription) | Requires eBay seller account and developer credentials — outside codebase scope | Before E06 deploys to prod |
 | axe-core browser run on admin intake success view (EbayPushButton) | Requires live browser session | Post-E06 merge verification |
@@ -59,6 +60,30 @@ Deliver E10 · Analytics, Feature Flags & Admin Dashboard — GA4 custom events 
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 08** (2026-05-18 → 2026-05-18) — Closed E10 · Analytics, Feature Flags & Admin Dashboard.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `docs/projects/E10_Analytics_Feature_Flags_Admin_Dashboard.md` spec drafted | E10 | 2026-05-18 |
+| `src/lib/firebase.ts` updated: `analytics` + `remoteConfig` exports + `measurementId` env var | E10 | 2026-05-18 |
+| `src/lib/analytics.ts` — typed PII-safe GA4 event helper (5 event types; null-guard for unconfigured environments) | E10 | 2026-05-18 |
+| `src/lib/featureFlags.ts` — Remote Config hook (3 flags: `show_staff_picks`, `show_related_items`, `pawn_form_enabled`; 60s fetch interval in prod) | E10 | 2026-05-18 |
+| `src/lib/utm.ts` — UTM sessionStorage capture + retrieval (sessionStorage-only, never Firestore) | E10 | 2026-05-18 |
+| GA4 `page_view` events: `PawnPage`, `CannabisPage`, `FireworksPage` (on mount) | E10 | 2026-05-18 |
+| GA4 `item_view` event: `ItemQuickView` (on mount, fires per item open) | E10 | 2026-05-18 |
+| GA4 `enquiry_submit` event: `ClickCollectModal` (on createReservation success) | E10 | 2026-05-18 |
+| GA4 `age_gate_event` pass/fail: `AgeGate` (alongside existing logAgeGateFn CF call) | E10 | 2026-05-18 |
+| GA4 `pawn_form_submit` event: `PawnEnquiryForm` (on submitPawnRequest success) | E10 | 2026-05-18 |
+| Feature flag consumption: `PawnPage` (`showStaffPicks`, `showRelatedItems`), `SellPage` (`pawnFormEnabled`) | E10 | 2026-05-18 |
+| `setPoliceHold` callable CF — admin claim only, `policeHold` write + `police_hold_set` auditLog | E10 | 2026-05-18 |
+| `PoliceHoldManager` admin component — item lookup by Firestore ID, toggle with confirmation dialog | E10 | 2026-05-18 |
+| `DashboardPage` + `/admin/dashboard` route — status count cards, view breakdown, pawn volume, top 5 trending items table | E10 | 2026-05-18 |
+| `captureUtm()` called at module load in `main.tsx` — UTM captured on every landing URL | E10 | 2026-05-18 |
+| 8 `DECISIONS.md` entries: analytics null-guard, Remote Config intervals, defaults placement, UTM scope, setPoliceHold claim rationale, getDocs/getCountFromServer pattern, dashboard auth gates | E10 | 2026-05-18 |
+| **E10 CLOSED** | E10 | 2026-05-18 |
+
+---
 
 **Cycle 07** (2026-05-18 → 2026-05-18) — Closed E13 · Merchandising Engine.
 
@@ -155,7 +180,7 @@ Deliver E10 · Analytics, Feature Flags & Admin Dashboard — GA4 custom events 
 
 ## Next Cycle Preview
 
-After E10 closes: E17 · Conversion Optimisation — recently sold strip, years-in-business badge, privacy-safe live activity feed, limited-edition/rare-find display, hold countdown badge.
+After E17 closes: E14 · Seasonal Campaign Scheduler — campaigns/{id} collection, activateCampaign + deactivateCampaign Cloud Functions, admin campaign calendar UI, real-date countdown timer, Fireworks pre-order flow.
 
 ---
 

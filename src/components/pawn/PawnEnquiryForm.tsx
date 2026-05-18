@@ -4,6 +4,7 @@ import { httpsCallable } from 'firebase/functions'
 import { storage, functions } from '../../lib/firebase'
 import { useAuth } from '../../context/AuthContext'
 import Input from '../ui/Input'
+import { Analytics } from '../../lib/analytics'
 
 // Makoonsii: form completable one-handed in portrait mode, plain-language labels,
 // 48px touch targets throughout, ≤2 taps from Pawn homepage.
@@ -141,6 +142,7 @@ export default function PawnEnquiryForm() {
       }, SubmitResponse>(functions, 'submitPawnRequest')
 
       await submit({ name, email, phone, itemDescription, serialNumber, imageUrls })
+      Analytics.pawnFormSubmit({ view: 'pawn' })
       setSubmitted(true)
     } catch {
       setSubmitError('Something went wrong — please try again or call us directly.')

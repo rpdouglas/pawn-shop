@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { httpsCallable } from 'firebase/functions'
 import { functions } from '../../lib/firebase'
 import Button from '../ui/Button'
+import { Analytics } from '../../lib/analytics'
 
 interface LogAgeGateData {
   eventType: 'age_gate_pass' | 'age_gate_fail'
@@ -57,6 +58,7 @@ export default function AgeGate({ minAge, viewTag, children }: AgeGateProps) {
     } catch {
       // Best-effort audit log — never block the user due to a CF failure
     }
+    Analytics.ageGateEvent({ view: viewTag, result: 'pass' })
     try {
       sessionStorage.setItem(storageKey(viewTag), 'passed')
     } catch {
@@ -73,6 +75,7 @@ export default function AgeGate({ minAge, viewTag, children }: AgeGateProps) {
     } catch {
       // Best-effort
     }
+    Analytics.ageGateEvent({ view: viewTag, result: 'fail' })
     setGateState('denied')
     setProcessing(false)
   }

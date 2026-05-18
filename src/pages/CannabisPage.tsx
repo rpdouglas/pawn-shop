@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import CinematicHero from '../components/cannabis/CinematicHero'
 import MoodCard from '../components/cannabis/MoodCard'
 import LuxuryProductCard from '../components/cannabis/LuxuryProductCard'
 import Button from '../components/ui/Button'
 import { useItems } from '../hooks/useItems'
 import type { MoodCategory } from '../lib/types'
+import { Analytics } from '../lib/analytics'
 
 // Category values that map to each mood in inventory
 const MOOD_CATEGORY: Record<MoodCategory, string> = {
@@ -23,6 +24,10 @@ const WHATSAPP_HREF = `https://wa.me/${import.meta.env['VITE_WHATSAPP_NUMBER'] ?
 export default function CannabisPage() {
   const { items, loading, error } = useItems('cannabis')
   const [selectedMood, setSelectedMood] = useState<MoodCategory | null>(null)
+
+  useEffect(() => {
+    Analytics.pageView({ view: 'cannabis', page_path: '/cannabis' })
+  }, [])
 
   const scrollToCollections = () => {
     document.getElementById('cannabis-collections')?.scrollIntoView({ behavior: 'smooth' })

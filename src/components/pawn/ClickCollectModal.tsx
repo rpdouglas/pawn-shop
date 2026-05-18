@@ -5,6 +5,7 @@ import { db, functions } from '../../lib/firebase'
 import { useAuth } from '../../context/AuthContext'
 import Modal from '../ui/Modal'
 import type { Item, StoreHours, StoreHoursDay } from '../../lib/types'
+import { Analytics } from '../../lib/analytics'
 
 interface Props {
   item: Item
@@ -131,6 +132,7 @@ export default function ClickCollectModal({ item, onClose }: Props) {
         pickupWindow: buildPickupWindow(selectedDate, selectedSlot),
         viewTag: item.viewTag,
       })
+      Analytics.enquirySubmit({ view: item.viewTag, category: item.category })
       setSubmitted(true)
     } catch (err) {
       setError((err as { message?: string }).message ?? 'Something went wrong — please try again')

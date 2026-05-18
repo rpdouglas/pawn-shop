@@ -138,6 +138,22 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — E13: Search decision — Firestore prefix tokens retained (no Algolia). Current inventory scale and response times are within Dale's 300ms requirement. Algolia evaluation deferred until production traffic data shows degradation. Decision logged to close EPICS.md open search decision task.
 
+2026-05-18 — E10: GA4 analytics helper (analytics.ts) uses typed parameter interfaces that structurally exclude uid, email, name, and phone. PII exclusion is a compile-time guarantee, not a code review concern.
+
+2026-05-18 — E10: analytics export in firebase.ts is conditionally null when VITE_FIREBASE_MEASUREMENT_ID is not set. All Analytics.* call sites check for null before logEvent — no GA4 call is ever made in dev environments without measurementId configured.
+
+2026-05-18 — E10: Remote Config minimumFetchIntervalMillis set to 0 in dev (import.meta.env.DEV) and 60,000ms in production. This avoids hitting Remote Config quota during rapid local iteration while keeping flag propagation within 60 seconds in prod.
+
+2026-05-18 — E10: Remote Config defaults (show_staff_picks: true, show_related_items: true, pawn_form_enabled: true) are set on the remoteConfig object in firebase.ts rather than inside useFeatureFlags. This means getValue() returns the correct default even before fetchAndActivate completes on first render.
+
+2026-05-18 — E10: UTM params captured at module load in main.tsx (captureUtm() called before router creation). sessionStorage-only — never written to Firestore or included in auditLogs. Attribution data for future campaign analysis without PII exposure.
+
+2026-05-18 — E10: setPoliceHold CF restricted to admin claim only (not manager). policeHold is a compliance action tied to law enforcement contact — a higher bar than operational staff decisions. Managers may request a hold via an admin.
+
+2026-05-18 — E10: DashboardPage uses getDocs for active-by-view breakdown (client-side count) to avoid composite indexes. getCountFromServer is used for single-field status counts and pawn request volume where it is efficient without index overhead.
+
+2026-05-18 — E10: DashboardPage auth gate: admin or manager role. PoliceHoldManager sub-section additionally restricted to isAdmin only (managers can view the dashboard but cannot set holds).
+
 ---
 
 *Add new entries above this line.*
