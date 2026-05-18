@@ -96,6 +96,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── shifts/{id} ──────────────────────────────────────────────────────────
+    match /shifts/{shiftId} {
+      allow read: if isStaff();
+      allow write: if isAdmin() || hasRole('manager');
+    }
+
     // ── campaigns/{id} ───────────────────────────────────────────────────────
     match /campaigns/{campaignId} {
       allow read: if true;

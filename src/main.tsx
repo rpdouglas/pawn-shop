@@ -31,12 +31,15 @@ import ReservationsPage from './pages/admin/ReservationsPage.tsx'
 import StoreHoursPage from './pages/admin/StoreHoursPage.tsx'
 import SerialBlacklistPage from './pages/admin/SerialBlacklistPage.tsx'
 import StaffPicksPage from './pages/admin/StaffPicksPage.tsx'
+import StaffManagementPage from './pages/admin/StaffManagementPage.tsx'
+import SchedulingPage from './pages/admin/SchedulingPage.tsx'
 import ContactPage from './pages/ContactPage.tsx'
 import AccessibilityPage from './pages/AccessibilityPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
 import SellPage from './pages/pawn/SellPage.tsx'
 import MoodCollectionPage from './pages/cannabis/MoodCollectionPage.tsx'
 import BundleCollectionPage from './pages/fireworks/BundleCollectionPage.tsx'
+import SchedulePage from './pages/staff/SchedulePage.tsx'
 import AgeGate from './components/age-gate/AgeGate.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import DashboardPage from './pages/admin/DashboardPage.tsx'
@@ -65,6 +68,9 @@ const router = createBrowserRouter([
       ]},
       { path: 'contact',       element: <ContactPage /> },
       { path: 'accessibility', element: <AccessibilityPage /> },
+      { path: 'staff', children: [
+        { path: 'schedule', element: <SchedulePage /> },
+      ]},
       { path: 'admin', children: [
         { path: 'intake',            element: <IntakePage /> },
         { path: 'inventory',         element: <InventoryPage /> },
@@ -73,6 +79,8 @@ const router = createBrowserRouter([
         { path: 'store-hours',       element: <StoreHoursPage /> },
         { path: 'serial-blacklist',  element: <SerialBlacklistPage /> },
         { path: 'staff-picks',       element: <StaffPicksPage /> },
+        { path: 'staff',             element: <StaffManagementPage /> },
+        { path: 'scheduling',        element: <SchedulingPage /> },
         { path: 'dashboard',         element: <DashboardPage /> },
       ]},
       { path: '*', element: <NotFoundPage /> },

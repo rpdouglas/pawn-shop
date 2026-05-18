@@ -228,6 +228,21 @@
 
 ---
 
+### E20 · Staff Management & Scheduling
+
+> **Persona Gate — E20:**
+> - **Managers:** Must be able to see all staff members and their roles. Role updates must be immediate.
+> - **Staff:** Shift schedule must be accessible and assignment-clear (Pawn/Cannabis/Fireworks).
+> - **Compliance:** Shift CRUD must be role-gated. Audit logs must capture all shift modifications.
+
+- [x] `getStaffMembers` Cloud Function (Manager/Admin only) `[Staff]` `[Comp]`
+- [x] Staff Management UI: list members, update roles via `assignRole` `[Staff]`
+- [x] Shift Scheduling UI: calendar-style list, create/delete shifts `[Staff]`
+- [x] Personal Schedule UI: staff see their own shifts only `[Staff]`
+- [x] `auditLogs` for `shift_created`, `shift_updated`, `shift_deleted` `[Comp]`
+
+---
+
 ### E17 · Conversion Optimisation
 
 > **Persona Gate — E17:**

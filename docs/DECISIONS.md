@@ -158,6 +158,10 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — Inventory Management page (`/admin/inventory`) and branded `NotFoundPage` (404) implemented. Solves missing route 404s and provides staff with a real-time list of all items across statuses and views. Global `*` route and `errorElement` added to `main.tsx`.
 
+2026-05-18 — `shifts` collection and `users.phoneNumber` added to schema to support E20 Staff Management & Scheduling.
+
+2026-05-18 — `getStaffMembers` implemented as a Cloud Function instead of a direct Firestore read. This ensures staff emails and phone numbers are only accessible to Managers and Admins, and allows for server-side role filtering before sending data to the client.
+
 ---
 
 *Add new entries above this line.*

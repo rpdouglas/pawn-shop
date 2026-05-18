@@ -20,6 +20,29 @@ export interface AuthUser {
   isAdmin: boolean
 }
 
+export interface StaffMember {
+  uid: string
+  email: string
+  displayName: string
+  role: StaffRole
+  mfaEnrolled: boolean
+  phoneNumber?: string
+  lastLoginAt?: Date
+  createdAt: Date
+}
+
+export interface Shift {
+  id: string
+  staffUid: string
+  startTime: Date
+  endTime: Date
+  viewTag: ViewType | 'all'
+  notes?: string
+  createdBy: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface Reservation {
   id: string
   uid: string

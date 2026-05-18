@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 10
+**Cycle:** 11
 **Started:** 2026-05-18
 **Target close:** TBD
 **Deploy target:** dev
@@ -60,6 +60,21 @@ Deliver E17 · Conversion Optimisation — recently sold strip (real data, `onIt
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 10** (2026-05-18 → 2026-05-18) — Closed E20 · Staff Management & Scheduling.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `getStaffMembers` Cloud Function (Manager/Admin only) | E20 | 2026-05-18 |
+| `createShift` / `updateShift` / `deleteShift` Cloud Functions | E20 | 2026-05-18 |
+| `StaffList` component (Role management UI) | E20 | 2026-05-18 |
+| `ShiftCalendar` component (Shift CRUD UI) | E20 | 2026-05-18 |
+| `StaffManagementPage` & `SchedulingPage` (Admin pages) | E20 | 2026-05-18 |
+| `SchedulePage` (Personal staff view) | E20 | 2026-05-18 |
+| `auditLogs` for all shift and role events | E20 | 2026-05-18 |
+| **E20 CLOSED** | E20 | 2026-05-18 |
+
+---
 
 **Cycle 09** (2026-05-18 → 2026-05-18) — Closed Firebase 403 Fix & Inventory/404 Implementation.
 

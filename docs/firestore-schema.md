@@ -125,7 +125,23 @@ Slot intervals are computed at runtime: `open` → `close − 30 min` in 30-minu
 | `alertMethod` | string | `sms` \| `email` \| `none` |
 | `alertOptIn` | boolean | CASL — must be true before sending alerts |
 | `crossViewFlag` | boolean | Browsed multiple views in one session |
+| `phoneNumber` | string | For shift alerts and verification |
 | `createdAt` | timestamp | |
+
+---
+
+## `shifts/{id}`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `staffUid` | string | Reference to `users/{uid}` |
+| `startTime` | timestamp | |
+| `endTime` | timestamp | |
+| `viewTag` | string | `pawn` \| `cannabis` \| `fireworks` \| `all` |
+| `notes` | string | Optional. Specific tasks or context |
+| `createdBy` | string | UID of admin/manager who created |
+| `createdAt` | timestamp | |
+| `updatedAt` | timestamp | |
 
 ---
 

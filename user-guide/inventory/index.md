@@ -18,6 +18,10 @@ Every item in the system is assigned to a primary **View**, which determines whi
 - **Merchandising Tags:** Staff can apply tags like `Just Arrived` or `Staff Pick` to highlight items.
 - **Police Hold:** A critical safety feature that allows staff to immediately hide an item from public view for legal or security reasons.
 
-## Searching and Discovery
+## Management Tools
 
-The system uses a custom prefix-search engine. When an item is published, the system automatically generates search tokens from its title and category, enabling fast, real-time discovery for customers.
+- **Intake Dashboard:** Where staff receive new items and generate descriptions.
+- **Inventory Overview:** A comprehensive list of all items in the collection, accessible at `/admin/inventory`. This view allows staff to see all items across every status (Active, Draft, Sold, Reserved) in a single sortable table.
+
+---
+*The Pawn Shop · Inventory Overview*

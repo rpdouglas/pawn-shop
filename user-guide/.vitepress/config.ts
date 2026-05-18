@@ -21,7 +21,16 @@ export default defineConfig({
         text: 'Storefronts & Compliance',
         items: [
           { text: 'Age Verification', link: '/compliance/age-gates' },
-          { text: 'Discovery & Search', link: '/inventory/search' }
+          { text: 'Discovery & Search', link: '/inventory/search' },
+          { text: 'Merchandising', link: '/admin/merchandising' }
+        ]
+      },
+      {
+        text: 'Staff & Scheduling',
+        items: [
+          { text: 'My Schedule', link: '/staff/personal-schedule' },
+          { text: 'Shift Coordination', link: '/admin/scheduling' },
+          { text: 'Staff Management', link: '/admin/staff-management' }
         ]
       },
       {
@@ -32,16 +41,12 @@ export default defineConfig({
         ]
       },
       {
-        text: 'eBay Integration',
+        text: 'Intelligence & Operations',
         items: [
-          { text: 'Cross-Posting & Sync', link: '/ebay/cross-posting' }
-        ]
-      },
-      {
-        text: 'Safety & Accountability',
-        items: [
+          { text: 'Admin Dashboard', link: '/admin/dashboard' },
+          { text: 'Audit Logs', link: '/admin/audit-logs' },
           { text: 'Police Holds', link: '/admin/police-holds' },
-          { text: 'Audit Logs', link: '/admin/audit-logs' }
+          { text: 'eBay Sync', link: '/ebay/cross-posting' }
         ]
       }
     ]

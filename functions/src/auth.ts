@@ -136,3 +136,32 @@ export const recordMfaEnrolled = onCall({ cors: true }, async (request) => {
 
   return { success: true }
 })
+
+// New callable: getStaffMembers. Admin/Manager only.
+export const getStaffMembers = onCall({ cors: true }, async (request) => {
+  const token = request.auth?.token as Record<string, unknown> | undefined
+  if (!request.auth || (token?.['admin'] !== true && token?.['manager'] !== true)) {
+    throw new HttpsError('permission-denied', 'Admin or Manager role required')
+  }
+
+  const db = getFirestore()
+  const snap = await db.collection('users')
+    .where('role', 'in', ['admin', 'manager', 'inventory_staff', 'marketing_staff'])
+    .get()
+
+  const staff = snap.docs.map(doc => {
+    const data = doc.data()
+    return {
+      uid: doc.id,
+      email: data['email'],
+      displayName: data['displayName'],
+      role: data['role'],
+      mfaEnrolled: data['mfaEnrolled'],
+      phoneNumber: data['phoneNumber'],
+      lastLoginAt: data['lastLoginAt']?.toDate()?.toISOString(),
+      createdAt: data['createdAt']?.toDate()?.toISOString(),
+    }
+  })
+
+  return { staff }
+})
