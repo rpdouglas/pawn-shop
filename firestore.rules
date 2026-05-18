@@ -26,10 +26,11 @@ service cloud.firestore {
     }
 
     // ── items/{id} ────────────────────────────────────────────────────────────
-    // Public read when active and no police hold. Staff write. Admin for sensitive fields.
+    // Public read when active or sold (sold items serve the recently-sold trust strip)
+    // and no police hold. Staff write. Admin for sensitive fields.
 
     match /items/{itemId} {
-      allow read: if resource.data.status == 'active'
+      allow read: if (resource.data.status == 'active' || resource.data.status == 'sold')
                      && resource.data.policeHold != true;
       allow read: if isStaff();
       allow create, update: if isStaff()
@@ -66,9 +67,16 @@ service cloud.firestore {
     }
 
     // ── config/{docId} ───────────────────────────────────────────────────────
-    // storeHours is read by authenticated users (slot picker). Writes via CF only.
+    // storeHours: signed-in only (slot picker). shopInfo: public (years-in-business badge).
     match /config/{docId} {
-      allow read: if isSignedIn();
+      allow read: if isSignedIn() || docId == 'shopInfo';
+      allow write: if false;
+    }
+
+    // ── activityFeed/{id} ────────────────────────────────────────────────────
+    // Public read — no PII ever stored. Writes via logActivity CF only (Admin SDK).
+    match /activityFeed/{entryId} {
+      allow read: if true;
       allow write: if false;
     }
 

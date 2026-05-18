@@ -232,7 +232,7 @@ export const completeReservation = onCall<CompleteReservationData>({ cors: true 
 
   const now = FieldValue.serverTimestamp()
   await resRef.update({ status: 'completed', updatedAt: now })
-  await db.collection('items').doc(resData['itemId'] as string).update({ status: 'sold', updatedAt: now })
+  await db.collection('items').doc(resData['itemId'] as string).update({ status: 'sold', soldAt: now, updatedAt: now })
 
   await db.collection('auditLogs').add({
     eventType: 'reservation_completed',

@@ -251,11 +251,11 @@
 > - **Makoonsii:** "Years in business" badge and testimonials module build the trust signal she needs. Copy must be warm, community-rooted — not generic.
 > - **Dale:** Recently sold strip validates deal quality. Real data only — `onItemSold` events, not manufactured.
 
-- [ ] Recently sold strip on homepage (sourced from `onItemSold` Firestore events — real data only) `[Dale]` `[San]`
-- [ ] Years in business badge + testimonials module `[Mak]`
-- [ ] Privacy-safe live activity feed (city-level only, rate-limited, no PII) `[San]` `[Comp]`
-- [ ] `limited-edition` / `rare-find` display (staff-set only — never manufactured) `[Marc]` `[Comp]`
-- [ ] Hold countdown badge on reserved items `[Kev]` `[Dale]`
+- [x] Recently sold strip on homepage (sourced from `onItemSold` Firestore events — real data only) `[Dale]` `[San]`
+- [x] Years in business badge + testimonials module `[Mak]`
+- [x] Privacy-safe live activity feed (city-level only, rate-limited, no PII) `[San]` `[Comp]`
+- [x] `limited-edition` / `rare-find` display (staff-set only — never manufactured) `[Marc]` `[Comp]`
+- [x] Hold countdown badge on reserved items `[Kev]` `[Dale]`
 
 ---
 

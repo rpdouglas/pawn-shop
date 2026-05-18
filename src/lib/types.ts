@@ -118,7 +118,23 @@ export interface Item {
   enquiryCount?: number
   staffPickNote?: string
   ebayListingId?: string
+  soldAt?: Date
   createdAt?: Date
   updatedAt?: Date
   publishedBy?: string
+}
+
+export interface ShopInfo {
+  foundedYear: number
+  ownerName?: string
+  updatedBy?: string
+  updatedAt?: Date
+}
+
+export interface ActivityFeedEntry {
+  id: string
+  viewTag: ViewType
+  action: 'browsing'
+  displayCity: string
+  createdAt: Date
 }

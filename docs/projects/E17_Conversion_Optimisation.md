@@ -1,6 +1,6 @@
 # Project E17: Conversion Optimisation
 
-**Status:** Active — 2026-05-18
+**Status:** Done — 2026-05-18 (deferred: axe-core browser run on new components — requires live browser session; `config/shopInfo` document requires manual admin creation in Firestore console before badge renders)
 **Epic:** E17 — Conversion Optimisation
 **Phase:** Phase 4 — Conversion & Admin Intelligence
 **Primary Persona:** Sandra (visual discovery, live activity)

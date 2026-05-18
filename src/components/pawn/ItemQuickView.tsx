@@ -1,13 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { httpsCallable } from 'firebase/functions'
 import { useView } from '../../context/ViewContext'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 import MerchandisingBadge from '../MerchandisingBadge'
 import RelatedItems from '../RelatedItems'
+import HoldCountdownBadge from './HoldCountdownBadge'
 import { formatPrice } from '../../lib/format'
-import type { Item, ConditionGrade } from '../../lib/types'
+import type { Item, ConditionGrade, ViewType } from '../../lib/types'
 import { Analytics } from '../../lib/analytics'
+import { functions } from '../../lib/firebase'
+
+const logActivityFn = httpsCallable<{ viewTag: ViewType }, { success: boolean }>(functions, 'logActivity')
 
 const CONDITION_LABELS: Record<ConditionGrade, string> = {
   'new':      'New',
@@ -39,6 +44,7 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
   // Fires once per item open — item_id is pseudonymous Firestore doc ID, not PII
   useEffect(() => {
     Analytics.itemView({ item_id: item.id, view: item.viewTag, category: item.category })
+    void logActivityFn({ viewTag: item.viewTag })
   }, [item.id, item.viewTag, item.category])
 
   // Body scroll lock
@@ -211,6 +217,9 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
               {item.merchandisingTags?.map((tag) => (
                 <MerchandisingBadge key={tag} tag={tag} />
               ))}
+              {item.status === 'reserved' && item.holdExpiresAt && (
+                <HoldCountdownBadge holdExpiresAt={item.holdExpiresAt} />
+              )}
             </div>
 
             {/* Description */}

@@ -35,6 +35,7 @@
 | `enquiryCount` | number | Incremented by `createReservation` CF. Input to `calculateTrendingScore`. Default 0. |
 | `staffPickNote` | string | Staff-written curator note (max 280 chars). Customer-visible on Staff Picks display. Staff-only write via `updateMerchandisingTags` CF. |
 | `ebayListingId` | string | Set when pushed to eBay |
+| `soldAt` | timestamp | Set by `completeReservation` and `ebayWebhook` CFs when status transitions to `'sold'`. Null until sold. |
 | `createdAt` | timestamp | Server timestamp |
 | `updatedAt` | timestamp | Server timestamp |
 | `publishedBy` | string | UID of staff who published |
@@ -103,6 +104,32 @@
 | `updatedAt` | timestamp | Server timestamp |
 
 Slot intervals are computed at runtime: `open` → `close − 30 min` in 30-minute steps. Slot format stored in `reservations/{id}.pickupWindow`: `"YYYY-MM-DD HH:MM–HH:MM"`. Read access: any authenticated user. Write access: `admin` custom claim only via `updateStoreHours` CF.
+
+---
+
+## `config/shopInfo` — single document, admin-only write (E17)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `foundedYear` | number | Year the shop was founded. Used to compute years-in-business badge. |
+| `ownerName` | string | Optional. Display name used in testimonials context. |
+| `updatedBy` | string | UID of admin who last modified |
+| `updatedAt` | timestamp | Server timestamp |
+
+Read access: public (no auth required — displayed on public Pawn page). Write access: `admin` custom claim only via Firebase console or a future admin UI. Create this document manually in Firestore console with `foundedYear: <year>`.
+
+---
+
+## `activityFeed/{id}` — live activity collection (E17)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `viewTag` | string | `pawn` \| `cannabis` \| `fireworks` |
+| `action` | string | `'browsing'` — only value for MVP |
+| `displayCity` | string | Hardcoded `"Cornwall Island"` — **never** derived from user data, IP, or geolocation |
+| `createdAt` | timestamp | Server timestamp. Used for ordering and 24-hour TTL purge. |
+
+**Privacy guarantee:** No UID, item ID, IP address, device ID, or any customer-traceable field ever enters this collection. `displayCity` is a hardcoded string constant in the `logActivity` Cloud Function — not derived from request context. Read access: public. Write access: `if false` — all writes via `logActivity` callable CF (Admin SDK).
 
 ---
 

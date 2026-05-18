@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 11
+**Cycle:** 12
 **Started:** 2026-05-18
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E17 · Conversion Optimisation — recently sold strip (real data, `onItemSold` events), years-in-business badge + testimonials module, privacy-safe live activity feed (city-level only, rate-limited, no PII), `limited-edition`/`rare-find` display (staff-set only), hold countdown badge on reserved items.
+Deliver E14 · Seasonal Campaign Scheduler — `campaigns/{id}` collection, `activateCampaign` + `deactivateCampaign` Cloud Functions (scheduled), admin campaign calendar UI, real-date countdown timer component, Fireworks pre-order flow.
 
 ---
 
@@ -43,10 +43,12 @@ Deliver E17 · Conversion Optimisation — recently sold strip (real data, `onIt
 | Lighthouse ≥90 performance, ≥90 accessibility, ≥95 SEO | Requires deployed URL + Chrome DevTools — cannot run in Codespaces terminal | Before E13 ships to dev |
 | WCAG AA axe-core browser verification | Requires running browser session on `/pawn`, `/cannabis`, `/fireworks` | Before E02 fully closes |
 | axe-core browser run on admin dashboard + PoliceHoldManager | Requires live browser session | Post-E10 merge verification |
+| axe-core browser run on E17 components (RecentlySoldStrip, ActivityFeed, HoldCountdownBadge) | Requires live browser session | Post-E17 merge verification |
 | MFA bypass confirmed impossible | Requires Identity Platform upgrade — pre-prod compliance gate | Before prod deploy (E11) |
 | eBay developer account setup (webhook URL registration, notification subscription) | Requires eBay seller account and developer credentials — outside codebase scope | Before E06 deploys to prod |
 | axe-core browser run on admin intake success view (EbayPushButton) | Requires live browser session | Post-E06 merge verification |
-| Vertical video on Cannabis + Fireworks pages | Content dependency — no video assets available | E17 or when assets supplied |
+| Vertical video on Cannabis + Fireworks pages | Content dependency — no video assets available | When assets supplied |
+| `config/shopInfo` document creation | Requires admin to create via Firebase console (`foundedYear: <year>`) — no admin UI in E17 | Before E17 deploys to dev |
 
 ---
 
@@ -60,6 +62,31 @@ Deliver E17 · Conversion Optimisation — recently sold strip (real data, `onIt
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 11** (2026-05-18 → 2026-05-18) — Closed E17 · Conversion Optimisation.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `docs/projects/E17_Conversion_Optimisation.md` spec drafted | E17 | 2026-05-18 |
+| `items/{id}.soldAt` timestamp added to schema; `completeReservation` + `ebayWebhook` CFs updated to stamp `soldAt` | E17 | 2026-05-18 |
+| `config/shopInfo` document added to schema (foundedYear, ownerName) | E17 | 2026-05-18 |
+| `activityFeed/{id}` collection added to schema (privacy-safe, no PII, public read) | E17 | 2026-05-18 |
+| `logActivity` callable CF — rate-limited 1/viewTag/30s, displayCity hardcoded, non-blocking 24h purge | E17 | 2026-05-18 |
+| `RecentlySoldStrip` component — real soldAt data only, policeHold filter, horizontal scroll | E17 | 2026-05-18 |
+| `YearsInBusinessBadge` component — reads config/shopInfo.foundedYear, computes years | E17 | 2026-05-18 |
+| `TestimonialsModule` component — 3 staff-written community quotes, warm copy | E17 | 2026-05-18 |
+| `ActivityFeed` component — onSnapshot, city-level only, fade-up on new entry | E17 | 2026-05-18 |
+| `HoldCountdownBadge` component — 60s interval, no digit flip, returns null on expiry | E17 | 2026-05-18 |
+| `PawnPage` updated: all 4 new components wired, hidden during search | E17 | 2026-05-18 |
+| `ItemQuickView` updated: logActivity fire-and-forget + HoldCountdownBadge on reserved items | E17 | 2026-05-18 |
+| `MasonryGrid` updated: HoldCountdownBadge on reserved masonry cards | E17 | 2026-05-18 |
+| `limited-edition`/`rare-find` display verified complete (E13 built, E17 confirms) | E17 | 2026-05-18 |
+| `firestore.rules` updated: sold items public read, shopInfo public read, activityFeed rule | E17 | 2026-05-18 |
+| `firestore.indexes.json`: status+soldAt DESC and viewTag+createdAt DESC indexes | E17 | 2026-05-18 |
+| 4 `DECISIONS.md` entries: soldAt rationale, hardcoded city, rate-limit design, shopInfo public read | E17 | 2026-05-18 |
+| **E17 CLOSED** (deferred: axe-core browser run, config/shopInfo manual setup — see Deferred) | E17 | 2026-05-18 |
+
+---
 
 **Cycle 10** (2026-05-18 → 2026-05-18) — Closed E20 · Staff Management & Scheduling.
 
@@ -208,7 +235,7 @@ Deliver E17 · Conversion Optimisation — recently sold strip (real data, `onIt
 
 ## Next Cycle Preview
 
-After E17 closes: E14 · Seasonal Campaign Scheduler — campaigns/{id} collection, activateCampaign + deactivateCampaign Cloud Functions, admin campaign calendar UI, real-date countdown timer, Fireworks pre-order flow.
+After E14 closes: E11 · Compliance Programme — PIPEDA consent management, cannabis/fireworks legal disclosures, Identity Platform MFA enforcement (server-side bypass prevention), legal counsel integration.
 
 ---
 

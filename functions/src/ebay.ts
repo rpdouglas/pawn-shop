@@ -316,6 +316,7 @@ async function processEbayNotification(payload: unknown): Promise<void> {
 
   await itemDoc.ref.update({
     status: 'sold',
+    soldAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
   })
 

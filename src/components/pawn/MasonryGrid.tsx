@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import Badge from '../ui/Badge'
 import MerchandisingBadge from '../MerchandisingBadge'
+import HoldCountdownBadge from './HoldCountdownBadge'
 import { formatPrice } from '../../lib/format'
 import type { Item, ConditionGrade } from '../../lib/types'
 
@@ -101,6 +102,11 @@ function MasonryCard({ item, index, onClick, onHover }: MasonryCardProps) {
           variant={`condition-${item.condition}`}
           label={CONDITION_LABELS[item.condition]}
         />
+        {item.status === 'reserved' && item.holdExpiresAt && (
+          <div style={{ marginTop: 'var(--space-2)' }}>
+            <HoldCountdownBadge holdExpiresAt={item.holdExpiresAt} />
+          </div>
+        )}
       </div>
     </article>
   )

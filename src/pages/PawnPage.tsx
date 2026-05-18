@@ -7,6 +7,10 @@ import MasonryGrid from '../components/pawn/MasonryGrid'
 import ItemQuickView from '../components/pawn/ItemQuickView'
 import ClickCollectModal from '../components/pawn/ClickCollectModal'
 import StaffPicksSection from '../components/StaffPicksSection'
+import RecentlySoldStrip from '../components/pawn/RecentlySoldStrip'
+import YearsInBusinessBadge from '../components/pawn/YearsInBusinessBadge'
+import TestimonialsModule from '../components/pawn/TestimonialsModule'
+import ActivityFeed from '../components/pawn/ActivityFeed'
 import Input from '../components/ui/Input'
 import { useItemSearch } from '../hooks/useItemSearch'
 import { docToItem } from '../hooks/useItems'
@@ -45,6 +49,29 @@ export default function PawnPage() {
       <PawnHero />
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: 'var(--space-8) var(--space-6)' }}>
+
+        {/* Trust strip — years in business + recently sold (Makoonsii + Dale) */}
+        {!searchValue && (
+          <section
+            aria-label="Store trust signals"
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 'var(--space-8)',
+              flexWrap: 'wrap',
+              marginBottom: 'var(--space-12)',
+            }}
+          >
+            <YearsInBusinessBadge />
+          </section>
+        )}
+
+        {/* Recently sold strip — real sold data only (Dale persona) */}
+        {!searchValue && <RecentlySoldStrip />}
+
+        {/* Privacy-safe live activity feed (Sandra persona) */}
+        {!searchValue && <ActivityFeed />}
+
         {/* Prefix search bar — Dale and Kevin requirement */}
         <section aria-label="Search inventory" style={{ marginBottom: 'var(--space-12)' }}>
           <Input
@@ -105,6 +132,9 @@ export default function PawnPage() {
             onItemHover={handleItemHover}
           />
         </section>
+
+        {/* Community testimonials — Makoonsii trust signal */}
+        {!searchValue && <TestimonialsModule />}
       </div>
 
       {/* Quick-view modal — data pre-fetched on hover; opens in < 200ms */}

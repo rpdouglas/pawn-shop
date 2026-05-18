@@ -162,6 +162,14 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — `getStaffMembers` implemented as a Cloud Function instead of a direct Firestore read. This ensures staff emails and phone numbers are only accessible to Managers and Admins, and allows for server-side role filtering before sending data to the client.
 
+2026-05-18 — E17: soldAt timestamp added to items/{id}. Written by completeReservation and processEbayNotification CFs on status→sold transition. RecentlySoldStrip queries items by status='sold' orderBy soldAt desc — items sold before this deploy (no soldAt field) are excluded by Firestore's field-existence filter, which is the correct behavior: only real, timestamped sold events are displayed.
+
+2026-05-18 — E17: activityFeed/{id} displayCity hardcoded to "Cornwall Island" — never derived from user data, IP, or geolocation API. Structural PII exclusion: no customer input can introduce identifying data into the collection. Same feed entry produced regardless of visitor location.
+
+2026-05-18 — E17: logActivity callable CF rate-limits at 1 write per viewTag per 30 seconds. Check uses a Firestore query on activityFeed (viewTag == x && createdAt >= now-30s, limit 1). Purges entries older than 24h on each invocation (non-blocking). Collection stays small; no Firestore TTL policy required at this scale.
+
+2026-05-18 — E17: config/shopInfo public read allowed via Firestore rule (docId == 'shopInfo' OR isSignedIn()). YearsInBusinessBadge on public PawnPage requires unauthenticated read. storeHours remains signed-in only. Splitting by docId avoids exposing storeHours to anonymous users.
+
 ---
 
 *Add new entries above this line.*

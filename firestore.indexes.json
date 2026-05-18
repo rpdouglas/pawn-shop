@@ -71,6 +71,22 @@
         { "fieldPath": "viewTag", "order": "ASCENDING" },
         { "fieldPath": "active",  "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "items",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status",  "order": "ASCENDING" },
+        { "fieldPath": "soldAt",  "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "activityFeed",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "viewTag",   "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
