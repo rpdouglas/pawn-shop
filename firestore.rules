@@ -49,7 +49,10 @@ service cloud.firestore {
     // Client-side creates are blocked to guarantee serialBlacklistHit is always set.
     match /pawnRequests/{reqId} {
       allow create: if false;
-      allow read, update: if isStaff();
+      allow read: if isStaff();
+      allow update: if isStaff()
+                       && request.resource.data.diff(resource.data).affectedKeys()
+                           .hasOnly(['status', 'staffNotes']);
       allow delete: if isAdmin();
     }
 

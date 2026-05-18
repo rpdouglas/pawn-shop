@@ -94,6 +94,10 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-17 — auditLogs adds pawn_request_submit and serial_blacklist_hit event types (E07). Written by submitPawnRequest Cloud Function. Details map is {requestId, viewTag} for submit and {requestId, serialNumber} for blacklist hit — no PII in details; name/email/phone stay in pawnRequests/{id} only.
 
+2026-05-18 — pawn-requests Storage read restricted to staff custom claims (E07). Any authenticated user could previously read another customer's submission photos by path. Scoped to admin/manager/inventory_staff to match the Firestore pawnRequests read rule.
+
+2026-05-18 — PawnInbox uses onSnapshot instead of getDocs + manual refresh (E07). Real-time subscription means new submissions appear immediately without staff action. Expanded row closes automatically if the document leaves the current filter view after a status update.
+
 ---
 
 *Add new entries above this line.*

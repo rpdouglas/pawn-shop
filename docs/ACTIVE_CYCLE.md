@@ -7,8 +7,8 @@
 
 ## Current Cycle
 
-**Cycle:** 04
-**Started:** 2026-05-17
+**Cycle:** 05
+**Started:** 2026-05-18
 **Target close:** TBD
 **Deploy target:** dev
 
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E07 · Pawn Form & Inbox: customer pawn enquiry form, `onPawnRequestCreate` Cloud Function with serial blacklist check (sets `serialBlacklistFlag: true` and fires admin alert on match), and staff admin inbox to view/update requests.
+Deliver E08 · Click & Collect / Contact: click-and-collect request form on item detail pages, `reservations/{id}` collection with status flow (pending → confirmed → completed), SMS confirmation within 60 seconds, contact page with Google Maps embed (store location, Cornwall Island).
 
 ---
 
@@ -58,6 +58,19 @@ Deliver E07 · Pawn Form & Inbox: customer pawn enquiry form, `onPawnRequestCrea
 
 ## Previous Cycle Summary
 
+**Cycle 04** (2026-05-17 → 2026-05-18) — Closed E07 · Pawn Form & Inbox.
+
+| Task | Epic | Completed |
+|---|---|---|
+| Customer pawn enquiry form (`PawnEnquiryForm`) + `/pawn/sell` route | E07 | 2026-05-18 |
+| `submitPawnRequest` callable CF — serial blacklist check, auditLogs, admin alert | E07 | 2026-05-18 |
+| `pawnRequests/{id}` Firestore rules — create blocked on client, update field-scoped | E07 | 2026-05-18 |
+| `PawnInbox` admin component — real-time `onSnapshot`, status/notes update | E07 | 2026-05-18 |
+| Storage rules — `pawn-requests/` read restricted to staff custom claims | E07 | 2026-05-18 |
+| **E07 CLOSED** | E07 | 2026-05-18 |
+
+---
+
 **Cycle 03** (2026-05-17 → 2026-05-17) — Closed E06 · eBay Cross-Posting.
 
 | Task | Epic | Completed |
@@ -73,8 +86,8 @@ Deliver E07 · Pawn Form & Inbox: customer pawn enquiry form, `onPawnRequestCrea
 
 ## Next Cycle Preview
 
-After E07 closes: E08 · Click & Collect / Contact — click-and-collect request form, `reservations/{id}` collection, SMS confirmation within 60 seconds, contact page with Google Maps embed.
+After E08 closes: E13 · Merchandising Engine — staff picks admin UI, `calculateTrendingScore` Cloud Function, mood collections per view, quick-view modal (≤200ms), related items by trending score.
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-17*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-18*

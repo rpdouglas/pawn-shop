@@ -1,6 +1,6 @@
 import { useEffect, useState, Fragment } from 'react'
 import {
-  collection, query, orderBy, where, getDocs,
+  collection, query, orderBy, where, onSnapshot,
   doc, updateDoc, Timestamp,
 } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
@@ -59,8 +59,6 @@ export default function PawnInbox() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<FilterValue>('all')
 
-  const [refreshKey, setRefreshKey] = useState(0)
-
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [editStatus, setEditStatus] = useState<PawnRequestStatus>('pending')
   const [editNotes, setEditNotes] = useState('')
@@ -68,30 +66,27 @@ export default function PawnInbox() {
   const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
-    let cancelled = false
+    const col = collection(db, 'pawnRequests')
+    const q = filter === 'all'
+      ? query(col, orderBy('createdAt', 'desc'))
+      : query(col, where('status', '==', filter), orderBy('createdAt', 'desc'))
 
-    const load = async () => {
-      if (!cancelled) setLoading(true)
-      try {
-        const col = collection(db, 'pawnRequests')
-        const q = filter === 'all'
-          ? query(col, orderBy('createdAt', 'desc'))
-          : query(col, where('status', '==', filter), orderBy('createdAt', 'desc'))
+    const unsubscribe = onSnapshot(
+      q,
+      (snap) => {
+        const updated = snap.docs.map(d => toPawnRequest(d.id, d.data() as Record<string, unknown>))
+        setRequests(updated)
+        // Close expanded panel if its request is no longer in the current view
+        setExpandedId(prev => updated.some(r => r.id === prev) ? prev : null)
+        setLoading(false)
+      },
+      () => {
+        setLoading(false)
+      },
+    )
 
-        const snap = await getDocs(q)
-        if (!cancelled) {
-          setRequests(snap.docs.map(d => toPawnRequest(d.id, d.data() as Record<string, unknown>)))
-        }
-      } catch {
-        // Fetch failure is silent — empty table shown; staff can refresh manually
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-
-    load()
-    return () => { cancelled = true }
-  }, [filter, refreshKey])
+    return unsubscribe
+  }, [filter])
 
   const handleExpand = (req: PawnRequest) => {
     if (expandedId === req.id) {
@@ -151,20 +146,12 @@ export default function PawnInbox() {
             key={f}
             type="button"
             className={`btn btn-sm ${filter === f ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => { setFilter(f); setExpandedId(null) }}
+            onClick={() => { setFilter(f); setLoading(true); setExpandedId(null) }}
             aria-pressed={filter === f}
           >
             {FILTER_LABELS[f]}
           </button>
         ))}
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          onClick={() => setRefreshKey(k => k + 1)}
-          aria-label="Refresh enquiries"
-        >
-          ↺ Refresh
-        </button>
       </div>
 
       {loading && (

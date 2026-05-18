@@ -133,10 +133,10 @@
 > - **Dale:** Serial blacklist check gives Dale confidence that the platform takes item integrity seriously — it builds trust in the overall pricing model.
 > - **Compliance:** Every pawn form submission triggers a serial blacklist check. A match sets `serialBlacklistFlag: true` and fires an admin alert. This is not optional.
 
-- [ ] Customer pawn enquiry form (item description, photos, contact info) `[Mak]` `[Dale]`
-- [ ] `onPawnRequestCreate` Cloud Function: serial blacklist check, police hold flag if match, admin alert `[Comp]` `[Staff]`
-- [ ] `pawnRequests/{id}` collection written on submit `[Mak]` `[Dale]`
-- [ ] Staff admin inbox: view requests, update status, add notes `[Staff]`
+- [x] Customer pawn enquiry form (item description, photos, contact info) `[Mak]` `[Dale]`
+- [x] `onPawnRequestCreate` Cloud Function: serial blacklist check, police hold flag if match, admin alert `[Comp]` `[Staff]`
+- [x] `pawnRequests/{id}` collection written on submit `[Mak]` `[Dale]`
+- [x] Staff admin inbox: view requests, update status, add notes `[Staff]`
 
 ---
 

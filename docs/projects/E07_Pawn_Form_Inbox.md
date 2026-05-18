@@ -1,6 +1,6 @@
 # Project E07: Pawn Form & Inbox
 
-**Status:** Active
+**Status:** Done — 2026-05-18
 **Epic:** E07 — Pawn Form & Inbox
 **Phase:** Phase 2 — Core Product
 **Primary Persona:** Makoonsii (The Reserve Regular)
