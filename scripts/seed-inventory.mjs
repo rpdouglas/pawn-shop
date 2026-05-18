@@ -1,8 +1,17 @@
-import { initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
-// Point to the local emulator
-process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
+// Only use emulator if explicitly requested
+if (process.env.USE_EMULATORS === 'true') {
+  console.log('Using Firestore Emulator (localhost:8080)');
+  process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
+} else {
+  console.log('Seeding LIVE project: nats-rack');
+  // Use discovered credentials if in Codespace
+  if (process.env.CODESPACES === 'true') {
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = '/home/codespace/.config/firebase/rpdouglas_gmail_com_application_default_credentials.json';
+  }
+}
 
 initializeApp({
   projectId: 'nats-rack'
