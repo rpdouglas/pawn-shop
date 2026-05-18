@@ -88,6 +88,7 @@ function generateItem(viewTag) {
     category,
     viewTag,
     status,
+    policeHold: false,
     price,
     condition,
     images: [`https://picsum.photos/seed/${Math.random()}/800/600`],

@@ -66,6 +66,7 @@ export function useItems(
       collection(db, 'items'),
       where('viewTag', '==', viewTag),
       where('status', '==', 'active'),
+      where('policeHold', '==', false),
       orderBy(orderField, 'desc'),
       firestoreLimit(itemLimit),
     )

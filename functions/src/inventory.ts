@@ -87,6 +87,7 @@ export const createDraftItem = onCall<CreateDraftItemData>({ cors: true }, async
     category,
     viewTag,
     status: 'draft',
+    policeHold: false,
     images: [],
     searchTokens: [],
     createdAt: now,
@@ -197,6 +198,7 @@ export const publishItem = onCall<PublishItemData>({ cors: true }, async (reques
 
   await itemRef.update({
     status: 'active',
+    policeHold: item['policeHold'] ?? false,
     searchTokens,
     publishedBy: request.auth.uid,
     updatedAt: FieldValue.serverTimestamp(),

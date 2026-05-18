@@ -8,10 +8,10 @@ import type { MoodCategory } from '../lib/types'
 
 // Category values that map to each mood in inventory
 const MOOD_CATEGORY: Record<MoodCategory, string> = {
-  relax:    'cannabis-indica',
-  focus:    'cannabis-sativa',
-  social:   'cannabis-hybrid',
-  ceremony: 'cannabis-premium',
+  relax:    'flower',
+  focus:    'concentrates',
+  social:   'edibles',
+  ceremony: 'topicals',
 }
 
 const ALL_MOODS: MoodCategory[] = ['relax', 'focus', 'social', 'ceremony']

@@ -44,6 +44,7 @@ export function useItemSearch(viewTag: ViewType): {
     const baseConstraints = [
       where('viewTag', '==', viewTag),
       where('status', '==', 'active'),
+      where('policeHold', '==', false),
     ]
 
     const q = debouncedSearch

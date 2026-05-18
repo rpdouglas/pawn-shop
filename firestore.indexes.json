@@ -6,6 +6,7 @@
       "fields": [
         { "fieldPath": "viewTag",    "order": "ASCENDING" },
         { "fieldPath": "status",     "order": "ASCENDING" },
+        { "fieldPath": "policeHold", "order": "ASCENDING" },
         { "fieldPath": "createdAt",  "order": "DESCENDING" }
       ]
     },
@@ -15,15 +16,8 @@
       "fields": [
         { "fieldPath": "viewTag",        "order": "ASCENDING" },
         { "fieldPath": "status",         "order": "ASCENDING" },
+        { "fieldPath": "policeHold",     "order": "ASCENDING" },
         { "fieldPath": "trendingScore",  "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "items",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "searchTokens", "arrayConfig": "CONTAINS" },
-        { "fieldPath": "status",       "order": "ASCENDING" }
       ]
     },
     {
@@ -32,6 +26,7 @@
       "fields": [
         { "fieldPath": "viewTag",      "order": "ASCENDING" },
         { "fieldPath": "status",       "order": "ASCENDING" },
+        { "fieldPath": "policeHold",   "order": "ASCENDING" },
         { "fieldPath": "searchTokens", "arrayConfig": "CONTAINS" }
       ]
     },
