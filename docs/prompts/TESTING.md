@@ -1,5 +1,5 @@
 # QA & Verification Prompt — The Pawn Shop
-**Version:** 1.0 · **Run after `APPROVAL.md` delivers code. Before any PR is opened.**
+**Version:** 1.1 · **Run after `APPROVAL.md` delivers code. Before any PR is opened.**
 
 ---
 
@@ -38,6 +38,14 @@ Confirm for all new code:
 - [ ] All new props and function parameters have explicit types
 - [ ] All Firestore document reads use a typed interface from `src/lib/types.ts`
 - [ ] Prices are integers (CAD cents), never floats
+
+### Bundle Architecture Checks
+
+The main bundle must stay lean. Check after any new page, context, or layout component is added:
+
+- [ ] **New pages lazy-loaded:** Every new route in `main.tsx` uses `lazy()` — never a static import.
+- [ ] **No eager Firebase full imports in layout/context:** `src/App.tsx`, `src/context/`, and `src/components/layout/` must not import from `src/lib/firebase.ts`. They may import from `src/lib/firebase-core.ts` (auth + functions only). Any Firestore/Storage write in an eagerly-loaded component must use a dynamic `import('../lib/firebase')`.
+- [ ] **Main bundle size check:** After `npm run build`, the `dist/assets/index-*.js` chunk must be under 500 KB unminified (≈150 KB gzip). If it exceeds this, something is pulling `firebase.ts` into the eager path — investigate before continuing.
 
 ### Firebase Checks
 
@@ -104,7 +112,7 @@ Run the smoke tests relevant to the primary persona of this feature. These are p
 ### For Jordan & Marcus — All Views
 
 - [ ] **The aiDescription Firewall Test:** Find an item with an `aiDescription` in the emulator. Is it readable from the customer-facing product page? It must not be.
-- [ ] **The PWA Lighthouse Test:** Run Lighthouse in Chrome DevTools on the deployed dev URL. Scores: Performance ≥90, Accessibility ≥90, SEO ≥95.
+- [ ] **The PWA Lighthouse Test:** Run `npm run test:lhci` against the deployed dev URL (`https://nats-rack.web.app`). Thresholds enforced by `lighthouserc.json`: Accessibility ≥90, SEO ≥95, Performance ≥50. Note: Performance ≥90 requires SSR — backlogged. Do not lower the Accessibility or SEO thresholds without a recorded decision in `DECISIONS.md`.
 - [ ] **The Marcus Photography Test:** View the feature on a product detail page. Is the primary image shot to dark luxury standard (macro, dark background, well-lit)? If a placeholder or poorly lit image is displayed, flag it before shipping.
 - [ ] **The Cross-View Coherence Test:** Navigate between `/pawn`, `/cannabis`, and `/fireworks`. Does the brand voice, typography, and editorial quality feel consistent (only accent colour and font should differ)?
 
@@ -136,11 +144,14 @@ For every `auditLogs` entry written by this feature:
 
 ## Part 4 — Accessibility Check
 
-- [ ] Run axe-core in browser DevTools. Zero failures on all new UI.
+- [ ] **Automated axe-core sweep:** Run `npm run test:a11y` (Playwright + axe-core against the deployed dev URL). Zero violations required. If a violation is introduced, the suite catches it before any manual review is needed.
+- [ ] **Manual supplement for new UI:** If new interactive elements were added that are not yet covered by `e2e/accessibility.spec.ts`, verify them with axe-core in browser DevTools and add a test case to the spec.
 - [ ] All new interactive elements have visible focus states.
 - [ ] All images have descriptive `alt` text (or `alt=""` if decorative).
 - [ ] Colour is not the sole means of conveying information (use text labels + colour).
 - [ ] All new text meets WCAG AA contrast (4.5:1 minimum).
+
+> **Note on reduced-motion:** The Playwright config runs with `reducedMotion: 'reduce'`. New CSS animations must honour `@media (prefers-reduced-motion: reduce)` — `animation: none !important` is already in `src/index.css`. Any animation added outside of that global rule needs its own reduced-motion override.
 
 ---
 
@@ -203,4 +214,4 @@ Non-blocking failures may be tracked as GitHub Issues and resolved in the next c
 
 ---
 
-*The Pawn Shop · docs/prompts/TESTING.md · v1.0*
+*The Pawn Shop · docs/prompts/TESTING.md · v1.1 · Updated Cycle 21: bundle architecture checks, automated a11y, LHCI thresholds*
