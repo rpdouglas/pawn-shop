@@ -101,7 +101,7 @@
   --color-accent:        #E8A020;
   --color-highlight:     rgba(232, 160, 32, 0.12);
   --color-text:          #F5EDEC;
-  --color-text-muted:    #9E6B66;
+  --color-text-muted:    #A87878;  /* warm rose-gray: 5.15:1 on #1A0A0A — WCAG AA ✓ */
   --color-border:        #2D1110;
   --font-display:        var(--font-bebas);
   --font-body:           var(--font-oswald);
@@ -913,6 +913,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ── Print — show only QR label ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 @media print {
   body * { visibility: hidden; }
   .qr-label, .qr-label * { visibility: visible; }

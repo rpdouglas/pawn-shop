@@ -5,8 +5,9 @@ export default defineConfig({
   timeout: 30_000,
   retries: 1,
   use: {
-    baseURL: 'https://nats-rack.web.app',
+    baseURL: process.env['PLAYWRIGHT_BASE_URL'] ?? 'http://localhost:5173',
     headless: true,
+    reducedMotion: 'reduce',
     screenshot: 'only-on-failure',
   },
   projects: [
