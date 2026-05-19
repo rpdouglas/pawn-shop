@@ -7,19 +7,6 @@ export default function App() {
   return (
     <ViewProvider>
       <ViewLayout>
-        {/* Dev nav — replaced by per-view navigation in E05 */}
-        <nav aria-label="Site navigation" style={{
-          display: 'flex',
-          gap: 'var(--space-6)',
-          padding: 'var(--space-1) var(--space-8)',
-          borderBottom: '1px solid var(--color-border)',
-          backgroundColor: 'var(--color-surface)',
-        }}>
-          <Link to="/pawn"      className="site-nav-link">Pawn</Link>
-          <Link to="/cannabis"  className="site-nav-link">Cannabis</Link>
-          <Link to="/fireworks" className="site-nav-link">Fireworks</Link>
-        </nav>
-
         <ConsentBanner />
 
         <main id="main-content">

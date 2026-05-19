@@ -380,5 +380,22 @@
 
 ---
 
+## Phase 7 — App Shell & Navigation
+
+### E23 · Unified Global Header
+
+> **Persona Gate — E23:**
+> - **Makoonsii (Primary):** Hamburger menu toggle, drawer links, and profile circle must meet the 48px hit area standard. Navigation must be intuitive and accessible on small viewports.
+> - **Staff:** Admin Dashboard must remain role-gated and easily accessible via the unified header.
+
+- [ ] Unified `GlobalHeader` with Hamburger Menu `[Mak]` `[All]`
+- [ ] Contextual page title in header `[All]`
+- [ ] `NavigationDrawer` with Home, Pawn, Cannabis, Fireworks, Tobacco links `[All]`
+- [ ] `UserProfileCircle` with dropdown (Sign In / Profile / Sign Out) `[All]`
+- [ ] Basic `HomePage` landing page (`/`) `[All]`
+- [ ] Role-gated Admin button in header `[Staff]`
+
+---
+
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*

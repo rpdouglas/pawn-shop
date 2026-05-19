@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 // Self-hosted fonts via @fontsource — no CDN requests at runtime
 import '@fontsource/playfair-display/400.css'
@@ -46,6 +46,7 @@ import ContactPage from './pages/ContactPage.tsx'
 import FavouritesPage from './pages/FavouritesPage.tsx'
 import AccessibilityPage from './pages/AccessibilityPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
+import HomePage from './pages/HomePage.tsx'
 import SellPage from './pages/pawn/SellPage.tsx'
 import MoodCollectionPage from './pages/cannabis/MoodCollectionPage.tsx'
 import BundleCollectionPage from './pages/fireworks/BundleCollectionPage.tsx'
@@ -68,7 +69,7 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <NotFoundPage />,
     children: [
-      { index: true, element: <Navigate to="/pawn" replace /> },
+      { index: true, element: <HomePage /> },
       { path: 'pawn',      element: <PawnPage /> },
       { path: 'pawn/sell', element: <SellPage /> },
       { path: 'cannabis',  element: <AgeGate minAge={19} viewTag="cannabis"><CannabisPage /></AgeGate> },

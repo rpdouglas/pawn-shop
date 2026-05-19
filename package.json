@@ -17,7 +17,7 @@
     "export:llm": "node scripts/export-codebase.mjs",
     "test:e2e": "playwright test",
     "test:a11y": "playwright test e2e/accessibility.spec.ts",
-    "test:lhci": "lhci autorun"
+    "test:lhci": "CHROME_PATH=$(find chrome -name chrome -type f 2>/dev/null | head -1) lhci autorun"
   },
   "dependencies": {
     "@fontsource/bebas-neue": "^5.2.7",

@@ -31,3 +31,7 @@ codebase-export.txt
 # VitePress
 user-guide/.vitepress/dist
 user-guide/.vitepress/cache
+
+# Lighthouse CI output and Chrome binary
+.lighthouseci/
+chrome/

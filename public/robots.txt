@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nats-rack.web.app/sitemap.xml
