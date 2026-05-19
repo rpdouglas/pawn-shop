@@ -18,6 +18,20 @@ export interface AuthUser {
   isMfaEnrolled: boolean
   isStaff: boolean
   isAdmin: boolean
+  // CRM & Retention fields (E15)
+  purchaseHistory?: string[]
+  inquiryHistory?: string[]
+  lifetimeValue?: number
+  segments?: string[]
+  vipFlag?: boolean
+  resellerTier?: ResellerTier
+  alertMethod?: AlertMethod
+  alertOptIn?: boolean
+  crossViewFlag?: boolean
+  phoneNumber?: string
+  consentAcceptedAt?: Date | null
+  consentVersion?: string | null
+  createdAt?: Date
 }
 
 export interface StaffMember {

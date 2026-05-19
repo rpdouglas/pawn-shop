@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
-import twilio from 'twilio'
+import { dispatchSms } from './lib/sms'
 
 const DAY_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const
 
@@ -36,19 +36,6 @@ function isValidPickupWindow(pickupWindow: string, hoursDoc: Record<string, unkn
   const dayConfig = hoursDoc[dayKey] as DayConfig | undefined
   if (!dayConfig || dayConfig.closed) return false
   return generateSlots(dayConfig).includes(startTime)
-}
-
-async function dispatchSms(to: string, body: string): Promise<boolean> {
-  const accountSid = process.env['TWILIO_ACCOUNT_SID']
-  const authToken = process.env['TWILIO_AUTH_TOKEN']
-  const fromNumber = process.env['TWILIO_FROM_NUMBER']
-  if (!accountSid || !authToken || !fromNumber) {
-    console.warn('[SMS] Twilio credentials not configured — skipping')
-    return false
-  }
-  const client = twilio(accountSid, authToken)
-  await client.messages.create({ body, from: fromNumber, to })
-  return true
 }
 
 // ── createReservation ────────────────────────────────────────────────────────
@@ -232,7 +219,22 @@ export const completeReservation = onCall<CompleteReservationData>({ cors: true 
 
   const now = FieldValue.serverTimestamp()
   await resRef.update({ status: 'completed', updatedAt: now })
-  await db.collection('items').doc(resData['itemId'] as string).update({ status: 'sold', soldAt: now, updatedAt: now })
+  
+  const itemRef = db.collection('items').doc(resData['itemId'] as string)
+  const itemSnap = await itemRef.get()
+  const itemPrice = (itemSnap.data() as Record<string, unknown>)?.['price'] as number ?? 0
+
+  await itemRef.update({ status: 'sold', soldAt: now, updatedAt: now })
+
+  // E15: Update customer purchase history and lifetime value
+  const customerUid = resData['uid'] as string
+  if (customerUid) {
+    await db.collection('users').doc(customerUid).update({
+      purchaseHistory: FieldValue.arrayUnion(resData['itemId']),
+      lifetimeValue: FieldValue.increment(itemPrice),
+      updatedAt: now,
+    })
+  }
 
   await db.collection('auditLogs').add({
     eventType: 'reservation_completed',

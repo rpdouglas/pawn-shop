@@ -301,11 +301,11 @@
 > - **Marie:** All CRM automations must pass the Marie Discretion Test before activating. Automated follow-up for cannabis/fireworks views must use generic language.
 > - **Kevin:** 48h staff reminder on pending pawn requests — this is the Kevin conversion trigger. A pawn request that goes unresponded for 48h means Kevin (or Dale) has moved on.
 
-- [ ] `users/{uid}` CRM fields: `purchaseHistory[]` `inquiryHistory[]` `lifetimeValue` `segments[]` `[All]`
-- [ ] VIP flag + reseller tiers (bronze/silver/gold) — staff-set only `[Kev]` `[Marc]` `[Comp]`
-- [ ] Automated follow-ups: 48h staff reminder on pending pawn requests; 72h customer follow-up on quoted items `[Kev]` `[Dale]`
-- [ ] `/admin/crm` dashboard: customer profile view, engagement score `[Staff]`
-- [ ] Cross-view browsing flag (`crossViewFlag`) tracking `[Jord]` `[Marc]`
+- [x] `users/{uid}` CRM fields: `purchaseHistory[]` `inquiryHistory[]` `lifetimeValue` `segments[]` `[All]`
+- [x] VIP flag + reseller tiers (bronze/silver/gold) — staff-set only `[Kev]` `[Marc]` `[Comp]`
+- [x] Automated follow-ups: 48h staff reminder on pending pawn requests; 72h customer follow-up on quoted items `[Kev]` `[Dale]`
+- [x] `/admin/crm` dashboard: customer profile view, engagement score `[Staff]`
+- [x] Cross-view browsing flag (`crossViewFlag`) tracking `[Jord]` `[Marc]`
 
 ---
 

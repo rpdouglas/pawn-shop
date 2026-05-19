@@ -1,5 +1,8 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { doc, updateDoc } from 'firebase/firestore'
+import { db } from '../lib/firebase'
+import { useAuth } from './AuthContext'
 import type { ReactNode } from 'react'
 import type { ViewType } from '../lib/types'
 
@@ -17,7 +20,28 @@ function deriveView(pathname: string): ViewType {
 
 export function ViewProvider({ children }: { children: ReactNode }) {
   const { pathname } = useLocation()
+  const { user } = useAuth()
   const view = deriveView(pathname)
+
+  useEffect(() => {
+    // E15: Cross-view browsing detection
+    const sessionViewsStr = sessionStorage.getItem('pawn_shop_session_views') || ''
+    const sessionViews = new Set(sessionViewsStr ? sessionViewsStr.split(',') : [])
+    
+    if (!sessionViews.has(view)) {
+      sessionViews.add(view)
+      sessionStorage.setItem('pawn_shop_session_views', Array.from(sessionViews).join(','))
+    }
+
+    if (sessionViews.size > 1 && user?.uid) {
+      const userRef = doc(db, 'users', user.uid)
+      updateDoc(userRef, { crossViewFlag: true }).catch(err => {
+        // Silently fail if not authorized or network error
+        console.debug('Failed to update crossViewFlag:', err.message)
+      })
+    }
+  }, [view, user])
+
   return (
     <ViewContext.Provider value={{ view }}>
       {children}

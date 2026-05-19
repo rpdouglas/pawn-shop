@@ -60,6 +60,14 @@ export const submitPawnRequest = onCall<SubmitPawnRequestData>({ cors: true }, a
   // before any staff read, satisfying the E07 compliance requirement.
   const ref = await db.collection('pawnRequests').add(docData)
 
+  // E15: Update customer inquiry history if signed in
+  if (uid) {
+    await db.collection('users').doc(uid).update({
+      inquiryHistory: FieldValue.arrayUnion(ref.id),
+      updatedAt: now,
+    })
+  }
+
   // Audit: submission — no PII in details
   await db.collection('auditLogs').add({
     eventType: 'pawn_request_submit',

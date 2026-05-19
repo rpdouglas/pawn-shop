@@ -198,6 +198,18 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-19 — E11: assertMfaEnrolled helper exported from functions/src/auth.ts and applied to assignRole, setPoliceHold, addSerialToBlacklist, removeSerialFromBlacklist. Skipped in FUNCTIONS_EMULATOR environment (MFA claims are not issued without Identity Platform). In production this check enforces MFA-verified sign-in for the four highest-risk admin operations. Full enforcement across all staff CFs is gated on the Identity Platform upgrade (pre-prod compliance gate from E03).
 
+2026-05-19 — E15 · CRM & Retention: Customer History Tracking. Implemented automated tracking of `purchaseHistory` and `inquiryHistory` on `users/{uid}` via `completeReservation` and `submitPawnRequest` Cloud Functions.
+
+2026-05-19 — E15 · CRM & Retention: Lifetime Value (LTV). Added `lifetimeValue` field to `users/{uid}` (CAD cents), incremented by `completeReservation` using `FieldValue.increment`.
+
+2026-05-19 — E15 · CRM & Retention: VIP & Reseller Tiers. Delivered `vipFlag` and `resellerTier` (bronze/silver/gold) fields. Tier management is manual via staff-only `assignVipStatus` and `updateResellerTier` callables.
+
+2026-05-19 — E15 · CRM & Retention: Scheduled CRM Reminders. Implemented `crmDailyReminders` scheduled job (daily at 09:00). Includes 48h Staff Reminder for pending pawn requests and 72h Customer Follow-up for quoted pawn requests (SMS only if `alertOptIn: true`).
+
+2026-05-19 — E15 · CRM & Retention: Cross-View Detection. Added `crossViewFlag` tracking to `ViewContext.tsx` using `sessionStorage` and Firestore updates. Set true when > 1 view visited in a session and user is signed in.
+
+2026-05-19 — E15 · CRM & Retention: CRM Dashboard. Delivered `/admin/crm` for high-level customer browsing and `/admin/crm/{uid}` for deep profile management and tier control.
+
 ---
 
 *Add new entries above this line.*

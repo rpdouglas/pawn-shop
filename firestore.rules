@@ -82,12 +82,13 @@ service cloud.firestore {
 
     // ── users/{uid} ──────────────────────────────────────────────────────────
     match /users/{uid} {
-      allow read: if isOwner(uid) || isAdmin();
+      allow read: if isOwner(uid) || isStaff();
       allow create: if isOwner(uid);
       allow update: if isOwner(uid)
                        && !request.resource.data.diff(resource.data).affectedKeys()
-                           .hasAny(['role', 'vipFlag', 'resellerTier', 'lifetimeValue'])
-                    || isAdmin();
+                           .hasAny(['role', 'vipFlag', 'resellerTier', 'lifetimeValue', 'purchaseHistory', 'inquiryHistory'])
+                    || isAdmin()
+                    || hasRole('manager');
     }
 
     // ── auditLogs/{id} — immutable, no delete ever ───────────────────────────

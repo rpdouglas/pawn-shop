@@ -45,6 +45,8 @@ import SchedulePage from './pages/staff/SchedulePage.tsx'
 import AgeGate from './components/age-gate/AgeGate.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import DashboardPage from './pages/admin/DashboardPage.tsx'
+import CrmDashboardPage from './pages/admin/crm/CrmDashboardPage.tsx'
+import CustomerDetailPage from './pages/admin/crm/CustomerDetailPage.tsx'
 import PrivacyPage from './pages/PrivacyPage.tsx'
 import TermsPage from './pages/TermsPage.tsx'
 import { captureUtm } from './lib/utm.ts'
@@ -88,6 +90,8 @@ const router = createBrowserRouter([
         { path: 'staff',             element: <StaffManagementPage /> },
         { path: 'scheduling',        element: <SchedulingPage /> },
         { path: 'dashboard',         element: <DashboardPage /> },
+        { path: 'crm',               element: <CrmDashboardPage /> },
+        { path: 'crm/:uid',          element: <CustomerDetailPage /> },
         { path: 'preorders',         element: <PreorderInboxPage /> },
         { path: 'campaigns',         element: <CampaignAdminPage /> },
       ]},

@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 15
+**Cycle:** 16
 **Started:** 2026-05-19
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E15 · CRM & Retention — `purchaseHistory` and `inquiryHistory` tracking on `users/{uid}`, VIP flags and reseller tiers (bronze/silver/gold), automated 48h/72h staff/customer follow-ups, and the `/admin/crm` profile view.
+Deliver E12 · Alerts & Notifications — Saved searches, item favourites/wishlist, and 60-second automated inventory alerts via SMS/Email (CASL compliant).
 
 ---
 
@@ -63,6 +63,19 @@ Deliver E15 · CRM & Retention — `purchaseHistory` and `inquiryHistory` tracki
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 15** (2026-05-19 → 2026-05-19) — Closed E15 · CRM & Retention.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `purchaseHistory` and `inquiryHistory` automated tracking | E15 | 2026-05-19 |
+| VIP flag and Reseller Tier management callables | E15 | 2026-05-19 |
+| `crmDailyReminders` scheduled follow-up job | E15 | 2026-05-19 |
+| `/admin/crm` dashboard and customer detail pages | E15 | 2026-05-19 |
+| Cross-view browsing detection logic | E15 | 2026-05-19 |
+| **E15 CLOSED** | E15 | 2026-05-19 |
+
+---
 
 **Cycle 14** (2026-05-19 → 2026-05-19) — Closed E11 · Compliance Programme & Documentation Sync.
 
