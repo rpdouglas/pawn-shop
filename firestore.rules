@@ -89,6 +89,16 @@ service cloud.firestore {
                            .hasAny(['role', 'vipFlag', 'resellerTier', 'lifetimeValue', 'purchaseHistory', 'inquiryHistory'])
                     || isAdmin()
                     || hasRole('manager');
+
+      // Favourites (E12)
+      match /favourites/{itemId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      // Notifications (E12)
+      match /notifications/{notifId} {
+        allow read, update, delete: if isOwner(uid);
+      }
     }
 
     // ── auditLogs/{id} — immutable, no delete ever ───────────────────────────

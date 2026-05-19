@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import NotificationDropdown from './NotificationDropdown'
 
 export default function GlobalHeader() {
   const { user, loading, logout } = useAuth()
@@ -17,7 +18,7 @@ export default function GlobalHeader() {
       fontFamily: 'var(--font-body)',
       fontSize: 'var(--text-small)',
     }}>
-      <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-8)' }}>
         <Link to="/pawn" style={{
           color: 'var(--color-primary)',
           fontWeight: 600,
@@ -26,6 +27,14 @@ export default function GlobalHeader() {
         }}>
           The Pawn Shop
         </Link>
+
+        {user && (
+          <nav style={{ display: 'flex', gap: 'var(--space-4)' }}>
+            <Link to="/favourites" style={{ color: 'var(--color-text)', textDecoration: 'none', padding: 'var(--space-2)' }}>
+              Favourites
+            </Link>
+          </nav>
+        )}
       </div>
 
       <nav style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-6)' }}>
@@ -37,6 +46,7 @@ export default function GlobalHeader() {
         
         {!loading && user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+            <NotificationDropdown />
             <span style={{ color: 'var(--color-text-muted)' }}>
               {user.email}
             </span>

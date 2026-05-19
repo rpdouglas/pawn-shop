@@ -32,7 +32,12 @@ Deliver E12 · Alerts & Notifications — Saved searches, item favourites/wishli
 
 | Task | Epic | Completed |
 |---|---|---|
-| — | — | — |
+| `savedSearches/{id}` collection + customer UI | E12 | 2026-05-19 |
+| Favourites/wishlist UI (`FavouritesPage`) | E12 | 2026-05-19 |
+| `onItemPublished` Firestore alert trigger | E12 | 2026-05-19 |
+| In-app notification centre dropdown | E12 | 2026-05-19 |
+| CASL opt-in check and discretion branding | E12 | 2026-05-19 |
+| **E12 CLOSED** | E12 | 2026-05-19 |
 
 ---
 

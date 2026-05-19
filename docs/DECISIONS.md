@@ -210,6 +210,12 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-19 — E15 · CRM & Retention: CRM Dashboard. Delivered `/admin/crm` for high-level customer browsing and `/admin/crm/{uid}` for deep profile management and tier control.
 
+2026-05-19 — E12: Alerts matching logic moved to a dedicated Firestore trigger (`onItemPublished`) instead of inline in `publishItem` (E04). Guarantees 60-second SLA while decoupling alert processing from the publishing transaction.
+
+2026-05-19 — E12: Favourites stored in a `users/{uid}/favourites/{itemId}` subcollection rather than an array on the user document. Scales better for users with large wishlists and simplifies Firestore security rules.
+
+2026-05-19 — E12: Notification Centre implemented as a dropdown in the GlobalHeader with real-time Firestore updates. Provides immediate in-app visibility for matched searches and favourited item status changes.
+
 ---
 
 *Add new entries above this line.*

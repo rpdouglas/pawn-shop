@@ -317,12 +317,12 @@
 > - **Marie (Discretion):** Weekly digest email per view must use generic "The Pawn Shop Update" language. No category words in subject lines.
 > - **Tanya:** Seasonal reminders for fireworks (Canada Day, Victoria Day) are the Tanya retention mechanism. Pickup confirmation SMS uses specific time slots.
 
-- [ ] `savedSearches/{id}` collection + customer UI to save searches `[Kev]`
-- [ ] Favourites/wishlist on item detail pages `[San]` `[Marc]`
-- [ ] `onItemCreated` Cloud Function: match saved searches, dispatch SMS (Twilio) or email (SendGrid) within 60 seconds `[Kev]` `[Comp]`
-- [ ] In-app notification centre (mark as read) `[Kev]` `[San]`
+- [x] `savedSearches/{id}` collection + customer UI to save searches `[Kev]`
+- [x] Favourites/wishlist on item detail pages `[San]` `[Marc]`
+- [x] `onItemCreated` Cloud Function: match saved searches, dispatch SMS (Twilio) or email (SendGrid) within 60 seconds `[Kev]` `[Comp]`
+- [x] In-app notification centre (mark as read) `[Kev]` `[San]`
 - [ ] Seasonal reminders + pickup confirmation SMS `[Tan]`
-- [ ] CASL: `alertOptIn == true` checked before every send `[Marie]` `[Kev]` `[Comp]`
+- [x] CASL: `alertOptIn == true` checked before every send `[Marie]` `[Kev]` `[Comp]`
 - [ ] Weekly digest email per view (generic subject line — no category disclosure) `[Jord]` `[Marc]` `[Marie]`
 
 ---

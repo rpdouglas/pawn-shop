@@ -16,3 +16,8 @@ When a staff member **Publishes** an item, a Cloud Function automatically trigge
 - **Real-time Results:** As a customer types in the search bar, the app queries the `searchTokens` array. Results appear in under 300ms.
 - **Debouncing:** The search bar waits for a 300ms pause in typing before firing the query to reduce database load and flicker.
 - **View Scoping:** Search results are always automatically scoped to the current storefront (e.g., searching for "drill" in the Cannabis view will return zero results, even if we have drills in the Pawn view).
+
+## Saved Searches
+Signed-in customers can save their search queries to receive immediate alerts when new matching items are published. 
+
+For details on alert methods and management, see the [Alerts & Notifications](../pawn/alerts-notifications.md) guide.

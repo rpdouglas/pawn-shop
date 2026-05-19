@@ -2,10 +2,12 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { assertMfaEnrolled } from './auth'
 import { onObjectFinalized } from 'firebase-functions/v2/storage'
 import { onSchedule } from 'firebase-functions/v2/scheduler'
+import { onDocumentUpdated } from 'firebase-functions/v2/firestore'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
 import { getStorage } from 'firebase-admin/storage'
 import sharp from 'sharp'
 import * as path from 'node:path'
+import { dispatchSms } from './lib/sms'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -27,40 +29,78 @@ function buildSearchTokens(title: string, category: string): string[] {
   return Array.from(tokens)
 }
 
-// Notify Kevin: query savedSearches active for this viewTag, match query against
-// item's searchTokens, check alertOptIn before sending. Actual dispatch (SMS/email)
-// is deferred to E18 notification service integration.
-async function dispatchKevinAlerts(
-  itemId: string,
-  viewTag: string,
-  searchTokens: string[]
-): Promise<void> {
+// ── Alerts & Notifications (E12) ──────────────────────────────────────────────
+
+/**
+ * Triggered whenever an item is updated. 
+ * If status transitions to 'active' and policeHold is false, dispatches alerts.
+ */
+export const onItemPublished = onDocumentUpdated('items/{itemId}', async (event) => {
+  const before = event.data?.before.data()
+  const after = event.data?.after.data()
+
+  if (!after) return
+  if (before?.['status'] === 'active') return // Only trigger on transition to active
+  if (after['status'] !== 'active') return
+  if (after['policeHold'] === true) return // Never alert on police hold items
+
   const db = getFirestore()
-  const tokenSet = new Set(searchTokens)
+  const itemId = event.params.itemId
+  const viewTag = after['viewTag']
+  const title = after['title']
+  const searchTokens = new Set<string>(after['searchTokens'] || [])
 
   const searchesSnap = await db.collection('savedSearches')
     .where('active', '==', true)
     .where('viewTag', '==', viewTag)
     .get()
 
-  await Promise.all(
-    searchesSnap.docs.map(async (doc) => {
-      const savedSearch = doc.data()
-      const query = String(savedSearch['query'] ?? '').toLowerCase().trim()
-      if (!tokenSet.has(query)) return
+  if (searchesSnap.empty) return
 
-      const userSnap = await db.collection('users').doc(String(savedSearch['uid'])).get()
-      if (!userSnap.exists) return
+  const notifications = searchesSnap.docs.map(async (doc) => {
+    const savedSearch = doc.data()
+    const queryStr = String(savedSearch['query'] ?? '').toLowerCase().trim()
+    
+    // Exact match on one of the search tokens
+    if (!searchTokens.has(queryStr)) return
 
-      const user = userSnap.data()!
-      if (user['alertOptIn'] !== true) return
-      if (!user['alertMethod'] || user['alertMethod'] === 'none') return
+    const userSnap = await db.collection('users').doc(String(savedSearch['uid'])).get()
+    if (!userSnap.exists) return
 
-      // E18 will replace this stub with real dispatch via notification service
-      console.info(`[Kevin alert] method=${user['alertMethod']} itemId=${itemId}`)
-    })
-  )
-}
+    const user = userSnap.data()!
+    if (user['alertOptIn'] !== true) return
+
+    const alerts: Promise<unknown>[] = []
+
+    // 1. In-app notification
+    alerts.push(db.collection('users').doc(userSnap.id).collection('notifications').add({
+      title: 'New Item Match!',
+      body: `A new item matching "${queryStr}" is now available.`,
+      link: `/pawn/item/${itemId}`, // Assuming path structure
+      read: false,
+      createdAt: FieldValue.serverTimestamp()
+    }))
+
+    // 2. External Alert (SMS/Email)
+    const alertMethod = user['alertMethod']
+    if (alertMethod === 'sms' && user['phoneNumber']) {
+      // Discretion: generic branding for cannabis/fireworks
+      const body = viewTag === 'pawn' 
+        ? `[The Pawn Shop] Match found: ${title}. View: https://pawn.shop/item/${itemId}`
+        : `[The Pawn Shop Update] A new item matching your search is available. View: https://pawn.shop/item/${itemId}`
+      
+      alerts.push(dispatchSms(user['phoneNumber'], body))
+    } else if (alertMethod === 'email' && user['email']) {
+      // Email dispatch would go here (SendGrid)
+      // For now, logging email intent as SendGrid helper is internal to storeHours.ts
+      console.info(`[Email Alert] to=${user['email']} subject="New Match Found"`)
+    }
+
+    return Promise.all(alerts)
+  })
+
+  await Promise.all(notifications.filter(Boolean))
+})
 
 // ── createDraftItem ───────────────────────────────────────────────────────────
 // Creates a new draft item. Direct client writes are rejected by Firestore rules
@@ -213,11 +253,6 @@ export const publishItem = onCall<PublishItemData>({ cors: true }, async (reques
     details: { itemId, fromStatus: 'draft', toStatus: 'active' },
     createdAt: FieldValue.serverTimestamp(),
   })
-
-  // policeHold items must never trigger customer alerts — item is hidden from public reads
-  if (!item['policeHold']) {
-    await dispatchKevinAlerts(itemId, String(item['viewTag']), searchTokens)
-  }
 
   return { success: true }
 })

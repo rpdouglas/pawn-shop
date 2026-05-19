@@ -159,6 +159,23 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | `createdAt` | timestamp | |
 | `updatedAt` | timestamp | Server timestamp |
 
+### `users/{uid}/favourites/{itemId}` — customer-only subcollection (E12)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `itemId` | string | Reference to `items/{id}` |
+| `createdAt` | timestamp | |
+
+### `users/{uid}/notifications/{id}` — customer-only subcollection (E12)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `title` | string | Display title |
+| `body` | string | Notification message |
+| `link` | string | Optional destination URL |
+| `read` | boolean | Status flag |
+| `createdAt` | timestamp | |
+
 ---
 
 ## `shifts/{id}`

@@ -13,6 +13,7 @@ import TestimonialsModule from '../components/pawn/TestimonialsModule'
 import ActivityFeed from '../components/pawn/ActivityFeed'
 import CampaignBanner from '../components/CampaignBanner'
 import Input from '../components/ui/Input'
+import SaveSearchButton from '../components/pawn/SaveSearchButton'
 import { useItemSearch } from '../hooks/useItemSearch'
 import { docToItem } from '../hooks/useItems'
 import type { Item } from '../lib/types'
@@ -113,19 +114,29 @@ export default function PawnPage() {
 
         {/* Masonry discovery grid — Sandra's primary experience */}
         <section id="masonry-section" aria-labelledby="discover-heading">
-          <h2
-            id="discover-heading"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--text-heading)',
-              color: 'var(--color-text)',
-              marginBottom: 'var(--space-6)',
-            }}
-          >
-            {searchValue
-              ? `Results for "${searchValue}"`
-              : 'Discover'}
-          </h2>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginBottom: 'var(--space-6)' 
+          }}>
+            <h2
+              id="discover-heading"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--text-heading)',
+                color: 'var(--color-text)',
+                margin: 0,
+              }}
+            >
+              {searchValue
+                ? `Results for "${searchValue}"`
+                : 'Discover'}
+            </h2>
+            {searchValue && (
+              <SaveSearchButton query={searchValue} viewTag="pawn" />
+            )}
+          </div>
 
           <MasonryGrid
             items={items}

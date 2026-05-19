@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { httpsCallable } from 'firebase/functions'
 import { useView } from '../../context/ViewContext'
+import { useAuth } from '../../context/AuthContext'
+import { useFavourites } from '../../hooks/useFavourites'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 import MerchandisingBadge from '../MerchandisingBadge'
@@ -38,6 +40,8 @@ interface ItemQuickViewProps {
 
 export default function ItemQuickView({ item, onClose, onCollect, onSelectRelated }: ItemQuickViewProps) {
   const { view } = useView()
+  const { user } = useAuth()
+  const { isFavourite, toggleFavourite } = useFavourites()
   const panelRef = useRef<HTMLDivElement>(null)
   const [imageIndex, setImageIndex] = useState(0)
 
@@ -302,9 +306,33 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
 
             {/* CTAs */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-              <Button variant="primary" size="lg">
-                Enquire about this item
-              </Button>
+              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                <Button variant="primary" size="lg" style={{ flex: 1 }}>
+                  Enquire about this item
+                </Button>
+                {user && (
+                  <button
+                    onClick={() => toggleFavourite(item.id)}
+                    aria-label={isFavourite(item.id) ? 'Remove from favourites' : 'Add to favourites'}
+                    style={{
+                      background: 'none',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-md)',
+                      width: '48px',
+                      height: '48px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      fontSize: 'var(--text-heading)',
+                      color: isFavourite(item.id) ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                      transition: 'all 0.2s ease-in-out',
+                    }}
+                  >
+                    {isFavourite(item.id) ? '♥' : '♡'}
+                  </button>
+                )}
+              </div>
               {onCollect && item.status === 'active' && item.viewTag !== 'cannabis' && !item.policeHold && (
                 <Button variant="secondary" size="md" onClick={() => { onClose(); onCollect() }}>
                   Reserve for Collection

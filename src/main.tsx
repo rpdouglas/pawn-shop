@@ -36,6 +36,7 @@ import SchedulingPage from './pages/admin/SchedulingPage.tsx'
 import PreorderInboxPage from './pages/admin/PreorderInboxPage.tsx'
 import CampaignAdminPage from './pages/admin/CampaignAdminPage.tsx'
 import ContactPage from './pages/ContactPage.tsx'
+import FavouritesPage from './pages/FavouritesPage.tsx'
 import AccessibilityPage from './pages/AccessibilityPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
 import SellPage from './pages/pawn/SellPage.tsx'
@@ -69,6 +70,7 @@ const router = createBrowserRouter([
       { path: 'fireworks/collections/bundles', element: <AgeGate minAge={18} viewTag="fireworks"><BundleCollectionPage /></AgeGate> },
       { path: 'login',     element: <LoginPage /> },
       { path: 'signup',    element: <SignUpPage /> },
+      { path: 'favourites', element: <FavouritesPage /> },
       { path: 'auth', children: [
         { path: 'mfa-enroll', element: <MfaEnrollPage /> },
       ]},
