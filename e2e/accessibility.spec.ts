@@ -15,6 +15,11 @@ for (const route of publicRoutes) {
   test(`axe: ${route.label}`, async ({ page }) => {
     await page.goto(route.path)
     await page.waitForLoadState('load')
+    // Freeze all CSS animations so axe scans the settled state, not a mid-animation frame.
+    // fade-up starts at opacity:0 (fill-mode:both) — without this the color contrast
+    // checks measure blended/partial-opacity colours rather than the final token values.
+    await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })
+    await page.evaluate(() => new Promise<void>(r => requestAnimationFrame(() => r())))
     const results = await new AxeBuilder({ page }).analyze()
     expect(results.violations).toEqual([])
   })
