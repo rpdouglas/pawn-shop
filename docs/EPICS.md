@@ -388,12 +388,12 @@
 > - **Makoonsii (Primary):** Hamburger menu toggle, drawer links, and profile circle must meet the 48px hit area standard. Navigation must be intuitive and accessible on small viewports.
 > - **Staff:** Admin Dashboard must remain role-gated and easily accessible via the unified header.
 
-- [ ] Unified `GlobalHeader` with Hamburger Menu `[Mak]` `[All]`
-- [ ] Contextual page title in header `[All]`
-- [ ] `NavigationDrawer` with Home, Pawn, Cannabis, Fireworks, Tobacco links `[All]`
-- [ ] `UserProfileCircle` with dropdown (Sign In / Profile / Sign Out) `[All]`
-- [ ] Basic `HomePage` landing page (`/`) `[All]`
-- [ ] Role-gated Admin button in header `[Staff]`
+- [x] Unified `GlobalHeader` with Hamburger Menu `[Mak]` `[All]`
+- [x] Contextual page title in header `[All]`
+- [x] `NavigationDrawer` with Home, Pawn, Cannabis, Fireworks, Tobacco links `[All]`
+- [x] `UserProfileCircle` with dropdown (Sign In / Profile / Sign Out) `[All]`
+- [x] Basic `HomePage` landing page (`/`) `[All]`
+- [x] Role-gated Admin button in header `[Staff]`
 
 ---
 
