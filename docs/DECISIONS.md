@@ -220,6 +220,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-19 — E16: eBay Dispute Integration. Managed via a simplified staff view using `ebayDisputeId` matching. Background sync deferred to E22; current phase focuses on staff visibility and manual resolution matching.
 
+2026-05-19 — E18: Added `aiTagSuggestions` to `items/{id}/internal/ai` schema to support staff-facing tag recommendations.
+
 ---
 
 *Add new entries above this line.*

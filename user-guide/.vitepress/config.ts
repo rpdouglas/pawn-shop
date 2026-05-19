@@ -46,12 +46,15 @@ export default defineConfig({
       {
         text: 'Intelligence & Operations',
         items: [
-          { text: 'Admin Dashboard', link: '/admin/dashboard' },
+          { text: 'Global Dashboard', link: '/admin/dashboard' },
+          { text: 'Inventory Management', link: '/admin/inventory' },
+          { text: 'AI Assistant', link: '/admin/ai-assistant' },
           { text: 'Audit Logs', link: '/admin/audit-logs' },
           { text: 'Police Holds', link: '/admin/police-holds' },
           { text: 'eBay Sync', link: '/ebay/cross-posting' }
         ]
       }
+
     ]
   }
 })

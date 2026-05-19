@@ -351,13 +351,13 @@
 > - **Staff review gate (Compliance):** Every Gemini output is a draft. It saves to `aiDescription` only. Staff must explicitly promote to `description`. No exceptions. This is enforced at the Cloud Function level, the Firestore rule level, and the UI level.
 > - **Kanien'kéha Rule:** AI must never generate Kanien'kéha. Embed this constraint in every Gemini system prompt. See `docs/prompts/GEMINI_INITIALIZATION.md`.
 
-- [ ] `generateAIDescription` Cloud Function (callable, Gemini, staff review gate — no auto-publish) `[Jord]` `[Marc]` `[Comp]`
+- [x] `generateAIDescription` Cloud Function (callable, Gemini, staff review gate — no auto-publish) `[Jord]` `[Marc]` `[Comp]`
   - High-value items: prompt includes provenance, cultural context, scarcity `[Marc]`
   - Draft saved to `aiDescription` only — Firestore rule prevents customer read `[Comp]`
-- [ ] eBay title optimiser (AI suggests 3 variants, staff selects) `[Dale]` `[Staff]`
-- [ ] Auto-tagging: min 3 suggestions per item, staff confirms each `[All]` `[Comp]`
-- [ ] Price suggestion: eBay sold comps range, guidance only, never a published price `[Dale]` `[Comp]`
-- [ ] Duplicate detection: alert before publishing if similar item exists `[Staff]`
+- [x] eBay title optimiser (AI suggests 3 variants, staff selects) `[Dale]` `[Staff]`
+- [x] Auto-tagging: min 3 suggestions per item, staff confirms each `[All]` `[Comp]`
+- [x] Price suggestion: eBay sold comps range, guidance only, never a published price `[Dale]` `[Comp]`
+- [x] Duplicate detection: alert before publishing if similar item exists `[Staff]`
 
 ---
 

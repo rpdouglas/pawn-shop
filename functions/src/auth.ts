@@ -15,6 +15,20 @@ export function assertMfaEnrolled(request: CallableRequest): void {
   }
 }
 
+export function assertStaff(request: CallableRequest): { uid: string } {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Sign in required')
+  }
+  const token = request.auth.token as Record<string, unknown>
+  const staffRoles = ['admin', 'manager', 'inventory_staff', 'marketing_staff']
+  const isStaff = staffRoles.some(role => token[role] === true)
+  
+  if (!isStaff) {
+    throw new HttpsError('permission-denied', 'Staff only.')
+  }
+  return { uid: request.auth.uid }
+}
+
 type StaffRole = 'admin' | 'manager' | 'inventory_staff' | 'marketing_staff' | 'customer'
 
 const VALID_ROLES: readonly StaffRole[] = [
