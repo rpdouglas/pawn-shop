@@ -256,6 +256,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-19 — E23: Unified Global Header implemented with a component-split architecture (`GlobalHeader`, `NavigationDrawer`, `UserNav`, `UserProfileCircle`). The Hamburger Menu approach was selected to provide a clean, mobile-first navigation shell that meets Makoonsii's 48px touch target requirements and avoids monolithic file bloat.
 
+2026-05-19 — E24 CI/CD: `deploy-dev.yml` re-targeted to `dev` branch. `deploy-prod.yml` triggered on `main` push but temporarily routes to `nats-rack` dev project using `DEV_FIREBASE_*` secrets and `FIREBASE_SERVICE_ACCOUNT_DEV`. Prod switchover instructions embedded as a comment block in `deploy-prod.yml`. Both branches validate against the same dev environment during this phase. `deploy-prod.yml` also gains: paths filter matching `deploy-dev.yml`, "skip if no package.json" safety step, and an event-aware `if:` guard that allows push triggers while still requiring "DEPLOY" confirmation on manual dispatch.
+
 ---
 
 *Add new entries above this line.*
