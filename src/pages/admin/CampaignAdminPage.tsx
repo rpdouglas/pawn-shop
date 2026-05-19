@@ -24,6 +24,7 @@ function docToCampaign(doc: { id: string; data: () => Record<string, unknown> })
     bannerCopy:       String(d['bannerCopy'] ?? ''),
     countdownEnabled: Boolean(d['countdownEnabled']),
     createdBy:        d['createdBy'] != null ? String(d['createdBy']) : undefined,
+    reminderSentAt:   d['reminderSentAt'] != null ? (d['reminderSentAt'] as { toDate(): Date }).toDate() : null,
     updatedAt:        d['updatedAt'] != null ? (d['updatedAt'] as { toDate(): Date }).toDate() : undefined,
     createdAt:        (d['createdAt'] as { toDate(): Date }).toDate(),
   }
@@ -141,13 +142,18 @@ function CampaignAdmin() {
               {c.viewTag} · {c.startDate.toLocaleDateString('en-CA')} – {c.endDate.toLocaleDateString('en-CA')}
               {c.countdownEnabled && ' · Countdown'}
             </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: 0, fontStyle: 'italic' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: '0 0 var(--space-1)', fontStyle: 'italic' }}>
               "{c.bannerCopy}"
               {c.discountRule.value > 0 && (
                 <span style={{ marginLeft: 'var(--space-2)' }}>
                   — {c.discountRule.type === 'percent' ? `${c.discountRule.value}%` : formatPrice(c.discountRule.value)} off
                 </span>
               )}
+            </p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: 0 }}>
+              {c.reminderSentAt != null
+                ? `Reminder sent: ${c.reminderSentAt.toLocaleDateString('en-CA')}`
+                : 'Reminder: not yet sent'}
             </p>
           </div>
           <span style={{

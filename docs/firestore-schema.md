@@ -84,6 +84,7 @@
 | `customerPhone` | string | Phone number for Twilio SMS — never in `auditLogs` |
 | `viewTag` | string | `pawn` \| `fireworks` — determines SMS language guard |
 | `smsDeliveredAt` | timestamp | Set by CF after Twilio API call; null if delivery failed |
+| `pickupReminderSentAt` | timestamp | Set by `sendPickupReminders` CF when the 24-hour pre-pickup SMS has been dispatched. Null until sent. Prevents duplicate sends. |
 | `staffNotes` | string | Internal — never shown to customer |
 | `createdAt` | timestamp | Server timestamp |
 | `updatedAt` | timestamp | Set by confirmReservation and completeReservation CFs on status transition |
@@ -198,7 +199,7 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` `ebay_push` `ebay_sync_sold` `pawn_request_submit` `serial_blacklist_hit` `reservation_created` `reservation_confirmed` `reservation_declined` `reservation_completed` `store_hours_updated` `serial_blacklist_add` `serial_blacklist_remove` `data_purged` `staff_pick_set` `staff_pick_removed` `campaign_activated` `campaign_deactivated` `preorder_created` `preorder_confirmed` `preorder_ready` `preorder_collected` `preorder_cancelled` `dispute_created` `dispute_resolved` `item_restocked` |
+| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` `ebay_push` `ebay_sync_sold` `pawn_request_submit` `serial_blacklist_hit` `reservation_created` `reservation_confirmed` `reservation_declined` `reservation_completed` `store_hours_updated` `serial_blacklist_add` `serial_blacklist_remove` `data_purged` `staff_pick_set` `staff_pick_removed` `campaign_activated` `campaign_deactivated` `preorder_created` `preorder_confirmed` `preorder_ready` `preorder_collected` `preorder_cancelled` `dispute_created` `dispute_resolved` `item_restocked` `seasonal_reminder_sent` `pickup_reminder_sent` `weekly_digest_sent` |
 | `uid` | string | Actor UID |
 | `targetId` | string | Optional — item/user being acted on |
 | `details` | map | Context. **Never include PII** |
@@ -230,6 +231,7 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | `bannerCopy` | string | |
 | `countdownEnabled` | boolean | |
 | `createdBy` | string | UID of staff member who created the campaign |
+| `reminderSentAt` | timestamp | Set by `sendSeasonalReminders` CF when the batch reminder has been dispatched. Null until sent. Prevents duplicate sends per campaign activation. |
 | `updatedAt` | timestamp | Server timestamp. Set by CF on activate/deactivate. |
 | `createdAt` | timestamp | |
 
@@ -311,5 +313,6 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | `smsDeliveredAt` | timestamp | Set by CF after Twilio API call; null if not yet sent or delivery failed |
 | `campaignId` | string | Optional. Reference to `campaigns/{id}` if preorder placed during a campaign |
 | `staffNotes` | string | Internal — never shown to customer |
+| `pickupReminderSentAt` | timestamp | Set by `sendPickupReminders` CF when the 24-hour pre-pickup SMS has been dispatched. Null until sent. Prevents duplicate sends. |
 | `updatedAt` | timestamp | Set by CF on every status transition (confirm, ready, collect, cancel) |
 | `createdAt` | timestamp | Server timestamp |

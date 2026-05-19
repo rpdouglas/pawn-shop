@@ -321,9 +321,9 @@
 - [x] Favourites/wishlist on item detail pages `[San]` `[Marc]`
 - [x] `onItemCreated` Cloud Function: match saved searches, dispatch SMS (Twilio) or email (SendGrid) within 60 seconds `[Kev]` `[Comp]`
 - [x] In-app notification centre (mark as read) `[Kev]` `[San]`
-- [ ] Seasonal reminders + pickup confirmation SMS `[Tan]`
+- [x] Seasonal reminders + pickup confirmation SMS `[Tan]`
 - [x] CASL: `alertOptIn == true` checked before every send `[Marie]` `[Kev]` `[Comp]`
-- [ ] Weekly digest email per view (generic subject line — no category disclosure) `[Jord]` `[Marc]` `[Marie]`
+- [x] Weekly digest email per view (generic subject line — no category disclosure) `[Jord]` `[Marc]` `[Marie]`
 
 ---
 

@@ -33,4 +33,47 @@ Notifications are updated in real-time and can be marked as read once viewed.
 
 ---
 
+## Pickup Reminder
+
+If you have a confirmed reservation or pre-order with a scheduled pickup window, the system will send you an SMS reminder approximately 24 hours before your window opens.
+
+- The message will include your **exact pickup time slot** (e.g., "Your pickup is tomorrow. Window: 2024-06-30 14:00–16:00").
+- No action is required — the reminder is sent automatically once your booking is confirmed.
+- Requires CASL opt-in (see below).
+
+---
+
+## Seasonal Reminders
+
+When The Pawn Shop opens a seasonal event (such as Fireworks season), opted-in customers receive a one-time SMS letting them know selections are now available.
+
+- Messages use **The Pawn Shop Update** branding — no category-specific language appears in the message.
+- The reminder fires once per campaign and will not repeat for the same event.
+- Requires CASL opt-in (see below).
+
+---
+
+## Weekly Digest Email
+
+Every Monday morning, opted-in customers receive **The Pawn Shop Update** — a curated email featuring that week's top finds from the shop.
+
+- Subject line is always "The Pawn Shop Update" — no category or product words appear in the subject or preheader.
+- The email links directly to individual item pages so you can act before they sell.
+- To stop receiving the weekly digest, ask a staff member to update your communication preferences, or contact us directly.
+- Requires CASL opt-in (see below).
+
+---
+
+## CASL Opt-In
+
+All outbound messages from The Pawn Shop — saved search alerts, seasonal reminders, pickup reminders, and the weekly digest — require your explicit consent under Canada's Anti-Spam Legislation (CASL).
+
+**How to opt in:** A staff member or CRM manager can enable notifications on your account via the customer profile in the admin dashboard. You may also be prompted during account registration.
+
+**How to opt out:** Contact us at any time to remove your consent. Your preferences will be updated immediately and no further messages will be sent.
+
+Until `alertOptIn` is enabled on your account, all scheduled and triggered notifications will be silently bypassed — no messages will be sent regardless of your saved searches or bookings.
+
+---
+
 *The Pawn Shop · user-guide/pawn/alerts-notifications.md*

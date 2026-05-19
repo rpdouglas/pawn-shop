@@ -181,6 +181,7 @@ export interface Campaign {
   bannerCopy: string
   countdownEnabled: boolean
   createdBy?: string
+  reminderSentAt?: Date | null
   updatedAt?: Date
   createdAt: Date
 }

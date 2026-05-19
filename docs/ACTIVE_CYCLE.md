@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 20
+**Cycle:** 21
 **Started:** 2026-05-19
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Optimize merchandising workflows and finalize quality audits.
+Deploy E12 to dev; complete all outstanding browser-based QA verification (Lighthouse ≥90, axe-core runs deferred from E09, E14, E17, E19).
 
 ---
 
@@ -32,6 +32,7 @@ Optimize merchandising workflows and finalize quality audits.
 
 | Task | Epic | Completed |
 |---|---|---|
+| | | |
 
 ---
 
@@ -61,6 +62,19 @@ Optimize merchandising workflows and finalize quality audits.
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 20** (2026-05-19 → 2026-05-19) — Closed E12 · Alerts & Notifications (remaining tasks).
+
+| Task | Epic | Completed |
+|---|---|---|
+| `sendSeasonalReminders` CF — campaign-driven SMS batch, idempotency via `reminderSentAt` | E12 | 2026-05-19 |
+| `sendPickupReminders` CF — 24h advance SMS for confirmed reservations + preorders | E12 | 2026-05-19 |
+| `sendWeeklyDigest` CF — Monday HTML email, subject "The Pawn Shop Update", CASL-gated | E12 | 2026-05-19 |
+| `dispatchEmail` SendGrid utility (`functions/src/lib/email.ts`) | E12 | 2026-05-19 |
+| `CampaignAdminPage` — `reminderSentAt` read-only display | E12 | 2026-05-19 |
+| **E12 CLOSED** | E12 | 2026-05-19 |
+
+---
 
 **Cycle 19** (2026-05-19 → 2026-05-19) — Closed E19 · Editorial CMS & Brand Narrative.
 
@@ -144,4 +158,4 @@ Optimize merchandising workflows and finalize quality audits.
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-19*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-19 (Cycle 21 open)*

@@ -15,6 +15,11 @@ Our platform manages high-stakes retail. Learn about our router-level age verifi
 - [Search & Discovery](/inventory/search)
 - [Regional Search (Local SEO)](/admin/local-seo)
 
+### 🔔 Alerts & Notifications
+Our CASL-compliant notification system covers saved search alerts, 24-hour pickup reminders, seasonal campaign SMS, and the weekly Monday digest email.
+- [Customer Alerts & Notifications](/pawn/alerts-notifications)
+- [Seasonal Campaign Scheduler](/admin/campaigns)
+
 ### 🤝 Pawn & Resale
 Details on our one-handed mobile pawn enquiry form, the server-side serial blacklist check, and our internal staff inbox management.
 - [Customer Pawn Enquiries](/pawn/selling)

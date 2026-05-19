@@ -232,6 +232,20 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-19 — E19: `logFaqAction` Cloud Function implemented to handle `auditLogs` for FAQ creation, updates, and deletions. Ensures compliance with "Admin SDK writes only" mandate for audit logs.
 
+2026-05-19 — E12 remaining: `sendWeeklyDigest` restricted to pawn-only items (caught in QA). Cannabis/fireworks viewTags expose the category via the item URL path in the email body, violating the Marie Discretion Test. Pawn items are safe to feature cross-audience. View-specific digests (cannabis-only to opted-in cannabis users) deferred until per-view segment opt-in is built.
+
+2026-05-19 — E12 remaining: `sendWeeklyDigest` sends one combined digest to all opted-in users featuring top 5 trending items across all views. Per-view targeting (cannabis-only digest, fireworks-only digest) deferred — no `segments[]` data to target safely without risking category disclosure for Marie. One neutral digest satisfies all three tagged personas (Jordan, Marcus, Marie) without discrimination risk.
+
+2026-05-19 — E12 remaining: Weekly digest queries `items where status == 'active' orderBy trendingScore desc limit 10` using a new `(status, trendingScore)` composite index. Existing indexes require `viewTag` as the leading field; a cross-view digest requires this new two-field index. `policeHold` filtered in JS after the Firestore read (fetch 10, keep first 5 with policeHold != true).
+
+2026-05-19 — E12 remaining: `sendSeasonalReminders` sets `reminderSentAt` after the batch regardless of how many SMS sends succeeded. Chosen to prevent duplicate batch sends if the CF retries (e.g. Twilio outage). At MVP scale a missed batch is less harmful than flooding all opted-in users with duplicate messages. `auditLogs.recipientCount` gives staff visibility into whether the send was effective.
+
+2026-05-19 — E12 remaining: `campaigns/{id}.reminderSentAt` added (timestamp, nullable). Set by `sendSeasonalReminders` CF after dispatching the batch reminder for an activated campaign. Prevents duplicate sends across multiple CF invocations.
+
+2026-05-19 — E12 remaining: `reservations/{id}.pickupReminderSentAt` and `preorders/{id}.pickupReminderSentAt` added (timestamp, nullable). Set by `sendPickupReminders` CF when the 24-hour pre-pickup SMS is dispatched. Idempotency guard — the scheduled CF checks this field before sending.
+
+2026-05-19 — E12 remaining: `auditLogs.eventType` union extended with `seasonal_reminder_sent`, `pickup_reminder_sent`, `weekly_digest_sent`. Details maps: seasonal uses `{campaignId, viewTag, recipientCount}`; pickup uses `{reservationId | preorderId, viewTag}`; digest uses `{viewTag, recipientCount}` — no PII in any map.
+
 ---
 
 *Add new entries above this line.*

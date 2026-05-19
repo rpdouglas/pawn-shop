@@ -81,6 +81,14 @@
       ]
     },
     {
+      "collectionGroup": "items",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status",       "order": "ASCENDING" },
+        { "fieldPath": "trendingScore","order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "activityFeed",
       "queryScope": "COLLECTION",
       "fields": [
