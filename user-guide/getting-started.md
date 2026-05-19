@@ -72,8 +72,9 @@ See [Age Verification](/compliance/age-gates) for full details.
 | I want to… | Go to |
 |---|---|
 | Receive and publish a new item | [Intake Process](/inventory/intake) |
-| Understand how items move through the system | [Item Lifecycle](/inventory/lifecycle) |
-| See live inventory and operational stats | [Admin Dashboard](/admin/dashboard) |
+| Manage customer profiles and VIPs | [CRM Dashboard](/admin/crm) |
+| Create editorial content | [Editorial CMS](/admin/editorial-cms) |
+| See live inventory and stats | [Admin Dashboard](/admin/dashboard) |
 | Review incoming pawn enquiries | [Pawn Inbox](/admin/pawn-inbox) |
 | Manage my shift schedule | [My Schedule](/staff/personal-schedule) |
 | Set up a saved search alert | [Alerts & Notifications](/pawn/alerts-notifications) |

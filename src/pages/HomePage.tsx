@@ -7,11 +7,23 @@ export default function HomePage() {
   return (
     <div className={`view-${view}`} style={{ backgroundColor: 'var(--color-bg)', minHeight: '100vh' }}>
       <section style={{ 
-        padding: 'var(--space-20) var(--space-6)', 
+        padding: 'var(--space-12) var(--space-6)', 
         textAlign: 'center',
         maxWidth: '1200px',
         margin: '0 auto'
       }}>
+        <div style={{ marginBottom: 'var(--space-8)', display: 'flex', justifyContent: 'center' }}>
+          <img 
+            src="/branding/logo.webp" 
+            alt="The Pawn Shop - Cornwall Island, Akwesasne"
+            width={800}
+            height={533}
+            style={{ 
+              maxWidth: 'clamp(200px, 50vw, 400px)', 
+              height: 'auto' 
+            }}
+          />
+        </div>
         <h1 style={{ 
           fontFamily: 'var(--font-display)', 
           fontSize: 'clamp(3rem, 10vw, 6rem)', 

@@ -262,6 +262,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-19 — E25: `overflow: hidden` added to `NavigationDrawer` outer div. CSS flex `min-width: auto` prevents a flex child from shrinking below its content width, which blocks the `text-overflow: ellipsis` on the page title span. `overflow: hidden` on the flex child forces `min-width: 0`, enabling truncation at narrow viewports (e.g. "The Pawn Shop - Pawn & Resale" at 375px). Not a layout overflow concern — the drawer uses `position: fixed` and is unaffected.
 
+2026-05-19 — E27: Brand logo (`logo_pc.png`) optimized from 2.3MB to 113KB WebP using a manual `sharp` script. Manual optimization selected over Vite plugins to avoid unnecessary build dependencies, as dynamic inventory image optimization is already handled by server-side Cloud Functions.
+
 ---
 
 *Add new entries above this line.*

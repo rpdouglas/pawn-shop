@@ -409,6 +409,16 @@
 
 ---
 
+### E27 · Homepage Logo Integration
+
+> **Persona Gate — E27:**
+> - **Makoonsii:** High-recognition brand signal. Appropriate mobile sizing.
+> - **Jordan:** PWA Performance maintenance. No layout shift.
+
+- [x] Optimize and integrate official brand logo on HomePage `[Mak]` `[Jord]`
+
+---
+
 ## Phase 8 — Infrastructure
 
 ### E24 · CI/CD Pipeline Strategy
@@ -444,6 +454,252 @@
 
 - [ ] Modify deployment workflows to generate and inject `VITE_APP_VERSION` `[Staff]`
 - [ ] Display automated version string in Site Footer and Admin Dashboard `[Staff]`
+
+---
+
+---
+
+## Phase 9 — Production Readiness
+
+> **Gate:** All Phase 9 items must be closed before any Phase 10+ work begins in `the-addicts-agenda`. No net-new features ship to production until this phase is complete.
+
+### Cycle 24 QA — Design Token & WCAG Fixes
+
+> **Persona Gate:**
+> - **Makoonsii:** Navigation drawer heading must pass WCAG AA contrast in all three views.
+> - **Jordan:** No hardcoded px/rem/ms values in any shipped component. Token system must be consistent end-to-end.
+> - **Compliance:** axe-core scan must return zero violations after fixes.
+
+- [ ] Fix `HomePage.tsx`: replace `maxWidth: '1200px'`, `minHeight: '240px'`, `fontSize: '2rem'`, clamp hero font, and `transition: 'transform 0.2s ease-in-out'` with `--space-*`, `--text-*`, and `--motion-*` tokens `[Jord]` `[Comp]`
+- [ ] Fix `UserProfileCircle.tsx`: replace all hardcoded `px` and `rem` values with `--space-*` / `--text-*` / `--dropdown-min-width` tokens `[Mak]` `[Jord]`
+- [ ] Fix `NavigationDrawer.tsx`: change "Navigation" `h2` colour from `--color-primary` to `--color-text-muted` (WCAG AA at 2.8:1 fails in cannabis view) `[Mak]` `[Comp]`
+- [ ] Run Playwright axe-core scan — zero violations is the close condition `[Mak]` `[Comp]`
+
+---
+
+### E03-QA · MFA Bypass Confirmation
+
+> Identity Platform upgrade required for production gate.
+
+- [ ] Upgrade Firebase project `the-addicts-agenda` to Identity Platform (console operation) `[Comp]`
+- [ ] Verify `assertMfaEnrolled` (in `functions/src/auth.ts`) enforces MFA in production `[Comp]` `[Marie]`
+- [ ] Test MFA bypass attempt with staff account in prod — confirm `unauthenticated` error thrown `[Comp]`
+- [ ] Log decision date in `DECISIONS.md` `[Comp]`
+
+---
+
+### E06-QA · eBay Webhook Production Credentials
+
+> Config-only — implementation is complete in `functions/src/ebay.ts`.
+
+- [ ] Register `ebayWebhook` deployed URL in eBay developer portal Notification API `[Staff]`
+- [ ] Set `EBAY_VERIFICATION_TOKEN` and `EBAY_WEBHOOK_URL` in GitHub Secrets + Firebase Functions env `[Staff]`
+- [ ] Run GET challenge verification to confirm eBay handshake `[Staff]`
+- [ ] Test sandbox sold event — confirm `status: 'sold'` propagates to Firestore within 60 s `[Dale]` `[Kev]`
+
+---
+
+### E09-QA · Lighthouse Performance Decision Gate
+
+> Confirm non-negotiable Lighthouse gates pass. Log SSR decision for Phase 14 planning.
+
+- [ ] Confirm Lighthouse accessibility ≥0.90 and SEO ≥0.95 pass on dev build `[Jord]` `[Marc]` `[Comp]`
+- [ ] Log SSR deferral decision in `DECISIONS.md` with rationale (performance ≥0.90 blocked by SSR — deferred to Phase 14) `[Staff]`
+- [ ] Update `lighthouserc.json` comment to reference E37 (SSR epic in Phase 14) `[Staff]`
+
+---
+
+## Phase 10 — Inventory Intelligence
+
+> **Goal:** Data-driven merchandising. Automate stale-inventory turnover and close the cannabis product data gap vs. Dutchie/Jane. Schema updates in `docs/firestore-schema.md` and `docs/DECISIONS.md` are required before any implementation task begins.
+
+### E28 · Algorithmic Markdown Engine (Dutch Auction)
+
+> **Persona Gate — E28:**
+> - **Dale (Authenticity Test):** Price drops must be real — based on staff-configured `markdownRate` and `floorPrice`. No manufactured urgency. `rare-find` and `limited-edition` tags are immune to markdown scheduling.
+> - **Kevin (Alert Accuracy):** Price-drop notifications must respect CASL `alertOptIn` and fire within 60 s of the Cloud Function write — same SLA as item alerts.
+> - **Sandra:** "Price Dropped" badge must surface in the masonry grid via the existing `MerchandisingBadge` component. No bounce or particle animation.
+
+- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `floorPrice`, `markdownRate`, `markdownPeriodDays`, `markdownEnabled`, `lastMarkdownAt`, `originalPrice` to `items/{id}`. Log in `DECISIONS.md`. `[Staff]` `[Comp]`
+- [ ] Create `functions/src/markdownEngine.ts`: `applyMarkdownDrops` scheduled CF (daily 03:00 UTC) — batch price drops, CASL-gated SMS/email alerts, `price_override` audit log entries `[Dale]` `[Kev]` `[Comp]`
+- [ ] Create `enableMarkdown` and `disableMarkdown` callable CFs (manager+ only) — staff configures cadence and floor per item `[Staff]` `[Comp]`
+- [ ] Extend `functions/src/notifications.ts` — `sendMarkdownAlert` helper: saved-search match on price drop, generic SMS body (no pricing detail in copy — Marie Discretion Test) `[Kev]` `[Marie]` `[Comp]`
+- [ ] Admin UI: markdown config panel on item detail page in `src/pages/admin/InventoryPage.tsx` (manager-only gate) `[Staff]`
+- [ ] Update `src/components/pawn/MasonryGrid.tsx` and `src/components/ui/Card.tsx`: render "Price Dropped" `MerchandisingBadge` variant when `item.originalPrice` is set `[San]` `[Dale]`
+- [ ] Export new CFs from `functions/src/index.ts` `[Staff]`
+
+---
+
+### E29 · Cannabis Product Intelligence
+
+> **Persona Gate — E29:**
+> - **Marie (Discretion Test):** No new fields, labels, or analytics events may disclose the cannabis category in CRM output, SMS, or email subjects. "Wellness Profile" is the permitted section heading. No strain names in notification copy.
+> - **Jordan:** Spider-chart must render correctly at all breakpoints and meet the dark luxury aesthetic — muted lavender lines, token-based colours only, no external charting library.
+> - **Marcus:** All terpene data is staff-entered — never AI-generated. `provenanceNotes` standard applies.
+
+- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `cannabisProfile` submap (`thcMin`, `thcMax`, `cbdMin`, `cbdMax`, `terpenes[]`, `geneticLineage`, `effectProfile[]`) to `items/{id}`. Log in `DECISIONS.md`. `[Marie]` `[Comp]`
+- [ ] Update `src/lib/types.ts` — add `CannabisProfile` interface, extend `Item` interface `[Staff]`
+- [ ] Extend `src/components/admin/IntakeForm.tsx` — cannabis-specific panel (renders only when `viewTag === 'cannabis'`): THC/CBD ranges, terpene add/remove rows, genetic lineage `[Staff]`
+- [ ] Create `src/components/cannabis/TerpeneProfile.tsx` — SVG-only spider/radar chart, no charting library dependency `[Marie]` `[Jord]`
+- [ ] Create `src/components/cannabis/CannabisProductData.tsx` — collapsible panel for product intelligence data on item detail page `[Marie]` `[Jord]`
+- [ ] Update `src/pages/CannabisPage.tsx` item detail view to include `CannabisProductData` when `item.cannabisProfile` is present `[Marie]`
+
+---
+
+## Phase 11 — Customer Acquisition
+
+> **Goal:** Reduce friction for new pawn customers entering the enquiry funnel via AI-assisted pre-submission triage. Schema updates required before implementation.
+
+### E30 · Gemini Vision Appraisal Engine
+
+> **Persona Gate — E30:**
+> - **Dale (Speed Test):** Appraisal result must return within 10 seconds of image upload. Gemini latency is the binding constraint — test against the deployed CF, not emulator.
+> - **Makoonsii (Language Test):** Result must display in plain language. Copy template: "Here's what our system found. This is a general guide — our team will give you a final offer." No jargon. No price commitment in any customer-facing string.
+> - **Compliance:** Gemini API key stays in Cloud Functions. Appraisal result is transient — not persisted to `aiDescription` subcollection. Result is always framed as an estimate, never a commitment. Rate-limit: 5 calls per UID per hour.
+
+- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `appraisalResult` submap to `pawnRequests/{id}`; add `visionAppraisal` to `items/{id}/internal/ai`. Log in `DECISIONS.md`. `[Comp]`
+- [ ] Export `ebayRequest()` helper from `functions/src/ebay.ts` (currently unexported — needed by vision appraisal) `[Staff]`
+- [ ] Extend `functions/src/ai.ts` — add `appraisePawnItem` callable CF: Gemini 1.5 Pro vision → item ID → eBay Browse API sold comps → structured result. Rate-limited. Writes `appraisalResult` to `pawnRequests/{id}` if `pawnRequestId` provided. `[Dale]` `[Mak]` `[Comp]`
+- [ ] Extend `functions/src/ai.ts` — add `appraiseDraftItem` callable CF (staff-only): vision appraisal on intake items, writes to `items/{id}/internal/ai.visionAppraisal` `[Marc]` `[Staff]`
+- [ ] Add `auditLogs` event types: `vision_appraisal_requested`, `vision_appraisal_completed` `[Comp]`
+- [ ] Create `src/components/pawn/AppraisalUploader.tsx` — camera-first image capture (`<input capture="environment">`) + drag-drop fallback `[Mak]` `[Dale]`
+- [ ] Create `src/components/pawn/AppraisalResult.tsx` — value range card, confidence indicator, "Estimate Only — Not a Commitment" label, CTA to full enquiry `[Mak]` `[Dale]`
+- [ ] Update `src/pages/pawn/SellPage.tsx` — add optional "Get Instant Estimate" step above `PawnEnquiryForm` `[Mak]` `[Dale]`
+- [ ] Add "AI Appraisal" button to admin item detail page (alongside existing `AiAssistantPanel`) `[Marc]` `[Staff]`
+- [ ] Export new CFs from `functions/src/index.ts` `[Staff]`
+
+---
+
+## Phase 12 — Pawn Services Deepening
+
+> **Goal:** Deepen the customer relationship post-sale with mobile loan management and wallet passes. E31 must land before E32 — wallet passes reference loan ticket data.
+
+### E31 · Pawn Loan Management Portal
+
+> **Persona Gate — E31:**
+> - **Makoonsii (Trust Test):** Loan form and ticket viewer must be completable one-handed in portrait mode. 48 px touch targets throughout. Plain language copy — no financial jargon.
+> - **Compliance:** Audit log entry required on every loan status change (`loan_ticket_created`, `extension_requested`, `extension_approved`, `extension_declined`, `loan_forfeited`, `loan_redeemed`). All status changes via Cloud Function Admin SDK — no client writes to `loanTickets`.
+
+- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `loanTickets/{id}` collection (`uid`, `pawnRequestId`, `itemDescription`, `loanAmount`, `interestRate`, `periodDays`, `dueDate`, `status`, `extensionCount`, `staffNotes`, timestamps). Add `pawnLoanId` link to `pawnRequests/{id}`. Log all in `DECISIONS.md`. `[Comp]`
+- [ ] Update Firestore rules: customer read own tickets (`isOwner`), staff read/write all, public blocked `[Comp]`
+- [ ] Create `functions/src/loanTickets.ts`: `createLoanTicket` (staff-only), `requestExtension` (customer — `isOwner`), `processExtension` (staff-only), `checkLoanDueDates` scheduled CF (daily — 48 h forfeit alert + SMS, CASL-gated) `[Mak]` `[Dale]` `[Comp]`
+- [ ] Add `auditLogs` event types for all loan lifecycle events `[Comp]`
+- [ ] Create `src/pages/LoanTicketsPage.tsx` — customer-facing ticket list, route `/pawn/my-loans` (auth-gated) `[Mak]` `[Dale]`
+- [ ] Create `src/components/pawn/LoanTicketCard.tsx` — loan summary card (reuses `Card`, `Badge` from `src/components/ui/`) `[Mak]`
+- [ ] Create `src/components/pawn/ExtensionRequestModal.tsx` — extension request confirmation (reuses `Modal`) `[Mak]`
+- [ ] Add loan ticket list to `/admin` — staff view of all active tickets by status/due date (reuses `Table`) `[Staff]`
+- [ ] Add `/pawn/my-loans` link to `NavigationDrawer` (authenticated users only) `[All]`
+- [ ] Export new CFs from `functions/src/index.ts` `[Staff]`
+
+---
+
+### E32 · Digital Pawn Wallets
+
+> **Persona Gate — E32:**
+> - **Tanya (Confirmation Test):** Wallet pass URL must be included in the reservation confirmation SMS within 60 seconds of `status: 'confirmed'`.
+> - **Makoonsii:** Pass content must use plain language. Item category for cannabis must not appear in pass text — use "wellness item" or reference number only.
+> - **Compliance:** Apple and Google Wallet signing credentials go through Secret Manager (same pattern as Twilio/SendGrid). Never client-side.
+> - **External dependency gate:** Do not begin implementation until Apple Developer Program membership and Google Pay & Wallet Console service account are confirmed available.
+
+- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `walletPassId` and `walletPassUrl` to `reservations/{id}`, `preorders/{id}`, and `loanTickets/{id}`. Log in `DECISIONS.md`. `[Comp]`
+- [ ] Create `functions/src/walletPasses.ts`: `generateReservationPass` (Firestore-triggered on `confirmed`), `generateLoanTicketPass` (callable — dep: E31), `updatePassStatus` (internal helper for completion/forfeiture) `[Tan]` `[Mak]` `[Comp]`
+- [ ] Integrate `passkit-generator` (Apple `.pkpass`) and Google Wallet REST API — signing credentials via Secret Manager `[Staff]` `[Comp]`
+- [ ] Add `auditLogs` event types: `wallet_pass_generated`, `wallet_pass_updated` `[Comp]`
+- [ ] Update `functions/src/lib/sms.ts` — include `walletPassUrl` short link in reservation confirmation SMS `[Tan]`
+- [ ] Update `src/components/pawn/ClickCollectModal.tsx` — add "Add to Apple Wallet" / "Add to Google Wallet" CTAs on confirmation state `[Tan]` `[Mak]`
+- [ ] Update `src/pages/LoanTicketsPage.tsx` (E31) — add wallet pass buttons on each active ticket card `[Mak]`
+- [ ] Export new CFs from `functions/src/index.ts` `[Staff]`
+
+---
+
+## Phase 13 — Operational Excellence
+
+> **Goal:** Improve internal staff efficiency (peak-season fireworks pick-path) and address monolithic backend tech debt. E34 CF Refactor must ship last — after all Phase 10–12 CFs are stable.
+
+### E33 · Staff Pick-Path Optimizer
+
+> **Persona Gate — E33:**
+> - **Tanya (60s SLA):** `completePickItem` must trigger `status: 'ready'` transition and confirmation SMS to the customer within 60 seconds.
+> - **Compliance:** Staff-only route (manager/admin/inventory_staff claims). No PII in the pick list — order reference + item title only.
+
+- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `pickPathAssignedTo`, `pickPathOrder`, `pickPathCompletedAt` to `preorders/{id}`. Log in `DECISIONS.md`. `[Comp]`
+- [ ] Create `functions/src/pickPath.ts`: `generatePickPath` callable (staff-only — orders by category), `assignPickPath` callable (staff-only), `completePickItem` callable (staff-only — fires `status: 'ready'` + customer SMS) `[Tan]` `[Staff]`
+- [ ] Add `auditLogs` event types: `pick_path_generated`, `pick_path_item_completed` `[Comp]`
+- [ ] Create `src/pages/admin/PickPathPage.tsx` — staff pick list: date range selector, sequenced order rows grouped by category, checkbox per item (`completePickItem` CF call). Reuses `Table` component. `[Tan]` `[Staff]`
+- [ ] Add route `/admin/pick-path` (staff-gated) and link in `NavigationDrawer` staff section `[Staff]`
+- [ ] Export new CFs from `functions/src/index.ts` `[Staff]`
+
+---
+
+### E34 · Cloud Functions Modular Refactor
+
+> **Persona Gate:** Infrastructure epic — no customer-facing persona directly served. Enables targeted deploys per function group, reducing CI/CD blast radius.
+> **Dependency:** All CFs from E28–E33 must be stable in production before restructure begins.
+
+- [ ] Define and document grouping strategy in `DECISIONS.md`: `inventory`, `reservations`, `pawn`, `ai`, `notifications`, `compliance`, `admin` groups `[Staff]`
+- [ ] Create group subdirectories under `functions/src/groups/` — move source files, create per-group `index.ts` `[Staff]`
+- [ ] Refactor `functions/src/index.ts` to import from group index files (no function name changes) `[Staff]`
+- [ ] Update `.github/workflows/deploy-dev.yml` and `deploy-prod.yml` — add path-aware targeted deploy steps (`firebase deploy --only functions:groupName`) `[Staff]`
+- [ ] Run full Emulator Suite regression after restructure — zero CF name or behaviour regressions `[Staff]` `[Comp]`
+
+---
+
+## Phase 14 — Future Horizons
+
+> **Goal:** Innovative differentiators that require the most R&D investment and the longest external dependency lead times. Sequence after all Phase 13 features are stable in production.
+
+### E35 · Store Mode Geo-Fencing
+
+> **Persona Gate — E35:**
+> - **Makoonsii (Trust Test):** Store Mode activates only on explicit location permission grant — never silently. Permission prompt must explain purpose in plain language (PIPEDA). If permission is denied, Store Mode is simply not available — no degraded state shown.
+> - **Sandra:** In-store scanning must surface the full item detail within 3 seconds of QR scan decode.
+> - **Compliance:** Location data is never sent to Firestore, Cloud Functions, or analytics. Proximity check is client-side only. Log this decision in `DECISIONS.md`.
+
+- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `latitude`, `longitude`, `geofenceRadiusMetres` to `config/shopInfo`. Log in `DECISIONS.md`. `[Comp]`
+- [ ] Create `src/hooks/useStoreMode.ts` — Geolocation API `watchPosition()`, Haversine distance check against `config/shopInfo` coordinates, debounced 10 s intervals `[San]` `[Mak]` `[Comp]`
+- [ ] Create `src/components/layout/StoreModeHeader.tsx` — "You're in The Pawn Shop" header with large "Scan Item" CTA; camera capture via `<input capture="environment">`; QR decode via lightweight library (evaluate `html5-qrcode` bundle impact first) `[San]` `[Mak]`
+- [ ] Update `src/App.tsx` — conditionally swap `GlobalHeader` for `StoreModeHeader` based on `useStoreMode()` `[All]`
+- [ ] Create `functions/src/storeMode.ts`: `getItemByQrTag(tagId)` callable CF (public — reads active items only) `[San]` `[Staff]`
+- [ ] In-store item detail view: surface `ProvenanceBadge` (E36) prominently; read-only `AiAssistantPanel` appraisal result if available; no checkout/click-and-collect CTAs in Store Mode `[San]` `[Marc]`
+- [ ] Export new CF from `functions/src/index.ts` `[Staff]`
+
+---
+
+### E36 · Authenticated Trust Ledgers
+
+> **Persona Gate — E36:**
+> - **Marcus (Photography + Provenance):** "Verified Provenance" badge must only appear when a manager or admin has explicitly sealed the provenance via the admin tool — never auto-applied on publish.
+> - **Jordan:** Verification UI must be plain-language. Customers see: "Independently Verified on [date] by The Pawn Shop staff." No cryptographic detail visible.
+> - **Dale (Authenticity Test):** Hash verification callable is public — any customer can independently verify. Result shows pass/fail + verified date. No price or staff identity disclosed.
+> - **Compliance:** Hash computed server-side only (`node:crypto` in Cloud Function). `provenanceNotes` remain staff-write-only. Badge copy passes Makoonsii plain-language standard.
+
+- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `provenanceLedger` map (`hash`, `snapshot`, `verifiedAt`, `verifiedBy`, `badgeVisible`) to `items/{id}`. Log in `DECISIONS.md`. `[Comp]`
+- [ ] Create `functions/src/provenance.ts`: `sealProvenance` callable (manager+ only — SHA-256 hash of canonical snapshot, sets `badgeVisible: true`, writes `provenance_sealed` audit log), `verifyProvenanceHash` callable (public — re-computes hash from stored snapshot, returns `{ verified, verifiedAt }`) `[Marc]` `[Dale]` `[Comp]`
+- [ ] Add `auditLogs` event type: `provenance_sealed` `[Comp]`
+- [ ] Create `src/components/pawn/ProvenanceBadge.tsx` — "Verified Provenance" badge with modal: what was verified, date, "Verify" button calling `verifyProvenanceHash` CF, pass/fail result. Reuses `Badge`, `Modal` from `src/components/ui/`. `[Marc]` `[Dale]` `[Jord]`
+- [ ] Update `src/components/pawn/ItemQuickView.tsx` — display `ProvenanceBadge` when `item.provenanceLedger?.badgeVisible == true` `[Marc]` `[Dale]`
+- [ ] Add `sealProvenance` button to admin item detail view (manager-only) `[Staff]`
+- [ ] Export new CFs from `functions/src/index.ts` `[Staff]`
+
+---
+
+### E37 · Vite SSR (Lighthouse Performance ≥0.90)
+
+> **Persona Gate — E37:**
+> - **Jordan (PWA Standard):** Lighthouse performance ≥0.90 on simulated 4G after SSR is enabled. This is the single measure of success for this epic.
+> - **Compliance:** Age gates (`AgeGate.tsx`) must use client-only hydration in SSR — server has no session context. This must be verified before the epic closes.
+> - **All:** Zero functional regressions across all three views after SSR ships. Persona smoke tests (E09 standard) must re-pass.
+> **Dependency:** All Phase 10–14 features must be stable in production before SSR refactoring begins.
+
+- [ ] Log SSR approach decision in `DECISIONS.md`: Vite SSR (`renderToString`) in a Firebase Cloud Functions v2 `onRequest` CF + Hosting rewrite — no meta-framework migration `[Staff]`
+- [ ] Create `src/entry-server.tsx` and `src/entry-client.tsx` — split from existing `src/main.tsx` `[Jord]` `[All]`
+- [ ] Create `ssrRenderer` Cloud Function (`onRequest`) — imports Vite SSR bundle, calls `renderToString`, injects into `index.html` shell `[Jord]` `[All]`
+- [ ] Configure Firebase Hosting rewrite: `{ "source": "**", "function": "ssrRenderer" }` — static assets bypass via direct Hosting paths `[All]`
+- [ ] Age gate SSR handling — render placeholder server-side; client hydration replaces with session-aware gate `[Marie]` `[Tan]` `[Comp]`
+- [ ] Audit all components for `typeof window !== 'undefined'` guards (browser-only APIs) `[Jord]` `[Comp]`
+- [ ] Run LHCI — confirm performance ≥0.90 on simulated 4G `[Jord]`
+- [ ] Update `lighthouserc.json` — promote performance threshold back to `["error", { "minScore": 0.9 }]` `[Jord]`
+- [ ] Re-run full persona smoke tests across all three views `[All]` `[Comp]`
 
 ---
 

@@ -32,7 +32,7 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 
 | Task | Epic | Completed |
 |---|---|---|
-| | | |
+| Optimize and integrate official brand logo on HomePage | E27 | 2026-05-19 |
 
 ---
 
