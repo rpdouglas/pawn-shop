@@ -15,6 +15,16 @@ for (const route of publicRoutes) {
   test(`axe: ${route.label}`, async ({ page }) => {
     await page.goto(route.path)
     await page.waitForLoadState('load')
+    // Route-level code splitting: the page component chunk loads asynchronously
+    // after the main bundle. Wait for #main-content to have rendered children
+    // before scanning — otherwise axe runs against an empty shell.
+    await page.waitForFunction(
+      () => {
+        const main = document.querySelector('#main-content')
+        return main !== null && main.children.length > 0
+      },
+      { timeout: 15_000 },
+    )
     // Freeze all CSS animations so axe scans the settled state, not a mid-animation frame.
     // fade-up starts at opacity:0 (fill-mode:both) — without this the color contrast
     // checks measure blended/partial-opacity colours rather than the final token values.

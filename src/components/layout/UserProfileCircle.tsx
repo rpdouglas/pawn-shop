@@ -31,7 +31,7 @@ export default function UserProfileCircle() {
           height: '48px',
           borderRadius: '50%',
           backgroundColor: 'var(--color-primary)',
-          color: 'var(--color-bg)',
+          color: 'var(--color-on-primary)',
           border: 'none',
           display: 'flex',
           alignItems: 'center',
