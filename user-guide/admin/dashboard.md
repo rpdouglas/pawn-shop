@@ -2,6 +2,12 @@
 
 The Admin Dashboard provides a real-time overview of The Pawn Shop's operational health and market trends. It is designed to help Managers and Admins make data-driven decisions about inventory and staffing.
 
+## Getting There
+
+Tap the navigation menu (☰) in the top-left corner of any page. **Admin Dashboard** appears at the foot of the drawer, below a separator — visible only to accounts with a staff role. Select it to open the dashboard.
+
+If the link is absent, your account has not been granted a staff role. Contact your Admin to request access.
+
 ## Key Metrics
 
 The dashboard surfaces critical data points:

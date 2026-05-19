@@ -67,6 +67,18 @@
 
 ---
 
+### E21 · Vitest Unit Testing
+
+> **Persona Gate — E21:**
+> - **Developer (Staff):** Fast, reliable verification of code correctness.
+> - **Compliance (Marie):** Regression testing for critical compliance logic (age gates, PII filters).
+
+- [ ] Install Vitest, jsdom, and React Testing Library `[Staff]`
+- [ ] Configure `vite.config.ts` and `src/setupTests.ts` `[Staff]`
+- [ ] Implement initial unit tests for core utilities and components `[Staff]`
+
+---
+
 ### E03 · Auth & Staff Roles
 
 > **Persona Gate — E03:**
@@ -394,6 +406,44 @@
 - [x] `UserProfileCircle` with dropdown (Sign In / Profile / Sign Out) `[All]`
 - [x] Basic `HomePage` landing page (`/`) `[All]`
 - [x] Role-gated Admin button in header `[Staff]`
+
+---
+
+## Phase 8 — Infrastructure
+
+### E24 · CI/CD Pipeline Strategy
+
+> **Persona Gate:** Infrastructure epic. No customer-facing persona directly served.
+> Enables safe feature development by separating `dev` and `main` branch deploys.
+
+- [x] `deploy-dev.yml` re-targeted to `dev` branch (was `main`) `[All]`
+- [x] `deploy-prod.yml` adds `push: branches: [main]` trigger; temporarily routes to `nats-rack` using `DEV_FIREBASE_*` secrets `[All]`
+- [x] Prod switchover comment block embedded in `deploy-prod.yml` (exact steps + prerequisites) `[Staff]`
+- [x] `deploy-prod.yml` parity: paths filter, "skip if no package.json" step, event-aware `if:` guard `[All]`
+- [x] Decision logged in `DECISIONS.md` `[Staff]`
+
+---
+
+### E25 · Header Navigation Refinement
+
+> **Persona Gate — E25:**
+> - **Jordan:** Brand prefix "The Pawn Shop - [View]" visible in header on every non-home route. Admin link removed from header bar.
+> - **Makoonsii:** Admin link in drawer meets 48px touch target. No navigation regression.
+> - **All staff:** Admin Dashboard accessible via hamburger drawer, role-gated to `isStaff`.
+
+- [x] Move admin dashboard link from `UserNav` header to `NavigationDrawer` drawer (staff-only) `[Staff]`
+- [x] Update `getPageTitle()` to prefix "The Pawn Shop - " on Pawn, Cannabis, Fireworks, Admin views `[Jord]` `[All]`
+- [x] Fix Cycle 23 deferred token violations in `NavigationDrawer.tsx` (`--text-lead`, `--motion-speed-base`) `[Jord]`
+
+---
+
+### E26 · Versioning Strategy
+
+> **Persona Gate:** Infrastructure epic.
+> Automates app versioning using CalVer + Git SHA for improved traceability.
+
+- [ ] Modify deployment workflows to generate and inject `VITE_APP_VERSION` `[Staff]`
+- [ ] Display automated version string in Site Footer and Admin Dashboard `[Staff]`
 
 ---
 

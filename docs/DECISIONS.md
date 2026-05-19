@@ -258,6 +258,10 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-19 — E24 CI/CD: `deploy-dev.yml` re-targeted to `dev` branch. `deploy-prod.yml` triggered on `main` push but temporarily routes to `nats-rack` dev project using `DEV_FIREBASE_*` secrets and `FIREBASE_SERVICE_ACCOUNT_DEV`. Prod switchover instructions embedded as a comment block in `deploy-prod.yml`. Both branches validate against the same dev environment during this phase. `deploy-prod.yml` also gains: paths filter matching `deploy-dev.yml`, "skip if no package.json" safety step, and an event-aware `if:` guard that allows push triggers while still requiring "DEPLOY" confirmation on manual dispatch.
 
+2026-05-19 — E25: Admin dashboard link moved from `UserNav` header bar to `NavigationDrawer` drawer. Establishes a deliberate pattern: the header bar is reserved for account/profile actions; utility navigation (admin, future staff tools) belongs in the hamburger drawer. Keeps the header uncluttered as admin tooling grows.
+
+2026-05-19 — E25: `overflow: hidden` added to `NavigationDrawer` outer div. CSS flex `min-width: auto` prevents a flex child from shrinking below its content width, which blocks the `text-overflow: ellipsis` on the page title span. `overflow: hidden` on the flex child forces `min-width: 0`, enabling truncation at narrow viewports (e.g. "The Pawn Shop - Pawn & Resale" at 375px). Not a layout overflow concern — the drawer uses `position: fixed` and is unaffected.
+
 ---
 
 *Add new entries above this line.*
