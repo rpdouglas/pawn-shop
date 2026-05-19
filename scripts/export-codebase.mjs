@@ -7,31 +7,46 @@ const __dirname = path.dirname(__filename)
 const ROOT_DIR = path.resolve(__dirname, '..')
 const OUTPUT_FILE = path.join(ROOT_DIR, 'codebase-export.txt')
 
-// Directories to completely skip during traversal to save time
+// Opt-in strategy: Only process these specific paths
+const TARGETS = [
+  'src',
+  'functions/src',
+  'functions/package.json',
+  'functions/tsconfig.json',
+  'user-guide',
+  'docs/firestore-schema.md',
+  'docs/DECISIONS.md',
+  'package.json',
+  'vite.config.ts',
+  'tsconfig.json',
+  'tsconfig.app.json',
+  'tsconfig.node.json',
+  'eslint.config.js',
+  'firebase.json',
+  'firestore.rules',
+  'firestore.indexes.json',
+  'storage.rules',
+  'index.html'
+]
+
+// Directories to skip when traversing allowed TARGETS
 const IGNORE_DIRS = new Set([
   'node_modules',
   'dist',
-  '.git',
-  '.firebase',
-  'emulator-data',
-  '.vitepress/dist',
-  '.vitepress/cache',
-  'functions/lib',
-  'functions/node_modules'
+  '.vitepress' // Skips .vitepress/dist and .vitepress/cache
 ])
 
-// File extensions to include in the export (ignore binaries, images, etc.)
-const ALLOWED_EXTENSIONS = new Set([
-  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs',
-  '.json', '.md', '.txt', '.html', '.css',
-  '.yml', '.yaml', '.rules'
-])
-
-// Specific files to explicitly ignore (e.g., secrets)
+// Specific files to explicitly ignore
 const IGNORE_FILES = new Set([
   'package-lock.json',
   '.env',
-  '.env.local'
+  '.env.local',
+  'codebase-export.txt' // Prevent infinite recursive inclusion!
+])
+
+const ALLOWED_EXTENSIONS = new Set([
+  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs',
+  '.json', '.md', '.html', '.css', '.rules'
 ])
 
 function isAllowedFile(filename) {
@@ -40,27 +55,28 @@ function isAllowedFile(filename) {
   return ext === '' || ALLOWED_EXTENSIONS.has(ext)
 }
 
-function processDirectory(dir, stream) {
-  const entries = fs.readdirSync(dir, { withFileTypes: true })
+function processPath(targetPath, stream) {
+  const fullPath = path.join(ROOT_DIR, targetPath)
+  if (!fs.existsSync(fullPath)) return
 
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name)
-    const relativePath = path.relative(ROOT_DIR, fullPath)
+  const stat = fs.statSync(fullPath)
 
-    if (entry.isDirectory()) {
-      if (!IGNORE_DIRS.has(entry.name)) {
-        processDirectory(fullPath, stream)
-      }
-    } else if (entry.isFile() && isAllowedFile(entry.name)) {
-      try {
-        const content = fs.readFileSync(fullPath, 'utf8')
-        // Wrap content in XML tags for LLM context parsing
-        stream.write(`<file path="${relativePath}">\n`)
-        stream.write(content)
-        stream.write(`\n</file>\n\n`)
-      } catch (err) {
-        console.error(`Failed to read file ${relativePath}:`, err)
-      }
+  if (stat.isDirectory()) {
+    const entries = fs.readdirSync(fullPath, { withFileTypes: true })
+    for (const entry of entries) {
+      if (IGNORE_DIRS.has(entry.name)) continue
+      
+      const childPath = path.join(targetPath, entry.name)
+      processPath(childPath, stream)
+    }
+  } else if (stat.isFile() && isAllowedFile(path.basename(fullPath))) {
+    try {
+      const content = fs.readFileSync(fullPath, 'utf8')
+      stream.write(`<file path="${targetPath}">\n`)
+      stream.write(content)
+      stream.write(`\n</file>\n\n`)
+    } catch (err) {
+      console.error(`Failed to read file ${targetPath}:`, err)
     }
   }
 }
@@ -71,12 +87,14 @@ function runExport() {
   const stream = fs.createWriteStream(OUTPUT_FILE, { flags: 'w' })
   stream.write(`<!-- Codebase Export generated on ${new Date().toISOString()} -->\n\n`)
   
-  processDirectory(ROOT_DIR, stream)
+  for (const target of TARGETS) {
+    processPath(target, stream)
+  }
   
   stream.end()
   
   stream.on('finish', () => {
-    console.log(`Export complete. You can now use ${OUTPUT_FILE} for LLM ingestion.`)
+    console.log(`Export complete. You can now use codebase-export.txt for LLM ingestion.`)
   })
 }
 
