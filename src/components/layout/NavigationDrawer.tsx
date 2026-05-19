@@ -167,6 +167,24 @@ export default function NavigationDrawer() {
                 >
                   Admin Dashboard
                 </Link>
+                <a
+                  href="https://rpdouglas.github.io/pawn-shop/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: 'var(--space-4)',
+                    color: 'var(--color-text)',
+                    textDecoration: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: 'transparent',
+                    minHeight: '48px'
+                  }}
+                >
+                  User Guide ↗
+                </a>
               </>
             )}
           </div>

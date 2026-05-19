@@ -41,6 +41,12 @@ const GROUPS = [
       { to: '/admin/store-hours', label: 'Store Hours', icon: '🕒' },
       { to: '/admin/serial-blacklist', label: 'Blacklist', icon: '🛡️' },
     ]
+  },
+  {
+    label: 'Support',
+    items: [
+      { to: 'https://rpdouglas.github.io/pawn-shop/', label: 'User Guide', icon: '📘', isExternal: true },
+    ]
   }
 ];
 
@@ -74,46 +80,97 @@ export default function AdminSidebar() {
               margin: 'var(--space-2) 0' 
             }} />
           )}
-          {group.items.map(item => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              title={item.label}
-              aria-label={item.label}
-              style={({ isActive }) => ({
-                width: '48px',
-                height: '48px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textDecoration: 'none',
-                borderRadius: 'var(--radius-sm)',
-                marginBottom: 'var(--space-1)',
-                backgroundColor: isActive ? '#2e2200' : 'transparent',
-                transition: 'background-color var(--motion-speed-fast) var(--motion-easing)'
-              })}
-            >
-              {({ isActive }) => (
-                <>
-                  <span style={{ 
-                    fontSize: '18px', 
-                    color: isActive ? 'var(--color-primary)' : '#7a5e0a' 
-                  }}>
-                    {item.icon}
-                  </span>
-                  <span style={{ 
-                    fontSize: '8px', 
-                    color: isActive ? 'var(--color-primary)' : '#5a4508',
-                    marginTop: '2px',
-                    textAlign: 'center'
-                  }}>
-                    {item.label.split(' ')[0]}
-                  </span>
-                </>
-              )}
-            </NavLink>
-          ))}
+          {group.items.map(item => {
+            const content = (
+              <>
+                <span style={{ 
+                  fontSize: '18px', 
+                  color: '#7a5e0a' 
+                }}>
+                  {item.icon}
+                </span>
+                <span style={{ 
+                  fontSize: '8px', 
+                  color: '#5a4508',
+                  marginTop: '2px',
+                  textAlign: 'center'
+                }}>
+                  {item.label.split(' ')[0]}
+                </span>
+              </>
+            );
+
+            if ('isExternal' in item && item.isExternal) {
+              return (
+                <a
+                  key={item.to}
+                  href={item.to}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={item.label}
+                  aria-label={item.label}
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textDecoration: 'none',
+                    borderRadius: 'var(--radius-sm)',
+                    marginBottom: 'var(--space-1)',
+                    backgroundColor: 'transparent',
+                    transition: 'background-color var(--motion-speed-fast) var(--motion-easing)'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2e2200'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  {content}
+                </a>
+              );
+            }
+
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                title={item.label}
+                aria-label={item.label}
+                style={({ isActive }) => ({
+                  width: '48px',
+                  height: '48px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textDecoration: 'none',
+                  borderRadius: 'var(--radius-sm)',
+                  marginBottom: 'var(--space-1)',
+                  backgroundColor: isActive ? '#2e2200' : 'transparent',
+                  transition: 'background-color var(--motion-speed-fast) var(--motion-easing)'
+                })}
+              >
+                {({ isActive }) => (
+                  <>
+                    <span style={{ 
+                      fontSize: '18px', 
+                      color: isActive ? 'var(--color-primary)' : '#7a5e0a' 
+                    }}>
+                      {item.icon}
+                    </span>
+                    <span style={{ 
+                      fontSize: '8px', 
+                      color: isActive ? 'var(--color-primary)' : '#5a4508',
+                      marginTop: '2px',
+                      textAlign: 'center'
+                    }}>
+                      {item.label.split(' ')[0]}
+                    </span>
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
         </div>
       ))}
     </nav>
