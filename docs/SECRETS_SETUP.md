@@ -152,15 +152,67 @@ firebase deploy --only firestore:rules,firestore:indexes --project the-addicts-a
 
 ---
 
+## Step 6 — Cloud Functions Environment Variables
+
+Cloud Functions read environment variables from `functions/.env` (dev) and `functions/.env.prod` (prod). These are **not** Firebase Secrets — they are plain env files deployed alongside the functions.
+
+Create `functions/.env` for the dev environment:
+
+```
+SENDGRID_API_KEY=<your SendGrid API key>
+SENDGRID_FROM_EMAIL=<verified sender email, e.g. hello@thepawnshop.ca>
+TWILIO_ACCOUNT_SID=<your Twilio Account SID>
+TWILIO_AUTH_TOKEN=<your Twilio Auth Token>
+TWILIO_FROM_NUMBER=<your Twilio phone number, e.g. +16135550123>
+SITE_URL=https://nats-rack.web.app
+```
+
+Create `functions/.env.prod` for the production environment:
+
+```
+SENDGRID_API_KEY=<prod SendGrid API key>
+SENDGRID_FROM_EMAIL=<prod verified sender email>
+TWILIO_ACCOUNT_SID=<prod Twilio Account SID>
+TWILIO_AUTH_TOKEN=<prod Twilio Auth Token>
+TWILIO_FROM_NUMBER=<prod Twilio phone number>
+SITE_URL=https://thepawnshop.ca
+```
+
+> `SITE_URL` is used by `sendWeeklyDigest` (E12) to build item links in the digest email. Dev points to nats-rack.web.app; prod will point to the eventual custom domain.
+
+Both `.env` files are gitignored. Add both to Codespaces secrets or a local password manager.
+
+- [ ] `functions/.env` created with all 6 values (dev)
+- [ ] `functions/.env.prod` created with all 6 values (prod)
+
+---
+
+## Step 7 — Install Playwright Browser Binary
+
+After running `npm install`, install the Chromium browser binary for Playwright and Lighthouse CI:
+
+```bash
+npx playwright install chromium
+```
+
+This is required to run `npm run test:a11y` (axe-core) and `npm run test:lhci` (Lighthouse CI) locally.
+
+- [ ] `npx playwright install chromium` completed ✅
+
+---
+
 ## Verification Checklist
 
 - [ ] All 14 GitHub Actions secrets set
 - [ ] All 6 Codespaces secrets set
 - [ ] `.env.local` created and gitignored
+- [ ] `functions/.env` created with 6 values (dev)
+- [ ] `functions/.env.prod` created with 6 values (prod)
 - [ ] Firestore rules deployed to nats-rack
 - [ ] Firestore rules deployed to the-addicts-agenda
 - [ ] `deploy-dev.yml` triggered by a push and passed ✅
+- [ ] `npx playwright install chromium` completed ✅
 
 ---
 
-*The Pawn Shop · docs/SECRETS_SETUP.md · v1.0*
+*The Pawn Shop · docs/SECRETS_SETUP.md · v1.1*

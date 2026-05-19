@@ -40,14 +40,14 @@ Deploy E12 to dev; complete all outstanding browser-based QA verification (Light
 
 | Item | Reason | Target cycle |
 |---|---|---|
-| Lighthouse ≥90 performance, ≥90 accessibility, ≥95 SEO | Requires deployed URL + Chrome DevTools — cannot run in Codespaces terminal | Before E13 ships to dev |
-| WCAG AA axe-core browser verification | Requires running browser session on `/pawn`, `/cannabis`, `/fireworks` | Before E02 fully closes |
-| axe-core browser run on admin dashboard + PoliceHoldManager | Requires live browser session | Post-E10 merge verification |
-| axe-core browser run on E17 components (RecentlySoldStrip, ActivityFeed, HoldCountdownBadge) | Requires live browser session | Post-E17 merge verification |
+| Lighthouse ≥90 performance, ≥90 accessibility, ≥95 SEO | **Unblocked** — run `npm run test:lhci` against https://nats-rack.web.app | Cycle 21 (current) |
+| WCAG AA axe-core browser verification on `/pawn`, `/cannabis`, `/fireworks` | **Unblocked** — run `npm run test:a11y` against https://nats-rack.web.app | Cycle 21 (current) |
+| axe-core browser run on admin dashboard + PoliceHoldManager | **Unblocked** — run `npm run test:a11y` (requires staff auth env vars) | Cycle 21 (current) |
+| axe-core browser run on E17 components (RecentlySoldStrip, ActivityFeed, HoldCountdownBadge) | **Unblocked** — covered by `/pawn` axe-core run (components render on public homepage) | Cycle 21 (current) |
 | MFA bypass confirmed impossible | Requires Identity Platform upgrade — pre-prod compliance gate | Before prod deploy (E11) |
 | eBay developer account setup (webhook URL registration, notification subscription) | Requires eBay seller account and developer credentials — outside codebase scope | Before E06 deploys to prod |
-| axe-core browser run on admin intake success view (EbayPushButton) | Requires live browser session | Post-E06 merge verification |
-| axe-core browser run on E14 components (PreorderModal, PreorderInboxPage, CampaignBanner, CampaignAdminPage) | Requires live browser session | Post-E14 merge verification |
+| axe-core browser run on admin intake success view (EbayPushButton) | **Unblocked** — run `npm run test:a11y` (requires staff auth env vars) | Cycle 21 (current) |
+| axe-core browser run on E14 components (PreorderModal, PreorderInboxPage, CampaignBanner, CampaignAdminPage) | **Unblocked** — CampaignBanner on public view; admin routes require staff auth env vars | Cycle 21 (current) |
 | Vertical video on Cannabis + Fireworks pages | Content dependency — no video assets available | When assets supplied |
 | `config/shopInfo` document creation | Requires admin to create via Firebase console (`foundedYear: <year>`) — no admin UI in E17 | Before E17 deploys to dev |
 

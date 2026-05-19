@@ -38,6 +38,7 @@ export default defineConfig({
         text: 'Pawn Services',
         items: [
           { text: 'Selling to Us', link: '/pawn/selling' },
+          { text: 'Alerts & Notifications', link: '/pawn/alerts-notifications' },
           { text: 'Managing the Inbox', link: '/admin/pawn-inbox' },
           { text: 'Disputes & Returns', link: '/admin/disputes-returns' },
           { text: 'Seasonal Pre-Orders', link: '/admin/preorders' }
@@ -50,6 +51,8 @@ export default defineConfig({
           { text: 'Inventory Management', link: '/admin/inventory' },
           { text: 'Editorial CMS', link: '/admin/editorial-cms' },
           { text: 'AI Assistant', link: '/admin/ai-assistant' },
+          { text: 'FAQ Management', link: '/admin/faq-management' },
+          { text: 'Local SEO', link: '/admin/local-seo' },
           { text: 'Audit Logs', link: '/admin/audit-logs' },
           { text: 'Police Holds', link: '/admin/police-holds' },
           { text: 'eBay Sync', link: '/ebay/cross-posting' }

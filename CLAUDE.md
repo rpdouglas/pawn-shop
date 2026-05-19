@@ -15,6 +15,13 @@ Brand voice: **Dapper. Debonair. Distinctly Akwesasne.**
 - Hosting: Firebase Hosting / Storage
 - Dev: GitHub Codespaces + Firebase Emulator Suite
 
+## Hosted Environments
+
+| Environment | URL | Notes |
+|---|---|---|
+| Dev app | https://nats-rack.web.app | Firebase Hosting — `nats-rack` project; auto-deploys on push to `main` |
+| Guide | https://rpdouglas.github.io/pawn-shop/ | GitHub Pages — auto-deployed from `user-guide/` changes |
+
 ## Three-View Architecture
 
 | View | Route | Age Gate | CSS Class | Primary | Font |

@@ -14,7 +14,10 @@
     "guide:dev": "vitepress dev user-guide",
     "guide:build": "vitepress build user-guide",
     "guide:preview": "vitepress preview user-guide",
-    "export:llm": "node scripts/export-codebase.mjs"
+    "export:llm": "node scripts/export-codebase.mjs",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test e2e/accessibility.spec.ts",
+    "test:lhci": "lhci autorun"
   },
   "dependencies": {
     "@fontsource/bebas-neue": "^5.2.7",
@@ -30,7 +33,10 @@
     "react-router-dom": "^7.15.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@eslint/js": "^10.0.1",
+    "@lhci/cli": "^0.14.0",
+    "@playwright/test": "^1.49.1",
     "@tailwindcss/vite": "^4.3.0",
     "@types/node": "^24.12.3",
     "@types/qrcode": "^1.5.6",

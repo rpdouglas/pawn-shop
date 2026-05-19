@@ -7,13 +7,8 @@ export default function App() {
   return (
     <ViewProvider>
       <ViewLayout>
-        {/* Skip to main content — keyboard navigation requirement */}
-        <a href="#main-content" className="skip-to-content">
-          Skip to main content
-        </a>
-
         {/* Dev nav — replaced by per-view navigation in E05 */}
-        <nav style={{
+        <nav aria-label="Site navigation" style={{
           display: 'flex',
           gap: 'var(--space-6)',
           padding: 'var(--space-1) var(--space-8)',

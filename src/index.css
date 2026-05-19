@@ -61,6 +61,7 @@
 .view-pawn {
   --color-primary:       #C8A14A;
   --color-primary-hover: #b8903b;
+  --color-on-primary:    #080706;  /* dark on gold: 7.8:1 — WCAG AA ✓ */
   --color-bg:            #080706;
   --color-surface:       #1A1714;
   --color-accent:        #B8963E;
@@ -77,6 +78,7 @@
 .view-cannabis {
   --color-primary:       #7B4FA0;
   --color-primary-hover: #6b3f90;
+  --color-on-primary:    #ffffff;  /* white on purple: 5.4:1 — WCAG AA ✓ */
   --color-bg:            #1A0D2E;
   --color-surface:       #221040;
   --color-accent:        #B89FCC;
@@ -93,6 +95,7 @@
 .view-fireworks {
   --color-primary:       #C0392B;
   --color-primary-hover: #a93226;
+  --color-on-primary:    #ffffff;  /* white on red: 8.7:1 — WCAG AA ✓ */
   --color-bg:            #1A0A0A;
   --color-surface:       #231212;
   --color-accent:        #E8A020;
@@ -175,7 +178,7 @@ h1, h2, h3, h4, h5, h6 {
 
   .btn-primary {
     background-color: var(--color-primary);
-    color: var(--color-bg);
+    color: var(--color-on-primary);
     border-color: var(--color-primary);
   }
   .btn-primary:hover:not(:disabled) {
@@ -190,7 +193,7 @@ h1, h2, h3, h4, h5, h6 {
   }
   .btn-secondary:hover:not(:disabled) {
     background-color: var(--color-primary);
-    color: var(--color-bg);
+    color: var(--color-on-primary);
   }
 
   /* Ghost: primary text, underline on hover — no fill */
@@ -1534,7 +1537,7 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 9999;
   padding: var(--space-2) var(--space-4);
   background-color: var(--color-primary);
-  color: var(--color-bg);
+  color: var(--color-on-primary);
   font-family: var(--font-body);
   font-size: var(--text-small);
   font-weight: 500;

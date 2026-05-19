@@ -162,7 +162,7 @@ export default function MasonryGrid({
 
   return (
     <div>
-      <div className="masonry-grid" aria-label="Inventory discovery grid">
+      <div className="masonry-grid" role="region" aria-label="Inventory discovery grid">
         {items.map((item, index) => (
           <MasonryCard
             key={item.id}
