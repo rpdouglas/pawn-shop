@@ -39,7 +39,7 @@ export default function PawnHero() {
       {/* Content — staggered text reveal (approved cinematic reveal pattern) */}
       <div
         className="pawn-hero-content"
-        style={{ position: 'relative', maxWidth: '720px' }}
+        style={{ position: 'relative', maxWidth: '720px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
       >
         <p style={{
           fontFamily: 'var(--font-body)',

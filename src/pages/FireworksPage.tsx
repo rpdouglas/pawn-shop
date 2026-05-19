@@ -62,12 +62,12 @@ export default function FireworksPage() {
       <section
         aria-label="Countdown to next event"
         style={{
-          minHeight: showCountdown ? '60vh' : '30vh',
+          minHeight: '30vh',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: 'var(--space-24) var(--space-6)',
+          padding: 'var(--space-12) var(--space-6)',
           textAlign: 'center',
           borderBottom: '1px solid var(--color-border)',
         }}
