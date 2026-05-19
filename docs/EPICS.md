@@ -397,5 +397,20 @@
 
 ---
 
+## Phase 8 — Infrastructure
+
+### E24 · CI/CD Pipeline Strategy
+
+> **Persona Gate:** Infrastructure epic. No customer-facing persona directly served.
+> Enables safe feature development by separating `dev` and `main` branch deploys.
+
+- [x] `deploy-dev.yml` re-targeted to `dev` branch (was `main`) `[All]`
+- [x] `deploy-prod.yml` adds `push: branches: [main]` trigger; temporarily routes to `nats-rack` using `DEV_FIREBASE_*` secrets `[All]`
+- [x] Prod switchover comment block embedded in `deploy-prod.yml` (exact steps + prerequisites) `[Staff]`
+- [x] `deploy-prod.yml` parity: paths filter, "skip if no package.json" step, event-aware `if:` guard `[All]`
+- [x] Decision logged in `DECISIONS.md` `[Staff]`
+
+---
+
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*

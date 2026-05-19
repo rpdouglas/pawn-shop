@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 22
+**Cycle:** 23
 **Started:** 2026-05-19
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Complete outstanding browser-based QA verification (Lighthouse ≥90, axe-core runs) and initiate Phase 8 planning.
+Address deferred QA items from Cycle 22 (E23 design system token violations, admin axe-core auth setup) and begin production readiness audit.
 
 ---
 
@@ -32,13 +32,7 @@ Complete outstanding browser-based QA verification (Lighthouse ≥90, axe-core r
 
 | Task | Epic | Completed |
 |---|---|---|
-| `firebase-core.ts` split — auth/functions eager, Firestore/Storage/Analytics lazy | Cycle 22 infra | 2026-05-19 |
-| React Router v7 `lazy()` for all 35+ page routes — main bundle 437 KB (135 KB gzip) | Cycle 22 infra | 2026-05-19 |
-| `UserProfileCircle` WCAG AA contrast fix — `--color-on-primary` token, cannabis view 5.4:1 | Cycle 22 a11y | 2026-05-19 |
-| Playwright + `@axe-core/playwright` setup — `e2e/accessibility.spec.ts`, zero violations | Cycle 22 QA | 2026-05-19 |
-| LHCI setup — `lighthouserc.json`, `npm run test:lhci`, performance warn ≥0.40 | Cycle 22 QA | 2026-05-19 |
-| `TESTING.md` updated to v1.1 — bundle architecture checks, automated a11y, LHCI thresholds | Cycle 22 docs | 2026-05-19 |
-| `DECISIONS.md` — 4 new Cycle 22 architectural entries logged | Cycle 22 docs | 2026-05-19 |
+| | | |
 
 ---
 
@@ -65,6 +59,22 @@ Complete outstanding browser-based QA verification (Lighthouse ≥90, axe-core r
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 22** (2026-05-19 → 2026-05-19) — Closed E24 · CI/CD Pipeline Strategy. Phase 8 complete.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `firebase-core.ts` split — auth/functions eager, Firestore/Storage/Analytics lazy | Cycle 22 infra | 2026-05-19 |
+| React Router v7 `lazy()` for all 35+ page routes — main bundle 437 KB (135 KB gzip) | Cycle 22 infra | 2026-05-19 |
+| `UserProfileCircle` WCAG AA contrast fix — `--color-on-primary` token, cannabis view 5.4:1 | Cycle 22 a11y | 2026-05-19 |
+| Playwright + `@axe-core/playwright` setup — `e2e/accessibility.spec.ts`, zero violations | Cycle 22 QA | 2026-05-19 |
+| LHCI setup — `lighthouserc.json`, `npm run test:lhci`, performance warn ≥0.40 | Cycle 22 QA | 2026-05-19 |
+| `TESTING.md` updated to v1.1 — bundle architecture checks, automated a11y, LHCI thresholds | Cycle 22 docs | 2026-05-19 |
+| `DECISIONS.md` — 4 new Cycle 22 architectural entries logged | Cycle 22 docs | 2026-05-19 |
+| E24 CI/CD — `dev`/`main` branch split, `deploy-prod.yml` routes to `nats-rack` temporarily | E24 | 2026-05-19 |
+| **E24 CLOSED** | E24 | 2026-05-19 |
+
+---
 
 **Cycle 21** (2026-05-19 → 2026-05-19) — Closed E23 · Unified Global Header.
 
