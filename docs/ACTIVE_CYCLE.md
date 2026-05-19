@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 23
+**Cycle:** 24
 **Started:** 2026-05-19
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Address deferred QA items from Cycle 22 (E23 design system token violations, admin axe-core auth setup) and begin production readiness audit.
+Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx` design system token violations; admin axe-core auth setup (if env vars available). Begin production readiness audit.
 
 ---
 
@@ -42,11 +42,12 @@ Address deferred QA items from Cycle 22 (E23 design system token violations, adm
 |---|---|---|
 | MFA bypass confirmed impossible | Requires Identity Platform upgrade — pre-prod compliance gate | Before prod deploy (E11) |
 | eBay developer account setup (webhook URL registration, notification subscription) | Requires eBay seller account and developer credentials — outside codebase scope | Before E06 deploys to prod |
-| Admin axe-core tests (dashboard, inventory, preorders, campaigns) | Require `PLAYWRIGHT_AUTH_EMAIL` + `PLAYWRIGHT_AUTH_PASSWORD` env vars — skipped in CI | Cycle 23 (if auth vars available) |
+| Admin axe-core tests (dashboard, inventory, preorders, campaigns) | Require `PLAYWRIGHT_AUTH_EMAIL` + `PLAYWRIGHT_AUTH_PASSWORD` env vars — skipped in CI | Cycle 24 (if auth vars available) |
 | Performance ≥0.90 on Lighthouse | Requires SSR or pre-rendering — current SPA + static hosting cannot reach ≥0.90 on simulated 4G | Backlogged (future SSR cycle) |
 | Vertical video on Cannabis + Fireworks pages | Content dependency — no video assets available | When assets supplied |
 | `config/shopInfo` document creation | Requires admin to create via Firebase console (`foundedYear: <year>`) — no admin UI in E17 | Before E17 deploys to dev |
-| E23 design system token violations | `NavigationDrawer.tsx`, `HomePage.tsx`, `UserProfileCircle.tsx` — hardcoded px/rem/ms values | Cycle 23 (E23 QA clean-up) |
+| E23 design system token violations | `HomePage.tsx`, `UserProfileCircle.tsx` — hardcoded px/rem/ms values | Cycle 24 (E23 QA clean-up) |
+| `Navigation` drawer heading contrast | `--color-primary` at `--text-small` (14px) in cannabis view = 2.8:1 — WCAG AA failure at small text (pre-existing E23, not introduced by E25) | Cycle 24 (E23 QA clean-up) |
 
 ---
 
@@ -59,6 +60,17 @@ Address deferred QA items from Cycle 22 (E23 design system token violations, adm
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 23** (2026-05-19 → 2026-05-19) — Closed E25 · Header Navigation Refinement. Phase 8 continued.
+
+| Task | Epic | Completed |
+|---|---|---|
+| Admin dashboard link moved from `UserNav` header to `NavigationDrawer` drawer (staff-gated) | E25 | 2026-05-19 |
+| Page title updated to "The Pawn Shop - [View]" format on all non-home routes | E25 | 2026-05-19 |
+| `NavigationDrawer.tsx` token violations resolved — `--text-lead`, `--motion-speed-base` | E25 | 2026-05-19 |
+| **E25 CLOSED** | E25 | 2026-05-19 |
+
+---
 
 **Cycle 22** (2026-05-19 → 2026-05-19) — Closed E24 · CI/CD Pipeline Strategy. Phase 8 complete.
 
@@ -118,4 +130,4 @@ Address deferred QA items from Cycle 22 (E23 design system token violations, adm
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-19 (Cycle 22 open)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-19 (Cycle 24 open)*

@@ -10,6 +10,12 @@ export default defineConfig({
     ],
     sidebar: [
       {
+        text: 'Getting Started',
+        items: [
+          { text: 'Platform Overview', link: '/getting-started' }
+        ]
+      },
+      {
         text: 'Core Inventory',
         items: [
           { text: 'Overview', link: '/inventory/' },
