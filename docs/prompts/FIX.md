@@ -23,6 +23,11 @@ Paste both before asking for a fix:
 [paste complete current file contents, or the specific function if the file is very large]
 ```
 
+### The Diagnostic Step (For TS/ESLint Errors)
+1. Read the EXACT line of code causing the error, AND the 10 lines above and below it.
+2. Read the import block at the top of the file to check for namespace collisions (e.g., importing `User` from Firebase Auth vs `User` from local types).
+3. Do not propose a "blind replace" without verifying the surrounding context first.
+
 ---
 
 ## The Surgical Protocol

@@ -33,6 +33,13 @@ Reply format for each file:
 If you cannot confirm the current contents of a file you plan to modify:
 > *"I need the exact current contents of `[filename]`. Please paste it below before I proceed."*
 
+### Gate 2.5 — Blast Radius Verification (For Refactors)
+
+If your plan includes modifying a shared interface in `src/lib/types.ts`, renaming an exported component, or changing a core utility:
+- You MUST perform a global workspace search (e.g., using `grep_search` or equivalent) for the old name/interface before writing code.
+- You MUST include all files returned by that search in your Scope Lock (Gate 3).
+- If the blast radius is larger than 5 files, state this explicitly and confirm with the user before proceeding. Do not attempt blind renaming without mapping the dependencies.
+
 ### Gate 3 — Scope Lock
 
 State the exact list of files that will be created or modified. Do not touch files outside this list without explicit approval.
@@ -55,7 +62,8 @@ Files to MODIFY:
 
 ### Code Quality Rules (enforced on every file)
 
-- **No `any` types.** Use specific interfaces from `src/lib/types.ts` or `unknown`. If a type is needed and doesn't exist, define it first.
+- **No `any` types.** Use specific interfaces from `src/lib/types.ts` or `unknown`. If a type is needed and doesn't exist, define it first. Never cast Firestore data using `as any`.
+- **Compile-as-you-go:** After completing the modifications for a set of related files, run `npm run build` to catch typing cascades immediately, before moving to unrelated files.
 - **No hardcoded hex values.** Use `var(--color-primary)` and `.view-*` CSS classes.
 - **No unused imports.** Remove them before delivering.
 - **No unused variables.** Prefix intentionally unused args with `_`.

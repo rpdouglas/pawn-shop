@@ -10,6 +10,7 @@
    - No hardcoded hex (use `.view-*` tokens).
    - Age gates at router level (Logged to `auditLogs`).
    - `aiDescription` is NEVER customer-visible.
+   - **Strict Firestore Data Handling:** NEVER cast Firestore data using `as any`. When reading `snap.data()`, cast it to `Record<string, unknown>` or use a dedicated type guard. For Firestore Timestamps, strictly assert the type (e.g., `(data.createdAt as unknown as Timestamp).toDate()`).
 
 ## Operational Workflow
 Follow the **Research -> Strategy -> Execution** cycle for every task.
