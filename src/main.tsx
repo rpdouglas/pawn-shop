@@ -18,46 +18,9 @@ import '@fontsource/oswald/500.css'
 
 import './index.css'
 import App from './App.tsx'
-import PawnPage from './pages/PawnPage.tsx'
-import CannabisPage from './pages/CannabisPage.tsx'
-import FireworksPage from './pages/FireworksPage.tsx'
-import LoginPage from './pages/auth/LoginPage.tsx'
-import SignUpPage from './pages/auth/SignUpPage.tsx'
-import MfaEnrollPage from './pages/auth/MfaEnrollPage.tsx'
-import IntakePage from './pages/admin/IntakePage.tsx'
-import InventoryPage from './pages/admin/InventoryPage.tsx'
-import PawnInboxPage from './pages/admin/PawnInboxPage.tsx'
-import ReservationsPage from './pages/admin/ReservationsPage.tsx'
-import StoreHoursPage from './pages/admin/StoreHoursPage.tsx'
-import SerialBlacklistPage from './pages/admin/SerialBlacklistPage.tsx'
-import StaffPicksPage from './pages/admin/StaffPicksPage.tsx'
-import StaffManagementPage from './pages/admin/StaffManagementPage.tsx'
-import SchedulingPage from './pages/admin/SchedulingPage.tsx'
-import PreorderInboxPage from './pages/admin/PreorderInboxPage.tsx'
-import CampaignAdminPage from './pages/admin/CampaignAdminPage.tsx'
-import DisputeAdminPage from './pages/admin/DisputeAdminPage.tsx'
-import ArticleListPage from './pages/admin/ArticleListPage.tsx'
-import ArticleEditorPage from './pages/admin/ArticleEditorPage.tsx'
-import FaqAdminPage from './pages/admin/FaqAdminPage.tsx'
-import ArticleDetailPage from './pages/ArticleDetailPage.tsx'
-import FaqPage from './pages/FaqPage.tsx'
-import LocalSeoPage from './pages/LocalSeoPage.tsx'
-import ContactPage from './pages/ContactPage.tsx'
-import FavouritesPage from './pages/FavouritesPage.tsx'
-import AccessibilityPage from './pages/AccessibilityPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
-import HomePage from './pages/HomePage.tsx'
-import SellPage from './pages/pawn/SellPage.tsx'
-import MoodCollectionPage from './pages/cannabis/MoodCollectionPage.tsx'
-import BundleCollectionPage from './pages/fireworks/BundleCollectionPage.tsx'
-import SchedulePage from './pages/staff/SchedulePage.tsx'
 import AgeGate from './components/age-gate/AgeGate.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
-import DashboardPage from './pages/admin/DashboardPage.tsx'
-import CrmDashboardPage from './pages/admin/crm/CrmDashboardPage.tsx'
-import CustomerDetailPage from './pages/admin/crm/CustomerDetailPage.tsx'
-import PrivacyPage from './pages/PrivacyPage.tsx'
-import TermsPage from './pages/TermsPage.tsx'
 import { captureUtm } from './lib/utm.ts'
 
 // Capture UTM params from landing URL into sessionStorage on first load
@@ -69,48 +32,72 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <NotFoundPage />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: 'pawn',      element: <PawnPage /> },
-      { path: 'pawn/sell', element: <SellPage /> },
-      { path: 'cannabis',  element: <AgeGate minAge={19} viewTag="cannabis"><CannabisPage /></AgeGate> },
-      { path: 'cannabis/collections/:mood', element: <AgeGate minAge={19} viewTag="cannabis"><MoodCollectionPage /></AgeGate> },
-      { path: 'fireworks', element: <AgeGate minAge={18} viewTag="fireworks"><FireworksPage /></AgeGate> },
-      { path: 'fireworks/collections/bundles', element: <AgeGate minAge={18} viewTag="fireworks"><BundleCollectionPage /></AgeGate> },
-      { path: 'login',     element: <LoginPage /> },
-      { path: 'signup',    element: <SignUpPage /> },
-      { path: 'favourites', element: <FavouritesPage /> },
+      { index: true, lazy: () => import('./pages/HomePage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'pawn',      lazy: () => import('./pages/PawnPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'pawn/sell', lazy: () => import('./pages/pawn/SellPage.tsx').then(m => ({ Component: m.default })) },
+      {
+        path: 'cannabis',
+        lazy: async () => {
+          const { default: CannabisPage } = await import('./pages/CannabisPage.tsx')
+          return { element: <AgeGate minAge={19} viewTag="cannabis"><CannabisPage /></AgeGate> }
+        },
+      },
+      {
+        path: 'cannabis/collections/:mood',
+        lazy: async () => {
+          const { default: MoodCollectionPage } = await import('./pages/cannabis/MoodCollectionPage.tsx')
+          return { element: <AgeGate minAge={19} viewTag="cannabis"><MoodCollectionPage /></AgeGate> }
+        },
+      },
+      {
+        path: 'fireworks',
+        lazy: async () => {
+          const { default: FireworksPage } = await import('./pages/FireworksPage.tsx')
+          return { element: <AgeGate minAge={18} viewTag="fireworks"><FireworksPage /></AgeGate> }
+        },
+      },
+      {
+        path: 'fireworks/collections/bundles',
+        lazy: async () => {
+          const { default: BundleCollectionPage } = await import('./pages/fireworks/BundleCollectionPage.tsx')
+          return { element: <AgeGate minAge={18} viewTag="fireworks"><BundleCollectionPage /></AgeGate> }
+        },
+      },
+      { path: 'login',      lazy: () => import('./pages/auth/LoginPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'signup',     lazy: () => import('./pages/auth/SignUpPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'favourites', lazy: () => import('./pages/FavouritesPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'auth', children: [
-        { path: 'mfa-enroll', element: <MfaEnrollPage /> },
+        { path: 'mfa-enroll', lazy: () => import('./pages/auth/MfaEnrollPage.tsx').then(m => ({ Component: m.default })) },
       ]},
-      { path: 'contact',       element: <ContactPage /> },
-      { path: 'accessibility', element: <AccessibilityPage /> },
-      { path: 'privacy',       element: <PrivacyPage /> },
-      { path: 'terms',         element: <TermsPage /> },
+      { path: 'contact',       lazy: () => import('./pages/ContactPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'accessibility', lazy: () => import('./pages/AccessibilityPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'privacy',       lazy: () => import('./pages/PrivacyPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'terms',         lazy: () => import('./pages/TermsPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'staff', children: [
-        { path: 'schedule', element: <SchedulePage /> },
+        { path: 'schedule', lazy: () => import('./pages/staff/SchedulePage.tsx').then(m => ({ Component: m.default })) },
       ]},
-      { path: 'articles/:slug', element: <ArticleDetailPage /> },
-      { path: 'faq',            element: <FaqPage /> },
-      { path: 'local/:location', element: <LocalSeoPage /> },
+      { path: 'articles/:slug', lazy: () => import('./pages/ArticleDetailPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'faq',            lazy: () => import('./pages/FaqPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'local/:location', lazy: () => import('./pages/LocalSeoPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'admin', children: [
-        { path: 'intake',            element: <IntakePage /> },
-        { path: 'inventory',         element: <InventoryPage /> },
-        { path: 'pawn-inbox',        element: <PawnInboxPage /> },
-        { path: 'reservations',      element: <ReservationsPage /> },
-        { path: 'store-hours',       element: <StoreHoursPage /> },
-        { path: 'serial-blacklist',  element: <SerialBlacklistPage /> },
-        { path: 'staff-picks',       element: <StaffPicksPage /> },
-        { path: 'staff',             element: <StaffManagementPage /> },
-        { path: 'scheduling',        element: <SchedulingPage /> },
-        { path: 'dashboard',         element: <DashboardPage /> },
-        { path: 'crm',               element: <CrmDashboardPage /> },
-        { path: 'crm/:uid',          element: <CustomerDetailPage /> },
-        { path: 'preorders',         element: <PreorderInboxPage /> },
-        { path: 'campaigns',         element: <CampaignAdminPage /> },
-        { path: 'disputes',          element: <DisputeAdminPage /> },
-        { path: 'articles',          element: <ArticleListPage /> },
-        { path: 'articles/:id/edit', element: <ArticleEditorPage /> },
-        { path: 'faqs',              element: <FaqAdminPage /> },
+        { path: 'intake',            lazy: () => import('./pages/admin/IntakePage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'inventory',         lazy: () => import('./pages/admin/InventoryPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'pawn-inbox',        lazy: () => import('./pages/admin/PawnInboxPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'reservations',      lazy: () => import('./pages/admin/ReservationsPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'store-hours',       lazy: () => import('./pages/admin/StoreHoursPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'serial-blacklist',  lazy: () => import('./pages/admin/SerialBlacklistPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'staff-picks',       lazy: () => import('./pages/admin/StaffPicksPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'staff',             lazy: () => import('./pages/admin/StaffManagementPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'scheduling',        lazy: () => import('./pages/admin/SchedulingPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'dashboard',         lazy: () => import('./pages/admin/DashboardPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'crm',               lazy: () => import('./pages/admin/crm/CrmDashboardPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'crm/:uid',          lazy: () => import('./pages/admin/crm/CustomerDetailPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'preorders',         lazy: () => import('./pages/admin/PreorderInboxPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'campaigns',         lazy: () => import('./pages/admin/CampaignAdminPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'disputes',          lazy: () => import('./pages/admin/DisputeAdminPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'articles',          lazy: () => import('./pages/admin/ArticleListPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'articles/:id/edit', lazy: () => import('./pages/admin/ArticleEditorPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'faqs',              lazy: () => import('./pages/admin/FaqAdminPage.tsx').then(m => ({ Component: m.default })) },
       ]},
       { path: '*', element: <NotFoundPage /> },
     ],

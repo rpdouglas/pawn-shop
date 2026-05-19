@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { httpsCallable } from 'firebase/functions'
-import { functions } from '../../lib/firebase'
+import { functions } from '../../lib/firebase-core'
 import Button from '../ui/Button'
 import { Analytics } from '../../lib/analytics'
 

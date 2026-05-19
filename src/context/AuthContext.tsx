@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { onAuthStateChanged, getIdTokenResult, multiFactor, signOut } from 'firebase/auth'
 import { httpsCallable } from 'firebase/functions'
 import type { User } from 'firebase/auth'
-import { auth, functions } from '../lib/firebase'
+import { auth, functions } from '../lib/firebase-core'
 import type { AuthUser, StaffRole } from '../lib/types'
 
 interface AuthContextValue {

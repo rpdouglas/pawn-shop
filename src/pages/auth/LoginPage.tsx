@@ -9,7 +9,7 @@ import {
 } from 'firebase/auth'
 import type { AuthError, MultiFactorError, MultiFactorResolver } from 'firebase/auth'
 import { httpsCallable } from 'firebase/functions'
-import { auth, functions } from '../../lib/firebase'
+import { auth, functions } from '../../lib/firebase-core'
 import { useAuth } from '../../context/AuthContext'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'

@@ -1,7 +1,10 @@
+import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import NotificationDropdown from './NotificationDropdown'
 import UserProfileCircle from './UserProfileCircle'
+
+// Lazy: only shown to authenticated users; avoids pulling Firestore into main bundle
+const NotificationDropdown = lazy(() => import('./NotificationDropdown'))
 
 export default function UserNav() {
   const { user, loading } = useAuth()
@@ -33,7 +36,7 @@ export default function UserNav() {
 
       {!loading && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-          {user && <NotificationDropdown />}
+          {user && <Suspense fallback={null}><NotificationDropdown /></Suspense>}
           <UserProfileCircle />
         </div>
       )}
