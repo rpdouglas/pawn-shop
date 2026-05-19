@@ -13,11 +13,11 @@ This skill provides a systematic workflow for verifying new features and epics a
 Always start by verifying the codebase is in a stable state.
 - **Run:** `npm run build` (Zero TypeScript errors)
 - **Run:** `npm run lint` (Zero ESLint warnings or errors)
-- **Type Safety Audit:** Ensure no `any` types were introduced and all Firestore reads are properly typed.
+- **Type Safety Audit:** Ensure no `any` types were introduced. **CRITICAL:** Explicitly check for and reject `as any` casts or `!` non-null assertions during Firestore data handling (e.g., `doc.data()`). Enforce `Record<string, unknown>` and strict `Timestamp` typing.
 
 ### Part 2 — Persona Smoke Tests
 Execute pass/fail tests for the primary persona of the feature. Refer to `docs/prompts/TESTING.md` for specific criteria for:
-- **Makoonsii:** 48px touch targets, plain language, Kanien'kéha audit.
+- **Makoonsii:** **48px minimum hit areas** on all interactive elements (buttons, radio labels, inputs). Plain language, Kanien'kéha audit.
 - **Dale:** Price visibility, condition clarity, stale inventory check.
 - **Tanya:** 60-second SMS SLA, specific pickup windows, age gates (18+).
 - **Marie:** Discretion audit (no category names in CRM), age gates (19+), auditLog verification.

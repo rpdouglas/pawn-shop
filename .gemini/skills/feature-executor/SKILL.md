@@ -25,10 +25,10 @@ You MUST complete all three gates before writing a single line of code.
 ## Execution Protocol
 
 ### Code Quality Rules
-- **No `any` types:** Use specific interfaces or `unknown`. Never cast Firestore data as `any`.
-- **CSS Tokens:** Use `var(--color-primary)` and `.view-*` classes. No hardcoded hex values.
+- **No `any` types:** Use specific interfaces or `unknown`. **CRITICAL:** Never cast Firestore data as `any` or use non-null assertions `!`. Always cast `doc.data()` to `Record<string, unknown>`.
+- **Firestore Timestamps:** Convert Firestore `Timestamp` to JS `Date` using strict typing: `(data.createdAt as Timestamp)?.toDate?.()`.
+- **CSS Tokens & UI:** Use `var(--color-primary)` and `.view-*` classes. No hardcoded hex values. Ensure all interactive elements (buttons, radio labels, inputs) have a minimum **48px hit area** (e.g., `minHeight: '48px'`, `padding`) for accessibility.
 - **Price Integrity:** Use CAD cents (integers) exclusively.
-- **Date Handling:** Convert Firestore `Timestamp` to JS `Date` using `.toDate()` where appropriate.
 - **Clean Code:** No `console.log`, no unused imports, no unused variables (prefix with `_`).
 
 ### Compliance Execution
