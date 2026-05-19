@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 24
+**Cycle:** 25
 **Started:** 2026-05-19
 **Target close:** TBD
 **Deploy target:** dev
@@ -32,7 +32,9 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 
 | Task | Epic | Completed |
 |---|---|---|
-| | | |
+| Optimize and integrate official brand logo on HomePage | E27 | 2026-05-19 |
+| **E38 · Admin Desktop Portal** (Approaches, Layout, Components, Integration) | E38 | 2026-05-19 |
+| **E38 CLOSED** | E38 | 2026-05-19 |
 
 ---
 
@@ -60,6 +62,18 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 24** (2026-05-19 → 2026-05-19) — Closed E38 · Admin Desktop Portal. Phase 7 continued.
+
+| Task | Epic | Completed |
+|---|---|---|
+| Admin Desktop Portal implemented (Approach A: Nested Router Layout) | E38 | 2026-05-19 |
+| Core Portal Components: `AdminLayout`, `AdminSidebar`, `AdminTopbar` delivered | E38 | 2026-05-19 |
+| Persistent desktop shell (≥ 1024px) for all staff roles | E38 | 2026-05-19 |
+| Makoonsii 48px hit area fix for sidebar icons | E38 | 2026-05-19 |
+| **E38 CLOSED** | E38 | 2026-05-19 |
+
+---
 
 **Cycle 23** (2026-05-19 → 2026-05-19) — Closed E25 · Header Navigation Refinement. Phase 8 continued.
 
@@ -130,4 +144,4 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-19 (Cycle 24 open)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-19 (Cycle 25 open)*

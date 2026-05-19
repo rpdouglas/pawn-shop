@@ -1,7 +1,12 @@
 import NavigationDrawer from './NavigationDrawer'
 import UserNav from './UserNav'
+import { useAdminShell } from '../../context/AdminShellContext'
 
 export default function GlobalHeader() {
+  const { isAdminDesktop } = useAdminShell()
+
+  if (isAdminDesktop) return null
+
   return (
     <header 
       aria-label="Site header" 
