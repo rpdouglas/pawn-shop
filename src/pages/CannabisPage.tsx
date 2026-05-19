@@ -5,6 +5,7 @@ import MoodCard from '../components/cannabis/MoodCard'
 import LuxuryProductCard from '../components/cannabis/LuxuryProductCard'
 import Button from '../components/ui/Button'
 import CampaignBanner from '../components/CampaignBanner'
+import ArticleSection from '../components/ArticleSection'
 import { useItems } from '../hooks/useItems'
 import type { MoodCategory, ShopInfo } from '../lib/types'
 import { Analytics } from '../lib/analytics'
@@ -191,6 +192,9 @@ export default function CannabisPage() {
             </div>
           )}
         </section>
+
+        {/* Cannabis Stories — E19 editorial integration */}
+        <ArticleSection viewTag="cannabis" title="Cannabis Stories" />
       </section>
 
       {/* Anonymous WhatsApp enquiry — no account required (Marie Discretion Test) */}

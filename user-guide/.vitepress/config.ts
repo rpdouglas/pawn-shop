@@ -48,6 +48,7 @@ export default defineConfig({
         items: [
           { text: 'Global Dashboard', link: '/admin/dashboard' },
           { text: 'Inventory Management', link: '/admin/inventory' },
+          { text: 'Editorial CMS', link: '/admin/editorial-cms' },
           { text: 'AI Assistant', link: '/admin/ai-assistant' },
           { text: 'Audit Logs', link: '/admin/audit-logs' },
           { text: 'Police Holds', link: '/admin/police-holds' },

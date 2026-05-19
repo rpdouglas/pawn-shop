@@ -283,6 +283,19 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 
 ---
 
+## `faqs/{id}`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `question` | string | |
+| `answer` | string | |
+| `category` | string | `pawn` \| `cannabis` \| `fireworks` \| `general` |
+| `order` | number | Display order |
+| `updatedAt` | timestamp | |
+| `createdAt` | timestamp | |
+
+---
+
 ## `preorders/{id}`
 
 | Field | Type | Notes |

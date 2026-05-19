@@ -12,6 +12,7 @@ import YearsInBusinessBadge from '../components/pawn/YearsInBusinessBadge'
 import TestimonialsModule from '../components/pawn/TestimonialsModule'
 import ActivityFeed from '../components/pawn/ActivityFeed'
 import CampaignBanner from '../components/CampaignBanner'
+import ArticleSection from '../components/ArticleSection'
 import Input from '../components/ui/Input'
 import SaveSearchButton from '../components/pawn/SaveSearchButton'
 import { useItemSearch } from '../hooks/useItemSearch'
@@ -147,6 +148,9 @@ export default function PawnPage() {
             onItemHover={handleItemHover}
           />
         </section>
+
+        {/* Narrative & Stories — E19 Akwesasne identity foundation */}
+        {!searchValue && <ArticleSection viewTag="pawn" title="Akwesasne Narrative" />}
 
         {/* Community testimonials — Makoonsii trust signal */}
         {!searchValue && <TestimonialsModule />}

@@ -215,3 +215,33 @@ export interface Dispute {
   createdAt: Date
   resolvedAt?: Date | null
 }
+
+export type ArticleStatus = 'draft' | 'published' | 'archived'
+
+export interface Article {
+  id: string
+  title: string
+  slug: string
+  body: string
+  viewTag: ViewType | 'all'
+  status: ArticleStatus
+  seoMeta: {
+    title: string
+    description: string
+  }
+  publishedAt?: Date | null
+  authorUid: string
+  indigenousLanguageReviewed: boolean
+  createdAt: Date
+  updatedAt?: Date
+}
+
+export interface Faq {
+  id: string
+  question: string
+  answer: string
+  category: 'pawn' | 'cannabis' | 'fireworks' | 'general'
+  order: number
+  updatedAt: Date
+  createdAt: Date
+}

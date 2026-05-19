@@ -222,6 +222,16 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-19 — E18: Added `aiTagSuggestions` to `items/{id}/internal/ai` schema to support staff-facing tag recommendations.
 
+2026-05-19 — E19: Editorial CMS. Implemented as a Firestore-backed Markdown editor with a mandatory `indigenousLanguageReviewed` publishing gate to enforce Akwesasne cultural integrity.
+
+2026-05-19 — E19: Added `faqs` collection to support an admin-editable FAQ engine for trust-building with the Makoonsii persona.
+
+2026-05-19 — E19: FAQ engine implemented with `faqs` collection. Admin CRUD interface restricted to `marketing_staff` and `admin`. Public view adapted per `ViewContext` to show only relevant categories.
+
+2026-05-19 — E19: Local SEO landing pages (x6) delivered via dynamic `LocalSeoPage.tsx`. Injects JSON-LD `LocalBusiness` schema and updates document metadata for regional search visibility (Cornwall, Massena, etc.).
+
+2026-05-19 — E19: `logFaqAction` Cloud Function implemented to handle `auditLogs` for FAQ creation, updates, and deletions. Ensures compliance with "Admin SDK writes only" mandate for audit logs.
+
 ---
 
 *Add new entries above this line.*

@@ -6,6 +6,7 @@ import BundleCard from '../components/fireworks/BundleCard'
 import UrgencyBadge from '../components/fireworks/UrgencyBadge'
 import CampaignBanner from '../components/CampaignBanner'
 import PreorderModal from '../components/fireworks/PreorderModal'
+import ArticleSection from '../components/ArticleSection'
 import { useItems } from '../hooks/useItems'
 import type { Item, Campaign, CampaignViewTag } from '../lib/types'
 import { Analytics } from '../lib/analytics'
@@ -191,6 +192,9 @@ export default function FireworksPage() {
             ))}
           </div>
         )}
+
+        {/* Fireworks Stories — E19 editorial integration */}
+        <ArticleSection viewTag="fireworks" title="Seasonal Stories" />
       </section>
 
       {/* Pickup information */}

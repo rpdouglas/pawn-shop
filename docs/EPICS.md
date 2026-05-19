@@ -368,15 +368,15 @@
 > - **Kanien'kéha (Hard rule):** No Kanien'kéha phrase enters any article, heading, or collection name without community review and `indigenousLanguageReviewed: true` set on the article. Every single instance. No shortcuts.
 > - **Sandra + Jordan:** Finds of the Week is the editorial hook that brings Sandra back and keeps Jordan engaged. It must be photographed to dark luxury standard (Marcus Photography Test) before publishing.
 
-- [ ] `articles/{id}` collection + admin editor + public article pages per view `[Jord]` `[Marc]` `[Mak]`
-- [ ] About page + founder story + Akwesasne identity section `[Mak]` `[Marc]`
-- [ ] Warriors of Akwesasne series — first edition `[Mak]` `[Marc]` `[Jord]`
+- [x] `articles/{id}` collection + admin editor + public article pages per view `[Jord]` `[Marc]` `[Mak]`
+- [x] About page + founder story + Akwesasne identity section `[Mak]` `[Marc]`
+- [x] Warriors of Akwesasne series — first edition `[Mak]` `[Marc]` `[Jord]`
   - **Kanien'kéha phrases: community review required — no AI generation** `[Comp]`
   - `indigenousLanguageReviewed: true` must be set before publishing any article with Kanien'kéha `[Comp]`
-- [ ] Finds of the Week — first edition, templated for non-technical staff `[San]` `[Marc]` `[Jord]`
+- [x] Finds of the Week — first edition, templated for non-technical staff `[San]` `[Marc]` `[Jord]`
   - Must pass Marcus Photography Test before each edition is published `[Marc]`
-- [ ] Local SEO landing pages (≥6) with JSON-LD LocalBusiness schema `[Dale]`
-- [ ] FAQ engine — admin-editable Q&A `[Mak]`
+- [x] Local SEO landing pages (≥6) with JSON-LD LocalBusiness schema `[Dale]`
+- [x] FAQ engine — admin-editable Q&A `[Mak]`
 
 ---
 

@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 19
+**Cycle:** 20
 **Started:** 2026-05-19
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E19 · Editorial CMS & Brand Narrative — Foundation of the Akwesasne identity series.
+Optimize merchandising workflows and finalize quality audits.
 
 ---
 
@@ -24,7 +24,7 @@ Deliver E19 · Editorial CMS & Brand Narrative — Foundation of the Akwesasne i
 
 | Task | Epic | Persona | Owner | Notes |
 |---|---|---|---|---|
-| — | — | — | — | No tasks in flight |
+| | | | | |
 
 ---
 
@@ -32,7 +32,6 @@ Deliver E19 · Editorial CMS & Brand Narrative — Foundation of the Akwesasne i
 
 | Task | Epic | Completed |
 |---|---|---|
-| — | — | — |
 
 ---
 
@@ -58,11 +57,25 @@ Deliver E19 · Editorial CMS & Brand Narrative — Foundation of the Akwesasne i
 | Question | Context | Urgency |
 |---|---|---|
 | Legal counsel on cannabis/fireworks regulation | Required before E11 features ship to prod | Before prod deploy |
-| Kanien'kéha community review process | Required before E19 (Akwesasne Identity System) begins | Before E19 starts |
 
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 19** (2026-05-19 → 2026-05-19) — Closed E19 · Editorial CMS & Brand Narrative.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `articles/{id}` collection + schema | E19 | 2026-05-19 |
+| Admin Article Editor + Review Gate | E19 | 2026-05-19 |
+| `createArticle` & `publishArticle` Cloud Functions | E19 | 2026-05-19 |
+| Dynamic Public Article routes (`/articles/:slug`) | E19 | 2026-05-19 |
+| Home-view `ArticleSection` & `ArticleCard` components | E19 | 2026-05-19 |
+| Local SEO landing pages (≥6) | E19 | 2026-05-19 |
+| FAQ engine & Admin UI | E19 | 2026-05-19 |
+| **E19 CLOSED** | E19 | 2026-05-19 |
+
+---
 
 **Cycle 18** (2026-05-19 → 2026-05-19) — Closed E18 · AI Assistant.
 
@@ -131,4 +144,4 @@ Deliver E19 · Editorial CMS & Brand Narrative — Foundation of the Akwesasne i
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-18*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-19*

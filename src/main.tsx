@@ -36,6 +36,12 @@ import SchedulingPage from './pages/admin/SchedulingPage.tsx'
 import PreorderInboxPage from './pages/admin/PreorderInboxPage.tsx'
 import CampaignAdminPage from './pages/admin/CampaignAdminPage.tsx'
 import DisputeAdminPage from './pages/admin/DisputeAdminPage.tsx'
+import ArticleListPage from './pages/admin/ArticleListPage.tsx'
+import ArticleEditorPage from './pages/admin/ArticleEditorPage.tsx'
+import FaqAdminPage from './pages/admin/FaqAdminPage.tsx'
+import ArticleDetailPage from './pages/ArticleDetailPage.tsx'
+import FaqPage from './pages/FaqPage.tsx'
+import LocalSeoPage from './pages/LocalSeoPage.tsx'
 import ContactPage from './pages/ContactPage.tsx'
 import FavouritesPage from './pages/FavouritesPage.tsx'
 import AccessibilityPage from './pages/AccessibilityPage.tsx'
@@ -82,6 +88,9 @@ const router = createBrowserRouter([
       { path: 'staff', children: [
         { path: 'schedule', element: <SchedulePage /> },
       ]},
+      { path: 'articles/:slug', element: <ArticleDetailPage /> },
+      { path: 'faq',            element: <FaqPage /> },
+      { path: 'local/:location', element: <LocalSeoPage /> },
       { path: 'admin', children: [
         { path: 'intake',            element: <IntakePage /> },
         { path: 'inventory',         element: <InventoryPage /> },
@@ -98,6 +107,9 @@ const router = createBrowserRouter([
         { path: 'preorders',         element: <PreorderInboxPage /> },
         { path: 'campaigns',         element: <CampaignAdminPage /> },
         { path: 'disputes',          element: <DisputeAdminPage /> },
+        { path: 'articles',          element: <ArticleListPage /> },
+        { path: 'articles/:id/edit', element: <ArticleEditorPage /> },
+        { path: 'faqs',              element: <FaqAdminPage /> },
       ]},
       { path: '*', element: <NotFoundPage /> },
     ],
