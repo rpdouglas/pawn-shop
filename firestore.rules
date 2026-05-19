@@ -138,7 +138,7 @@ service cloud.firestore {
 
     // ── disputes/{id} ────────────────────────────────────────────────────────
     match /disputes/{disputeId} {
-      allow create: if isSignedIn();
+      allow create: if false;
       allow read, update: if isStaff() || isOwner(resource.data.uid);
       allow delete: if isAdmin();
     }

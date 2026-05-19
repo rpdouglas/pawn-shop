@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import {
   collection,
   query,
@@ -214,6 +214,23 @@ export default function DashboardPage() {
               <StatCard label="Reserved"     value={stats.reservedCount} />
               <StatCard label="Draft"        value={stats.draftCount} />
               <StatCard label="Police Hold"  value={stats.policeHoldCount} />
+            </div>
+
+            <div style={{ marginTop: 'var(--space-6)' }}>
+              <Link 
+                to="/admin/disputes" 
+                style={{ 
+                  fontFamily: 'var(--font-body)', 
+                  fontSize: 'var(--text-small)', 
+                  color: 'var(--color-primary)', 
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)'
+                }}
+              >
+                Manage Returns & Disputes →
+              </Link>
             </div>
           </section>
 

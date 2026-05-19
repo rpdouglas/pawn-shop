@@ -9,6 +9,7 @@ import Button from '../ui/Button'
 import MerchandisingBadge from '../MerchandisingBadge'
 import RelatedItems from '../RelatedItems'
 import HoldCountdownBadge from './HoldCountdownBadge'
+import ReturnRequestForm from './ReturnRequestForm'
 import { formatPrice } from '../../lib/format'
 import type { Item, ConditionGrade, ViewType } from '../../lib/types'
 import { Analytics } from '../../lib/analytics'
@@ -44,6 +45,8 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
   const { isFavourite, toggleFavourite } = useFavourites()
   const panelRef = useRef<HTMLDivElement>(null)
   const [imageIndex, setImageIndex] = useState(0)
+  const [showDisputeForm, setShowDisputeForm] = useState(false)
+  const [disputeSuccess, setDisputeSuccess] = useState(false)
 
   // Fires once per item open — item_id is pseudonymous Firestore doc ID, not PII
   useEffect(() => {
@@ -306,41 +309,63 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
 
             {/* CTAs */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                <Button variant="primary" size="lg" style={{ flex: 1 }}>
-                  Enquire about this item
-                </Button>
-                {user && (
-                  <button
-                    onClick={() => toggleFavourite(item.id)}
-                    aria-label={isFavourite(item.id) ? 'Remove from favourites' : 'Add to favourites'}
-                    style={{
-                      background: 'none',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-md)',
-                      width: '48px',
-                      height: '48px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      fontSize: 'var(--text-heading)',
-                      color: isFavourite(item.id) ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                      transition: 'all 0.2s ease-in-out',
-                    }}
-                  >
-                    {isFavourite(item.id) ? '♥' : '♡'}
-                  </button>
-                )}
-              </div>
-              {onCollect && item.status === 'active' && item.viewTag !== 'cannabis' && !item.policeHold && (
-                <Button variant="secondary" size="md" onClick={() => { onClose(); onCollect() }}>
-                  Reserve for Collection
-                </Button>
+              {showDisputeForm ? (
+                disputeSuccess ? (
+                  <div style={{ textAlign: 'center', padding: 'var(--space-4)', backgroundColor: 'rgba(200, 161, 74, 0.1)', borderRadius: 'var(--radius-md)' }}>
+                    <p style={{ fontFamily: 'var(--font-display)', color: 'var(--color-primary)', margin: 0 }}>Request received. We'll be in touch soon.</p>
+                    <Button variant="ghost" size="sm" onClick={onClose} style={{ marginTop: 'var(--space-4)' }}>Close</Button>
+                  </div>
+                ) : (
+                  <ReturnRequestForm 
+                    item={item} 
+                    onClose={() => setShowDisputeForm(false)} 
+                    onSuccess={() => setDisputeSuccess(true)} 
+                  />
+                )
+              ) : (
+                <>
+                  <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                    <Button variant="primary" size="lg" style={{ flex: 1 }}>
+                      Enquire about this item
+                    </Button>
+                    {user && (
+                      <button
+                        onClick={() => toggleFavourite(item.id)}
+                        aria-label={isFavourite(item.id) ? 'Remove from favourites' : 'Add to favourites'}
+                        style={{
+                          background: 'none',
+                          border: '1px solid var(--color-border)',
+                          borderRadius: 'var(--radius-md)',
+                          width: '48px',
+                          height: '48px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          fontSize: 'var(--text-heading)',
+                          color: isFavourite(item.id) ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                          transition: 'all 0.2s ease-in-out',
+                        }}
+                      >
+                        {isFavourite(item.id) ? '♥' : '♡'}
+                      </button>
+                    )}
+                  </div>
+                  {onCollect && item.status === 'active' && item.viewTag !== 'cannabis' && !item.policeHold && (
+                    <Button variant="secondary" size="md" onClick={() => { onClose(); onCollect() }}>
+                      Reserve for Collection
+                    </Button>
+                  )}
+                  {item.status === 'sold' && user && (
+                    <Button variant="ghost" size="md" onClick={() => setShowDisputeForm(true)}>
+                      Report an issue with this purchase
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="md" onClick={onClose}>
+                    Close
+                  </Button>
+                </>
               )}
-              <Button variant="ghost" size="md" onClick={onClose}>
-                Close
-              </Button>
             </div>
 
             {/* Related items by trending score — same category + view */}

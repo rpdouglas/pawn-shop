@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 16
+**Cycle:** 18
 **Started:** 2026-05-19
 **Target close:** TBD
 **Deploy target:** dev
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E12 · Alerts & Notifications — Saved searches, item favourites/wishlist, and 60-second automated inventory alerts via SMS/Email (CASL compliant).
+Deliver E18 · AI Assistant (Staff-Facing) — Draft generation for descriptions and pricing suggestions.
 
 ---
 
@@ -32,12 +32,7 @@ Deliver E12 · Alerts & Notifications — Saved searches, item favourites/wishli
 
 | Task | Epic | Completed |
 |---|---|---|
-| `savedSearches/{id}` collection + customer UI | E12 | 2026-05-19 |
-| Favourites/wishlist UI (`FavouritesPage`) | E12 | 2026-05-19 |
-| `onItemPublished` Firestore alert trigger | E12 | 2026-05-19 |
-| In-app notification centre dropdown | E12 | 2026-05-19 |
-| CASL opt-in check and discretion branding | E12 | 2026-05-19 |
-| **E12 CLOSED** | E12 | 2026-05-19 |
+| — | — | — |
 
 ---
 
@@ -68,6 +63,32 @@ Deliver E12 · Alerts & Notifications — Saved searches, item favourites/wishli
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 17** (2026-05-19 → 2026-05-19) — Closed E16 · Post-Sale Operations.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `disputes/{id}` collection + schema | E16 | 2026-05-19 |
+| `ReturnRequestForm` customer component | E16 | 2026-05-19 |
+| `DisputeAdminPage` & `RestockAction` admin UI | E16 | 2026-05-19 |
+| `createDispute` & `resolveDispute` Cloud Functions | E16 | 2026-05-19 |
+| Atomic restock logic with Kevin alert trigger | E16 | 2026-05-19 |
+| **E16 CLOSED** (eBay background sync deferred to E22) | E16 | 2026-05-19 |
+
+---
+
+**Cycle 16** (2026-05-19 → 2026-05-19) — Closed E12 · Alerts & Notifications.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `savedSearches/{id}` collection + customer UI | E12 | 2026-05-19 |
+| Favourites/wishlist UI (`FavouritesPage`) | E12 | 2026-05-19 |
+| `onItemPublished` Firestore alert trigger | E12 | 2026-05-19 |
+| In-app notification centre dropdown | E12 | 2026-05-19 |
+| CASL opt-in check and discretion branding | E12 | 2026-05-19 |
+| **E12 CLOSED** | E12 | 2026-05-19 |
+
+---
 
 **Cycle 15** (2026-05-19 → 2026-05-19) — Closed E15 · CRM & Retention.
 

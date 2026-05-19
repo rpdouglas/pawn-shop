@@ -216,6 +216,10 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-19 — E12: Notification Centre implemented as a dropdown in the GlobalHeader with real-time Firestore updates. Provides immediate in-app visibility for matched searches and favourited item status changes.
 
+2026-05-19 — E16: Post-Sale Operations. `resolveDispute` implemented as a Cloud Function to ensure atomic status transitions and guaranteed audit log integrity. Restock logic (transitioning items back to `active`) is handled server-side to immediately trigger inventory alerts.
+
+2026-05-19 — E16: eBay Dispute Integration. Managed via a simplified staff view using `ebayDisputeId` matching. Background sync deferred to E22; current phase focuses on staff visibility and manual resolution matching.
+
 ---
 
 *Add new entries above this line.*

@@ -161,6 +161,9 @@ export interface ActivityFeedEntry {
 
 export type CampaignViewTag = ViewType | 'all'
 export type PreorderStatus = 'pending' | 'confirmed' | 'ready' | 'collected' | 'cancelled'
+export type DisputeStatus = 'open' | 'investigating' | 'resolved'
+export type DisputeType = 'return' | 'dispute'
+export type RefundMethod = 'cash' | 'etransfer' | 'store-credit'
 
 export interface DiscountRule {
   type: 'percent' | 'fixed'
@@ -196,4 +199,19 @@ export interface Preorder {
   campaignId?: string
   staffNotes?: string
   createdAt: Date
+}
+
+export interface Dispute {
+  id: string
+  uid: string
+  itemId: string
+  type: DisputeType
+  status: DisputeStatus
+  description: string
+  refundAmount?: number // CAD cents
+  refundMethod?: RefundMethod
+  staffNotes?: string
+  ebayDisputeId?: string
+  createdAt: Date
+  resolvedAt?: Date | null
 }

@@ -39,6 +39,7 @@ export default defineConfig({
         items: [
           { text: 'Selling to Us', link: '/pawn/selling' },
           { text: 'Managing the Inbox', link: '/admin/pawn-inbox' },
+          { text: 'Disputes & Returns', link: '/admin/disputes-returns' },
           { text: 'Seasonal Pre-Orders', link: '/admin/preorders' }
         ]
       },

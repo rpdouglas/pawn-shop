@@ -35,6 +35,7 @@ import StaffManagementPage from './pages/admin/StaffManagementPage.tsx'
 import SchedulingPage from './pages/admin/SchedulingPage.tsx'
 import PreorderInboxPage from './pages/admin/PreorderInboxPage.tsx'
 import CampaignAdminPage from './pages/admin/CampaignAdminPage.tsx'
+import DisputeAdminPage from './pages/admin/DisputeAdminPage.tsx'
 import ContactPage from './pages/ContactPage.tsx'
 import FavouritesPage from './pages/FavouritesPage.tsx'
 import AccessibilityPage from './pages/AccessibilityPage.tsx'
@@ -96,6 +97,7 @@ const router = createBrowserRouter([
         { path: 'crm/:uid',          element: <CustomerDetailPage /> },
         { path: 'preorders',         element: <PreorderInboxPage /> },
         { path: 'campaigns',         element: <CampaignAdminPage /> },
+        { path: 'disputes',          element: <DisputeAdminPage /> },
       ]},
       { path: '*', element: <NotFoundPage /> },
     ],

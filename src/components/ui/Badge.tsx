@@ -1,19 +1,22 @@
-import type { ConditionGrade, ItemStatus } from '../../lib/types'
+import type { ConditionGrade, ItemStatus, DisputeStatus, DisputeType } from '../../lib/types'
 
 type BadgeVariant =
   | ItemStatus
   | `condition-${ConditionGrade}`
+  | DisputeStatus
+  | DisputeType
   | 'tag'
 
 interface BadgeProps {
   variant: BadgeVariant
-  label: string
+  label?: string
+  children?: React.ReactNode
 }
 
-export default function Badge({ variant, label }: BadgeProps) {
+export default function Badge({ variant, label, children }: BadgeProps) {
   return (
     <span className={`badge badge-${variant}`}>
-      {label}
+      {children || label}
     </span>
   )
 }

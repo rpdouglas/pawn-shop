@@ -334,10 +334,10 @@
 > - **Dale:** eBay disputes pulled from API and manageable in admin — Dale's cross-border purchases sometimes require post-sale resolution. A broken dispute flow ends his trust in the platform.
 > - **Staff:** Resolving a return that restocks an item must update `items/{id}.status` immediately — so Kevin's alerts work correctly on restocked items.
 
-- [ ] Return/dispute ticket form (customer or staff) `[Mak]` `[Dale]`
-- [ ] `disputes/{id}` collection: status, refund log, staff notes `[Dale]` `[Comp]`
-- [ ] eBay disputes pulled from API and manageable in admin `[Dale]` `[Staff]`
-- [ ] Resolving a return updates `items/{id}.status` if item is restocked `[Kev]` `[Staff]`
+- [x] Return/dispute ticket form (customer or staff) `[Mak]` `[Dale]`
+- [x] `disputes/{id}` collection: status, refund log, staff notes `[Dale]` `[Comp]`
+- [x] eBay disputes pulled from API and manageable in admin `[Dale]` `[Staff]`
+- [x] Resolving a return updates `items/{id}.status` if item is restocked `[Kev]` `[Staff]`
 
 ---
 
