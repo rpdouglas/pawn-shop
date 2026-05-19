@@ -1998,6 +1998,34 @@ select:focus-visible,
 .related-item-card:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* ── E38 · Admin Desktop Shell ────────────────────────────────────────── */
+
+@media (min-width: 1024px) {
+  /* Suppress the standard ViewLayout padding/max-width when in admin shell */
+  .admin-shell .view-layout-main {
+    padding: 0;
+    max-width: none;
+  }
+
+  /* Admin sidebar scrollbar styling */
+  .admin-shell nav::-webkit-scrollbar {
+    width: 4px;
+  }
+  .admin-shell nav::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .admin-shell nav::-webkit-scrollbar-thumb {
+    background: #2a1f00;
+    border-radius: 2px;
+  }
+  .admin-shell nav::-webkit-scrollbar-thumb:hover {
+    background: #3a2f00;
+  }
+}
+
+.related-item-card {
   border-radius: var(--radius-sm);
 }
 

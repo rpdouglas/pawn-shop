@@ -62,7 +62,9 @@ export default function ViewLayout({ children }: ViewLayoutProps) {
   return (
     <div className={`view-${view} min-h-screen`}>
       <GlobalHeader />
-      {children}
+      <div className="view-layout-main">
+        {children}
+      </div>
     </div>
   )
 }

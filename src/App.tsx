@@ -1,12 +1,14 @@
 import { Link, Outlet } from 'react-router-dom'
 import { ViewProvider } from './context/ViewContext'
+import { AdminShellProvider } from './context/AdminShellContext'
 import ViewLayout from './components/layout/ViewLayout'
 import ConsentBanner from './components/ConsentBanner'
 
 export default function App() {
   return (
     <ViewProvider>
-      <ViewLayout>
+      <AdminShellProvider value={{ isAdminDesktop: false }}>
+        <ViewLayout>
         <ConsentBanner />
 
         <main id="main-content">
@@ -25,6 +27,7 @@ export default function App() {
           </p>
         </footer>
       </ViewLayout>
+      </AdminShellProvider>
     </ViewProvider>
   )
 }

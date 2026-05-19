@@ -26,6 +26,7 @@ Our platform manages high-stakes retail. Learn about our router-level age verifi
 Maintaining the "Dapper and Debonair" identity through our Markdown CMS and strict visual standards.
 - [Editorial CMS](/admin/editorial-cms)
 - [Branding & Visual Identity](/admin/branding)
+- [Admin Desktop Portal](/admin/portal)
 
 ### 📈 CRM & Retention
 Tools for tracking customer lifetime value (LTV), managing reseller tiers, and automated follow-ups.

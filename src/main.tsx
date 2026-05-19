@@ -22,6 +22,7 @@ import NotFoundPage from './pages/NotFoundPage.tsx'
 import AgeGate from './components/age-gate/AgeGate.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import { captureUtm } from './lib/utm.ts'
+import AdminLayout from './components/layout/AdminLayout.tsx'
 
 // Capture UTM params from landing URL into sessionStorage on first load
 captureUtm()
@@ -79,7 +80,7 @@ const router = createBrowserRouter([
       { path: 'articles/:slug', lazy: () => import('./pages/ArticleDetailPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'faq',            lazy: () => import('./pages/FaqPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'local/:location', lazy: () => import('./pages/LocalSeoPage.tsx').then(m => ({ Component: m.default })) },
-      { path: 'admin', children: [
+      { path: 'admin', element: <AdminLayout />, children: [
         { path: 'intake',            lazy: () => import('./pages/admin/IntakePage.tsx').then(m => ({ Component: m.default })) },
         { path: 'inventory',         lazy: () => import('./pages/admin/InventoryPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'pawn-inbox',        lazy: () => import('./pages/admin/PawnInboxPage.tsx').then(m => ({ Component: m.default })) },

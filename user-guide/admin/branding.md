@@ -24,6 +24,7 @@ Each storefront Vertical uses a specific color palette defined by CSS tokens.
 | **Pawn** | The Pawn Palette | Gold (`#C8A14A`) |
 | **Cannabis** | The Wellness Palette | Purple (`#7B4FA0`) |
 | **Fireworks** | The Energy Palette | Red (`#C0392B`) |
+| **Admin Shell** | The Portal Palette | Topbar (`#1c1400`) / Sidebar (`#161000`) |
 
 Staff should avoid introducing hardcoded hex values in Markdown articles or CMS content. Use descriptive terms that align with these established palettes.
 
