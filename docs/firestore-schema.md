@@ -113,6 +113,7 @@ Slot intervals are computed at runtime: `open` → `close − 30 min` in 30-minu
 |-------|------|-------|
 | `foundedYear` | number | Year the shop was founded. Used to compute years-in-business badge. |
 | `ownerName` | string | Optional. Display name used in testimonials context. |
+| `phoneNumber` | string | E.164 format (e.g. `+16135551234`). Used for WhatsApp enquiry deep link on cannabis item pages. Admin-only write. |
 | `updatedBy` | string | UID of admin who last modified |
 | `updatedAt` | timestamp | Server timestamp |
 
@@ -153,6 +154,8 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | `alertOptIn` | boolean | CASL — must be true before sending alerts |
 | `crossViewFlag` | boolean | Browsed multiple views in one session |
 | `phoneNumber` | string | For shift alerts and verification |
+| `consentAcceptedAt` | timestamp | null until user accepts the privacy policy. Set on account creation (SignUpPage) or by ConsentBanner on first post-E11 session. Never null for compliant accounts. |
+| `consentVersion` | string | Version slug of the accepted policy (e.g. `"2026-05-01"`). Enables re-consent detection on material policy changes. |
 | `createdAt` | timestamp | |
 
 ---

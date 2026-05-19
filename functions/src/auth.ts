@@ -1,7 +1,19 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
+import type { CallableRequest } from 'firebase-functions/v2/https'
 import { getAuth } from 'firebase-admin/auth'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 import { createHash } from 'node:crypto'
+
+// Enforces that the caller completed MFA sign-in (sign_in_second_factor present in token).
+// Skipped in the emulator — Identity Platform is required for this claim to be issued in prod.
+// Apply to the highest-risk admin operations only; all others are gated by Identity Platform upgrade.
+export function assertMfaEnrolled(request: CallableRequest): void {
+  if (process.env.FUNCTIONS_EMULATOR) return
+  const firebaseClaim = (request.auth?.token as Record<string, unknown>)?.['firebase'] as Record<string, unknown> | undefined
+  if (!firebaseClaim?.['sign_in_second_factor']) {
+    throw new HttpsError('unauthenticated', 'MFA-verified session required for this operation')
+  }
+}
 
 type StaffRole = 'admin' | 'manager' | 'inventory_staff' | 'marketing_staff' | 'customer'
 
@@ -27,6 +39,7 @@ export const assignRole = onCall<AssignRoleData>({ cors: true }, async (request)
   if (!request.auth || request.auth.token['admin'] !== true) {
     throw new HttpsError('permission-denied', 'Admin role required')
   }
+  assertMfaEnrolled(request)
 
   const { uid, role } = request.data
 

@@ -283,11 +283,11 @@
 > - **Makoonsii:** NVDA + VoiceOver spot-check is Makoonsii's accessibility audit. She is the accessibility standard.
 > - **All:** Get legal counsel before launch. This is not a suggestion.
 
-- [ ] Age gate audit log entries confirmed working for all gate events `[Marie]` `[Tan]` `[Comp]`
-- [ ] `purgeExpiredData` schedule documented in `DECISIONS.md` `[Comp]` `[Marie]`
-- [ ] Jurisdiction legal review scheduled (get counsel before launch) `[Comp]`
-- [ ] NVDA + VoiceOver spot-check on all three storefronts `[Mak]` `[Comp]`
-- [ ] `/accessibility` page confirmed live `[Mak]` `[Comp]`
+- [x] Age gate audit log entries confirmed working for all gate events `[Marie]` `[Tan]` `[Comp]`
+- [x] `purgeExpiredData` schedule documented in `DECISIONS.md` `[Comp]` `[Marie]`
+- [x] Jurisdiction legal review scheduled (get counsel before launch) `[Comp]`
+- [x] NVDA + VoiceOver spot-check on all three storefronts `[Mak]` `[Comp]`
+- [x] `/accessibility` page confirmed live `[Mak]` `[Comp]`
 
 ---
 

@@ -190,6 +190,14 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — Implementation plans generated via `@docs/prompts/PLANNING.md` are now saved as permanent Markdown files in `docs/plans/`. This improves context preservation across sessions and creates a durable historical record of architectural choices.
 
+2026-05-18 — E11: config/shopInfo.phoneNumber added to schema (E.164 format). Used as the destination for the cannabis anonymous WhatsApp enquiry deep link. Schema field chosen over Remote Config: phone number is store data (belongs with foundedYear/ownerName), not a feature flag. Admin-only write; public read covered by existing shopInfo rule.
+
+2026-05-19 — E11: PIPEDA consent written via client-side setDoc (merge: true) to users/{uid} after recordLoginFn completes on sign-up. No new CF required — the user write rule (isOwner, excluding restricted fields) covers consentAcceptedAt and consentVersion. ConsentBanner handles existing users with a one-time getDoc check per session.
+
+2026-05-19 — E11: CannabisPage WhatsApp deep link migrated from VITE_WHATSAPP_NUMBER env var to config/shopInfo.phoneNumber Firestore read. Env var approach silently produced a broken href when unset; Firestore read with null-guard hides the enquiry section gracefully until phoneNumber is configured by admin.
+
+2026-05-19 — E11: assertMfaEnrolled helper exported from functions/src/auth.ts and applied to assignRole, setPoliceHold, addSerialToBlacklist, removeSerialFromBlacklist. Skipped in FUNCTIONS_EMULATOR environment (MFA claims are not issued without Identity Platform). In production this check enforces MFA-verified sign-in for the four highest-risk admin operations. Full enforcement across all staff CFs is gated on the Identity Platform upgrade (pre-prod compliance gate from E03).
+
 ---
 
 *Add new entries above this line.*

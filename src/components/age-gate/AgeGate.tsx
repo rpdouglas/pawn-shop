@@ -154,6 +154,7 @@ export default function AgeGate({ minAge, viewTag, children }: AgeGateProps) {
             </button>
           </div>
 
+          {/* Legal disclosure — copy below requires counsel review before prod deploy */}
           <p style={{
             fontFamily: 'var(--font-body)',
             fontSize: 'var(--text-xs)',
@@ -162,7 +163,11 @@ export default function AgeGate({ minAge, viewTag, children }: AgeGateProps) {
             maxWidth: '400px',
             lineHeight: 1.5,
           }}>
-            Built with Canadian privacy standards. Your response is session-scoped and not stored beyond this visit.
+            By entering, you confirm you are {minAge} or older and agree to our{' '}
+            <Link to="/terms" style={{ color: 'var(--color-text-muted)', textDecoration: 'underline' }}>Terms of Use</Link>
+            {' '}and{' '}
+            <Link to="/privacy" style={{ color: 'var(--color-text-muted)', textDecoration: 'underline' }}>Privacy Policy</Link>.
+            Your response is session-scoped and not stored beyond this visit.
           </p>
         </>
       ) : (

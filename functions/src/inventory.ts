@@ -1,4 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
+import { assertMfaEnrolled } from './auth'
 import { onObjectFinalized } from 'firebase-functions/v2/storage'
 import { onSchedule } from 'firebase-functions/v2/scheduler'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
@@ -286,6 +287,7 @@ export const setPoliceHold = onCall<SetPoliceHoldData>({ cors: true }, async (re
   if (!request.auth || token?.['admin'] !== true) {
     throw new HttpsError('permission-denied', 'Admin role required')
   }
+  assertMfaEnrolled(request)
 
   const { itemId, hold } = request.data
   if (!itemId) throw new HttpsError('invalid-argument', 'itemId is required')

@@ -7,8 +7,8 @@
 
 ## Current Cycle
 
-**Cycle:** 13
-**Started:** 2026-05-18
+**Cycle:** 15
+**Started:** 2026-05-19
 **Target close:** TBD
 **Deploy target:** dev
 
@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-Deliver E11 · Compliance Programme — PIPEDA consent management, cannabis/fireworks legal disclosures, Identity Platform MFA enforcement (server-side bypass prevention), legal counsel integration.
+Deliver E15 · CRM & Retention — `purchaseHistory` and `inquiryHistory` tracking on `users/{uid}`, VIP flags and reseller tiers (bronze/silver/gold), automated 48h/72h staff/customer follow-ups, and the `/admin/crm` profile view.
 
 ---
 
@@ -63,6 +63,21 @@ Deliver E11 · Compliance Programme — PIPEDA consent management, cannabis/fire
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 14** (2026-05-19 → 2026-05-19) — Closed E11 · Compliance Programme & Documentation Sync.
+
+| Task | Epic | Completed |
+|---|---|---|
+| Age gate audit log entries confirmed working | E11 | 2026-05-19 |
+| `purgeExpiredData` documented and scheduled | E11 | 2026-05-19 |
+| Legal review and NVDA spot-check scheduled | E11 | 2026-05-19 |
+| `/accessibility` page confirmed live | E11 | 2026-05-19 |
+| VitePress User Guide synced with current codebase | E22 | 2026-05-19 |
+| Codebase Export script (`export:llm`) implemented | E22 | 2026-05-18 |
+| Docs-as-Code Planning workflow implementation | E01 | 2026-05-18 |
+| **E11 CLOSED** | E11 | 2026-05-19 |
+
+---
 
 **Cycle 12** (2026-05-18 → 2026-05-18) — Closed E14 · Seasonal Campaign Scheduler.
 

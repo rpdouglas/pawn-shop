@@ -6,10 +6,13 @@ import {
 } from 'firebase/auth'
 import type { AuthError } from 'firebase/auth'
 import { httpsCallable } from 'firebase/functions'
-import { auth, functions } from '../../lib/firebase'
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { auth, functions, db } from '../../lib/firebase'
 import { useAuth } from '../../context/AuthContext'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
+
+const CONSENT_VERSION = '2026-05-01'
 
 interface RecordLoginData { method: 'email' | 'google' }
 
@@ -36,6 +39,7 @@ export default function SignUpPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [consentChecked, setConsentChecked] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -48,6 +52,7 @@ export default function SignUpPage() {
     if (!name.trim()) return 'Enter your name.'
     if (password.length < 6) return 'Password must be at least 6 characters.'
     if (password !== confirm) return 'Passwords do not match.'
+    if (!consentChecked) return 'You must agree to the Privacy Policy and Terms of Use to create an account.'
     return null
   }
 
@@ -64,6 +69,16 @@ export default function SignUpPage() {
         await recordLoginFn({ method: 'email' })
       } catch {
         // Non-fatal — audit log failure is logged server-side
+      }
+      // Write PIPEDA consent after recordLoginFn creates the users/{uid} document
+      try {
+        await setDoc(
+          doc(db, 'users', credential.user.uid),
+          { consentAcceptedAt: serverTimestamp(), consentVersion: CONSENT_VERSION },
+          { merge: true },
+        )
+      } catch {
+        // Non-fatal — ConsentBanner will prompt on next session if this write fails
       }
       navigate('/pawn', { replace: true })
     } catch (err) {
@@ -120,10 +135,25 @@ export default function SignUpPage() {
             error={error ?? undefined}
             disabled={submitting}
           />
+          <label style={consentLabelStyle}>
+            <input
+              type="checkbox"
+              checked={consentChecked}
+              onChange={(e) => setConsentChecked(e.target.checked)}
+              disabled={submitting}
+              style={{ width: '20px', height: '20px', flexShrink: 0, accentColor: 'var(--color-primary)', cursor: 'pointer' }}
+            />
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+              I have read and agree to the{' '}
+              <Link to="/privacy" style={{ color: 'var(--color-text-muted)', textDecoration: 'underline' }}>Privacy Policy</Link>
+              {' '}and{' '}
+              <Link to="/terms" style={{ color: 'var(--color-text-muted)', textDecoration: 'underline' }}>Terms of Use</Link>.
+            </span>
+          </label>
           <Button
             type="submit"
             size="lg"
-            disabled={submitting || !name || !email || !password || !confirm}
+            disabled={submitting || !name || !email || !password || !confirm || !consentChecked}
             style={fullWidth}
           >
             {submitting ? 'Creating account…' : 'Create account'}
@@ -171,6 +201,13 @@ const formStyle: React.CSSProperties = {
 }
 
 const fullWidth: React.CSSProperties = { width: '100%' }
+
+const consentLabelStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: 'var(--space-3)',
+  cursor: 'pointer',
+}
 
 const footerStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)',

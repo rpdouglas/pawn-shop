@@ -25,6 +25,9 @@ functions/lib/
 *.sln
 *.sw?
 
+# LLM Export
+codebase-export.txt
+
 # VitePress
 user-guide/.vitepress/dist
 user-guide/.vitepress/cache

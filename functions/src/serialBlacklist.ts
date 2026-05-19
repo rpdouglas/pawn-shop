@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
+import { assertMfaEnrolled } from './auth'
 
 // ── addSerialToBlacklist ─────────────────────────────────────────────────────
 
@@ -12,6 +13,7 @@ export const addSerialToBlacklist = onCall<AddSerialData>({ cors: true }, async 
   if (!request.auth?.token?.['admin']) {
     throw new HttpsError('permission-denied', 'Admin access required')
   }
+  assertMfaEnrolled(request)
 
   const { serialNumber, reason } = request.data
 
@@ -64,6 +66,7 @@ export const removeSerialFromBlacklist = onCall<RemoveSerialData>({ cors: true }
   if (!request.auth?.token?.['admin']) {
     throw new HttpsError('permission-denied', 'Admin access required')
   }
+  assertMfaEnrolled(request)
 
   const { blacklistId } = request.data
 

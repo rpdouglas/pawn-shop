@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
+import { doc, getDoc } from 'firebase/firestore'
 import CinematicHero from '../components/cannabis/CinematicHero'
 import MoodCard from '../components/cannabis/MoodCard'
 import LuxuryProductCard from '../components/cannabis/LuxuryProductCard'
 import Button from '../components/ui/Button'
 import CampaignBanner from '../components/CampaignBanner'
 import { useItems } from '../hooks/useItems'
-import type { MoodCategory } from '../lib/types'
+import type { MoodCategory, ShopInfo } from '../lib/types'
 import { Analytics } from '../lib/analytics'
+import { db } from '../lib/firebase'
 
 // Category values that map to each mood in inventory
 const MOOD_CATEGORY: Record<MoodCategory, string> = {
@@ -18,16 +20,24 @@ const MOOD_CATEGORY: Record<MoodCategory, string> = {
 
 const ALL_MOODS: MoodCategory[] = ['relax', 'focus', 'social', 'ceremony']
 
-// WhatsApp deep-link — no account required (Marie Discretion Test)
-// VITE_WHATSAPP_NUMBER must be set in .env.local before launch
-const WHATSAPP_HREF = `https://wa.me/${import.meta.env['VITE_WHATSAPP_NUMBER'] ?? ''}`
-
 export default function CannabisPage() {
   const { items, loading, error } = useItems('cannabis')
   const [selectedMood, setSelectedMood] = useState<MoodCategory | null>(null)
+  // WhatsApp href sourced from config/shopInfo — null until loaded, hidden if phoneNumber unset
+  const [whatsappHref, setWhatsappHref] = useState<string | null>(null)
 
   useEffect(() => {
     Analytics.pageView({ view: 'cannabis', page_path: '/cannabis' })
+  }, [])
+
+  useEffect(() => {
+    getDoc(doc(db, 'config', 'shopInfo'))
+      .then((snap) => {
+        if (!snap.exists()) return
+        const data = snap.data() as ShopInfo
+        if (data.phoneNumber) setWhatsappHref(`https://wa.me/${data.phoneNumber}`)
+      })
+      .catch(() => { /* non-critical — enquiry section stays hidden */ })
   }, [])
 
   const scrollToCollections = () => {
@@ -184,50 +194,52 @@ export default function CannabisPage() {
       </section>
 
       {/* Anonymous WhatsApp enquiry — no account required (Marie Discretion Test) */}
-      <section
-        aria-label="Anonymous enquiry"
-        style={{
-          padding: 'var(--space-16) var(--space-6)',
-          textAlign: 'center',
-          borderTop: '1px solid var(--color-border)',
-        }}
-      >
-        <h2 style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'var(--text-subheading)',
-          color: 'var(--color-text)',
-          fontWeight: 300,
-          marginBottom: 'var(--space-4)',
-        }}>
-          Prefer a private conversation?
-        </h2>
-        <p style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 'var(--text-body)',
-          color: 'var(--color-text-muted)',
-          marginBottom: 'var(--space-6)',
-        }}>
-          Reach us on WhatsApp — no account required.
-        </p>
-        <a
-          href={WHATSAPP_HREF}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ textDecoration: 'none' }}
+      {/* Section hidden until config/shopInfo.phoneNumber is set in Firestore console */}
+      {whatsappHref && (
+        <section
+          aria-label="Anonymous enquiry"
+          style={{
+            padding: 'var(--space-16) var(--space-6)',
+            textAlign: 'center',
+            borderTop: '1px solid var(--color-border)',
+          }}
         >
-          <Button variant="secondary" size="lg">Enquire on WhatsApp</Button>
-        </a>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-subheading)',
+            color: 'var(--color-text)',
+            fontWeight: 300,
+            marginBottom: 'var(--space-4)',
+          }}>
+            Prefer a private conversation?
+          </h2>
+          <p style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--text-body)',
+            color: 'var(--color-text-muted)',
+            marginBottom: 'var(--space-6)',
+          }}>
+            Reach us on WhatsApp — no account required.
+          </p>
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none' }}
+          >
+            <Button variant="secondary" size="lg">Enquire on WhatsApp</Button>
+          </a>
 
-        {/* Privacy footer — approved design element */}
-        <p style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 'var(--text-xs)',
-          color: 'var(--color-text-muted)',
-          marginTop: 'var(--space-12)',
-        }}>
-          Built with Canadian privacy standards.
-        </p>
-      </section>
+          <p style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--color-text-muted)',
+            marginTop: 'var(--space-12)',
+          }}>
+            Built with Canadian privacy standards.
+          </p>
+        </section>
+      )}
     </div>
   )
 }

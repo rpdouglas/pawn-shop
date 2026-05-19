@@ -22,7 +22,8 @@ export default defineConfig({
         items: [
           { text: 'Age Verification', link: '/compliance/age-gates' },
           { text: 'Discovery & Search', link: '/inventory/search' },
-          { text: 'Merchandising', link: '/admin/merchandising' }
+          { text: 'Merchandising', link: '/admin/merchandising' },
+          { text: 'Seasonal Campaigns', link: '/admin/campaigns' }
         ]
       },
       {
@@ -37,7 +38,8 @@ export default defineConfig({
         text: 'Pawn Services',
         items: [
           { text: 'Selling to Us', link: '/pawn/selling' },
-          { text: 'Managing the Inbox', link: '/admin/pawn-inbox' }
+          { text: 'Managing the Inbox', link: '/admin/pawn-inbox' },
+          { text: 'Seasonal Pre-Orders', link: '/admin/preorders' }
         ]
       },
       {

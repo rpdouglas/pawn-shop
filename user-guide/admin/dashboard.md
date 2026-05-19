@@ -21,5 +21,12 @@ From the dashboard, you can quickly jump to:
 - **Police Hold Manager:** Search by Firestore ID to immediately secure an item.
 - **Inventory Overview:** View the complete list of items in the collection.
 
+## Live Activity Feed
+
+The storefronts feature a "Live Activity" stream to show real-time browsing intent.
+- **Privacy Safeguards:** To protect our customers (and satisfy the **Marie Discretion Test**), the feed only displays city-level data ("Someone in Cornwall Island is browsing..."). 
+- **Data Integrity:** No UIDs, names, or specific item IDs are ever written to the public activity collection.
+- **Auto-Purge:** Activity data is automatically purged after 24 hours to ensure the system remains lean and ephemeral.
+
 ---
 *Primary Persona: Marie (Manager)*

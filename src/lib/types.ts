@@ -127,8 +127,14 @@ export interface Item {
 export interface ShopInfo {
   foundedYear: number
   ownerName?: string
+  phoneNumber?: string
   updatedBy?: string
   updatedAt?: Date
+}
+
+export interface UserProfile {
+  consentAcceptedAt: Date | null
+  consentVersion: string | null
 }
 
 export interface ActivityFeedEntry {

@@ -45,6 +45,8 @@ import SchedulePage from './pages/staff/SchedulePage.tsx'
 import AgeGate from './components/age-gate/AgeGate.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import DashboardPage from './pages/admin/DashboardPage.tsx'
+import PrivacyPage from './pages/PrivacyPage.tsx'
+import TermsPage from './pages/TermsPage.tsx'
 import { captureUtm } from './lib/utm.ts'
 
 // Capture UTM params from landing URL into sessionStorage on first load
@@ -70,6 +72,8 @@ const router = createBrowserRouter([
       ]},
       { path: 'contact',       element: <ContactPage /> },
       { path: 'accessibility', element: <AccessibilityPage /> },
+      { path: 'privacy',       element: <PrivacyPage /> },
+      { path: 'terms',         element: <TermsPage /> },
       { path: 'staff', children: [
         { path: 'schedule', element: <SchedulePage /> },
       ]},

@@ -14,7 +14,8 @@
     "dev:full": "concurrently \"npm run dev\" \"npm run emulate\"",
     "guide:dev": "vitepress dev user-guide",
     "guide:build": "vitepress build user-guide",
-    "guide:preview": "vitepress preview user-guide"
+    "guide:preview": "vitepress preview user-guide",
+    "export:llm": "node scripts/export-codebase.mjs"
   },
   "dependencies": {
     "@fontsource/bebas-neue": "^5.2.7",
