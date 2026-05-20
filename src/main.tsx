@@ -64,6 +64,13 @@ const router = createBrowserRouter([
           return { element: <AgeGate minAge={18} viewTag="fireworks"><BundleCollectionPage /></AgeGate> }
         },
       },
+      {
+        path: 'tobacco',
+        lazy: async () => {
+          const { default: TobaccoPage } = await import('./pages/TobaccoPage.tsx')
+          return { element: <AgeGate minAge={19} viewTag="tobacco"><TobaccoPage /></AgeGate> }
+        },
+      },
       { path: 'login',      lazy: () => import('./pages/auth/LoginPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'signup',     lazy: () => import('./pages/auth/SignUpPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'favourites', lazy: () => import('./pages/FavouritesPage.tsx').then(m => ({ Component: m.default })) },

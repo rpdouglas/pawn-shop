@@ -7,7 +7,7 @@ const LINKS = [
   { to: '/pawn', label: 'Pawn' },
   { to: '/cannabis', label: 'Cannabis' },
   { to: '/fireworks', label: 'Fireworks' },
-  { to: '#', label: 'Tobacco', comingSoon: true },
+  { to: '/tobacco', label: 'Tobacco' },
 ]
 
 export default function NavigationDrawer() {
@@ -34,6 +34,7 @@ export default function NavigationDrawer() {
     if (path.startsWith('/pawn')) return 'The Pawn Shop - Pawn & Resale'
     if (path.startsWith('/cannabis')) return 'The Pawn Shop - Cannabis'
     if (path.startsWith('/fireworks')) return 'The Pawn Shop - Fireworks'
+    if (path.startsWith('/tobacco')) return 'The Pawn Shop - Tobacco'
     if (path.startsWith('/admin')) return 'The Pawn Shop - Admin'
     return 'The Pawn Shop'
   }
@@ -43,8 +44,8 @@ export default function NavigationDrawer() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          width: '48px',
-          height: '48px',
+          width: 'var(--space-12)',
+          height: 'var(--space-12)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -59,9 +60,9 @@ export default function NavigationDrawer() {
         aria-label="Toggle navigation menu"
         aria-expanded={isOpen}
       >
-        <span style={{ width: '24px', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(45deg) translate(6px, 6px)' : 'none' }} />
-        <span style={{ width: '24px', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', opacity: isOpen ? 0 : 1 }} />
-        <span style={{ width: '24px', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(-45deg) translate(5px, -6px)' : 'none' }} />
+        <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(45deg) translate(6px, 6px)' : 'none' }} />
+        <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', opacity: isOpen ? 0 : 1 }} />
+        <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(-45deg) translate(5px, -6px)' : 'none' }} />
       </button>
 
       <span style={{
@@ -124,7 +125,7 @@ export default function NavigationDrawer() {
                     borderRadius: 'var(--radius-md)',
                     backgroundColor: location.pathname === link.to ? 'var(--color-surface)' : 'transparent',
                     pointerEvents: link.comingSoon ? 'none' : 'auto',
-                    minHeight: '48px'
+                    minHeight: 'var(--space-12)'
                   }}
                 >
                   {link.label}
@@ -162,7 +163,7 @@ export default function NavigationDrawer() {
                     textDecoration: 'none',
                     borderRadius: 'var(--radius-md)',
                     backgroundColor: location.pathname.startsWith('/admin') ? 'var(--color-surface)' : 'transparent',
-                    minHeight: '48px'
+                    minHeight: 'var(--space-12)'
                   }}
                 >
                   Admin Dashboard
