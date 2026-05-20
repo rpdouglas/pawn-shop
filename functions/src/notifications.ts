@@ -95,7 +95,7 @@ export const sendSeasonalReminders = onSchedule('0 * * * *', async () => {
     .get()
 
   const eligible = campaignSnap.docs.filter((d) => {
-    const data = d.data()
+    const data = d.data() as Record<string, unknown>
     const tag = String(data['viewTag'] ?? '')
     return (tag === 'fireworks' || tag === 'all') && data['reminderSentAt'] == null
   })
@@ -107,7 +107,7 @@ export const sendSeasonalReminders = onSchedule('0 * * * *', async () => {
     .get()
 
   const phoneRecipients = usersSnap.docs.filter((d) => {
-    const phone = d.data()['phoneNumber']
+    const phone = (d.data() as Record<string, unknown>)['phoneNumber']
     return typeof phone === 'string' && phone.length > 0
   })
 
@@ -116,12 +116,12 @@ export const sendSeasonalReminders = onSchedule('0 * * * *', async () => {
   const smsBody = 'The Pawn Shop Update — our seasonal collection is now available. Visit us before selections sell out.'
 
   for (const campaign of eligible) {
-    const viewTag = String(campaign.data()['viewTag'] ?? '')
+    const viewTag = String((campaign.data() as Record<string, unknown>)['viewTag'] ?? '')
     let successCount = 0
 
     for (const user of phoneRecipients) {
       try {
-        const sent = await dispatchSms(String(user.data()['phoneNumber']), smsBody)
+        const sent = await dispatchSms(String((user.data() as Record<string, unknown>)['phoneNumber']), smsBody)
         if (sent) successCount++
       } catch (err) {
         console.error(`[sendSeasonalReminders] SMS failed for user ${user.id}:`, (err as Error).message)
@@ -157,7 +157,7 @@ export const sendPickupReminders = onSchedule('0 * * * *', async () => {
     .get()
 
   for (const doc of resSnap.docs) {
-    const data = doc.data()
+    const data = doc.data() as Record<string, unknown>
     if (data['pickupReminderSentAt'] != null) continue
 
     const pickupWindow = String(data['pickupWindow'] ?? '')
@@ -169,7 +169,7 @@ export const sendPickupReminders = onSchedule('0 * * * *', async () => {
     const uid = String(data['uid'] ?? '')
     if (uid) {
       const userSnap = await db.collection('users').doc(uid).get()
-      if (!userSnap.exists || userSnap.data()?.['alertOptIn'] !== true) continue
+      if (!userSnap.exists || (userSnap.data() as Record<string, unknown> | undefined)?.['alertOptIn'] !== true) continue
     }
 
     const body = `The Pawn Shop — reminder: your pickup is tomorrow. Window: ${pickupWindow}. We look forward to seeing you.`
@@ -197,7 +197,7 @@ export const sendPickupReminders = onSchedule('0 * * * *', async () => {
     .get()
 
   for (const doc of preSnap.docs) {
-    const data = doc.data()
+    const data = doc.data() as Record<string, unknown>
     if (data['pickupReminderSentAt'] != null) continue
 
     const pickupWindow = String(data['pickupWindow'] ?? '')
@@ -209,7 +209,7 @@ export const sendPickupReminders = onSchedule('0 * * * *', async () => {
     const uid = String(data['uid'] ?? '')
     if (uid) {
       const userSnap = await db.collection('users').doc(uid).get()
-      if (!userSnap.exists || userSnap.data()?.['alertOptIn'] !== true) continue
+      if (!userSnap.exists || (userSnap.data() as Record<string, unknown> | undefined)?.['alertOptIn'] !== true) continue
     }
 
     const body = `The Pawn Shop — reminder: your pickup is tomorrow. Window: ${pickupWindow}. We look forward to seeing you.`
@@ -253,12 +253,12 @@ export const sendWeeklyDigest = onSchedule('0 14 * * 1', async () => {
 
   const digestItems: DigestItem[] = itemSnap.docs
     .filter((d) => {
-      const data = d.data()
+      const data = d.data() as Record<string, unknown>
       return data['policeHold'] !== true && data['viewTag'] === 'pawn'
     })
     .slice(0, 5)
     .map((d) => {
-      const data = d.data()
+      const data = d.data() as Record<string, unknown>
       return {
         title:     String(data['title'] ?? ''),
         condition: String(data['condition'] ?? ''),
@@ -280,14 +280,14 @@ export const sendWeeklyDigest = onSchedule('0 14 * * 1', async () => {
     .get()
 
   const emailRecipients = usersSnap.docs.filter((d) => {
-    const email = d.data()['email']
+    const email = (d.data() as Record<string, unknown>)['email']
     return typeof email === 'string' && email.length > 0
   })
 
   let successCount = 0
   for (const user of emailRecipients) {
     try {
-      const sent = await dispatchEmail(String(user.data()['email']), subject, html)
+      const sent = await dispatchEmail(String((user.data() as Record<string, unknown>)['email']), subject, html)
       if (sent) successCount++
     } catch (err) {
       console.error(`[sendWeeklyDigest] Email failed for user ${user.id}:`, (err as Error).message)

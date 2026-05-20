@@ -27,6 +27,7 @@ export function assertStaff(request: CallableRequest): { uid: string } {
   if (!isStaff) {
     throw new HttpsError('permission-denied', 'Staff only.')
   }
+  assertMfaEnrolled(request)
   return { uid: request.auth.uid }
 }
 
@@ -171,6 +172,7 @@ export const getStaffMembers = onCall({ cors: true }, async (request) => {
   if (!request.auth || (token?.['admin'] !== true && token?.['manager'] !== true)) {
     throw new HttpsError('permission-denied', 'Admin or Manager role required')
   }
+  assertMfaEnrolled(request)
 
   const db = getFirestore()
   const snap = await db.collection('users')
@@ -178,7 +180,7 @@ export const getStaffMembers = onCall({ cors: true }, async (request) => {
     .get()
 
   const staff = snap.docs.map(doc => {
-    const data = doc.data()
+    const data = doc.data() as Record<string, unknown>
     return {
       uid: doc.id,
       email: data['email'],

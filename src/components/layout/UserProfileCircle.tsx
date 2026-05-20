@@ -27,8 +27,8 @@ export default function UserProfileCircle() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          width: '48px',
-          height: '48px',
+          width: 'var(--space-12)',
+          height: 'var(--space-12)',
           borderRadius: '50%',
           backgroundColor: 'var(--color-primary)',
           color: 'var(--color-on-primary)',
@@ -38,7 +38,7 @@ export default function UserProfileCircle() {
           justifyContent: 'center',
           cursor: 'pointer',
           fontFamily: 'var(--font-display)',
-          fontSize: '1rem',
+          fontSize: 'var(--text-body)',
           fontWeight: 600,
           padding: 0
         }}
@@ -73,7 +73,7 @@ export default function UserProfileCircle() {
                 <p style={{ margin: 0, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
               </div>
               <Link to="/profile" onClick={() => setIsOpen(false)} style={itemStyle}>Profile</Link>
-              <button onClick={() => { logout(); setIsOpen(false); }} style={{ ...itemStyle, border: 'none', background: 'none', width: '100%', textAlign: 'left', color: 'var(--color-error)' }}>
+              <button onClick={() => { logout(); setIsOpen(false); }} style={{ ...itemStyle, border: 'none', background: 'none', width: '100%', textAlign: 'left', color: 'var(--color-danger)' }}>
                 Sign Out
               </button>
             </>
@@ -92,7 +92,7 @@ const itemStyle: React.CSSProperties = {
   textDecoration: 'none',
   fontSize: 'var(--text-small)',
   cursor: 'pointer',
-  minHeight: '48px',
+  minHeight: 'var(--space-12)',
   display: 'flex',
   alignItems: 'center'
 }

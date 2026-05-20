@@ -110,7 +110,7 @@ export default function NavigationDrawer() {
             <h2 style={{
               fontFamily: 'var(--font-display)',
               fontSize: 'var(--text-small)',
-              color: 'var(--color-primary)',
+              color: 'var(--color-text-muted)',
               padding: '0 var(--space-4)',
               marginBottom: 'var(--space-4)',
               textTransform: 'uppercase'

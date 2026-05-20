@@ -59,7 +59,7 @@ export const publishArticle = onCall<PublishArticleData>({ cors: true }, async (
     throw new HttpsError('not-found', 'Article not found')
   }
 
-  const article = snap.data()!
+  const article = snap.data() as Record<string, unknown>
   
   // Compliance Gate: blocked if Kanien'kéha rule not met (simulated by checking the flag)
   // In a real scenario, we might scan the body for Kanien'kéha tags/keywords

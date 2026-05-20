@@ -17,7 +17,7 @@ export const activateCampaigns = onSchedule('every 5 minutes', async () => {
     .get()
 
   const toActivate = snap.docs.filter((d) => {
-    const startDate = d.data()['startDate'] as Timestamp | undefined
+    const startDate = (d.data() as Record<string, unknown>)['startDate'] as Timestamp | undefined
     return startDate != null && startDate.toMillis() <= now.toMillis()
   })
 
@@ -31,7 +31,7 @@ export const activateCampaigns = onSchedule('every 5 minutes', async () => {
       eventType: 'campaign_activated',
       uid: 'system',
       targetId: d.id,
-      details: { campaignId: d.id, viewTag: String(d.data()['viewTag'] ?? '') },
+      details: { campaignId: d.id, viewTag: String((d.data() as Record<string, unknown>)['viewTag'] ?? '') },
       createdAt: FieldValue.serverTimestamp(),
     })
   }
@@ -61,7 +61,7 @@ export const deactivateCampaigns = onSchedule('every 5 minutes', async () => {
       eventType: 'campaign_deactivated',
       uid: 'system',
       targetId: d.id,
-      details: { campaignId: d.id, viewTag: String(d.data()['viewTag'] ?? '') },
+      details: { campaignId: d.id, viewTag: String((d.data() as Record<string, unknown>)['viewTag'] ?? '') },
       createdAt: FieldValue.serverTimestamp(),
     })
   }

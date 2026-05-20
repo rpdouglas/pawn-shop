@@ -97,7 +97,6 @@ export default function AgeGate({ minAge, viewTag, children }: AgeGateProps) {
             textTransform: 'uppercase',
             letterSpacing: '0.1em',
             marginBottom: 'var(--space-4)',
-            margin: `0 0 var(--space-4)`,
           }}>
             The Pawn Shop
           </p>

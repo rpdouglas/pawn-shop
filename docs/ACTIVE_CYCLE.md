@@ -24,7 +24,8 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 
 | Task | Epic | Persona | Owner | Notes |
 |---|---|---|---|---|
-| | | | | |
+| Fix `NavigationDrawer.tsx` contrast failure | E23 QA | Marie | Technical_Writer | Switched from `--color-primary` to `--color-text-muted` |
+| Initialize `docs/policies/` and `CULTURAL_LOG.md` | Governance | Marcus | Technical_Writer | Policy-as-Code migration complete |
 
 ---
 
@@ -35,6 +36,9 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 | Optimize and integrate official brand logo on HomePage | E27 | 2026-05-19 |
 | **E38 · Admin Desktop Portal** (Approaches, Layout, Components, Integration) | E38 | 2026-05-19 |
 | **E38 CLOSED** | E38 | 2026-05-19 |
+| Fix `HomePage.tsx` and `UserProfileCircle.tsx` token violations | E23 QA | 2026-05-20 |
+| Fix `NavigationDrawer.tsx` contrast failure | E23 QA | 2026-05-20 |
+| Establish Cultural Review Baseline in `CULTURAL_LOG.md` | Governance | 2026-05-20 |
 
 ---
 
