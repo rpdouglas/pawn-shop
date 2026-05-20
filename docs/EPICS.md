@@ -470,10 +470,10 @@
 > - **Jordan:** No hardcoded px/rem/ms values in any shipped component. Token system must be consistent end-to-end.
 > - **Compliance:** axe-core scan must return zero violations after fixes.
 
-- [ ] Fix `HomePage.tsx`: replace `maxWidth: '1200px'`, `minHeight: '240px'`, `fontSize: '2rem'`, clamp hero font, and `transition: 'transform 0.2s ease-in-out'` with `--space-*`, `--text-*`, and `--motion-*` tokens `[Jord]` `[Comp]`
-- [ ] Fix `UserProfileCircle.tsx`: replace all hardcoded `px` and `rem` values with `--space-*` / `--text-*` / `--dropdown-min-width` tokens `[Mak]` `[Jord]`
-- [ ] Fix `NavigationDrawer.tsx`: change "Navigation" `h2` colour from `--color-primary` to `--color-text-muted` (WCAG AA at 2.8:1 fails in cannabis view) `[Mak]` `[Comp]`
-- [ ] Run Playwright axe-core scan — zero violations is the close condition `[Mak]` `[Comp]`
+- [x] Fix `HomePage.tsx`: replace `maxWidth: '1200px'`, `minHeight: '240px'`, `fontSize: '2rem'`, clamp hero font, and `transition: 'transform 0.2s ease-in-out'` with `--space-*`, `--text-*`, and `--motion-*` tokens `[Jord]` `[Comp]`
+- [x] Fix `UserProfileCircle.tsx`: replace all hardcoded `px` and `rem` values with `--space-*` / `--text-*` / `--dropdown-min-width` tokens `[Mak]` `[Jord]`
+- [x] Fix `NavigationDrawer.tsx`: change "Navigation" `h2` colour from `--color-primary` to `--color-text-muted` (WCAG AA at 2.8:1 fails in cannabis view) `[Mak]` `[Comp]`
+- [/] Run Playwright axe-core scan — zero violations is the close condition `[Mak]` `[Comp]`
 
 ---
 

@@ -9,7 +9,7 @@ export default function HomePage() {
       <section style={{ 
         padding: 'var(--space-12) var(--space-6)', 
         textAlign: 'center',
-        maxWidth: '1200px',
+        maxWidth: 'var(--container-max-width)',
         margin: '0 auto'
       }}>
         <div style={{ marginBottom: 'var(--space-8)', display: 'flex', justifyContent: 'center' }}>
@@ -19,7 +19,7 @@ export default function HomePage() {
             width={800}
             height={533}
             style={{ 
-              maxWidth: 'clamp(200px, 50vw, 400px)', 
+              maxWidth: 'var(--logo-width-clamp)', 
               height: 'auto' 
             }}
           />
@@ -75,16 +75,16 @@ const cardStyle: React.CSSProperties = {
   padding: 'var(--space-12) var(--space-8)',
   borderRadius: 'var(--radius-lg)',
   textDecoration: 'none',
-  transition: 'transform 0.2s ease-in-out, border-color 0.2s ease-in-out',
+  transition: 'transform var(--motion-speed-fast) var(--motion-easing), border-color var(--motion-speed-fast) var(--motion-easing)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  minHeight: '240px'
+  minHeight: 'var(--space-24)'
 }
 
 const cardTitleStyle: React.CSSProperties = {
   fontFamily: 'var(--font-display)',
-  fontSize: '2rem',
+  fontSize: 'var(--text-heading)',
   color: 'var(--color-text)',
   marginBottom: 'var(--space-4)'
 }

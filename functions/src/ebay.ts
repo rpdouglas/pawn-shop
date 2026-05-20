@@ -100,7 +100,7 @@ export const pushToEbay = onCall<PushToEbayData, Promise<PushToEbayResult>>(
 
     if (!snap.exists) throw new HttpsError('not-found', `Item ${itemId} not found`)
 
-    const item = snap.data()!
+    const item = snap.data() as Record<string, unknown>
 
     if (item['status'] !== 'active') {
       throw new HttpsError(
@@ -312,7 +312,7 @@ async function processEbayNotification(payload: unknown): Promise<void> {
   if (snap.empty) return
 
   const itemDoc = snap.docs[0]
-  if (itemDoc.data()['status'] === 'sold') return // Idempotent — already synced
+  if ((itemDoc.data() as Record<string, unknown>)['status'] === 'sold') return // Idempotent — already synced
 
   await itemDoc.ref.update({
     status: 'sold',

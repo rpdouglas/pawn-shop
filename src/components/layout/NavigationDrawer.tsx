@@ -43,8 +43,8 @@ export default function NavigationDrawer() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          width: '48px',
-          height: '48px',
+          width: 'var(--space-12)',
+          height: 'var(--space-12)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -59,9 +59,9 @@ export default function NavigationDrawer() {
         aria-label="Toggle navigation menu"
         aria-expanded={isOpen}
       >
-        <span style={{ width: '24px', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(45deg) translate(6px, 6px)' : 'none' }} />
-        <span style={{ width: '24px', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', opacity: isOpen ? 0 : 1 }} />
-        <span style={{ width: '24px', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(-45deg) translate(5px, -6px)' : 'none' }} />
+        <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(45deg) translate(6px, 6px)' : 'none' }} />
+        <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', opacity: isOpen ? 0 : 1 }} />
+        <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(-45deg) translate(5px, -6px)' : 'none' }} />
       </button>
 
       <span style={{
@@ -103,7 +103,7 @@ export default function NavigationDrawer() {
             <h2 style={{
               fontFamily: 'var(--font-display)',
               fontSize: 'var(--text-small)',
-              color: 'var(--color-primary)',
+              color: 'var(--color-text-muted)',
               padding: '0 var(--space-4)',
               marginBottom: 'var(--space-4)',
               textTransform: 'uppercase'
@@ -124,7 +124,7 @@ export default function NavigationDrawer() {
                     borderRadius: 'var(--radius-md)',
                     backgroundColor: location.pathname === link.to ? 'var(--color-surface)' : 'transparent',
                     pointerEvents: link.comingSoon ? 'none' : 'auto',
-                    minHeight: '48px'
+                    minHeight: 'var(--space-12)'
                   }}
                 >
                   {link.label}
@@ -162,7 +162,7 @@ export default function NavigationDrawer() {
                     textDecoration: 'none',
                     borderRadius: 'var(--radius-md)',
                     backgroundColor: location.pathname.startsWith('/admin') ? 'var(--color-surface)' : 'transparent',
-                    minHeight: '48px'
+                    minHeight: 'var(--space-12)'
                   }}
                 >
                   Admin Dashboard
@@ -180,7 +180,7 @@ export default function NavigationDrawer() {
                     textDecoration: 'none',
                     borderRadius: 'var(--radius-md)',
                     backgroundColor: 'transparent',
-                    minHeight: '48px'
+                    minHeight: 'var(--space-12)'
                   }}
                 >
                   User Guide ↗

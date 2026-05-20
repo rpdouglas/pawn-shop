@@ -36,8 +36,8 @@ function buildSearchTokens(title: string, category: string): string[] {
  * If status transitions to 'active' and policeHold is false, dispatches alerts.
  */
 export const onItemPublished = onDocumentUpdated('items/{itemId}', async (event) => {
-  const before = event.data?.before.data()
-  const after = event.data?.after.data()
+  const before = event.data?.before.data() as Record<string, unknown> | undefined
+  const after = event.data?.after.data() as Record<string, unknown>
 
   if (!after) return
   if (before?.['status'] === 'active') return // Only trigger on transition to active
@@ -58,7 +58,7 @@ export const onItemPublished = onDocumentUpdated('items/{itemId}', async (event)
   if (searchesSnap.empty) return
 
   const notifications = searchesSnap.docs.map(async (doc) => {
-    const savedSearch = doc.data()
+    const savedSearch = doc.data() as Record<string, unknown>
     const queryStr = String(savedSearch['query'] ?? '').toLowerCase().trim()
     
     // Exact match on one of the search tokens
@@ -67,7 +67,7 @@ export const onItemPublished = onDocumentUpdated('items/{itemId}', async (event)
     const userSnap = await db.collection('users').doc(String(savedSearch['uid'])).get()
     if (!userSnap.exists) return
 
-    const user = userSnap.data()!
+    const user = userSnap.data() as Record<string, unknown>
     if (user['alertOptIn'] !== true) return
 
     const alerts: Promise<unknown>[] = []
@@ -93,7 +93,7 @@ export const onItemPublished = onDocumentUpdated('items/{itemId}', async (event)
     } else if (alertMethod === 'email' && user['email']) {
       // Email dispatch would go here (SendGrid)
       // For now, logging email intent as SendGrid helper is internal to storeHours.ts
-      console.info(`[Email Alert] to=${user['email']} subject="New Match Found"`)
+      console.info(`[Email Alert] uid=${userSnap.id} subject="New Match Found"`)
     }
 
     return Promise.all(alerts)
@@ -218,7 +218,7 @@ export const publishItem = onCall<PublishItemData>({ cors: true }, async (reques
 
   if (!snap.exists) throw new HttpsError('not-found', `Item ${itemId} not found`)
 
-  const item = snap.data()!
+  const item = snap.data() as Record<string, unknown>
 
   if (item['status'] !== 'draft') {
     throw new HttpsError('failed-precondition', `Item must be in draft status, current: ${item['status']}`)
@@ -280,7 +280,7 @@ export const setHold = onCall<SetHoldData>({ cors: true }, async (request) => {
 
   if (!snap.exists) throw new HttpsError('not-found', `Item ${itemId} not found`)
 
-  const item = snap.data()!
+  const item = snap.data() as Record<string, unknown>
   if (item['status'] !== 'active') {
     throw new HttpsError(
       'failed-precondition',
@@ -334,7 +334,7 @@ export const setPoliceHold = onCall<SetPoliceHoldData>({ cors: true }, async (re
 
   if (!snap.exists) throw new HttpsError('not-found', `Item ${itemId} not found`)
 
-  const previousValue: boolean = snap.data()!['policeHold'] ?? false
+  const previousValue: boolean = (snap.data() as Record<string, unknown>)['policeHold'] as boolean ?? false
 
   await itemRef.update({
     policeHold: hold,

@@ -8,6 +8,7 @@
   --color-danger:  #dc2626;
   --color-caution: #ea580c;
   --color-neutral: #6b7280;
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
 
   /* Merchandising badge colors — E13 (view-neutral; appear across all views) */
   --color-badge-on-primary:         #080706;  /* near-black text on gold/red primary */
@@ -54,6 +55,9 @@
   --space-12: 48px;
   --space-16: 64px;
   --space-24: 96px;
+  /* Layout tokens */
+  --container-max-width: 1200px;
+  --logo-width-clamp:    clamp(200px, 50vw, 400px);
 }
 
 /* ── View-scoped design tokens ── */

@@ -106,17 +106,17 @@ export const crmDailyReminders = onSchedule('every day 09:00', async () => {
     .get()
 
   for (const doc of quotedPawnRequests.docs) {
-    const data = doc.data()
-    const userUid = data.uid
+    const data = doc.data() as Record<string, unknown>
+    const userUid = data['uid'] as string | undefined
     if (userUid) {
       const userSnap = await db.collection('users').doc(userUid).get()
-      const userData = userSnap.data()
+      const userData = userSnap.data() as Record<string, unknown> | undefined
       
       // Marie Discretion Test & CASL Compliance
-      if (userData?.alertOptIn && userData.phoneNumber) {
+      if (userData?.['alertOptIn'] === true && userData['phoneNumber']) {
         const body = `The Pawn Shop Update — checking in on your recent enquiry. If you have questions, we are here to help.`
         try {
-          const sent = await dispatchSms(userData.phoneNumber, body)
+          const sent = await dispatchSms(userData['phoneNumber'] as string, body)
           if (sent) {
             await db.collection('auditLogs').add({
               eventType: 'crm_followup_sent',

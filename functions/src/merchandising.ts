@@ -66,7 +66,7 @@ export const updateMerchandisingTags = onCall<UpdateMerchandisingTagsData>({ cor
   await itemRef.update(updatePayload)
 
   if (tag === 'staff-pick') {
-    const item = snap.data()!
+    const item = snap.data() as Record<string, unknown>
     await db.collection('auditLogs').add({
       eventType: action === 'add' ? 'staff_pick_set' : 'staff_pick_removed',
       uid: request.auth!.uid,
@@ -100,7 +100,7 @@ export const calculateTrendingScore = onSchedule('every 30 minutes', async () =>
   let count = 0
 
   for (const doc of snap.docs) {
-    const d = doc.data()
+    const d = doc.data() as Record<string, unknown>
     const viewCount = Number(d['viewCount'] ?? 0)
     const enquiryCount = Number(d['enquiryCount'] ?? 0)
     const score = viewCount + enquiryCount * 5
@@ -139,7 +139,7 @@ export const removeJustArrivedTags = onSchedule('every 30 minutes', async () => 
 
   const cutoffMs = Date.now() - JUST_ARRIVED_HOURS * 60 * 60 * 1000
   const toUpdate = snap.docs.filter((doc) => {
-    const createdAt = doc.data()['createdAt'] as Timestamp | undefined
+    const createdAt = (doc.data() as Record<string, unknown>)['createdAt'] as Timestamp | undefined
     return createdAt != null && createdAt.toMillis() < cutoffMs
   })
 
