@@ -40,7 +40,7 @@ export default function Card({
   const isInteractive = onClick !== undefined
 
   return (
-    <article
+    <div
       className={`card${isInteractive ? ' cursor-pointer' : ''}`}
       onClick={onClick}
       role={isInteractive ? 'button' : undefined}
@@ -96,6 +96,6 @@ export default function Card({
           )}
         </div>
       </div>
-    </article>
+    </div>
   )
 }

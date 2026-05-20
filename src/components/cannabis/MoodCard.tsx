@@ -18,7 +18,7 @@ export default function MoodCard({ mood, itemCount, onClick }: MoodCardProps) {
   const isInteractive = onClick !== undefined
 
   return (
-    <article
+    <div
       onClick={onClick}
       role={isInteractive ? 'button' : undefined}
       tabIndex={isInteractive ? 0 : undefined}
@@ -74,6 +74,6 @@ export default function MoodCard({ mood, itemCount, onClick }: MoodCardProps) {
           {itemCount} {itemCount === 1 ? 'item' : 'items'}
         </p>
       )}
-    </article>
+    </div>
   )
 }

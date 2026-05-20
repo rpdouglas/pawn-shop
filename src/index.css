@@ -141,11 +141,11 @@
 .portal-container {
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: 6px var(--space-6); /* Further reduced from 12px */
+  padding: var(--space-16) var(--space-6);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
   align-items: center;
+  gap: var(--space-12);
 }
 
 .portal-hero {
@@ -156,23 +156,17 @@
 }
 
 .portal-logo-wrap {
-  width: 180px;
-  height: auto; /* Eliminated aspect-ratio padding */
-  margin-bottom: 2px;
+  width: 340px; /* 50% increase from 225px */
+  height: auto;
+  margin-bottom: var(--space-4);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.portal-logo {
-  max-width: 100%;
-  height: auto;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
-}
-
 .portal-title {
   font-family: var(--font-display);
-  font-size: var(--text-display);
+  font-size: var(--text-hero); /* 72px cinematic scale */
   color: var(--color-text);
   margin-bottom: var(--space-2);
   letter-spacing: -0.02em;
@@ -180,25 +174,25 @@
 
 .portal-subtitle {
   font-family: var(--font-body);
-  font-size: var(--text-small);
+  font-size: 21px; /* 50% increase from 14px */
   color: var(--color-primary);
   text-transform: uppercase;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.4em;
 }
 
 .portal-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-8);
   width: 100%;
-  max-width: 720px;
+  max-width: 900px;
 }
 
 .portal-card {
   display: flex;
   align-items: center;
-  gap: var(--space-6);
-  padding: var(--space-6) var(--space-8);
+  gap: var(--space-12);
+  padding: 54px var(--space-12); /* 50% increase from 36px */
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -209,21 +203,21 @@
 
 .portal-card:hover {
   border-color: var(--color-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
 }
 
 .portal-card-icon {
-  width: var(--space-12);
-  height: var(--space-12);
+  width: var(--space-16);
+  height: var(--space-16);
   background-color: var(--color-bg);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   color: var(--color-primary);
-  font-size: 1.5rem;
+  font-size: 2rem;
   border: 1px solid var(--color-border);
 }
 
@@ -233,20 +227,21 @@
 
 .portal-card-title {
   font-family: var(--font-display);
-  font-size: var(--text-subheading);
+  font-size: var(--text-heading);
   color: var(--color-text);
-  margin-bottom: var(--space-1);
+  margin-bottom: var(--space-2);
 }
 
 .portal-card-desc {
   font-family: var(--font-body);
-  font-size: var(--text-small);
+  font-size: var(--text-lead);
   color: var(--color-text-muted);
+  line-height: 1.5;
 }
 
 .portal-card-chevron {
   color: var(--color-border);
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   transition: transform var(--motion-speed-fast) var(--motion-easing);
 }
 
@@ -363,11 +358,11 @@ h1, h2, h3, h4, h5, h6 {
   .badge-sold      { color: var(--color-danger);  background-color: color-mix(in srgb, var(--color-danger)  15%, transparent); border-color: color-mix(in srgb, var(--color-danger)  35%, transparent); }
   .badge-archived  { color: var(--color-neutral); background-color: color-mix(in srgb, var(--color-neutral) 15%, transparent); border-color: color-mix(in srgb, var(--color-neutral) 35%, transparent); }
 
-  .badge-condition-new      { color: var(--color-success); background-color: color-mix(in srgb, var(--color-success) 15%, transparent); border-color: color-mix(in srgb, var(--color-success) 35%, transparent); }
-  .badge-condition-like-new { color: var(--color-success); background-color: color-mix(in srgb, var(--color-success) 10%, transparent); border-color: color-mix(in srgb, var(--color-success) 25%, transparent); }
-  .badge-condition-good     { color: var(--color-warning); background-color: color-mix(in srgb, var(--color-warning) 15%, transparent); border-color: color-mix(in srgb, var(--color-warning) 35%, transparent); }
-  .badge-condition-fair     { color: var(--color-caution); background-color: color-mix(in srgb, var(--color-caution) 15%, transparent); border-color: color-mix(in srgb, var(--color-caution) 35%, transparent); }
-  .badge-condition-poor     { color: var(--color-danger);  background-color: color-mix(in srgb, var(--color-danger)  15%, transparent); border-color: color-mix(in srgb, var(--color-danger)  35%, transparent); }
+  .badge-condition-new      { color: color-mix(in srgb, var(--color-success) 85%, #ffffff); background-color: color-mix(in srgb, var(--color-success) 15%, transparent); border-color: color-mix(in srgb, var(--color-success) 35%, transparent); }
+  .badge-condition-like-new { color: color-mix(in srgb, var(--color-success) 80%, #ffffff); background-color: color-mix(in srgb, var(--color-success) 10%, transparent); border-color: color-mix(in srgb, var(--color-success) 25%, transparent); }
+  .badge-condition-good     { color: color-mix(in srgb, var(--color-warning) 85%, #ffffff); background-color: color-mix(in srgb, var(--color-warning) 15%, transparent); border-color: color-mix(in srgb, var(--color-warning) 35%, transparent); }
+  .badge-condition-fair     { color: color-mix(in srgb, var(--color-caution) 80%, #ffffff); background-color: color-mix(in srgb, var(--color-caution) 15%, transparent); border-color: color-mix(in srgb, var(--color-caution) 35%, transparent); }
+  .badge-condition-poor     { color: color-mix(in srgb, var(--color-danger) 75%, #ffffff);  background-color: color-mix(in srgb, var(--color-danger)  15%, transparent); border-color: color-mix(in srgb, var(--color-danger)  35%, transparent); }
 
   .badge-tag {
     color: var(--color-text-muted);
@@ -2288,4 +2283,75 @@ select:focus-visible,
 .pick-note-textarea:focus-visible {
   outline: none;
   border-color: var(--color-primary);
+}
+
+/* ── Mobile Optimization (Pixel 9 focus) ── */
+@media (max-width: 480px) {
+  .portal-container {
+    padding: 12px var(--space-4);
+    gap: var(--space-6);
+  }
+
+  .portal-logo-wrap {
+    width: 120px;
+  }
+
+  .portal-title {
+    font-size: 1.5rem;
+  }
+
+  .portal-subtitle {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+  }
+
+  .portal-card {
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .portal-card-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .portal-card-title {
+    font-size: 16px;
+  }
+
+  .portal-card-desc {
+    font-size: 12px;
+  }
+}
+
+/* ── Footer Styling ── */
+.site-footer {
+  padding: var(--space-8) var(--space-6);
+  background-color: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.site-footer-link {
+  display: inline-block;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  margin: 0 var(--space-2) var(--space-2);
+  transition: color var(--motion-speed-fast) var(--motion-easing);
+}
+
+.site-footer-link:hover {
+  color: var(--color-primary);
+}
+
+.site-footer-copy {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-top: var(--space-4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }

@@ -7,6 +7,7 @@ const VIEW_LABELS: Record<ViewType, string> = {
   pawn:      'Pawn Shop',
   cannabis:  'Cannabis Wellness',
   fireworks: 'Fireworks',
+  tobacco:   'Tobacco & Fine Smoking',
 }
 
 function entryFromDoc(doc: { id: string; data: () => Record<string, unknown> }): ActivityFeedEntry {

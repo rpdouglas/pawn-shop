@@ -3,12 +3,12 @@ import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 
 interface LogAgeGateData {
   eventType: 'age_gate_pass' | 'age_gate_fail'
-  viewTag: 'cannabis' | 'fireworks'
+  viewTag: 'cannabis' | 'fireworks' | 'tobacco'
   policyVersion: string
 }
 
 const VALID_EVENTS: ReadonlyArray<LogAgeGateData['eventType']> = ['age_gate_pass', 'age_gate_fail']
-const VALID_VIEWS: ReadonlyArray<LogAgeGateData['viewTag']> = ['cannabis', 'fireworks']
+const VALID_VIEWS: ReadonlyArray<LogAgeGateData['viewTag']> = ['cannabis', 'fireworks', 'tobacco']
 
 // Public invoker — anonymous users must be able to log age gate events without signing in.
 // Admin SDK write bypasses Firestore rules (auditLogs allow create: isSignedIn() is for clients only).

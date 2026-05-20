@@ -63,6 +63,10 @@ Do not proceed if any of these would be violated.
 - Prices stored in CAD cents (integer). Never floating point.
 - Unused variables: prefix with `_`. Delete unused imports immediately.
 
+**Domain Extension & Compiler Gates:**
+- When adding a new vertical (e.g., tobacco), follow the checklist: (1) Update `ViewType` union in `types.ts`, (2) Audit and update all `Record<ViewType, ...>` or exhaustive structures, (3) Update `AgeGate` props and `logAgeGate` validation arrays if regulated, (4) Use explicit typings instead of implicit inference on list arrays.
+- Always run `npm run build` or `npx tsc -b` before submitting changes or claiming success. Zero warnings/errors is a strict blocking gate.
+
 ---
 
 ## Persona Quick Reference
@@ -105,9 +109,11 @@ Claude does not write `aiDescription` content. Gemini does not write code. See `
 
 ---
 
-## Available Slash Commands
+## Available Slash Commands & Automation Tools
 
-These commands invoke the project's prompt library without manual copy-paste:
+These commands and tools invoke the project's prompt library and automate the governance template lifecycle:
+
+### Slash Commands (Human/CLI prompts)
 
 | Command | When to use |
 |---|---|
@@ -120,7 +126,22 @@ These commands invoke the project's prompt library without manual copy-paste:
 | `/sprint-audit` | End of deploy cycle. Full system audit before promoting to dev/prod. |
 | `/audit` | Long session gap or new codebase. Deep ingestion + gap report. |
 
-Workflow order for a new feature: `/read-state` → `/plan` → `/approve` → `/qa` → `/close`
+### Governance Automation Scripts (ESM CLI Tools)
+
+| NPM Script | Purpose |
+|---|---|
+| `npm run governance:project <EPIC_ID> <SLUG>` | Automates creation of a project spec in `docs/projects/` from `00_TEMPLATE.md`, resolving Epic title and Phase from `EPICS.md`. |
+| `npm run governance:plan <SPEC_FILE>` | Automates strategy proposal plan generation in `docs/plans/` for the specified project, prepopulating persona gates. |
+
+### The Mandatory Lifecycle Workflow
+The specs-first planning cycle is a blocking gate. No code may be written until Phase 3 is completed and approved:
+1. **Spec Init:** `npm run governance:project` to scaffold the project spec.
+2. **State Ingestion:** `/read-state <area>` to verify system status and rules.
+3. **Plan Init:** `npm run governance:plan` to generate the strategy proposal file.
+4. **Draft Proposal:** Fill out the 3 strategies and checklists inside the plan document.
+5. **Chat Summary & STOP:** Post the summary block in the chat and wait for approval.
+6. **Execution:** `/approve <strategy>` to execute the changes once approved.
+7. **QA & Close:** `/qa <epic>` to verify compliance, then `/close <epic>` to complete the cycle and sync docs.
 
 ---
 

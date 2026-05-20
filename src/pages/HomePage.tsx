@@ -6,7 +6,7 @@ export default function HomePage() {
   const { view } = useView()
 
   return (
-    <div className={`view-${view}`} style={{ backgroundColor: 'var(--color-bg)', minHeight: '100vh' }}>
+    <div className={`view-${view}`} style={{ backgroundColor: 'var(--color-bg)' }}>
       <PortalLayout
         title="The Pawn Shop"
         subtitle="Cornwall Island · Akwesasne"

@@ -2,7 +2,13 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
-const LINKS = [
+interface NavLink {
+  to: string
+  label: string
+  comingSoon?: boolean
+}
+
+const LINKS: NavLink[] = [
   { to: '/', label: 'Home' },
   { to: '/pawn', label: 'Pawn' },
   { to: '/cannabis', label: 'Cannabis' },
@@ -167,6 +173,24 @@ export default function NavigationDrawer() {
                   }}
                 >
                   Admin Dashboard
+                </Link>
+                <Link
+                  to="/user-guide/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: 'var(--space-4)',
+                    color: 'var(--color-text-muted)',
+                    textDecoration: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: 'transparent',
+                    minHeight: 'var(--space-12)'
+                  }}
+                >
+                  User Guide ↗
                 </Link>
               </>
             )}

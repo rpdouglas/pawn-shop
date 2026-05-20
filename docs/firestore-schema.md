@@ -13,7 +13,7 @@
 | `title` | string | Display title |
 | `description` | string | Staff-written, customer-visible |
 | `category` | string | e.g. `electronics`, `jewellery`, `cannabis-flower` |
-| `viewTag` | string | Primary view: `pawn` \| `cannabis` \| `fireworks` |
+| `viewTag` | string | Primary view: `pawn` \| `cannabis` \| `fireworks` \| `tobacco` |
 | `viewTags` | array\<string\> | Multi-view items |
 | `status` | string | `draft` \| `active` \| `reserved` \| `sold` \| `archived` |
 | `price` | number | CAD cents (e.g. 1999 = $19.99) |
@@ -127,7 +127,7 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `viewTag` | string | `pawn` \| `cannabis` \| `fireworks` |
+| `viewTag` | string | `pawn` \| `cannabis` \| `fireworks` \| `tobacco` |
 | `action` | string | `'browsing'` — only value for MVP |
 | `displayCity` | string | Hardcoded `"Cornwall Island"` — **never** derived from user data, IP, or geolocation |
 | `createdAt` | timestamp | Server timestamp. Used for ordering and 24-hour TTL purge. |
@@ -187,7 +187,7 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | `staffUid` | string | Reference to `users/{uid}` |
 | `startTime` | timestamp | |
 | `endTime` | timestamp | |
-| `viewTag` | string | `pawn` \| `cannabis` \| `fireworks` \| `all` |
+| `viewTag` | string | `pawn` \| `cannabis` \| `fireworks` \| `tobacco` \| `all` |
 | `notes` | string | Optional. Specific tasks or context |
 | `createdBy` | string | UID of admin/manager who created |
 | `createdAt` | timestamp | |
@@ -223,7 +223,7 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | Field | Type | Notes |
 |-------|------|-------|
 | `title` | string | |
-| `viewTag` | string | `pawn` \| `cannabis` \| `fireworks` \| `all` |
+| `viewTag` | string | `pawn` \| `cannabis` \| `fireworks` \| `tobacco` \| `all` |
 | `startDate` | timestamp | |
 | `endDate` | timestamp | |
 | `active` | boolean | Managed by Cloud Function — set true when now ≥ startDate; false when now > endDate |

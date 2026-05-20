@@ -15,6 +15,8 @@
     "guide:build": "vitepress build user-guide",
     "guide:preview": "vitepress preview user-guide",
     "export:llm": "node scripts/export-codebase.mjs",
+    "governance:project": "node scripts/governance/init-project.js",
+    "governance:plan": "node scripts/governance/init-plan.js",
     "test:e2e": "playwright test",
     "test:a11y": "playwright test e2e/accessibility.spec.ts",
     "test:lhci": "CHROME_PATH=$(find ~/.cache/ms-playwright/chromium-* -name chrome -type f 2>/dev/null | head -1) lhci autorun"

@@ -6,7 +6,7 @@ import type { ViewType } from './types'
 interface PageViewParams    { view: ViewType; page_path: string }
 interface ItemViewParams    { item_id: string; view: ViewType; category: string }
 interface EnquiryParams     { view: ViewType; category: string }
-interface AgeGateParams     { view: 'cannabis' | 'fireworks'; result: 'pass' | 'fail' }
+interface AgeGateParams     { view: 'cannabis' | 'fireworks' | 'tobacco'; result: 'pass' | 'fail' }
 interface PawnSubmitParams  { view: 'pawn' }
 
 function fire(event: string, params: object): void {

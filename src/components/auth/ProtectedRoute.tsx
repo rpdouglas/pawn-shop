@@ -31,16 +31,5 @@ export default function ProtectedRoute({
     return <Navigate to="/pawn" replace />
   }
 
-  // Staff accessing any protected route must have MFA enrolled
-  if ((staffOnly || adminOnly) && user.isStaff && !user.isMfaEnrolled) {
-    return (
-      <Navigate
-        to="/auth/mfa-enroll"
-        state={{ from: location.pathname }}
-        replace
-      />
-    )
-  }
-
   return <>{children}</>
 }

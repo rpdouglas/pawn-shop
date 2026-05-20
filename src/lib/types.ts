@@ -1,4 +1,4 @@
-export type ViewType = 'pawn' | 'cannabis' | 'fireworks'
+export type ViewType = 'pawn' | 'cannabis' | 'fireworks' | 'tobacco'
 export type ReservationStatus = 'pending' | 'confirmed' | 'declined' | 'completed'
 export type PawnRequestStatus = 'pending' | 'reviewed' | 'quoted' | 'declined' | 'completed'
 export type ConditionGrade = 'new' | 'like-new' | 'good' | 'fair' | 'poor'
