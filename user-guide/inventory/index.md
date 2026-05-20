@@ -2,13 +2,14 @@
 
 The Pawn Shop's inventory system is designed to manage diverse product lines across three distinct storefronts while maintaining strict compliance and luxury standards.
 
-## The Three Views
+## The Four Views
 
 Every item in the system is assigned to a primary **View**, which determines which storefront it appears in:
 
 - **Pawn:** Traditional and high-value items (Jewellery, Watches, Electronics). Uses an "Art Deco" discovery aesthetic.
 - **Cannabis:** Premium wellness products. Requires an age gate (19+) and prioritizes discretion.
 - **Fireworks:** Event-based products. Requires an age gate (18+) and emphasizes seasonal urgency.
+- **Tobacco:** Premium domestic and reserve tobacco products. Requires an age gate (19+).
 
 ## Key Item Attributes
 

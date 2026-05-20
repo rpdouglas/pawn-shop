@@ -21,8 +21,8 @@ Access to the staff management tools is restricted to **Admins**.
 ## MFA Verification
 
 The staff list displays the MFA (Multi-Factor Authentication) enrollment status for every team member.
-- **Mandatory:** All staff members MUST enroll in TOTP (Time-based One-Time Password) MFA to access customer-facing data or compliance-sensitive routes.
-- **Compliance:** Marie's Discretion Test ensures that no staff account without MFA can access cannabis purchase history.
+- **Strongly Recommended:** All staff members should enroll in TOTP (Time-based One-Time Password) MFA. Full enforcement at the platform level is on the roadmap pending an Identity Platform upgrade.
+- **Compliance:** Once enforcement is active, Marie's Discretion Test requires that no staff account without MFA can access cannabis purchase history. Admins should proactively track enrollment status and encourage all team members to enroll now.
 
 ---
 *Primary Persona: Admin*

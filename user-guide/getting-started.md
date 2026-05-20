@@ -13,6 +13,7 @@ The platform operates three independent storefronts under one roof, each with it
 | **Pawn & Resale** | `/pawn` | Open to all visitors |
 | **Cannabis Wellness** | `/cannabis` | 19+ age verification required |
 | **Fireworks** | `/fireworks` | 18+ age verification required |
+| **Tobacco** | `/tobacco` | 19+ age verification required |
 
 Each view has its own colour palette, typography, and editorial voice — but shares the same inventory engine, notification system, and staff tooling.
 
@@ -27,8 +28,7 @@ Every page on the platform shares the same persistent header. It contains two el
 The hamburger icon in the top-left corner opens the navigation drawer. It contains:
 
 - **Home** — the platform landing page
-- **Pawn**, **Cannabis**, **Fireworks** — the three storefronts
-- **Tobacco** — coming soon
+- **Pawn**, **Cannabis**, **Fireworks**, **Tobacco** — the four storefronts
 - **Admin Dashboard** — visible only to staff accounts
 
 The page title to the right of the icon always reflects your current location — for example, **The Pawn Shop · Cannabis** — so you always know which view you are in.
@@ -76,5 +76,7 @@ See [Age Verification](/compliance/age-gates) for full details.
 | Create editorial content | [Editorial CMS](/admin/editorial-cms) |
 | See live inventory and stats | [Admin Dashboard](/admin/dashboard) |
 | Review incoming pawn enquiries | [Pawn Inbox](/admin/pawn-inbox) |
+| Manage active customer reservations | [Reservations Inbox](/admin/reservations) |
+| Update store opening hours | [Store Hours](/admin/store-hours) |
 | Manage my shift schedule | [My Schedule](/staff/personal-schedule) |
 | Set up a saved search alert | [Alerts & Notifications](/pawn/alerts-notifications) |
