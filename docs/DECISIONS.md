@@ -268,6 +268,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-19 — Admin Desktop Portal background colors set to #1c1400 (topbar) and #161000 (sidebar). These hardcoded dark values are approved exceptions to the token system, reserved strictly for the administrative chrome to differentiate it from customer-facing views.
 
+2026-05-20 — Centered PawnHero content horizontally and vertically to improve desktop visual balance. (Architect)
+
 ---
 
 *Add new entries above this line.*

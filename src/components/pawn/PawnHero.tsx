@@ -16,11 +16,12 @@ export default function PawnHero() {
         minHeight: '80vh',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'flex-end',
+        alignItems: 'center',
+        justifyContent: 'center',
         padding: 'var(--space-12) var(--space-8)',
         backgroundColor: 'var(--color-bg)',
         overflow: 'hidden',
+        textAlign: 'center'
       }}
     >
       {/* Decorative gold rule — art deco motif */}
@@ -73,6 +74,7 @@ export default function PawnHero() {
           lineHeight: 1.6,
           marginBottom: 'var(--space-8)',
           maxWidth: '540px',
+          margin: '0 auto var(--space-8) auto'
         }}>
           Curated inventory — timepieces, instruments, cameras, and rare finds — presented to the standard they deserve.
         </p>
