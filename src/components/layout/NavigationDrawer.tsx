@@ -2,12 +2,18 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
-const LINKS = [
+interface NavLink {
+  to: string
+  label: string
+  comingSoon?: boolean
+}
+
+const LINKS: NavLink[] = [
   { to: '/', label: 'Home' },
   { to: '/pawn', label: 'Pawn' },
   { to: '/cannabis', label: 'Cannabis' },
   { to: '/fireworks', label: 'Fireworks' },
-  { to: '#', label: 'Tobacco', comingSoon: true },
+  { to: '/tobacco', label: 'Tobacco' },
 ]
 
 export default function NavigationDrawer() {
@@ -34,6 +40,7 @@ export default function NavigationDrawer() {
     if (path.startsWith('/pawn')) return 'The Pawn Shop - Pawn & Resale'
     if (path.startsWith('/cannabis')) return 'The Pawn Shop - Cannabis'
     if (path.startsWith('/fireworks')) return 'The Pawn Shop - Fireworks'
+    if (path.startsWith('/tobacco')) return 'The Pawn Shop - Tobacco'
     if (path.startsWith('/admin')) return 'The Pawn Shop - Admin'
     return 'The Pawn Shop'
   }
@@ -167,8 +174,8 @@ export default function NavigationDrawer() {
                 >
                   Admin Dashboard
                 </Link>
-                <a
-                  href="https://rpdouglas.github.io/pawn-shop/"
+                <Link
+                  to="/user-guide/"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsOpen(false)}
@@ -176,7 +183,7 @@ export default function NavigationDrawer() {
                     display: 'flex',
                     alignItems: 'center',
                     padding: 'var(--space-4)',
-                    color: 'var(--color-text)',
+                    color: 'var(--color-text-muted)',
                     textDecoration: 'none',
                     borderRadius: 'var(--radius-md)',
                     backgroundColor: 'transparent',
@@ -184,7 +191,7 @@ export default function NavigationDrawer() {
                   }}
                 >
                   User Guide ↗
-                </a>
+                </Link>
               </>
             )}
           </div>

@@ -8,7 +8,7 @@ import { Analytics } from '../../lib/analytics'
 
 interface LogAgeGateData {
   eventType: 'age_gate_pass' | 'age_gate_fail'
-  viewTag: 'cannabis' | 'fireworks'
+  viewTag: 'cannabis' | 'fireworks' | 'tobacco'
   policyVersion: string
 }
 
@@ -18,7 +18,7 @@ const POLICY_VERSION = '1.0'
 
 interface AgeGateProps {
   minAge: 18 | 19
-  viewTag: 'cannabis' | 'fireworks'
+  viewTag: 'cannabis' | 'fireworks' | 'tobacco'
   children: ReactNode
 }
 

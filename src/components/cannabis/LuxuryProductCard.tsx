@@ -31,7 +31,7 @@ export default function LuxuryProductCard({
   const isInteractive = onClick !== undefined
 
   return (
-    <article
+    <div
       onClick={onClick}
       role={isInteractive ? 'button' : undefined}
       tabIndex={isInteractive ? 0 : undefined}
@@ -119,6 +119,6 @@ export default function LuxuryProductCard({
           {formatPrice(price)}
         </div>
       </div>
-    </article>
+    </div>
   )
 }

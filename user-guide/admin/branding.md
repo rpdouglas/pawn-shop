@@ -21,10 +21,11 @@ Each storefront Vertical uses a specific color palette defined by CSS tokens.
 
 | Storefront | Theme | Primary Color |
 |---|---|---|
-| **Pawn** | The Pawn Palette | Gold (`#C8A14A`) |
-| **Cannabis** | The Wellness Palette | Purple (`#7B4FA0`) |
-| **Fireworks** | The Energy Palette | Red (`#C0392B`) |
-| **Admin Shell** | The Portal Palette | Topbar (`#1c1400`) / Sidebar (`#161000`) |
+| **Pawn** | The Pawn Palette | Antique Gold |
+| **Cannabis** | The Wellness Palette | Deep Violet |
+| **Fireworks** | The Energy Palette | Ember Red |
+| **Tobacco** | The Reserve Palette | Aged Tobacco Brown |
+| **Admin Shell** | The Portal Palette | Midnight Topbar / Deep Onyx Sidebar |
 
 Staff should avoid introducing hardcoded hex values in Markdown articles or CMS content. Use descriptive terms that align with these established palettes.
 

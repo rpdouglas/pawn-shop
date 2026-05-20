@@ -6,7 +6,7 @@ The **Inventory Management** page (`/admin/inventory`) is the central hub for ov
 
 The inventory table provides a real-time view of:
 - **Status:** Active, Sold, Reserved, or Draft.
-- **View:** Which storefront the item belongs to (Pawn, Cannabis, or Fireworks).
+- **View:** Which storefront the item belongs to (Pawn, Cannabis, Fireworks, or Tobacco).
 - **Price:** Current listed price in CAD.
 - **Condition:** Verified condition grade.
 

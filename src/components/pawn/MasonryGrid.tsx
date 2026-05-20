@@ -24,7 +24,7 @@ function MasonryCard({ item, index, onClick, onHover }: MasonryCardProps) {
   const staggerDelay = Math.min(index * 50, 600)
 
   return (
-    <article
+    <div
       className="masonry-item"
       style={{ '--masonry-delay': `${staggerDelay}ms` } as React.CSSProperties}
       onClick={onClick}
@@ -108,7 +108,7 @@ function MasonryCard({ item, index, onClick, onHover }: MasonryCardProps) {
           </div>
         )}
       </div>
-    </article>
+    </div>
   )
 }
 

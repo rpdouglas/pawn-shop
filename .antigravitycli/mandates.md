@@ -1,41 +1,26 @@
-# Antigravity Mandates — The Pawn Shop
+# Antigravity Governance Mandates — The Pawn Shop
 
-This document serves as the high-fidelity operational context for Antigravity. It is derived from `GEMINI.md` and `docs/firestore-schema.md`.
+This file contains the strict mandates that Antigravity must follow during every session. These rules are non-negotiable and represent the architectural floor of Kawehno:ke Cornwall Island's multi-vertical retail platform.
 
-## Core Architectural Guardrails
+## 1. Specs-First Planning Gate
+*   **Mandate:** Do NOT create or edit any source code files under `src/` or `functions/src/` or run code execution commands until a project spec exists in `docs/projects/`, a 3-strategy plan has been drafted to `docs/plans/`, and the user has explicitly approved a strategy in writing.
+*   **Friction Elimination:** Use the automated CLI scripts:
+    *   `npm run governance:project <EPIC_ID> <SLUG>` to initialize a project spec.
+    *   `npm run governance:plan <SPEC_FILE>` to generate a strategy plan template.
 
-### 1. Persona Alignment
-- **Agent Attribution:** Log all subagent decisions in `docs/DECISIONS.md` with an `(Agent)` suffix.
-- **Verification Proofs:** Attach Lighthouse and Playwright results to every `walkthrough.md`.
-- **Policy-as-Code:** Subagents must strictly enforce the policies in `docs/policies/`.
-- **Makoonsii (Owner):** Visual excellence, brand integrity, cultural grounding.
-- **Marie (Compliance):** Age gates, audit logs, PII protection, Police Hold.
-- **Kevin (Customer):** Premium UX, accessibility, transparency.
+## 2. Persona UX & Compliance
+*   **Persona Test:** Every single code modification must state which persona it serves (e.g., Makoonsii, Marie, Kevin, Tanya, etc.) and satisfy their specific tests from `docs/PERSONAS.md`.
+*   **No Kanien'kéha Generation:** The AI must NEVER generate Mohawk language phrases. Flag for community review instead.
+*   **Absolute Discretion:** Under Marie's Cannabis Wellness guidelines, keep CRM details generic and enforce age gates at the router level.
+*   **Audit Logs & Hold Rules:** Client-side deletes of `auditLogs` are strictly forbidden. The `policeHold: true` field hides active items immediately.
 
-### 2. Design System & UX
-**Policy:** [docs/policies/design.md](file:///workspaces/pawn-shop/docs/policies/design.md)
-- **Token Integrity:** Use CSS variables only. Zero hardcoded hex/px/ms.
-- **Motion:** Respect view-scoped `--motion-speed` and `--motion-easing`.
-- **Verification Thresholds:** Lighthouse A11y ≥ 0.90, SEO ≥ 0.95.
+## 3. Anti-Regression & Brand Aesthetics
+*   **No Hardcoded Hexes:** Use HSL CSS cascade variables (`.view-*`) in `index.css`.
+*   **Zero PII:** Verify that no customer names, emails, or phone numbers are written to `auditLogs` or standard console logging.
+*   **Cloud-Only AI Keys:** Never place Gemini, Claude, or SendGrid API keys in the client-side code. All keys must be secured in Cloud Functions.
 
-### 3. Data, Compliance & Security
-**Policies:** [compliance.md](file:///workspaces/pawn-shop/docs/policies/compliance.md) | [firebase.md](file:///workspaces/pawn-shop/docs/policies/firebase.md) | [cultural.md](file:///workspaces/pawn-shop/docs/policies/cultural.md)
-- **Age Gates:** Mandatory at router level for Cannabis (19+) and Fireworks (18+).
-- **Strict Typing:** No `as any` on Firestore data.
-- **PII:** Zero PII in `auditLogs` or console.
-- **Cultural Rule:** AI must NEVER generate Kanien'kéha. Refer to [CULTURAL_LOG.md](file:///workspaces/pawn-shop/docs/CULTURAL_LOG.md).
+## 4. Domain Union Extension
+*   When introducing a new business line, update the `ViewType` union in `src/lib/types.ts` first, perform an exhaustive switch/Record audit across the codebase, and extend age-gates/validation schemas concurrently.
 
-## Compressed Schema Reference
-
-### Core Collections
-- `items`: Primary inventory. `category`, `viewTag`, `status` (`draft`|`active`|`sold`), `price` (cents).
-- `auditLogs`: Immutable event stream. `eventType`, `uid`, `details` (No PII).
-- `users`: `role` (mirrors custom claims), `consentAcceptedAt`, `mfaEnrolled`.
-- `reservations`: `status` (`pending`|`confirmed`|`completed`), `pickupWindow`.
-- `pawnRequests`: Customer intake for quotes. `status` (`pending`|`reviewed`).
-
-## Developer Workflow
-1. **Research:** Verify current state of Firestore/Context/Hooks.
-2. **Strategy:** Propose 3 strategies (Minimal, Recommended, Robust) with Persona Impact.
-3. **Execution:** Surgical changes + Linter/Tests.
-4. **Close:** Update schema docs and decisions.
+## 5. The Blocking Compiler Gate
+*   The final stage of any feature or fix is running `npm run build` and `npm run lint`. No ticket may be proposed for closure until both compile and validate with zero errors or warnings.
