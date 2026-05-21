@@ -3,6 +3,7 @@ import { doc, getDoc } from 'firebase/firestore'
 import CinematicHero from '../components/cannabis/CinematicHero'
 import MoodCard from '../components/cannabis/MoodCard'
 import LuxuryProductCard from '../components/cannabis/LuxuryProductCard'
+import MoodPillStrip from '../components/cannabis/MoodPillStrip'
 import FilterPanel, { type FilterState } from '../components/cannabis/FilterPanel'
 import LayoutToggle, { type LayoutMode } from '../components/cannabis/LayoutToggle'
 import Button from '../components/ui/Button'
@@ -132,21 +133,30 @@ export default function CannabisPage() {
           Shop by mood
         </h2>
 
+        <div className="mood-pills">
+          <MoodPillStrip
+            activeMood={filters.mood}
+            onChange={mood => setFilters(f => ({ ...f, mood }))}
+          />
+        </div>
+
         {/* MoodCards — clicking sets filters.mood */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-          gap: 'var(--space-4)',
-          marginBottom: 'var(--space-12)',
-        }}>
-          {ALL_MOODS.map(mood => (
-            <MoodCard
-              key={mood}
-              mood={mood}
-              itemCount={moodCounts[mood]}
-              onClick={() => setFilters(f => ({ ...f, mood: f.mood === mood ? null : mood }))}
-            />
-          ))}
+        <div className="mood-cards">
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+            gap: 'var(--space-4)',
+            marginBottom: 'var(--space-12)',
+          }}>
+            {ALL_MOODS.map(mood => (
+              <MoodCard
+                key={mood}
+                mood={mood}
+                itemCount={moodCounts[mood]}
+                onClick={() => setFilters(f => ({ ...f, mood: f.mood === mood ? null : mood }))}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Product section */}

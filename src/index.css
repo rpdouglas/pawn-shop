@@ -2330,6 +2330,20 @@ select:focus-visible,
   }
 }
 
+/* ── E02 · Cannabis — mood pill strip (mobile) vs. mood cards (tablet+) ── */
+.mood-pills { display: flex; }
+.mood-cards { display: none; }
+
+@media (min-width: 768px) {
+  .mood-pills { display: none; }
+  .mood-cards { display: block; }
+}
+
+.mood-pills button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 /* ── Footer Styling ── */
 .site-footer {
   padding: var(--space-8) var(--space-6);

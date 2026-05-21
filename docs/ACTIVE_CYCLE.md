@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 27
+**Cycle:** 28
 **Started:** 2026-05-21
 **Target close:** TBD
 **Deploy target:** dev
@@ -57,6 +57,17 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 27** (2026-05-21 → 2026-05-21) — Closed E40 · Cannabis Mobile Mood Pills.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `MoodPillStrip.tsx` — icon pills (All/Relax/Focus/Social/Ceremony), 48px targets, `aria-pressed`, token-only | E40 | 2026-05-21 |
+| `CannabisPage.tsx` — `.mood-pills` / `.mood-cards` CSS toggle at 768px breakpoint | E40 | 2026-05-21 |
+| `index.css` — 4 responsive rules + `.mood-pills button:focus-visible` a11y fix | E40 | 2026-05-21 |
+| **E40 CLOSED** | E40 | 2026-05-21 |
+
+---
 
 **Cycle 26** (2026-05-21 → 2026-05-21) — Closed E39 · Cannabis Storefront Enhancement. Phase 3 (Discovery & Merchandising).
 

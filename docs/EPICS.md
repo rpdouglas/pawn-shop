@@ -718,5 +718,18 @@
 
 ---
 
+---
+
+### E40 · Cannabis Mobile Mood Pills
+
+> **Persona Gate — E40:**
+> - **Marie:** Maintains the premium wellness aesthetic. Pills must not look "cheap" or "budget". They must use the `.view-cannabis` primary color for active states.
+> - **Kevin:** Tap targets must remain large enough (minimum 48px height or padding) for quick, reliable selection on mobile.
+
+- [x] Create `src/components/cannabis/MoodPillStrip.tsx` using the design system tokens. `[Marie]`
+- [x] Update `CannabisPage.tsx` to conditionally display pills on mobile and cards on desktop. `[Marie]` `[Kev]`
+
+---
+
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*

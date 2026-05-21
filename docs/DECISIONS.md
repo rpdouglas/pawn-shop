@@ -282,5 +282,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-21 — E39: Filter state (mood, category, price range, sort) is not persisted to URL or localStorage. Deliberate choice — URL persistence would leave cannabis browsing history in browser history, violating Marie's discretion requirement.
 
+2026-05-21 — E40: Used CSS visibility toggle (.mood-pills / .mood-cards at 768px breakpoint) over a JS useMobileBreakpoint hook to swap MoodPillStrip for MoodCards on mobile. CSS owns visual layout concerns; a JS hook would require typeof window guards for E37 SSR and would duplicate the AdminLayout breakpoint pattern without a shared abstraction.
+
 *Add new entries above this line.*
 
