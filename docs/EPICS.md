@@ -171,6 +171,21 @@
 
 ## Phase 3 — Discovery & Merchandising
 
+### E39 · Cannabis Storefront Enhancement
+
+> **Persona Gate — E39:**
+> - **Marie (Primary):** Filter panel and layout toggle must not introduce urgency, clinical language, or category disclosure. Controls must be accessible on mobile in under 3 taps.
+> - **Marcus:** All card layouts must frame item photography correctly — no cropping of primary images.
+> - **Makoonsii:** All touch targets ≥48px. Plain-language labels on all filters.
+
+- [x] Filter panel: mood, category, price range slider, sort controls — client-side, no new Firestore queries `[Marie]` `[Mak]`
+- [x] Layout toggle: grid2, grid3, list, magazine modes `[Marie]` `[Jord]`
+- [x] `TagBadge` component — `merchandisingTags` displayed with cannabis palette tokens `[Marc]` `[Marie]`
+- [x] Enhanced `LuxuryProductCard` — badge strip, list/magazine card variants `[Marc]` `[Marie]`
+- [x] All design tokens — zero hardcoded hex, px, or ms values `[Comp]`
+
+---
+
 ### E13 · Merchandising Engine
 
 > **Persona Gate — E13:**
@@ -452,8 +467,8 @@
 > **Persona Gate:** Infrastructure epic.
 > Automates app versioning using CalVer + Git SHA for improved traceability.
 
-- [ ] Modify deployment workflows to generate and inject `VITE_APP_VERSION` `[Staff]`
-- [ ] Display automated version string in Site Footer and Admin Dashboard `[Staff]`
+- [x] Modify deployment workflows to generate and inject `VITE_APP_VERSION` `[Staff]`
+- [x] Display automated version string in Site Footer and Admin Dashboard `[Staff]`
 
 ---
 

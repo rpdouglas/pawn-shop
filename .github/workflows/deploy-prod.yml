@@ -82,6 +82,10 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         run: npm ci
 
+      - name: Generate version
+        if: steps.check.outputs.skip != 'true'
+        run: echo "VITE_APP_VERSION=v$(date +'%y.%m.%d')-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
       - name: Build
         if: steps.check.outputs.skip != 'true'
         run: npm run build
@@ -92,6 +96,7 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET:     ${{ secrets.DEV_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.DEV_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID:             ${{ secrets.DEV_FIREBASE_APP_ID }}
+          VITE_APP_VERSION:                 ${{ env.VITE_APP_VERSION }}
 
       - name: Deploy to Firebase Dev
         if: steps.check.outputs.skip != 'true'

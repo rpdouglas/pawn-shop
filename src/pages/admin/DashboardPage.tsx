@@ -170,7 +170,7 @@ export default function DashboardPage() {
           fontSize: 'var(--text-small)',
           color: 'var(--color-text-muted)',
         }}>
-          Live inventory snapshot · The Pawn Shop
+          Live inventory snapshot · The Pawn Shop · {import.meta.env.VITE_APP_VERSION || 'v0.0.0-local'}
         </p>
       </header>
 

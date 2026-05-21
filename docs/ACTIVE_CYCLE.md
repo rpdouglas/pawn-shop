@@ -7,16 +7,16 @@
 
 ## Current Cycle
 
-**Cycle:** 25
-**Started:** 2026-05-19
-**Target close:** 2026-05-21
+**Cycle:** 27
+**Started:** 2026-05-21
+**Target close:** TBD
 **Deploy target:** dev
 
 ---
 
 ## Cycle Goal
 
-Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx` design system token violations; admin axe-core auth setup (if env vars available). Begin production readiness audit.
+E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure `vite.config.ts` and `src/setupTests.ts`, implement initial unit tests for core utilities and compliance logic.
 
 ---
 
@@ -24,7 +24,7 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 
 | Task | Epic | Persona | Owner | Notes |
 |---|---|---|---|---|
-| — | — | — | — | Cycle 25 complete |
+| — | — | — | — | — |
 
 ---
 
@@ -32,14 +32,6 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 
 | Task | Epic | Completed |
 |---|---|---|
-| Optimize and integrate official brand logo on HomePage | E27 | 2026-05-19 |
-| **E38 · Admin Desktop Portal** (Approaches, Layout, Components, Integration) | E38 | 2026-05-19 |
-| **E38 CLOSED** | E38 | 2026-05-19 |
-| Fix `HomePage.tsx` and `UserProfileCircle.tsx` token violations | E23 QA | 2026-05-20 |
-| Fix `NavigationDrawer.tsx` contrast failure | E23 QA | 2026-05-20 |
-| Establish Cultural Review Baseline in `CULTURAL_LOG.md` | Governance | 2026-05-20 |
-| Run Playwright axe-core scan — 4/4 public routes, zero violations (Tobacco added to suite) | Cycle 24 QA | 2026-05-21 |
-| Initialize `docs/policies/` and `CULTURAL_LOG.md` | Governance | 2026-05-21 |
 
 ---
 
@@ -49,12 +41,10 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 |---|---|---|
 | MFA bypass confirmed impossible | Requires Identity Platform upgrade — pre-prod compliance gate | Before prod deploy (E11) |
 | eBay developer account setup (webhook URL registration, notification subscription) | Requires eBay seller account and developer credentials — outside codebase scope | Before E06 deploys to prod |
-| Admin axe-core tests (dashboard, inventory, preorders, campaigns) | Require `PLAYWRIGHT_AUTH_EMAIL` + `PLAYWRIGHT_AUTH_PASSWORD` env vars — skipped in CI | Cycle 24 (if auth vars available) |
-| Performance ≥0.90 on Lighthouse | Requires SSR or pre-rendering — current SPA + static hosting cannot reach ≥0.90 on simulated 4G | Backlogged (future SSR cycle) |
+| Admin axe-core tests (dashboard, inventory, preorders, campaigns) | Require `PLAYWRIGHT_AUTH_EMAIL` + `PLAYWRIGHT_AUTH_PASSWORD` env vars — skipped in CI | When auth vars available |
+| Performance ≥0.90 on Lighthouse | Requires SSR or pre-rendering — current SPA + static hosting cannot reach ≥0.90 on simulated 4G | Backlogged (E37 SSR cycle) |
 | Vertical video on Cannabis + Fireworks pages | Content dependency — no video assets available | When assets supplied |
 | `config/shopInfo` document creation | Requires admin to create via Firebase console (`foundedYear: <year>`) — no admin UI in E17 | Before E17 deploys to dev |
-| E23 design system token violations | `HomePage.tsx`, `UserProfileCircle.tsx` — hardcoded px/rem/ms values | Cycle 24 (E23 QA clean-up) |
-| `Navigation` drawer heading contrast | `--color-primary` at `--text-small` (14px) in cannabis view = 2.8:1 — WCAG AA failure at small text (pre-existing E23, not introduced by E25) | Cycle 24 (E23 QA clean-up) |
 
 ---
 
@@ -68,7 +58,20 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 
 ## Previous Cycle Summary
 
-**Cycle 25** (2026-05-19 → 2026-05-21) — Closed Cycle 24 QA block. Phase 9 design token and WCAG fixes confirmed clean.
+**Cycle 26** (2026-05-21 → 2026-05-21) — Closed E39 · Cannabis Storefront Enhancement. Phase 3 (Discovery & Merchandising).
+
+| Task | Epic | Completed |
+|---|---|---|
+| Filter panel: mood, category, price range slider, sort | E39 | 2026-05-21 |
+| Layout toggle: grid2, grid3, list, magazine | E39 | 2026-05-21 |
+| `TagBadge` component — `merchandisingTags` with cannabis palette tokens | E39 | 2026-05-21 |
+| `LuxuryProductCard` — list/magazine variants, token fixes, `TagBadge` integration | E39 | 2026-05-21 |
+| QA: token violations resolved (`--color-on-primary`, `--space-12`, `--space-24`, `--space-4`) | E39 | 2026-05-21 |
+| **E39 CLOSED** | E39 | 2026-05-21 |
+
+---
+
+**Cycle 25** (2026-05-19 → 2026-05-21) — Closed Cycle 24 QA block + E26 · Versioning Strategy. Phase 8 complete.
 
 | Task | Epic | Completed |
 |---|---|---|
@@ -78,6 +81,10 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 | Fix User Guide nav link (`/user-guide/` → `https://rpdouglas.github.io/pawn-shop/`) | E23 | 2026-05-21 |
 | Docs audit — 2 new files, 7 updated (Tobacco fourth view, MFA drift, branding palette terms) | Governance | 2026-05-21 |
 | Initialize `docs/policies/` and `CULTURAL_LOG.md` | Governance | 2026-05-21 |
+| `VITE_APP_VERSION` CalVer + SHA injected in both deploy workflows | E26 | 2026-05-21 |
+| `src/vite-env.d.ts` created — `VITE_APP_VERSION` typed in `ImportMetaEnv` | E26 | 2026-05-21 |
+| Version string displayed in site footer and Admin Dashboard subtitle | E26 | 2026-05-21 |
+| **E26 CLOSED** | E26 | 2026-05-21 |
 
 ---
 
@@ -162,4 +169,4 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-19 (Cycle 25 open)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-21 (Cycle 26 open)*

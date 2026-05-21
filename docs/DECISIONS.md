@@ -276,5 +276,11 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-20 — Integrated Antigravity project governance automation (E01). Added init-project.js and init-plan.js to automate specs-first planning, enforce the strict Planning Gate in GEMINI.md, and register NPM scripts for developers.
 
+2026-05-21 — E26: CalVer + Git SHA hybrid versioning (`vYY.MM.DD-shortsha`) injected via `$GITHUB_ENV` in both deploy workflows before the Vite build step. `VITE_APP_VERSION` declared in `src/vite-env.d.ts`. Displayed in site footer and Admin Dashboard subtitle with `v0.0.0-local` fallback for local dev. No `package.json` version bumping required.
+
+2026-05-21 — E39: Implemented client-side filtering (mood, category, price) and layout toggling for Cannabis Storefront. Kept `FilterState` entirely on the client, zero Firestore schema drift required. Used token-only inline styles for `TagBadge` and `LuxuryProductCard`.
+
+2026-05-21 — E39: Filter state (mood, category, price range, sort) is not persisted to URL or localStorage. Deliberate choice — URL persistence would leave cannabis browsing history in browser history, violating Marie's discretion requirement.
+
 *Add new entries above this line.*
 

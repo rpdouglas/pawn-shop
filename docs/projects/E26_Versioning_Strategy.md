@@ -1,6 +1,6 @@
 # Project E26: Versioning Strategy (CalVer + SHA)
 
-**Status:** Planned
+**Status:** Done — 2026-05-21
 **Epic:** E26 — Versioning Strategy
 **Phase:** Phase 8 (Infrastructure)
 **Primary Persona:** Staff

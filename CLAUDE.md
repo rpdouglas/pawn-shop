@@ -126,22 +126,14 @@ These commands and tools invoke the project's prompt library and automate the go
 | `/sprint-audit` | End of deploy cycle. Full system audit before promoting to dev/prod. |
 | `/audit` | Long session gap or new codebase. Deep ingestion + gap report. |
 
-### Governance Automation Scripts (ESM CLI Tools)
-
-| NPM Script | Purpose |
-|---|---|
-| `npm run governance:project <EPIC_ID> <SLUG>` | Automates creation of a project spec in `docs/projects/` from `00_TEMPLATE.md`, resolving Epic title and Phase from `EPICS.md`. |
-| `npm run governance:plan <SPEC_FILE>` | Automates strategy proposal plan generation in `docs/plans/` for the specified project, prepopulating persona gates. |
-
 ### The Mandatory Lifecycle Workflow
 The specs-first planning cycle is a blocking gate. No code may be written until Phase 3 is completed and approved:
-1. **Spec Init:** `npm run governance:project` to scaffold the project spec.
+1. **Spec Init:** Create `docs/projects/E[##]_[Feature].md` manually from `docs/projects/00_TEMPLATE.md`. Add the epic entry to `docs/EPICS.md` under the correct phase before running `/plan`.
 2. **State Ingestion:** `/read-state <area>` to verify system status and rules.
-3. **Plan Init:** `npm run governance:plan` to generate the strategy proposal file.
-4. **Draft Proposal:** Fill out the 3 strategies and checklists inside the plan document.
-5. **Chat Summary & STOP:** Post the summary block in the chat and wait for approval.
-6. **Execution:** `/approve <strategy>` to execute the changes once approved.
-7. **QA & Close:** `/qa <epic>` to verify compliance, then `/close <epic>` to complete the cycle and sync docs.
+3. **Plan:** `/plan <feature>` to generate the three-strategy proposal saved to `docs/plans/`.
+4. **Chat Summary & STOP:** Post the summary block in the chat and wait for approval.
+5. **Execution:** `/approve <strategy>` to execute the changes once approved.
+6. **QA & Close:** `/qa <epic>` to verify compliance, then `/close <epic>` to complete the cycle and sync docs.
 
 ---
 

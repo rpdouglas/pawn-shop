@@ -11,10 +11,29 @@ The Pawn Shop uses two AI systems with completely separate roles:
 
 | System | Role | Where it lives | Triggered by |
 |---|---|---|---|
-| **Claude** (this tool) | Development workflow — planning, coding, review, documentation | Developer's session | Developer |
+| **Antigravity (AGY)** | Agentic Development workflow — subagents, goals, testing | Developer's session | Developer |
+| **Claude** | CLI Development workflow — planning, coding, review, documentation | Developer's session | Developer |
 | **Gemini** (via Cloud Functions) | Runtime product feature — staff-facing AI in the admin (E18) | Firebase Cloud Functions | Staff in the admin UI |
 
-These systems never overlap. Claude does not power in-product features. Gemini does not write code or documentation. API keys for both live in Cloud Functions or GitHub Secrets — never in `src/`.
+These systems never overlap. Claude and Antigravity do not power in-product features. Gemini does not write code or documentation. API keys for all live in Cloud Functions or GitHub Secrets — never in `src/`.
+
+---
+
+## Antigravity (AGY) — Agentic Workflow
+
+Antigravity operates with autonomous **Subagents** rather than static wrapper scripts. You can invoke these directly or use native slash commands.
+
+### Antigravity Slash Commands
+- **`/grill-me`**: Use this when you need the `EpicPlanner` subagent to interview you and construct a compliant 3-strategy plan (equivalent to `.claude/commands/plan.md`).
+- **`/goal`**: Use this when you need the `QAVerifier` or `FeatureExecutor` to work autonomously in the background until a complex multi-file task or audit is complete.
+- **`/schedule`**: Use this for recurring sprint audits or background codebase checks.
+
+### Antigravity Subagents
+These subagents are defined and mapped to the existing `docs/prompts`:
+- **EpicPlanner**: Specializes in producing 3-strategy plans (maps to `PLANNING.md`).
+- **FeatureExecutor**: Follows strict write-access rules to execute approved plans (maps to `FIX.md` / `APPROVAL.md`).
+- **QAVerifier**: Inherits `TESTING.md` to rigorously check compliance gates.
+- **SprintAuditor**: Inherits `POST_SPRINT_AUDIT.md` to run drift detection across schemas and epics.
 
 ---
 

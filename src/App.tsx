@@ -24,6 +24,7 @@ export default function App() {
           </nav>
           <p className="site-footer-copy">
             © {new Date().getFullYear()} The Pawn Shop · Cornwall Island, Akwesasne
+            {' · '}{import.meta.env.VITE_APP_VERSION || 'v0.0.0-local'}
           </p>
         </footer>
       </ViewLayout>
