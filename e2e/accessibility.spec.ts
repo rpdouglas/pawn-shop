@@ -9,6 +9,7 @@ const publicRoutes = [
   { path: '/pawn',      label: 'Pawn view — E02, E09, E17 (RecentlySoldStrip, ActivityFeed, HoldCountdownBadge)' },
   { path: '/cannabis',  label: 'Cannabis age gate (19+) — E02' },
   { path: '/fireworks', label: 'Fireworks age gate (18+) — E02, E14 (CampaignBanner on public view)' },
+  { path: '/tobacco',   label: 'Tobacco age gate (19+) — E23' },
 ]
 
 for (const route of publicRoutes) {

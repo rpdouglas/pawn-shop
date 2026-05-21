@@ -9,7 +9,7 @@
 
 **Cycle:** 25
 **Started:** 2026-05-19
-**Target close:** TBD
+**Target close:** 2026-05-21
 **Deploy target:** dev
 
 ---
@@ -24,8 +24,7 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 
 | Task | Epic | Persona | Owner | Notes |
 |---|---|---|---|---|
-| Fix `NavigationDrawer.tsx` contrast failure | E23 QA | Marie | Technical_Writer | Switched from `--color-primary` to `--color-text-muted` |
-| Initialize `docs/policies/` and `CULTURAL_LOG.md` | Governance | Marcus | Technical_Writer | Policy-as-Code migration complete |
+| — | — | — | — | Cycle 25 complete |
 
 ---
 
@@ -39,6 +38,8 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 | Fix `HomePage.tsx` and `UserProfileCircle.tsx` token violations | E23 QA | 2026-05-20 |
 | Fix `NavigationDrawer.tsx` contrast failure | E23 QA | 2026-05-20 |
 | Establish Cultural Review Baseline in `CULTURAL_LOG.md` | Governance | 2026-05-20 |
+| Run Playwright axe-core scan — 4/4 public routes, zero violations (Tobacco added to suite) | Cycle 24 QA | 2026-05-21 |
+| Initialize `docs/policies/` and `CULTURAL_LOG.md` | Governance | 2026-05-21 |
 
 ---
 
@@ -66,6 +67,19 @@ Complete remaining Cycle 23 QA items: `HomePage.tsx` and `UserProfileCircle.tsx`
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 25** (2026-05-19 → 2026-05-21) — Closed Cycle 24 QA block. Phase 9 design token and WCAG fixes confirmed clean.
+
+| Task | Epic | Completed |
+|---|---|---|
+| Fix `HomePage.tsx` and `UserProfileCircle.tsx` token violations | Cycle 24 QA | 2026-05-20 |
+| Fix `NavigationDrawer.tsx` contrast failure (`--color-primary` → `--color-text-muted`) | Cycle 24 QA | 2026-05-20 |
+| Playwright axe-core scan — 4/4 public routes zero violations; `/tobacco` added to suite | Cycle 24 QA | 2026-05-21 |
+| Fix User Guide nav link (`/user-guide/` → `https://rpdouglas.github.io/pawn-shop/`) | E23 | 2026-05-21 |
+| Docs audit — 2 new files, 7 updated (Tobacco fourth view, MFA drift, branding palette terms) | Governance | 2026-05-21 |
+| Initialize `docs/policies/` and `CULTURAL_LOG.md` | Governance | 2026-05-21 |
+
+---
 
 **Cycle 24** (2026-05-19 → 2026-05-19) — Closed E38 · Admin Desktop Portal. Phase 7 continued.
 

@@ -175,7 +175,7 @@ export default function NavigationDrawer() {
                   Admin Dashboard
                 </Link>
                 <Link
-                  to="/user-guide/"
+                  to="https://rpdouglas.github.io/pawn-shop/"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsOpen(false)}
