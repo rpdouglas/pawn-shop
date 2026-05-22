@@ -15,6 +15,8 @@ Every item in the system is assigned to a primary **View**, which determines whi
 
 - **Price:** All prices are stored and managed in CAD cents to ensure precision.
 - **Condition:** Every item is graded from `New` to `Poor`.
+- **Quantity:** The stock count for each item. Set at intake (default: 1) and adjustable from the Inventory Management page using the `−` / `+` controls. Displays **Out of Stock** in the admin view when it reaches zero.
+- **Cost Price:** The purchase cost paid by the shop — stored in a staff-only subcollection separate from the public item record. Used for internal margin tracking; never visible to customers.
 - **Images:** High-quality photography is required. All images are automatically watermarked and converted to WebP for performance.
 - **Merchandising Tags:** Staff can apply tags like `Just Arrived` or `Staff Pick` to highlight items.
 - **Police Hold:** A critical safety feature that allows staff to immediately hide an item from public view for legal or security reasons.

@@ -48,7 +48,7 @@ export const onItemPublished = onDocumentUpdated('items/{itemId}', async (event)
   const itemId = event.params.itemId
   const viewTag = after['viewTag']
   const title = after['title']
-  const searchTokens = new Set<string>(after['searchTokens'] || [])
+  const searchTokens = new Set<string>((after['searchTokens'] as string[] | undefined) ?? [])
 
   const searchesSnap = await db.collection('savedSearches')
     .where('active', '==', true)
@@ -89,7 +89,7 @@ export const onItemPublished = onDocumentUpdated('items/{itemId}', async (event)
         ? `[The Pawn Shop] Match found: ${title}. View: https://pawn.shop/item/${itemId}`
         : `[The Pawn Shop Update] A new item matching your search is available. View: https://pawn.shop/item/${itemId}`
       
-      alerts.push(dispatchSms(user['phoneNumber'], body))
+      alerts.push(dispatchSms(user['phoneNumber'] as string, body))
     } else if (alertMethod === 'email' && user['email']) {
       // Email dispatch would go here (SendGrid)
       // For now, logging email intent as SendGrid helper is internal to storeHours.ts

@@ -20,7 +20,9 @@ export default defineConfig({
         items: [
           { text: 'Overview', link: '/inventory/' },
           { text: 'Item Lifecycle', link: '/inventory/lifecycle' },
-          { text: 'Intake Process', link: '/inventory/intake' }
+          { text: 'Intake Process', link: '/inventory/intake' },
+          { text: 'Mobile Intake', link: '/inventory/mobile-intake' },
+          { text: 'Stock Management', link: '/admin/stock-management' }
         ]
       },
       {
@@ -61,6 +63,8 @@ export default defineConfig({
           { text: 'Local SEO', link: '/admin/local-seo' },
           { text: 'Audit Logs', link: '/admin/audit-logs' },
           { text: 'Police Holds', link: '/admin/police-holds' },
+          { text: 'Serial Blacklist', link: '/admin/serial-blacklist' },
+          { text: 'CRM & Retention', link: '/admin/crm' },
           { text: 'eBay Sync', link: '/ebay/cross-posting' }
         ]
       }

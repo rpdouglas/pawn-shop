@@ -1,6 +1,15 @@
 # Intake Process
 
-The intake process is the primary workflow for adding new items to The Pawn Shop inventory. It is designed to ensure data quality and visual consistency.
+The Pawn Shop offers two intake paths — choose the one that fits your situation.
+
+| Path | Best for | Route |
+|---|---|---|
+| **Desktop Intake** (this guide) | Desk-based receiving, high-detail items | `/admin/intake` |
+| **[Mobile Intake Wizard](/inventory/mobile-intake)** | Shop-floor receiving on a phone, camera-first | `/admin/mobile-intake` |
+
+Both paths produce the same draft item and publish to the same storefront. Use Mobile Intake when speed and camera access matter most; use the Desktop form when you need the full AI Assistant or eBay push controls at the same time.
+
+---
 
 ## Step 1: Create a Draft
 
@@ -16,7 +25,9 @@ Saving these details creates a **Draft** in the system.
 Once a draft is created, staff can add more detailed information:
 - **Description:** A plain-language description for customers.
 - **Condition:** Select the appropriate grade.
-- **Price:** Enter the value in CAD.
+- **Price:** Enter the sale value in CAD.
+- **Cost Price (optional):** Your purchase cost in CAD. Staff-only — never shown to customers. Used for internal margin tracking. Stored separately from the item's public record.
+- **Initial Stock:** How many units you have on hand. Defaults to `1`. Can be adjusted at any time from the Inventory Management page.
 - **Photos:** Upload at least one high-quality photo.
 
 ### Automated Image Processing

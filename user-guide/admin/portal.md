@@ -24,7 +24,7 @@ Administrative functions are organized into five logical groups:
 The portal shell is only rendered for users with a verified staff role (`admin`, `manager`, `inventory_staff`, or `marketing_staff`). 
 
 -   **Desktop Efficiency:** On screens 1024px or wider, the shell remains fixed, allowing you to switch between admin pages without re-opening a menu.
--   **Mobile Continuity:** On viewports smaller than 1024px, the portal automatically collapses into the standard mobile header and hamburger drawer to preserve screen real estate.
+-   **Mobile Continuity:** On viewports smaller than 1024px, the sidebar and topbar are replaced by a **bottom tab bar** with three quick-access tabs — Inventory, Add Item (opens the Mobile Intake Wizard), and Dashboard. The standard site header is also hidden on these viewports to maximise screen space for content.
 
 ---
 

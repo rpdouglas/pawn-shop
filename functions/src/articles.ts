@@ -65,7 +65,7 @@ export const publishArticle = onCall<PublishArticleData>({ cors: true }, async (
   // In a real scenario, we might scan the body for Kanien'kéha tags/keywords
   // For E19, we rely on the manual staff flag as the gate.
   
-  if (article['body'].includes('[mohawk]') && !article['indigenousLanguageReviewed']) {
+  if (String(article['body'] ?? '').includes('[mohawk]') && !article['indigenousLanguageReviewed']) {
      throw new HttpsError('failed-precondition', 'Indigenous language review required before publishing content with [mohawk] tags.')
   }
 

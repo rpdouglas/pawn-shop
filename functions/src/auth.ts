@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import type { CallableRequest } from 'firebase-functions/v2/https'
 import { getAuth } from 'firebase-admin/auth'
-import { getFirestore, FieldValue } from 'firebase-admin/firestore'
+import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
 import { createHash } from 'node:crypto'
 
 // Enforces that the caller completed MFA sign-in (sign_in_second_factor present in token).
@@ -188,8 +188,8 @@ export const getStaffMembers = onCall({ cors: true }, async (request) => {
       role: data['role'],
       mfaEnrolled: data['mfaEnrolled'],
       phoneNumber: data['phoneNumber'],
-      lastLoginAt: data['lastLoginAt']?.toDate()?.toISOString(),
-      createdAt: data['createdAt']?.toDate()?.toISOString(),
+      lastLoginAt: (data['lastLoginAt'] as Timestamp | undefined)?.toDate()?.toISOString(),
+      createdAt: (data['createdAt'] as Timestamp | undefined)?.toDate()?.toISOString(),
     }
   })
 
