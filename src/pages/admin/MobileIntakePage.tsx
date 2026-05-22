@@ -39,6 +39,7 @@ interface UploadEntry {
   fileName: string
   progress: number
   error?: string
+  processing?: boolean  // Storage upload done; waiting for processImageUpload CF to write to Firestore
 }
 
 const ACCEPTED_MIME = ['image/jpeg', 'image/png', 'image/webp']
@@ -155,7 +156,18 @@ export default function MobileIntakePage() {
     const unsubscribe = onSnapshot(doc(db, 'items', itemId), (snap) => {
       if (!snap.exists()) return
       const data = snap.data()
-      setImages((data['images'] as string[] | undefined) ?? [])
+      const newImages = (data['images'] as string[] | undefined) ?? []
+      setImages(newImages)
+      if (newImages.length > 0) {
+        // CF has processed at least one image — clear any "Processing…" entries
+        setUploads(prev => {
+          const next = new Map(prev)
+          for (const [k, entry] of prev) {
+            if (entry.processing) next.delete(k)
+          }
+          return next
+        })
+      }
     })
     return unsubscribe
   }, [itemId])
@@ -193,7 +205,8 @@ export default function MobileIntakePage() {
         setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 0, error: 'Upload failed — try again.' }))
       },
       () => {
-        setUploads(prev => { const next = new Map(prev); next.delete(key); return next })
+        // Storage upload done — transition to "Processing…" until the CF writes to Firestore
+        setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 100, processing: true }))
       }
     )
   }, [])
@@ -249,9 +262,14 @@ export default function MobileIntakePage() {
     const errs: Record<string, string> = {}
     if (!form.title.trim()) errs.title = 'Name this item first'
     if (!form.viewTag) errs.viewTag = 'Select a view first'
-    const hasActiveUpload = Array.from(uploads.values()).some(u => !u.error)
+    const hasActiveUpload = Array.from(uploads.values()).some(u => !u.error && !u.processing)
+    const hasProcessing = Array.from(uploads.values()).some(u => u.processing)
     if (images.length === 0) {
-      errs.photo = hasActiveUpload ? 'Photo is still uploading — please wait' : 'At least one photo is required'
+      errs.photo = hasActiveUpload
+        ? 'Photo is still uploading — please wait'
+        : hasProcessing
+          ? 'Photo is still processing — please wait a moment'
+          : 'At least one photo is required'
     }
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setErrors({})
@@ -450,17 +468,19 @@ export default function MobileIntakePage() {
                   <span style={{ color: 'var(--color-text-muted)' }}>{u.fileName}</span>
                   {u.error
                     ? <span style={ERROR_TEXT}>{u.error}</span>
-                    : (
-                      <div
-                        role="progressbar"
-                        aria-valuenow={Math.round(u.progress)}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        style={{ height: '4px', backgroundColor: 'var(--color-border)', borderRadius: '2px', marginTop: 'var(--space-1)' }}
-                      >
-                        <div style={{ width: `${u.progress}%`, height: '100%', backgroundColor: 'var(--color-primary)', borderRadius: '2px', transition: `width var(--motion-speed-fast) var(--motion-easing)` }} />
-                      </div>
-                    )
+                    : u.processing
+                      ? <span style={{ ...LABEL, display: 'block', marginTop: 'var(--space-1)' }}>Processing…</span>
+                      : (
+                        <div
+                          role="progressbar"
+                          aria-valuenow={Math.round(u.progress)}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          style={{ height: '4px', backgroundColor: 'var(--color-border)', borderRadius: '2px', marginTop: 'var(--space-1)' }}
+                        >
+                          <div style={{ width: `${u.progress}%`, height: '100%', backgroundColor: 'var(--color-primary)', borderRadius: '2px', transition: `width var(--motion-speed-fast) var(--motion-easing)` }} />
+                        </div>
+                      )
                   }
                 </li>
               ))}
