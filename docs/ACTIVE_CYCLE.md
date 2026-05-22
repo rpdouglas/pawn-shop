@@ -32,6 +32,9 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 
 | Task | Epic | Completed |
 |---|---|---|
+| Installed `vitest`, `jsdom`, `@testing-library/react` and configured `vite.config.ts` | E21 | 2026-05-22 |
+| Implemented unit tests for `format.ts`, `Button.tsx`, and `AgeGate.tsx` | E21 | 2026-05-22 |
+| **E21 CLOSED** | E21 | 2026-05-22 |
 
 ---
 

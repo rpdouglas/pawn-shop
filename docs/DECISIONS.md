@@ -300,5 +300,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-22 — E43: Added `browser-image-compression` (v2) for client-side compression before Firebase Storage upload. Reduces camera photos from up to 20 MB to ~300 KB (max 1920px / WebP quality 80%) before upload, cutting transfer time ~40×. Sharp watermark + WebP conversion in `processImageUpload` CF is unchanged — compression only affects the temp upload file size, not final image quality.
 
+2026-05-22 — E21: Vitest, jsdom, and React Testing Library selected over Playwright Component Testing for unit tests. Vitest integrates natively with Vite, running sub-50ms node-based tests for rapid TDD feedback loops, while existing Playwright setup remains dedicated to browser-based E2E and Accessibility (axe) testing.
+
 *Add new entries above this line.*
 

@@ -73,9 +73,9 @@
 > - **Developer (Staff):** Fast, reliable verification of code correctness.
 > - **Compliance (Marie):** Regression testing for critical compliance logic (age gates, PII filters).
 
-- [ ] Install Vitest, jsdom, and React Testing Library `[Staff]`
-- [ ] Configure `vite.config.ts` and `src/setupTests.ts` `[Staff]`
-- [ ] Implement initial unit tests for core utilities and components `[Staff]`
+- [x] Install Vitest, jsdom, and React Testing Library `[Staff]`
+- [x] Configure `vite.config.ts` and `src/setupTests.ts` `[Staff]`
+- [x] Implement initial unit tests for core utilities and components `[Staff]`
 
 ---
 

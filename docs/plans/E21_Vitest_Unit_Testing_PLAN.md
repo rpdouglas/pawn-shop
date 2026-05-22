@@ -37,10 +37,10 @@
 - **Setup:** `src/setupTests.ts` for DOM matchers.
 - **Estimated scope:** Medium — 4 files (`package.json`, `vite.config.ts`, `src/setupTests.ts`, `src/components/ui/Button.test.tsx`).
 
-### Strategy C — Robust (Testing + Coverage + E2E Placeholder)
-**Summary:** Strategy B plus code coverage reporting and Playwright scaffolding for future E2E tests.
-- **Architecture:** Strategy B + `v8` coverage + Playwright.
-- **Estimated scope:** Large — 6+ files.
+### Strategy C — Robust (Testing + Coverage)
+**Summary:** Strategy B plus `v8` code coverage reporting. (Note: Playwright is already configured for E2E and accessibility testing in this project, so E2E scaffolding is no longer required here).
+- **Architecture:** Strategy B + `@vitest/coverage-v8`.
+- **Estimated scope:** Large — 5+ files.
 
 ---
 
@@ -60,7 +60,7 @@
 
 ## Recommendation
 
-I recommend **Strategy B**. It provides the necessary environment to test both logic (`src/lib/format.ts`) and UI components (`src/components/ui/Button.tsx`) using the same build pipeline as the main app. It avoids the overhead of coverage/E2E until the project scales further.
+I recommend **Strategy B**. Even with Playwright already enabled for E2E and accessibility testing, we still need Vitest and React Testing Library for fast, isolated unit testing of core logic (`src/lib/format.ts`) and individual UI components (`src/components/ui/Button.tsx`). Vitest integrates natively with our Vite build pipeline and runs in milliseconds, whereas Playwright is better suited for full-page integration tests. We can defer `v8` coverage (Strategy C) until the unit test suite scales further.
 
 ---
-*The Pawn Shop · docs/plans/E21_Vitest_Unit_Testing_PLAN.md · v1.1*
+*The Pawn Shop · docs/plans/E21_Vitest_Unit_Testing_PLAN.md · v1.2*

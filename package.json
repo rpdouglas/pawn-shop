@@ -19,7 +19,9 @@
     "governance:plan": "node scripts/governance/init-plan.js",
     "test:e2e": "playwright test",
     "test:a11y": "playwright test e2e/accessibility.spec.ts",
-    "test:lhci": "CHROME_PATH=$(find ~/.cache/ms-playwright/chromium-* -name chrome -type f 2>/dev/null | head -1) lhci autorun"
+    "test:lhci": "CHROME_PATH=$(find ~/.cache/ms-playwright/chromium-* -name chrome -type f 2>/dev/null | head -1) lhci autorun",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@fontsource/bebas-neue": "^5.2.7",
@@ -41,22 +43,26 @@
     "@lhci/cli": "^0.14.0",
     "@playwright/test": "^1.49.1",
     "@tailwindcss/vite": "^4.3.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^24.12.3",
     "@types/qrcode": "^1.5.6",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "^6.0.1",
+    "@vitejs/plugin-react": "^6.0.2",
     "concurrently": "^9.2.1",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "firebase-admin": "^13.10.0",
     "globals": "^17.6.0",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4.3.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12",
     "vitepress": "^1.6.4",
+    "vitest": "^4.1.7",
     "vue": "^3.5.34"
   },
   "overrides": {
