@@ -10,6 +10,7 @@ import MerchandisingBadge from '../MerchandisingBadge'
 import RelatedItems from '../RelatedItems'
 import HoldCountdownBadge from './HoldCountdownBadge'
 import ReturnRequestForm from './ReturnRequestForm'
+import CannabisProductData from '../cannabis/CannabisProductData'
 import { formatPrice } from '../../lib/format'
 import type { Item, ConditionGrade, ViewType } from '../../lib/types'
 import { Analytics } from '../../lib/analytics'
@@ -305,6 +306,11 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
                   {item.staffPickNote}
                 </p>
               </div>
+            )}
+
+            {/* Cannabis Profile */}
+            {item.viewTag === 'cannabis' && item.cannabisProfile && (
+              <CannabisProductData profile={item.cannabisProfile} />
             )}
 
             {/* CTAs */}

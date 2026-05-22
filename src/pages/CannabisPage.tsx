@@ -9,8 +9,9 @@ import LayoutToggle, { type LayoutMode } from '../components/cannabis/LayoutTogg
 import Button from '../components/ui/Button'
 import CampaignBanner from '../components/CampaignBanner'
 import ArticleSection from '../components/ArticleSection'
+import ItemQuickView from '../components/pawn/ItemQuickView'
 import { useItems } from '../hooks/useItems'
-import type { MoodCategory, ShopInfo } from '../lib/types'
+import type { Item, MoodCategory, ShopInfo } from '../lib/types'
 import { Analytics } from '../lib/analytics'
 import { db } from '../lib/firebase'
 
@@ -35,6 +36,7 @@ export default function CannabisPage() {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS)
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('grid3')
   const [whatsappHref, setWhatsappHref] = useState<string | null>(null)
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null)
 
   useEffect(() => {
     Analytics.pageView({ view: 'cannabis', page_path: '/cannabis' })
@@ -238,6 +240,7 @@ export default function CannabisPage() {
                       imageUrl={item.images[0]}
                       merchandisingTags={item.merchandisingTags}
                       layoutMode={layoutMode}
+                      onClick={() => setSelectedItem(item)}
                     />
                   </div>
                 )
@@ -245,6 +248,14 @@ export default function CannabisPage() {
             </div>
           )}
         </section>
+
+        {selectedItem && (
+          <ItemQuickView
+            item={selectedItem}
+            onClose={() => setSelectedItem(null)}
+            onSelectRelated={(item) => setSelectedItem(item)}
+          />
+        )}
 
         <ArticleSection viewTag="cannabis" title="Cannabis Stories" />
       </section>

@@ -304,5 +304,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-22 — E44: Enforced a "Fail-Fast" CI/CD pipeline in GitHub Actions. `deploy-dev.yml` and `deploy-prod.yml` now run `npm run lint` and `npm run test` (Vitest) prior to build, and `npm run test:a11y && npm run test:e2e` (Playwright) after build. Lighthouse CI runs post-deployment on `deploy-dev.yml`.
 
+2026-05-22 — E29: `cannabisProfile` submap added to `items/{id}` schema to store cannabis-specific attributes (THC, CBD, terpenes, lineage, brand, format). Allows rich, compliant merchandising on the Cannabis storefront while protecting the primary items collection from bloat. Terpene spider chart (`TerpeneProfile.tsx`) uses raw SVG without external charting dependencies.
+
 *Add new entries above this line.*
 

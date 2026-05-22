@@ -38,6 +38,20 @@ interface FormState {
   merchandisingTags: MerchandisingTag[]
   costInput: string      // Purchase cost — optional, staff-only, writes to internal/staff subcollection
   quantityInput: string  // Initial stock count — defaults to 1
+
+  // Cannabis Profile
+  thcMin: string
+  thcMax: string
+  cbdMin: string
+  cbdMax: string
+  terpenes: string
+  geneticLineage: string
+  effectProfile: string
+  brand: string
+  format: string
+  weight: string
+  lotNumber: string
+  packagedDate: string
 }
 
 interface FormErrors {
@@ -65,6 +79,18 @@ const EMPTY_FORM: FormState = {
   merchandisingTags: [],
   costInput: '',
   quantityInput: '1',
+  thcMin: '',
+  thcMax: '',
+  cbdMin: '',
+  cbdMax: '',
+  terpenes: '',
+  geneticLineage: '',
+  effectProfile: '',
+  brand: '',
+  format: '',
+  weight: '',
+  lotNumber: '',
+  packagedDate: '',
 }
 
 function parseQuantity(input: string): number {
@@ -138,6 +164,28 @@ export default function IntakeForm() {
     if (formState.serialNumber)    payload.serialNumber    = formState.serialNumber.trim()
     if (formState.provenanceNotes) payload.provenanceNotes = formState.provenanceNotes.trim()
     if (!isNaN(cents) && cents > 0) payload.price          = cents
+
+    if (formState.viewTag === 'cannabis') {
+      payload.cannabisProfile = {
+        thcMin: formState.thcMin ? parseFloat(formState.thcMin) : undefined,
+        thcMax: formState.thcMax ? parseFloat(formState.thcMax) : undefined,
+        cbdMin: formState.cbdMin ? parseFloat(formState.cbdMin) : undefined,
+        cbdMax: formState.cbdMax ? parseFloat(formState.cbdMax) : undefined,
+        terpenes: formState.terpenes ? formState.terpenes.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        effectProfile: formState.effectProfile ? formState.effectProfile.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        geneticLineage: formState.geneticLineage.trim() || undefined,
+        brand: formState.brand.trim() || undefined,
+        format: formState.format.trim() || undefined,
+        weight: formState.weight.trim() || undefined,
+        lotNumber: formState.lotNumber.trim() || undefined,
+        packagedDate: formState.packagedDate ? new Date(formState.packagedDate) : undefined,
+      }
+      const cp = payload.cannabisProfile as Record<string, unknown>
+      Object.keys(cp).forEach(key => 
+        cp[key] === undefined && delete cp[key]
+      )
+    }
+
     return payload
   }
 
@@ -412,6 +460,112 @@ export default function IntakeForm() {
           </label>
         </div>
       </section>
+
+      {/* ── Cannabis Profile ── */}
+      {formState.viewTag === 'cannabis' && (
+        <section className="intake-section">
+          <h2 className="intake-section-heading">Cannabis Profile</h2>
+          
+          <div className="intake-row intake-row-2">
+            <Input
+              id="brand"
+              label="Brand/Producer"
+              value={formState.brand}
+              onChange={set('brand')}
+              placeholder="e.g. Broken Coast"
+            />
+            <Input
+              id="geneticLineage"
+              label="Genetic Lineage"
+              value={formState.geneticLineage}
+              onChange={set('geneticLineage')}
+              placeholder="e.g. Sativa - Sour Diesel"
+            />
+          </div>
+
+          <div className="intake-row intake-row-4">
+            <Input
+              id="thcMin"
+              label="THC Min %"
+              value={formState.thcMin}
+              onChange={set('thcMin')}
+              placeholder="e.g. 20"
+            />
+            <Input
+              id="thcMax"
+              label="THC Max %"
+              value={formState.thcMax}
+              onChange={set('thcMax')}
+              placeholder="e.g. 25"
+            />
+            <Input
+              id="cbdMin"
+              label="CBD Min %"
+              value={formState.cbdMin}
+              onChange={set('cbdMin')}
+              placeholder="e.g. 0"
+            />
+            <Input
+              id="cbdMax"
+              label="CBD Max %"
+              value={formState.cbdMax}
+              onChange={set('cbdMax')}
+              placeholder="e.g. 1"
+            />
+          </div>
+
+          <div className="intake-row intake-row-2">
+            <Input
+              id="terpenes"
+              label="Terpenes (comma separated)"
+              value={formState.terpenes}
+              onChange={set('terpenes')}
+              placeholder="e.g. Myrcene, Limonene, Caryophyllene"
+            />
+            <Input
+              id="effectProfile"
+              label="Effects (comma separated)"
+              value={formState.effectProfile}
+              onChange={set('effectProfile')}
+              placeholder="e.g. Relax, Sleep"
+            />
+          </div>
+
+          <div className="intake-row intake-row-2">
+            <Input
+              id="format"
+              label="Format"
+              value={formState.format}
+              onChange={set('format')}
+              placeholder="e.g. Dried Flower"
+            />
+            <Input
+              id="weight"
+              label="Weight / Size"
+              value={formState.weight}
+              onChange={set('weight')}
+              placeholder="e.g. 3.5g"
+            />
+          </div>
+
+          <div className="intake-row intake-row-2">
+            <Input
+              id="lotNumber"
+              label="Lot Number"
+              value={formState.lotNumber}
+              onChange={set('lotNumber')}
+              placeholder="e.g. LOT12345"
+            />
+            <Input
+              id="packagedDate"
+              label="Packaged Date (YYYY-MM-DD)"
+              value={formState.packagedDate}
+              onChange={set('packagedDate')}
+              placeholder="2026-05-01"
+            />
+          </div>
+        </section>
+      )}
 
       {/* ── Error summary ── */}
       {publishError && (

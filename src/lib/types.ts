@@ -105,6 +105,21 @@ export interface PawnRequest {
   createdAt: Date
 }
 
+export interface CannabisProfile {
+  thcMin?: number
+  thcMax?: number
+  cbdMin?: number
+  cbdMax?: number
+  terpenes?: string[]
+  geneticLineage?: string
+  effectProfile?: string[]
+  brand?: string
+  format?: string
+  weight?: string
+  lotNumber?: string
+  packagedDate?: Date
+}
+
 // Firestore Timestamps are converted to Date before being assigned here
 export interface Item {
   id: string
@@ -141,6 +156,7 @@ export interface Item {
   posId?: string           // Brother POS external identifier
   posSyncStatus?: PosSyncStatus
   posLastSyncAt?: Date
+  cannabisProfile?: CannabisProfile
 }
 
 // items/{id}/internal/staff — staff-only subcollection document

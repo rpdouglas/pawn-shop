@@ -562,12 +562,12 @@
 > - **Jordan:** Spider-chart must render correctly at all breakpoints and meet the dark luxury aesthetic — muted lavender lines, token-based colours only, no external charting library.
 > - **Marcus:** All terpene data is staff-entered — never AI-generated. `provenanceNotes` standard applies.
 
-- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `cannabisProfile` submap (`thcMin`, `thcMax`, `cbdMin`, `cbdMax`, `terpenes[]`, `geneticLineage`, `effectProfile[]`) to `items/{id}`. Log in `DECISIONS.md`. `[Marie]` `[Comp]`
-- [ ] Update `src/lib/types.ts` — add `CannabisProfile` interface, extend `Item` interface `[Staff]`
-- [ ] Extend `src/components/admin/IntakeForm.tsx` — cannabis-specific panel (renders only when `viewTag === 'cannabis'`): THC/CBD ranges, terpene add/remove rows, genetic lineage `[Staff]`
-- [ ] Create `src/components/cannabis/TerpeneProfile.tsx` — SVG-only spider/radar chart, no charting library dependency `[Marie]` `[Jord]`
-- [ ] Create `src/components/cannabis/CannabisProductData.tsx` — collapsible panel for product intelligence data on item detail page `[Marie]` `[Jord]`
-- [ ] Update `src/pages/CannabisPage.tsx` item detail view to include `CannabisProductData` when `item.cannabisProfile` is present `[Marie]`
+- [x] **Schema first:** Update `docs/firestore-schema.md` — add `cannabisProfile` submap (`thcMin`, `thcMax`, `cbdMin`, `cbdMax`, `terpenes[]`, `geneticLineage`, `effectProfile[]`) to `items/{id}`. Log in `DECISIONS.md`. `[Marie]` `[Comp]`
+- [x] Update `src/lib/types.ts` — add `CannabisProfile` interface, extend `Item` interface `[Staff]`
+- [x] Extend `src/components/admin/IntakeForm.tsx` — cannabis-specific panel (renders only when `viewTag === 'cannabis'`): THC/CBD ranges, terpene add/remove rows, genetic lineage `[Staff]`
+- [x] Create `src/components/cannabis/TerpeneProfile.tsx` — SVG-only spider/radar chart, no charting library dependency `[Marie]` `[Jord]`
+- [x] Create `src/components/cannabis/CannabisProductData.tsx` — collapsible panel for product intelligence data on item detail page `[Marie]` `[Jord]`
+- [x] Update `src/pages/CannabisPage.tsx` item detail view to include `CannabisProductData` when `item.cannabisProfile` is present `[Marie]`
 
 ---
 
