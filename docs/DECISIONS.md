@@ -288,5 +288,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-22 — E41: ImageUploadZone now renders two separate hidden `<input>` elements: one with `capture="environment"` (camera-only, no multiple) and one without capture (gallery/desktop, multiple). This avoids toggling the capture attribute dynamically, which is unreliable across iOS/Android browsers, and gives clear semantic separation between the two capture modes.
 
+2026-05-22 — E41: After a Firebase Storage upload completes, the upload entry transitions to `processing: true` rather than being deleted from the uploads Map. The entry is cleared when the `onSnapshot` listener delivers new images written by the `processImageUpload` CF. Alternative considered: local blob URL preview. Rejected — blob URLs require explicit revocation and don't represent the watermarked image the publish gate depends on; processing state is semantically accurate and ties UI feedback directly to the Firestore write.
+
 *Add new entries above this line.*
 

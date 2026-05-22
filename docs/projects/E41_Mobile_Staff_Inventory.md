@@ -1,6 +1,6 @@
 # Project E41: Mobile Staff Inventory
 
-**Status:** Planned
+**Status:** Done — 2026-05-22
 **Epic:** E41 — Mobile Staff Inventory
 **Phase:** Phase 9 — Production Readiness
 **Primary Persona:** Staff (inventory_staff / manager / admin on shop floor)

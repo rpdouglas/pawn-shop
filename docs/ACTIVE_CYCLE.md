@@ -7,8 +7,8 @@
 
 ## Current Cycle
 
-**Cycle:** 28
-**Started:** 2026-05-21
+**Cycle:** 29
+**Started:** 2026-05-22
 **Target close:** TBD
 **Deploy target:** dev
 
@@ -58,7 +58,23 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 
 ## Previous Cycle Summary
 
-**Cycle 28** (2026-05-21) — UX Refinements.
+**Cycle 29** (2026-05-22) — Closed E41 · Mobile Staff Inventory.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `AdminMobileNav.tsx` — fixed bottom tab bar (Inventory / Add Item / Dashboard) for mobile admin (`< 1024px`) | E41 | 2026-05-22 |
+| `AdminLayout.tsx` — renders `AdminMobileNav` on mobile with 64px bottom padding on `<Outlet />` | E41 | 2026-05-22 |
+| `InventoryPage.tsx` — responsive card layout on mobile; table + `AiAssistantPanel` preserved on desktop; search input + status filter chips | E41 | 2026-05-22 |
+| `ImageUploadZone.tsx` — camera-first mobile UI: dual hidden inputs (`capture="environment"` + gallery), 56px CTA | E41 | 2026-05-22 |
+| `MobileIntakePage.tsx` — 3-step wizard: Step 1 Photo, Step 2 Details (title/view/category/description/price/condition), Step 3 Review + Publish | E41 | 2026-05-22 |
+| `main.tsx` — `/admin/mobile-intake` route registered as lazy chunk | E41 | 2026-05-22 |
+| QA fixes: filter chip touch target 36px → 44px; description field added (CF required); upload processing state replaces silent deletion | E41 | 2026-05-22 |
+| `e2e/accessibility.spec.ts` — `/admin/mobile-intake` and `/admin/inventory` (E41) added to admin axe-core suite | E41 | 2026-05-22 |
+| **E41 CLOSED** | E41 | 2026-05-22 |
+
+---
+
+**Cycle 28** (2026-05-21 → 2026-05-22) — UX Refinements.
 
 | Task | Epic | Completed |
 |---|---|---|
@@ -189,4 +205,4 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-21 (Cycle 26 open)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-22 (Cycle 29 open)*
