@@ -449,6 +449,16 @@
 
 ---
 
+### E44 · CI/CD Testing Pipeline
+
+> **Persona Gate:** Infrastructure epic. No customer-facing persona directly served.
+> Enforces the fail-fast deployment pipeline to protect against regressions.
+
+- [x] Modify `deploy-dev.yml` to enforce Lint/Unit/A11y/LHCI gates `[Staff]` `[Comp]`
+- [x] Modify `deploy-prod.yml` to enforce Lint/Unit/A11y gates `[Staff]` `[Comp]`
+
+---
+
 ### E25 · Header Navigation Refinement
 
 > **Persona Gate — E25:**

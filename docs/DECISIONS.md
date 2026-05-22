@@ -302,5 +302,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-22 — E21: Vitest, jsdom, and React Testing Library selected over Playwright Component Testing for unit tests. Vitest integrates natively with Vite, running sub-50ms node-based tests for rapid TDD feedback loops, while existing Playwright setup remains dedicated to browser-based E2E and Accessibility (axe) testing.
 
+2026-05-22 — E44: Enforced a "Fail-Fast" CI/CD pipeline in GitHub Actions. `deploy-dev.yml` and `deploy-prod.yml` now run `npm run lint` and `npm run test` (Vitest) prior to build, and `npm run test:a11y && npm run test:e2e` (Playwright) after build. Lighthouse CI runs post-deployment on `deploy-dev.yml`.
+
 *Add new entries above this line.*
 

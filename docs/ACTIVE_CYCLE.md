@@ -35,6 +35,9 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | Installed `vitest`, `jsdom`, `@testing-library/react` and configured `vite.config.ts` | E21 | 2026-05-22 |
 | Implemented unit tests for `format.ts`, `Button.tsx`, and `AgeGate.tsx` | E21 | 2026-05-22 |
 | **E21 CLOSED** | E21 | 2026-05-22 |
+| Modified `deploy-dev.yml` to enforce Lint/Unit/A11y/LHCI gates | E44 | 2026-05-22 |
+| Modified `deploy-prod.yml` to enforce Lint/Unit/A11y gates | E44 | 2026-05-22 |
+| **E44 CLOSED** | E44 | 2026-05-22 |
 
 ---
 
