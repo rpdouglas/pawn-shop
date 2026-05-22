@@ -24,7 +24,7 @@ const MOOD_CATEGORY: Record<MoodCategory, string> = {
 const ALL_MOODS: MoodCategory[] = ['relax', 'focus', 'social', 'ceremony']
 
 const DEFAULT_FILTERS: FilterState = {
-  mood: null,
+  moods: [],
   category: null,
   priceRange: [0, Infinity],
   sort: 'newest',
@@ -50,9 +50,7 @@ export default function CannabisPage() {
       .catch(() => { /* non-critical */ })
   }, [])
 
-  const scrollToCollections = () => {
-    document.getElementById('cannabis-collections')?.scrollIntoView({ behavior: 'smooth' })
-  }
+
 
   // Per-mood item counts (no extra Firestore queries)
   const moodCounts: Record<MoodCategory, number> = useMemo(() => ({
@@ -69,8 +67,10 @@ export default function CannabisPage() {
   const displayItems = useMemo(() => {
     let result = [...items]
 
-    if (filters.mood) {
-      result = result.filter(i => i.category === MOOD_CATEGORY[filters.mood!])
+    if (filters.moods.length > 0) {
+      result = result.filter(i => 
+        filters.moods.some(mood => MOOD_CATEGORY[mood] === i.category)
+      )
     }
     if (filters.category) {
       result = result.filter(i => i.category === filters.category)
@@ -108,14 +108,12 @@ export default function CannabisPage() {
       <CinematicHero
         heading="Wellness, curated."
         subheading="Premium cannabis for every intention — sourced with care, presented with discretion."
-        ctaLabel="Explore collections"
-        onCtaClick={scrollToCollections}
       />
 
       <section
         id="cannabis-collections"
         aria-labelledby="mood-heading"
-        style={{ padding: 'var(--space-12) var(--space-6)', maxWidth: '1280px', margin: '0 auto' }}
+        style={{ padding: 'var(--space-4) var(--space-6) var(--space-12)', maxWidth: '1280px', margin: '0 auto' }}
       >
         <CampaignBanner />
 
@@ -135,8 +133,8 @@ export default function CannabisPage() {
 
         <div className="mood-pills">
           <MoodPillStrip
-            activeMood={filters.mood}
-            onChange={mood => setFilters(f => ({ ...f, mood }))}
+            activeMoods={filters.moods}
+            onChange={moods => setFilters(f => ({ ...f, moods }))}
           />
         </div>
 
@@ -153,7 +151,12 @@ export default function CannabisPage() {
                 key={mood}
                 mood={mood}
                 itemCount={moodCounts[mood]}
-                onClick={() => setFilters(f => ({ ...f, mood: f.mood === mood ? null : mood }))}
+                onClick={() => setFilters(f => {
+                  const newMoods = f.moods.includes(mood)
+                    ? f.moods.filter(m => m !== mood)
+                    : [...f.moods, mood]
+                  return { ...f, moods: newMoods }
+                })}
               />
             ))}
           </div>
@@ -173,9 +176,11 @@ export default function CannabisPage() {
                 margin: 0,
               }}
             >
-              {filters.mood
-                ? `${filters.mood.charAt(0).toUpperCase() + filters.mood.slice(1)} collection`
-                : 'Featured products'}
+              {filters.moods.length === 1
+                ? `${filters.moods[0].charAt(0).toUpperCase() + filters.moods[0].slice(1)} collection`
+                : filters.moods.length > 1
+                  ? 'Curated wellness collection'
+                  : 'Featured products'}
             </h2>
 
             <LayoutToggle mode={layoutMode} onChange={setLayoutMode} />
@@ -213,7 +218,7 @@ export default function CannabisPage() {
               fontStyle: 'italic',
               fontSize: 'var(--text-body)',
             }}>
-              {filters.mood || filters.category
+              {filters.moods.length > 0 || filters.category
                 ? 'No items match these filters.'
                 : 'No products available at this time.'}
             </p>

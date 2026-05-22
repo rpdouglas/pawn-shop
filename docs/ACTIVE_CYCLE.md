@@ -58,6 +58,15 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 
 ## Previous Cycle Summary
 
+**Cycle 28** (2026-05-21) — UX Refinements.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `CannabisPage.tsx` — Reduce `.cannabis-collections` top padding to `var(--space-4)` | UX | 2026-05-21 |
+| `FilterState` — Refactor `mood` to `moods[]` for multiselect, remove "All" pill | UX | 2026-05-21 |
+
+---
+
 **Cycle 27** (2026-05-21 → 2026-05-21) — Closed E40 · Cannabis Mobile Mood Pills.
 
 | Task | Epic | Completed |

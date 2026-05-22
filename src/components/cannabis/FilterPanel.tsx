@@ -5,7 +5,7 @@ import type { Item, MoodCategory } from '../../lib/types'
 export type SortMode = 'newest' | 'trending' | 'price-asc' | 'price-desc'
 
 export interface FilterState {
-  mood: MoodCategory | null
+  moods: MoodCategory[]
   category: string | null
   priceRange: [number, number]
   sort: SortMode
@@ -61,14 +61,14 @@ export default function FilterPanel({ items, filters, onChange }: FilterPanelPro
   ), [items])
 
   const activeFilterCount = [
-    filters.mood,
+    filters.moods.length > 0,
     filters.category,
     filters.priceRange[0] > priceMin || filters.priceRange[1] < priceMax,
     filters.sort !== 'newest',
   ].filter(Boolean).length
 
   function clearAll() {
-    onChange({ mood: null, category: null, priceRange: [priceMin, priceMax], sort: 'newest' })
+    onChange({ moods: [], category: null, priceRange: [priceMin, priceMax], sort: 'newest' })
   }
 
   const effectivePriceRange: [number, number] = [
@@ -148,18 +148,18 @@ export default function FilterPanel({ items, filters, onChange }: FilterPanelPro
         )}
 
         {/* Active chips — mood and category */}
-        {filters.mood && (
-          <span style={{ ...chipStyle(true), display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)' }}>
-            {MOOD_LABELS[filters.mood]}
+        {filters.moods.map(mood => (
+          <span key={mood} style={{ ...chipStyle(true), display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+            {MOOD_LABELS[mood]}
             <button
-              onClick={() => onChange({ ...filters, mood: null })}
-              aria-label={`Remove ${MOOD_LABELS[filters.mood!]} filter`}
+              onClick={() => onChange({ ...filters, moods: filters.moods.filter(m => m !== mood) })}
+              aria-label={`Remove ${MOOD_LABELS[mood]} filter`}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', padding: 0, lineHeight: 1, fontSize: 'var(--text-body)' }}
             >
               ×
             </button>
           </span>
-        )}
+        ))}
         {filters.category && (
           <span style={{ ...chipStyle(true), display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)' }}>
             {filters.category.replace(/-/g, ' ')}
@@ -204,16 +204,24 @@ export default function FilterPanel({ items, filters, onChange }: FilterPanelPro
               Mood
             </legend>
             <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 'var(--space-2)' }}>
-              {ALL_MOODS.map(mood => (
-                <button
-                  key={mood}
-                  onClick={() => onChange({ ...filters, mood: filters.mood === mood ? null : mood })}
-                  aria-pressed={filters.mood === mood}
-                  style={chipStyle(filters.mood === mood)}
-                >
-                  {MOOD_LABELS[mood]}
-                </button>
-              ))}
+              {ALL_MOODS.map(mood => {
+                const isActive = filters.moods.includes(mood)
+                return (
+                  <button
+                    key={mood}
+                    onClick={() => {
+                      const newMoods = isActive
+                        ? filters.moods.filter(m => m !== mood)
+                        : [...filters.moods, mood]
+                      onChange({ ...filters, moods: newMoods })
+                    }}
+                    aria-pressed={isActive}
+                    style={chipStyle(isActive)}
+                  >
+                    {MOOD_LABELS[mood]}
+                  </button>
+                )
+              })}
             </div>
           </fieldset>
 

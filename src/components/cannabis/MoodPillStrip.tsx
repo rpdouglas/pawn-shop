@@ -1,7 +1,6 @@
 import type { MoodCategory } from '../../lib/types'
 
-const MOODS: { label: string; icon: string; mood: MoodCategory | null }[] = [
-  { label: 'All',      icon: 'circle', mood: null },
+const MOODS: { label: string; icon: string; mood: MoodCategory }[] = [
   { label: 'Relax',    icon: 'moon',   mood: 'relax' },
   { label: 'Focus',    icon: 'bolt',   mood: 'focus' },
   { label: 'Social',   icon: 'users',  mood: 'social' },
@@ -9,11 +8,11 @@ const MOODS: { label: string; icon: string; mood: MoodCategory | null }[] = [
 ]
 
 interface MoodPillStripProps {
-  activeMood: MoodCategory | null
-  onChange: (mood: MoodCategory | null) => void
+  activeMoods: MoodCategory[]
+  onChange: (moods: MoodCategory[]) => void
 }
 
-export default function MoodPillStrip({ activeMood, onChange }: MoodPillStripProps) {
+export default function MoodPillStrip({ activeMoods, onChange }: MoodPillStripProps) {
   return (
     <div
       style={{
@@ -25,11 +24,16 @@ export default function MoodPillStrip({ activeMood, onChange }: MoodPillStripPro
       }}
     >
       {MOODS.map(({ label, icon, mood }) => {
-        const isActive = activeMood === mood
+        const isActive = activeMoods.includes(mood)
         return (
           <button
             key={label}
-            onClick={() => onChange(mood)}
+            onClick={() => {
+              const newMoods = isActive
+                ? activeMoods.filter(m => m !== mood)
+                : [...activeMoods, mood]
+              onChange(newMoods)
+            }}
             aria-pressed={isActive}
             style={{
               display: 'flex',
