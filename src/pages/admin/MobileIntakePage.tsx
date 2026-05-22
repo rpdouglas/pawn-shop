@@ -30,6 +30,7 @@ interface FormState {
   title: string
   viewTag: ViewType | ''
   category: string
+  description: string
   priceInput: string
   condition: ConditionGrade | ''
 }
@@ -47,6 +48,7 @@ const EMPTY_FORM: FormState = {
   title: '',
   viewTag: '',
   category: '',
+  description: '',
   priceInput: '',
   condition: '',
 }
@@ -259,6 +261,7 @@ export default function MobileIntakePage() {
   const advanceToReview = async () => {
     const errs: Record<string, string> = {}
     if (!form.category.trim()) errs.category = 'Category is required'
+    if (!form.description.trim()) errs.description = 'Description is required'
     const cents = parsePriceCents(form.priceInput)
     if (isNaN(cents) || cents <= 0) errs.price = 'Valid price required (e.g. 49.99)'
     if (!form.condition) errs.condition = 'Condition is required'
@@ -271,6 +274,7 @@ export default function MobileIntakePage() {
       await updateDoc(doc(db, 'items', itemId), {
         title: form.title.trim(),
         category: form.category.trim(),
+        description: form.description.trim(),
         viewTag: form.viewTag,
         condition: form.condition,
         price: parsePriceCents(form.priceInput),
@@ -292,6 +296,7 @@ export default function MobileIntakePage() {
       await updateDoc(doc(db, 'items', itemId), {
         title: form.title.trim(),
         category: form.category.trim(),
+        description: form.description.trim(),
         viewTag: form.viewTag,
         condition: form.condition,
         price: parsePriceCents(form.priceInput),
@@ -528,6 +533,22 @@ export default function MobileIntakePage() {
             {errors.category && <span id="mi-category-error" style={ERROR_TEXT} role="alert">{errors.category}</span>}
           </div>
 
+          {/* Description */}
+          <div style={FIELD}>
+            <label htmlFor="mi-description" style={LABEL}>Description</label>
+            <textarea
+              id="mi-description"
+              value={form.description}
+              onChange={e => set('description')(e.target.value)}
+              placeholder="Describe the item — condition details, notable features, any included accessories."
+              rows={4}
+              style={{ ...INPUT, padding: 'var(--space-3) var(--space-4)', resize: 'vertical' }}
+              aria-invalid={errors.description ? 'true' : undefined}
+              aria-describedby={errors.description ? 'mi-description-error' : undefined}
+            />
+            {errors.description && <span id="mi-description-error" style={ERROR_TEXT} role="alert">{errors.description}</span>}
+          </div>
+
           {/* Price */}
           <div style={FIELD}>
             <label htmlFor="mi-price" style={LABEL}>Price (CAD $)</label>
@@ -605,6 +626,7 @@ export default function MobileIntakePage() {
               ['Item', form.title, 'none'],
               ['View', form.viewTag, 'capitalize'],
               ['Category', form.category, 'none'],
+              ['Description', form.description, 'none'],
               ['Price', formatPrice(parsePriceCents(form.priceInput)), 'none'],
               ['Condition', form.condition, 'capitalize'],
               ['Photos', String(images.length), 'none'],
