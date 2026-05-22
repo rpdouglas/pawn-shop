@@ -290,5 +290,13 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-22 — E41: After a Firebase Storage upload completes, the upload entry transitions to `processing: true` rather than being deleted from the uploads Map. The entry is cleared when the `onSnapshot` listener delivers new images written by the `processImageUpload` CF. Alternative considered: local blob URL preview. Rejected — blob URLs require explicit revocation and don't represent the watermarked image the publish gate depends on; processing state is semantically accurate and ties UI feedback directly to the Firestore write.
 
+2026-05-22 — E42: `cost` field stored in `items/{id}/internal/staff` subcollection (not on the parent document). Firestore rules are document-level — if the parent is publicly readable for active items, all its fields are readable. Subcollection placement is the only way to prevent customer access. Pattern follows `items/{id}/internal/ai` established in E04. Existing `/internal/{doc}` wildcard rule already covers the new `staff` document; no rules change required.
+
+2026-05-22 — E42: `quantity` field stored on `items/{id}` (public document, not subcollection). Stock level is customer-safe — showing "Out of Stock" or a count is a standard retail UX signal. No margin or cost data is exposed. Customer-facing pages can display quantity-based messaging without a subcollection read.
+
+2026-05-22 — E42: Quantity adjustments go through `adjustInventory` callable CF rather than direct client `updateDoc`. Rationale: (1) audit trail required — `inventory_quantity_adjusted` log entry captures delta, newQuantity, reason, and actor UID; (2) CF validates `newQuantity >= 0` before writing, preventing stock from going negative under concurrent adjustments. Direct client write (Strategy A) was rejected for these two reasons.
+
+2026-05-22 — E42: `receivePosWebhook` implemented as a verified stub (HMAC-SHA256 validation + payload parse + `posSyncStatus: 'pending'` write). No live Brother POS integration until API credentials and documentation are available. Stub approach delivers the full webhook surface (auth, parsing, error handling, Firestore write pattern) without external API dependency. When Brother POS credentials arrive, processing logic is added behind an already-working endpoint.
+
 *Add new entries above this line.*
 

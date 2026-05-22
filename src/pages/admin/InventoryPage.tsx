@@ -7,6 +7,7 @@ import { formatPrice } from '../../lib/format'
 import ProtectedRoute from '../../components/auth/ProtectedRoute'
 import Badge from '../../components/ui/Badge'
 import AiAssistantPanel from '../../components/admin/AiAssistantPanel'
+import QuantityAdjustControl from '../../components/admin/QuantityAdjustControl'
 import { updateDoc, doc, arrayUnion } from 'firebase/firestore'
 import type { Item, ItemStatus } from '../../lib/types'
 
@@ -243,6 +244,15 @@ export default function InventoryPage() {
                             {formatPrice(item.price)}
                           </span>
                         </div>
+                        {item.quantity !== undefined && (
+                          <div style={{ marginTop: 'var(--space-3)' }}>
+                            <QuantityAdjustControl
+                              itemId={item.id}
+                              quantity={item.quantity}
+                              compact
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </li>
@@ -282,7 +292,7 @@ export default function InventoryPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--color-border)', textAlign: 'left' }}>
-                    {['Item', 'Status', 'View', 'Price', 'Condition', 'Actions'].map((col) => (
+                    {['Item', 'Status', 'View', 'Price', 'Condition', 'Stock', 'Actions'].map((col) => (
                       <th
                         key={col}
                         style={{
@@ -330,6 +340,17 @@ export default function InventoryPage() {
                       </td>
                       <td style={{ padding: 'var(--space-4)', textTransform: 'capitalize', fontSize: 'var(--text-small)' }}>
                         {item.condition}
+                      </td>
+                      <td style={{ padding: 'var(--space-4)' }} onClick={e => e.stopPropagation()}>
+                        {item.quantity !== undefined ? (
+                          <QuantityAdjustControl
+                            itemId={item.id}
+                            quantity={item.quantity}
+                            compact
+                          />
+                        ) : (
+                          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>—</span>
+                        )}
                       </td>
                       <td style={{ padding: 'var(--space-4)' }}>
                         <button

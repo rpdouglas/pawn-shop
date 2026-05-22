@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
-import { doc, onSnapshot, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, onSnapshot, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { ref, uploadBytesResumable } from 'firebase/storage'
 import { httpsCallable } from 'firebase/functions'
 import { useNavigate } from 'react-router-dom'
@@ -33,6 +33,8 @@ interface FormState {
   description: string
   priceInput: string
   condition: ConditionGrade | ''
+  costInput: string      // Purchase cost — optional, staff-only, writes to internal/staff subcollection
+  quantityInput: string  // Initial stock count — defaults to 1
 }
 
 interface UploadEntry {
@@ -52,6 +54,13 @@ const EMPTY_FORM: FormState = {
   description: '',
   priceInput: '',
   condition: '',
+  costInput: '',
+  quantityInput: '1',
+}
+
+function parseQuantity(input: string): number {
+  const q = parseInt(input.trim(), 10)
+  return isNaN(q) || q < 1 ? 1 : q
 }
 
 function parsePriceCents(input: string): number {
@@ -283,6 +292,9 @@ export default function MobileIntakePage() {
     const cents = parsePriceCents(form.priceInput)
     if (isNaN(cents) || cents <= 0) errs.price = 'Valid price required (e.g. 49.99)'
     if (!form.condition) errs.condition = 'Condition is required'
+    if (form.quantityInput.trim() && (isNaN(parseInt(form.quantityInput, 10)) || parseInt(form.quantityInput, 10) < 1)) {
+      errs.quantity = 'Stock must be a whole number of at least 1'
+    }
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setErrors({})
 
@@ -296,8 +308,13 @@ export default function MobileIntakePage() {
         viewTag: form.viewTag,
         condition: form.condition,
         price: parsePriceCents(form.priceInput),
+        quantity: parseQuantity(form.quantityInput),
         updatedAt: serverTimestamp(),
       })
+      const costCents = parsePriceCents(form.costInput)
+      if (form.costInput.trim() && !isNaN(costCents) && costCents > 0) {
+        await setDoc(doc(db, 'items', itemId, 'internal', 'staff'), { cost: costCents }, { merge: true })
+      }
       setStep('review')
     } catch (err) {
       setErrors({ save: err instanceof Error ? err.message : 'Save failed. Try again.' })
@@ -318,8 +335,13 @@ export default function MobileIntakePage() {
         viewTag: form.viewTag,
         condition: form.condition,
         price: parsePriceCents(form.priceInput),
+        quantity: parseQuantity(form.quantityInput),
         updatedAt: serverTimestamp(),
       })
+      const costCents = parsePriceCents(form.costInput)
+      if (form.costInput.trim() && !isNaN(costCents) && costCents > 0) {
+        await setDoc(doc(db, 'items', itemId, 'internal', 'staff'), { cost: costCents }, { merge: true })
+      }
       await publishItemFn({ itemId })
       setStep('published')
     } catch (err) {
@@ -571,7 +593,7 @@ export default function MobileIntakePage() {
 
           {/* Price */}
           <div style={FIELD}>
-            <label htmlFor="mi-price" style={LABEL}>Price (CAD $)</label>
+            <label htmlFor="mi-price" style={LABEL}>Sale Price (CAD $)</label>
             <input
               id="mi-price"
               type="text"
@@ -584,6 +606,37 @@ export default function MobileIntakePage() {
               aria-describedby={errors.price ? 'mi-price-error' : undefined}
             />
             {errors.price && <span id="mi-price-error" style={ERROR_TEXT} role="alert">{errors.price}</span>}
+          </div>
+
+          {/* Cost — staff-only, written to internal/staff subcollection */}
+          <div style={FIELD}>
+            <label htmlFor="mi-cost" style={LABEL}>Cost Price (CAD $, optional)</label>
+            <input
+              id="mi-cost"
+              type="text"
+              inputMode="decimal"
+              value={form.costInput}
+              onChange={e => set('costInput')(e.target.value)}
+              placeholder="e.g. 25.00"
+              style={INPUT}
+            />
+          </div>
+
+          {/* Initial Stock */}
+          <div style={FIELD}>
+            <label htmlFor="mi-quantity" style={LABEL}>Initial Stock</label>
+            <input
+              id="mi-quantity"
+              type="text"
+              inputMode="numeric"
+              value={form.quantityInput}
+              onChange={e => set('quantityInput')(e.target.value)}
+              placeholder="1"
+              style={INPUT}
+              aria-invalid={errors.quantity ? 'true' : undefined}
+              aria-describedby={errors.quantity ? 'mi-quantity-error' : undefined}
+            />
+            {errors.quantity && <span id="mi-quantity-error" style={ERROR_TEXT} role="alert">{errors.quantity}</span>}
           </div>
 
           {/* Condition */}
@@ -647,7 +700,9 @@ export default function MobileIntakePage() {
               ['View', form.viewTag, 'capitalize'],
               ['Category', form.category, 'none'],
               ['Description', form.description, 'none'],
-              ['Price', formatPrice(parsePriceCents(form.priceInput)), 'none'],
+              ['Sale Price', formatPrice(parsePriceCents(form.priceInput)), 'none'],
+              ['Cost Price', form.costInput.trim() ? formatPrice(parsePriceCents(form.costInput)) : '—', 'none'],
+              ['Initial Stock', String(parseQuantity(form.quantityInput)), 'none'],
               ['Condition', form.condition, 'capitalize'],
               ['Photos', String(images.length), 'none'],
             ] as const).map(([label, value, transform]) => (

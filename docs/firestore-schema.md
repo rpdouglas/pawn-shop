@@ -39,6 +39,20 @@
 | `createdAt` | timestamp | Server timestamp |
 | `updatedAt` | timestamp | Server timestamp |
 | `publishedBy` | string | UID of staff who published |
+| `quantity` | number | Stock count integer. 0 = out of stock. Staff-set. Customer-readable (safe — it is stock level, not cost). |
+| `posId` | string | Brother POS external identifier. Null until synced. |
+| `posSyncStatus` | string | `'not_synced'` \| `'synced'` \| `'pending'` \| `'error'` |
+| `posLastSyncAt` | timestamp | Last successful POS sync. Null until first sync. |
+
+---
+
+## `items/{id}/internal/staff` — staff-only subcollection (E42)
+
+> Stores financial fields that must never be readable by customers. Firestore rules match `/internal/{doc}` — the wildcard covers both `ai` and `staff` documents.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `cost` | number | Purchase cost in CAD cents. Staff-only. Never exposed to customers via any public query. |
 
 ---
 
@@ -199,7 +213,7 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` `ebay_push` `ebay_sync_sold` `pawn_request_submit` `serial_blacklist_hit` `reservation_created` `reservation_confirmed` `reservation_declined` `reservation_completed` `store_hours_updated` `serial_blacklist_add` `serial_blacklist_remove` `data_purged` `staff_pick_set` `staff_pick_removed` `campaign_activated` `campaign_deactivated` `preorder_created` `preorder_confirmed` `preorder_ready` `preorder_collected` `preorder_cancelled` `dispute_created` `dispute_resolved` `item_restocked` `seasonal_reminder_sent` `pickup_reminder_sent` `weekly_digest_sent` |
+| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` `ebay_push` `ebay_sync_sold` `pawn_request_submit` `serial_blacklist_hit` `reservation_created` `reservation_confirmed` `reservation_declined` `reservation_completed` `store_hours_updated` `serial_blacklist_add` `serial_blacklist_remove` `data_purged` `staff_pick_set` `staff_pick_removed` `campaign_activated` `campaign_deactivated` `preorder_created` `preorder_confirmed` `preorder_ready` `preorder_collected` `preorder_cancelled` `dispute_created` `dispute_resolved` `item_restocked` `seasonal_reminder_sent` `pickup_reminder_sent` `weekly_digest_sent` `inventory_quantity_adjusted` |
 | `uid` | string | Actor UID |
 | `targetId` | string | Optional — item/user being acted on |
 | `details` | map | Context. **Never include PII** |

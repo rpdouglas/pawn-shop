@@ -1,4 +1,5 @@
 export type ViewType = 'pawn' | 'cannabis' | 'fireworks' | 'tobacco'
+export type PosSyncStatus = 'not_synced' | 'synced' | 'pending' | 'error'
 export type ReservationStatus = 'pending' | 'confirmed' | 'declined' | 'completed'
 export type PawnRequestStatus = 'pending' | 'reviewed' | 'quoted' | 'declined' | 'completed'
 export type ConditionGrade = 'new' | 'like-new' | 'good' | 'fair' | 'poor'
@@ -136,6 +137,22 @@ export interface Item {
   createdAt?: Date
   updatedAt?: Date
   publishedBy?: string
+  quantity?: number        // Stock count. 0 = out of stock. Staff-set. Customer-visible.
+  posId?: string           // Brother POS external identifier
+  posSyncStatus?: PosSyncStatus
+  posLastSyncAt?: Date
+}
+
+// items/{id}/internal/staff — staff-only subcollection document
+export interface StaffInternalDoc {
+  cost?: number  // Purchase cost in CAD cents
+}
+
+// Payload for adjustInventory callable CF
+export interface AdjustInventoryPayload {
+  itemId: string
+  delta: number      // Signed integer: positive = add stock, negative = remove
+  reason?: string
 }
 
 export interface ShopInfo {

@@ -748,5 +748,25 @@
 
 ---
 
+### E42 · Inventory Cost, Quantity & POS Integration
+
+> **Persona Gate — E42:**
+> - **Staff (Primary):** Cost and quantity fields must be settable during item creation (mobile and desktop intake) and quantity must be adjustable from the inventory view without a desktop.
+> - **Makoonsii:** All quantity adjustment controls ≥48px touch targets. Plain language copy ("Stock Level", not "SKU Quantity").
+> - **Dale:** Customer-facing pages must never expose the `cost` field. Subcollection isolation verified before close.
+
+- [x] **Schema first:** Update `docs/firestore-schema.md` — add `quantity`, `posId`, `posSyncStatus`, `posLastSyncAt` to `items/{id}`; add `items/{id}/internal/staff` subcollection with `cost`. Log all in `DECISIONS.md`. `[Staff]` `[Comp]`
+- [x] Update `firestore.rules` — existing `match /internal/{doc}` wildcard already covers `internal/staff`; no new rule required. `[Staff]` `[Comp]`
+- [x] Update `src/lib/types.ts` — extend `Item`; add `StaffInternalDoc`, `PosSyncStatus`, `AdjustInventoryPayload` `[Staff]`
+- [x] Create `adjustInventory` callable CF — validates staff role, applies signed quantity delta, writes `inventory_quantity_adjusted` audit log `[Staff]` `[Comp]`
+- [x] Create `receivePosWebhook` HTTP CF stub — HMAC-verified Brother POS webhook receiver (stub: parse + log; no live processing until credentials available) `[Staff]`
+- [x] Create `src/components/admin/QuantityAdjustControl.tsx` — `−`/`+` controls (≥48px), calls `adjustInventory` CF `[Staff]` `[Mak]`
+- [x] Update `MobileIntakePage.tsx` — add Cost and Quantity fields to Step 2 `[Staff]` `[Marc]`
+- [x] Update `IntakeForm.tsx` (desktop) — add Cost and Quantity fields to pricing section `[Staff]`
+- [x] Update `InventoryPage.tsx` — render `QuantityAdjustControl` on cards (mobile) and table rows (desktop); show "Out of Stock" badge when `quantity === 0` `[Staff]` `[Dale]`
+- [x] Export new CFs from `functions/src/index.ts` `[Staff]`
+
+---
+
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*

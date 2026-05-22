@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { doc, onSnapshot, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, onSnapshot, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { db, functions } from '../../lib/firebase'
 import type { ConditionGrade, MerchandisingTag, ViewType } from '../../lib/types'
@@ -36,6 +36,8 @@ interface FormState {
   provenanceNotes: string
   isSeasonalItem: boolean
   merchandisingTags: MerchandisingTag[]
+  costInput: string      // Purchase cost — optional, staff-only, writes to internal/staff subcollection
+  quantityInput: string  // Initial stock count — defaults to 1
 }
 
 interface FormErrors {
@@ -61,6 +63,13 @@ const EMPTY_FORM: FormState = {
   provenanceNotes: '',
   isSeasonalItem: false,
   merchandisingTags: [],
+  costInput: '',
+  quantityInput: '1',
+}
+
+function parseQuantity(input: string): number {
+  const q = parseInt(input.trim(), 10)
+  return isNaN(q) || q < 1 ? 1 : q
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -122,6 +131,7 @@ export default function IntakeForm() {
       viewTag:           formState.viewTag,
       isSeasonalItem:    formState.isSeasonalItem,
       merchandisingTags: formState.merchandisingTags,
+      quantity:          parseQuantity(formState.quantityInput),
       updatedAt:         serverTimestamp(),
     }
     if (formState.condition)       payload.condition       = formState.condition
@@ -129,6 +139,13 @@ export default function IntakeForm() {
     if (formState.provenanceNotes) payload.provenanceNotes = formState.provenanceNotes.trim()
     if (!isNaN(cents) && cents > 0) payload.price          = cents
     return payload
+  }
+
+  const writeCostIfProvided = async (itemId: string) => {
+    const costCents = parsePriceCents(formState.costInput)
+    if (formState.costInput.trim() && !isNaN(costCents) && costCents > 0) {
+      await setDoc(doc(db, 'items', itemId, 'internal', 'staff'), { cost: costCents }, { merge: true })
+    }
   }
 
   const saveDraft = async () => {
@@ -151,6 +168,7 @@ export default function IntakeForm() {
         setPhase('editing')
       }
       await updateDoc(doc(db, 'items', id), buildUpdatePayload())
+      await writeCostIfProvided(id)
     } catch (err) {
       setPublishError(err instanceof Error ? err.message : 'Save failed. Please try again.')
     } finally {
@@ -168,6 +186,7 @@ export default function IntakeForm() {
 
     try {
       await updateDoc(doc(db, 'items', itemId), buildUpdatePayload())
+      await writeCostIfProvided(itemId)
       await publishItemFn({ itemId })
       setPhase('published')
     } catch (err) {
@@ -292,7 +311,7 @@ export default function IntakeForm() {
 
         <div className="intake-row intake-row-2">
           <div className="input-wrapper">
-            <label className="input-label" htmlFor="price">Price (CAD $)</label>
+            <label className="input-label" htmlFor="price">Sale Price (CAD $)</label>
             <input
               id="price"
               type="text"
@@ -316,6 +335,34 @@ export default function IntakeForm() {
             onChange={set('serialNumber')}
             placeholder="e.g. SN123456"
           />
+        </div>
+
+        <div className="intake-row intake-row-2">
+          <div className="input-wrapper">
+            <label className="input-label" htmlFor="costInput">Cost Price (CAD $, optional)</label>
+            <input
+              id="costInput"
+              type="text"
+              inputMode="decimal"
+              className="input-field"
+              value={formState.costInput}
+              onChange={(e) => set('costInput')(e.target.value)}
+              placeholder="e.g. 25.00"
+            />
+          </div>
+
+          <div className="input-wrapper">
+            <label className="input-label" htmlFor="quantityInput">Initial Stock</label>
+            <input
+              id="quantityInput"
+              type="text"
+              inputMode="numeric"
+              className="input-field"
+              value={formState.quantityInput}
+              onChange={(e) => set('quantityInput')(e.target.value)}
+              placeholder="1"
+            />
+          </div>
         </div>
       </section>
 

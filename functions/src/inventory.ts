@@ -352,6 +352,61 @@ export const setPoliceHold = onCall<SetPoliceHoldData>({ cors: true }, async (re
   return { success: true }
 })
 
+// ── adjustInventory ───────────────────────────────────────────────────────────
+// Applies a signed quantity delta to items/{id}.quantity. Validates that the
+// resulting quantity cannot go negative. Writes an inventory_quantity_adjusted
+// audit log entry for every successful adjustment.
+
+interface AdjustInventoryData {
+  itemId: string
+  delta: number      // Signed integer — positive adds stock, negative removes
+  reason?: string
+}
+
+export const adjustInventory = onCall<AdjustInventoryData>({ cors: true }, async (request) => {
+  if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
+    throw new HttpsError('permission-denied', 'Staff role required')
+  }
+
+  const { itemId, delta, reason } = request.data
+  if (!itemId) throw new HttpsError('invalid-argument', 'itemId is required')
+  if (typeof delta !== 'number' || !Number.isInteger(delta) || delta === 0) {
+    throw new HttpsError('invalid-argument', 'delta must be a non-zero integer')
+  }
+
+  const db = getFirestore()
+  const itemRef = db.collection('items').doc(itemId)
+  const snap = await itemRef.get()
+
+  if (!snap.exists) throw new HttpsError('not-found', `Item ${itemId} not found`)
+
+  const item = snap.data() as Record<string, unknown>
+  const currentQuantity = typeof item['quantity'] === 'number' ? item['quantity'] : 0
+  const newQuantity = currentQuantity + delta
+
+  if (newQuantity < 0) {
+    throw new HttpsError(
+      'failed-precondition',
+      `Cannot reduce quantity below 0 (current: ${currentQuantity}, delta: ${delta})`
+    )
+  }
+
+  await itemRef.update({
+    quantity: newQuantity,
+    updatedAt: FieldValue.serverTimestamp(),
+  })
+
+  await db.collection('auditLogs').add({
+    eventType: 'inventory_quantity_adjusted',
+    uid: request.auth.uid,
+    targetId: itemId,
+    details: { delta, newQuantity, reason: reason ?? null },
+    createdAt: FieldValue.serverTimestamp(),
+  })
+
+  return { success: true, newQuantity }
+})
+
 // ── resetExpiredHolds ─────────────────────────────────────────────────────────
 // Scheduled every 30 minutes. Resets any reserved items whose holdExpiresAt has passed.
 

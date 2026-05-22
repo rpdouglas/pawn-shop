@@ -10,7 +10,7 @@ import {
   type Timestamp,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import type { Item, ViewType, ConditionGrade, ItemStatus, MerchandisingTag } from '../lib/types'
+import type { Item, ViewType, ConditionGrade, ItemStatus, MerchandisingTag, PosSyncStatus } from '../lib/types'
 
 export function docToItem(doc: DocumentSnapshot): Item {
   const d = doc.data() ?? {}
@@ -44,6 +44,10 @@ export function docToItem(doc: DocumentSnapshot): Item {
     createdAt: (d['createdAt'] as Timestamp | undefined)?.toDate(),
     updatedAt: (d['updatedAt'] as Timestamp | undefined)?.toDate(),
     publishedBy: d['publishedBy'] as string | undefined,
+    quantity: d['quantity'] as number | undefined,
+    posId: d['posId'] as string | undefined,
+    posSyncStatus: d['posSyncStatus'] as PosSyncStatus | undefined,
+    posLastSyncAt: (d['posLastSyncAt'] as Timestamp | undefined)?.toDate(),
   }
 }
 

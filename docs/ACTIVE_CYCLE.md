@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 29
+**Cycle:** 31
 **Started:** 2026-05-22
 **Target close:** TBD
 **Deploy target:** dev
@@ -57,6 +57,25 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 30** (2026-05-22) — Closed E42 · Inventory Cost, Quantity & POS Integration.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `docs/firestore-schema.md` — added `quantity`, `posId`, `posSyncStatus`, `posLastSyncAt`, `internal/staff.cost`, `inventory_quantity_adjusted` auditLog eventType | E42 | 2026-05-22 |
+| `docs/DECISIONS.md` — 4 new E42 entries: cost subcollection, quantity on parent, adjustInventory CF, receivePosWebhook stub | E42 | 2026-05-22 |
+| `src/lib/types.ts` — added `PosSyncStatus`, `StaffInternalDoc`, `AdjustInventoryPayload`; extended `Item` with 4 new fields | E42 | 2026-05-22 |
+| `src/hooks/useItems.ts` — `docToItem` maps `quantity`, `posId`, `posSyncStatus`, `posLastSyncAt` | E42 | 2026-05-22 |
+| `functions/src/inventory.ts` — `adjustInventory` callable CF: staff auth, signed delta, `newQuantity >= 0` guard, audit log | E42 | 2026-05-22 |
+| `functions/src/pos.ts` — `receivePosWebhook` HTTP CF: HMAC-SHA256 verification, stub processing, `posSyncStatus: 'pending'` write | E42 | 2026-05-22 |
+| `functions/src/index.ts` — exported `receivePosWebhook` | E42 | 2026-05-22 |
+| `src/components/admin/QuantityAdjustControl.tsx` — `−`/`+` buttons (48px), in-flight delta pattern, `aria-live` | E42 | 2026-05-22 |
+| `src/components/admin/IntakeForm.tsx` — Cost + Initial Stock fields; `writeCostIfProvided` to `internal/staff` | E42 | 2026-05-22 |
+| `src/pages/admin/MobileIntakePage.tsx` — Cost + Initial Stock in Step 2; review summary shows cost/quantity | E42 | 2026-05-22 |
+| `src/pages/admin/InventoryPage.tsx` — `QuantityAdjustControl` in mobile cards and desktop Stock column | E42 | 2026-05-22 |
+| **E42 CLOSED** | E42 | 2026-05-22 |
+
+---
 
 **Cycle 29** (2026-05-22) — Closed E41 · Mobile Staff Inventory.
 
@@ -205,4 +224,4 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-22 (Cycle 29 open)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-22 (Cycle 31 open — E21)*
