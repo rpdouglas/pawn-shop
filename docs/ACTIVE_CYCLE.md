@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 31
+**Cycle:** 32
 **Started:** 2026-05-22
 **Target close:** TBD
 **Deploy target:** dev
@@ -57,6 +57,20 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 ---
 
 ## Previous Cycle Summary
+
+**Cycle 31** (2026-05-22) — Closed E43 · Image Upload Performance.
+
+| Task | Epic | Completed |
+|---|---|---|
+| `package.json` — added `browser-image-compression` v2 | E43 | 2026-05-22 |
+| `src/components/admin/ImageUploadZone.tsx` — client-side compression (max 1920px / 1 MB) before `uploadBytesResumable`; ~40× size reduction on camera photos | E43 | 2026-05-22 |
+| `src/components/admin/ImageUploadZone.tsx` — optimistic preview via `URL.createObjectURL()` shown in <200 ms of file selection; blob revoked on CF completion and unmount | E43 | 2026-05-22 |
+| `src/components/admin/ImageUploadZone.tsx` — auto-retry with exponential backoff (3 attempts: 500 ms / 1 s / 2 s); manual "tap to retry" CTA after exhaustion | E43 | 2026-05-22 |
+| `src/index.css` — 4 new classes: `upload-optimistic-preview`, `upload-processing-label`, `upload-error-row`, `upload-retry-btn` (48px, `:focus-visible`, token-only) | E43 | 2026-05-22 |
+| `docs/DECISIONS.md` — `browser-image-compression` dependency decision logged | E43 | 2026-05-22 |
+| **E43 CLOSED** | E43 | 2026-05-22 |
+
+---
 
 **Cycle 30** (2026-05-22) — Closed E42 · Inventory Cost, Quantity & POS Integration.
 

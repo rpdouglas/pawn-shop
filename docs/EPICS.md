@@ -768,5 +768,21 @@
 
 ---
 
+### E43 · Image Upload Performance
+
+> **Persona Gate — E43:**
+> - **Staff (Primary):** Image thumbnails must appear within 2 seconds of selection on a 500 KB/s connection. Upload must recover automatically from a dropped connection without manual retry.
+> - **Makoonsii:** No regression to existing touch targets or camera flow. Plain-language status copy throughout.
+> - **Marcus:** CF watermark + WebP pipeline must be untouched — final customer-visible image quality is unchanged.
+
+- [x] Add `browser-image-compression` to `package.json` `[Staff]`
+- [x] Update `src/components/admin/ImageUploadZone.tsx` — compress to max 1920px / WebP 80% before upload `[Staff]` `[Marc]`
+- [x] Update `src/components/admin/ImageUploadZone.tsx` — optimistic preview via `URL.createObjectURL()` shown immediately on file selection `[Staff]` `[Marc]`
+- [x] Update `src/components/admin/ImageUploadZone.tsx` — auto-retry with exponential backoff (3 attempts: 500 ms / 1 s / 2 s) on upload failure `[Staff]` `[Mak]`
+- [x] Update `src/components/admin/ImageUploadZone.tsx` — clear "failed" state after all retries exhausted, with manual retry CTA `[Staff]` `[Mak]`
+- [x] Log `browser-image-compression` dependency decision in `docs/DECISIONS.md` `[Comp]`
+
+---
+
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*

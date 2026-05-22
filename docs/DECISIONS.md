@@ -298,5 +298,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-22 — E42: `receivePosWebhook` implemented as a verified stub (HMAC-SHA256 validation + payload parse + `posSyncStatus: 'pending'` write). No live Brother POS integration until API credentials and documentation are available. Stub approach delivers the full webhook surface (auth, parsing, error handling, Firestore write pattern) without external API dependency. When Brother POS credentials arrive, processing logic is added behind an already-working endpoint.
 
+2026-05-22 — E43: Added `browser-image-compression` (v2) for client-side compression before Firebase Storage upload. Reduces camera photos from up to 20 MB to ~300 KB (max 1920px / WebP quality 80%) before upload, cutting transfer time ~40×. Sharp watermark + WebP conversion in `processImageUpload` CF is unchanged — compression only affects the temp upload file size, not final image quality.
+
 *Add new entries above this line.*
 

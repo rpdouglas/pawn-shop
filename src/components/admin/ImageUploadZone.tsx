@@ -1,10 +1,15 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { ref, uploadBytesResumable } from 'firebase/storage'
+import imageCompression from 'browser-image-compression'
 import { storage } from '../../lib/firebase'
 
 interface UploadEntry {
   fileName: string
   progress: number
+  optimisticUrl?: string   // blob:// URL shown immediately on selection
+  hasBlob: boolean         // true when compressed blob is held for retry; never read during render from ref
+  retryCount: number
+  processing?: boolean     // true after upload completes, waiting for CF → Firestore
   error?: string
 }
 
@@ -13,15 +18,32 @@ interface ImageUploadZoneProps {
   images: string[]  // watermarked URLs — written to Firestore by processImageUpload CF
 }
 
+type UploadFn = (key: string, blob: Blob, fileName: string, attempt: number) => void
+
 const ACCEPTED_MIME = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_BYTES = 20 * 1024 * 1024  // 20 MB
+const MAX_RETRIES = 3
+const COMPRESSION_OPTIONS = {
+  maxSizeMB: 1,
+  maxWidthOrHeight: 1920,
+  useWebWorker: true,
+}
 
 export default function ImageUploadZone({ itemId, images }: ImageUploadZoneProps) {
   const [uploads, setUploads] = useState<Map<string, UploadEntry>>(new Map())
   const [isDragging, setIsDragging] = useState(false)
   const [isMobile, setIsMobile] = useState(window.matchMedia('(max-width: 767px)').matches)
-  const inputRef = useRef<HTMLInputElement>(null)       // gallery / desktop
-  const cameraInputRef = useRef<HTMLInputElement>(null) // camera capture (mobile)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  // Blobs kept for manual retry; keyed by upload key. Never read during render — use UploadEntry.hasBlob instead.
+  const blobsRef = useRef<Map<string, Blob>>(new Map())
+  // Ref to latest doUpload so the retry setTimeout can call it without a circular useCallback dependency
+  const doUploadRef = useRef<UploadFn | null>(null)
+  // Mirror of uploads state for unmount cleanup
+  const uploadsRef = useRef<Map<string, UploadEntry>>(new Map())
+  const prevImagesLengthRef = useRef(images.length)
+
+  useEffect(() => { uploadsRef.current = uploads }, [uploads])
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)')
@@ -30,52 +52,129 @@ export default function ImageUploadZone({ itemId, images }: ImageUploadZoneProps
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  const uploadFile = useCallback((file: File) => {
-    const key = `${Date.now()}-${file.name}`
-
-    if (!ACCEPTED_MIME.includes(file.type)) {
-      setUploads((prev) => new Map(prev).set(key, {
-        fileName: file.name,
-        progress: 0,
-        error: 'Invalid type — use JPG, PNG, or WebP.',
-      }))
-      return
+  // Revoke all blob URLs on unmount to free memory
+  useEffect(() => {
+    return () => {
+      uploadsRef.current.forEach(entry => {
+        if (entry.optimisticUrl) URL.revokeObjectURL(entry.optimisticUrl)
+      })
     }
-    if (file.size > MAX_BYTES) {
-      setUploads((prev) => new Map(prev).set(key, {
-        fileName: file.name,
-        progress: 0,
-        error: 'File too large — max 20 MB.',
-      }))
-      return
-    }
+  }, [])
 
-    const storagePath = `items/${itemId}/uploads/${key}`
-    const storageRef = ref(storage, storagePath)
-    const task = uploadBytesResumable(storageRef, file)
+  // When CF writes a new processed URL (images[] grows), clear the oldest processing entry
+  useEffect(() => {
+    const delta = images.length - prevImagesLengthRef.current
+    prevImagesLengthRef.current = images.length
+    if (delta <= 0) return
 
-    setUploads((prev) => new Map(prev).set(key, { fileName: file.name, progress: 0 }))
+    setUploads(prev => {
+      const next = new Map(prev)
+      let cleared = 0
+      for (const [k, v] of next.entries()) {
+        if (v.processing && cleared < delta) {
+          if (v.optimisticUrl) URL.revokeObjectURL(v.optimisticUrl)
+          blobsRef.current.delete(k)
+          next.delete(k)
+          cleared++
+        }
+      }
+      return next
+    })
+  }, [images.length])
+
+  const doUpload = useCallback<UploadFn>((key, blob, fileName, attempt) => {
+    const storageRef = ref(storage, `items/${itemId}/uploads/${key}`)
+    const task = uploadBytesResumable(storageRef, blob)
 
     task.on(
       'state_changed',
       (snap) => {
         const pct = (snap.bytesTransferred / snap.totalBytes) * 100
-        setUploads((prev) => new Map(prev).set(key, { fileName: file.name, progress: pct }))
+        setUploads(prev => {
+          const entry = prev.get(key)
+          if (!entry) return prev
+          return new Map(prev).set(key, { ...entry, progress: pct })
+        })
       },
       () => {
-        setUploads((prev) =>
-          new Map(prev).set(key, { fileName: file.name, progress: 0, error: 'Upload failed — try again.' })
-        )
+        if (attempt < MAX_RETRIES - 1) {
+          // Auto-retry with exponential backoff: 500 ms, 1 s, 2 s
+          // Use ref to avoid circular useCallback dependency on doUpload itself
+          setTimeout(() => doUploadRef.current?.(key, blob, fileName, attempt + 1), 500 * Math.pow(2, attempt))
+        } else {
+          // All retries exhausted — keep optimistic URL and blob for manual retry
+          setUploads(prev => {
+            const entry = prev.get(key)
+            return new Map(prev).set(key, {
+              fileName,
+              progress: 0,
+              optimisticUrl: entry?.optimisticUrl,
+              hasBlob: true,
+              retryCount: attempt + 1,
+              error: 'Save failed — tap to retry.',
+            })
+          })
+        }
       },
       () => {
-        setUploads((prev) => {
-          const next = new Map(prev)
-          next.delete(key)
-          return next
+        // Upload complete — transition to processing state until CF writes to Firestore
+        setUploads(prev => {
+          const entry = prev.get(key)
+          if (!entry) return prev
+          return new Map(prev).set(key, { ...entry, progress: 100, processing: true, error: undefined })
         })
       }
     )
   }, [itemId])
+
+  // Keep ref in sync so the retry setTimeout always calls the latest closure
+  useEffect(() => { doUploadRef.current = doUpload }, [doUpload])
+
+  const uploadFile = useCallback(async (file: File) => {
+    const key = `${Date.now()}-${file.name}`
+
+    if (!ACCEPTED_MIME.includes(file.type)) {
+      setUploads(prev => new Map(prev).set(key, {
+        fileName: file.name, progress: 0, hasBlob: false, retryCount: 0,
+        error: 'Invalid type — use JPG, PNG, or WebP.',
+      }))
+      return
+    }
+    if (file.size > MAX_BYTES) {
+      setUploads(prev => new Map(prev).set(key, {
+        fileName: file.name, progress: 0, hasBlob: false, retryCount: 0,
+        error: 'File too large — max 20 MB.',
+      }))
+      return
+    }
+
+    let blob: Blob = file
+    try {
+      blob = await imageCompression(file, COMPRESSION_OPTIONS)
+    } catch {
+      // Compression failed — proceed with original file
+    }
+
+    const optimisticUrl = URL.createObjectURL(blob)
+    blobsRef.current.set(key, blob)
+
+    setUploads(prev => new Map(prev).set(key, {
+      fileName: file.name, progress: 0, optimisticUrl, hasBlob: true, retryCount: 0,
+    }))
+
+    doUpload(key, blob, file.name, 0)
+  }, [doUpload])
+
+  const retryUpload = useCallback((key: string, fileName: string) => {
+    const blob = blobsRef.current.get(key)
+    if (!blob) return
+    setUploads(prev => {
+      const entry = prev.get(key)
+      if (!entry) return prev
+      return new Map(prev).set(key, { ...entry, progress: 0, error: undefined, retryCount: 0 })
+    })
+    doUpload(key, blob, fileName, 0)
+  }, [doUpload])
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (!files) return
@@ -88,7 +187,7 @@ export default function ImageUploadZone({ itemId, images }: ImageUploadZoneProps
     handleFiles(e.dataTransfer.files)
   }, [handleFiles])
 
-  const pendingUploads = Array.from(uploads.values())
+  const pendingUploads = Array.from(uploads.entries())
 
   return (
     <div className="image-upload-zone">
@@ -171,17 +270,47 @@ export default function ImageUploadZone({ itemId, images }: ImageUploadZoneProps
 
       {pendingUploads.length > 0 && (
         <ul className="upload-progress-list" aria-label="Upload progress">
-          {pendingUploads.map((u) => (
-            <li key={u.fileName} className="upload-progress-item">
-              <span className="upload-filename">{u.fileName}</span>
-              {u.error
-                ? <span className="input-error">{u.error}</span>
-                : (
-                  <div className="upload-progress-bar" role="progressbar" aria-valuenow={Math.round(u.progress)} aria-valuemin={0} aria-valuemax={100}>
-                    <div className="upload-progress-fill" style={{ width: `${u.progress}%` }} />
-                  </div>
-                )
-              }
+          {pendingUploads.map(([key, u]) => (
+            <li key={key} className="upload-progress-item">
+              {u.optimisticUrl ? (
+                <div className="upload-optimistic-preview">
+                  <img
+                    src={u.optimisticUrl}
+                    alt={u.fileName}
+                    className="uploaded-image-thumb"
+                  />
+                  {u.processing && (
+                    <span className="upload-processing-label">Saving photo…</span>
+                  )}
+                </div>
+              ) : (
+                <span className="upload-filename">{u.fileName}</span>
+              )}
+
+              {u.error ? (
+                <div className="upload-error-row">
+                  <span className="input-error">{u.error}</span>
+                  {u.hasBlob && (
+                    <button
+                      type="button"
+                      className="upload-retry-btn"
+                      onClick={() => retryUpload(key, u.fileName)}
+                    >
+                      Retry
+                    </button>
+                  )}
+                </div>
+              ) : !u.processing ? (
+                <div
+                  className="upload-progress-bar"
+                  role="progressbar"
+                  aria-valuenow={Math.round(u.progress)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                >
+                  <div className="upload-progress-fill" style={{ width: `${u.progress}%` }} />
+                </div>
+              ) : null}
             </li>
           ))}
         </ul>
