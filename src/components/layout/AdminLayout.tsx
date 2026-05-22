@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { AdminShellProvider } from '../../context/AdminShellContext';
 import AdminTopbar from './AdminTopbar';
 import AdminSidebar from './AdminSidebar';
+import AdminMobileNav from './AdminMobileNav';
 
 export default function AdminLayout() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
@@ -15,7 +16,14 @@ export default function AdminLayout() {
   }, []);
 
   if (!isDesktop) {
-    return <Outlet />;
+    return (
+      <>
+        <div style={{ paddingBottom: 'var(--space-16)' }}>
+          <Outlet />
+        </div>
+        <AdminMobileNav />
+      </>
+    );
   }
 
   return (

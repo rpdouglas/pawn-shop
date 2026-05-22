@@ -43,6 +43,7 @@ for (const route of publicRoutes) {
 // Covers:  E06 (EbayPushButton in admin intake)
 //          E10 (admin dashboard + PoliceHoldManager)
 //          E14 (PreorderInboxPage, CampaignAdminPage)
+//          E41 (mobile inventory view + mobile-intake wizard)
 
 const hasAuth = !!(process.env['PLAYWRIGHT_AUTH_EMAIL'] && process.env['PLAYWRIGHT_AUTH_PASSWORD'])
 
@@ -61,10 +62,11 @@ test.describe('admin routes', () => {
   })
 
   const adminRoutes = [
-    { path: '/admin/dashboard',  label: 'Admin dashboard — E10' },
-    { path: '/admin/inventory',  label: 'Admin inventory + PoliceHoldManager — E10' },
-    { path: '/admin/preorders',  label: 'Admin preorders (PreorderInboxPage) — E14' },
-    { path: '/admin/campaigns',  label: 'Admin campaigns (CampaignAdminPage) — E14' },
+    { path: '/admin/dashboard',      label: 'Admin dashboard — E10' },
+    { path: '/admin/inventory',      label: 'Admin inventory + PoliceHoldManager — E10, E41' },
+    { path: '/admin/mobile-intake',  label: 'Mobile camera intake wizard — E41' },
+    { path: '/admin/preorders',      label: 'Admin preorders (PreorderInboxPage) — E14' },
+    { path: '/admin/campaigns',      label: 'Admin campaigns (CampaignAdminPage) — E14' },
   ]
 
   for (const route of adminRoutes) {

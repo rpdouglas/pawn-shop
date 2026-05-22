@@ -731,5 +731,22 @@
 
 ---
 
+### E41 · Mobile Staff Inventory
+
+> **Persona Gate — E41:**
+> - **Staff (Primary):** Shop floor staff must be able to view all inventory as mobile cards and add a new item — including taking a photo — from a 375px viewport in under 3 taps.
+> - **Makoonsii:** All touch targets ≥48px. Plain language throughout.
+> - **Marcus:** Camera-first intake reinforces the photography standard — photo is Step 1.
+
+- [x] Add `AdminMobileNav.tsx` — bottom tab bar for admin routes on mobile (`< 1024px`) `[Staff]`
+- [x] Update `AdminLayout.tsx` to render `AdminMobileNav` on mobile `[Staff]`
+- [x] Refactor `InventoryPage.tsx` — card layout on mobile, table preserved on desktop `[Staff]` `[Mak]`
+- [x] Add client-side search + status filter chips to mobile inventory view `[Staff]` `[Dale]`
+- [x] Update `ImageUploadZone.tsx` — add `capture="environment"` for native camera on mobile `[Staff]` `[Marc]`
+- [x] Create `MobileIntakePage.tsx` — 3-step camera-first intake flow (`/admin/mobile-intake`) `[Staff]` `[Marc]` `[Mak]`
+- [x] Register `/admin/mobile-intake` route in `main.tsx` `[Staff]`
+
+---
+
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*
