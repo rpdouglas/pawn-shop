@@ -50,6 +50,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E47 CLOSED** | E09 | 2026-06-02 |
 | `E48 Mobile Intake Processing Resilience` — 30s timeout & CF Retry Logic | E48 | 2026-06-02 |
 | **E48 CLOSED** | E48 | 2026-06-02 |
+| `E24 QA Token Fixes` — Removed hardcoded px & fixed WCAG contrast | E24 | 2026-06-02 |
+| **E24 CLOSED** | E24 | 2026-06-02 |
 
 ---
 

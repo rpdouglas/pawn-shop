@@ -56,7 +56,7 @@ export default function NavigationDrawer() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          gap: '6px',
+          gap: 'var(--space-2)',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
@@ -66,9 +66,9 @@ export default function NavigationDrawer() {
         aria-label="Toggle navigation menu"
         aria-expanded={isOpen}
       >
-        <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(45deg) translate(6px, 6px)' : 'none' }} />
+        <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(45deg) translate(var(--space-1), var(--space-1))' : 'none' }} />
         <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', opacity: isOpen ? 0 : 1 }} />
-        <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(-45deg) translate(5px, -6px)' : 'none' }} />
+        <span style={{ width: 'var(--space-6)', height: '2px', backgroundColor: 'currentColor', transition: 'var(--motion-speed-base)', transform: isOpen ? 'rotate(-45deg) translate(var(--space-1), calc(var(--space-1) * -1))' : 'none' }} />
       </button>
 
       <span style={{
@@ -98,7 +98,7 @@ export default function NavigationDrawer() {
             position: 'absolute',
             top: 0,
             left: 0,
-            width: 'min(300px, 80%)',
+            width: 'min(18rem, 80%)',
             height: '100%',
             backgroundColor: 'var(--color-bg)',
             boxShadow: 'var(--shadow-xl)',
@@ -138,10 +138,11 @@ export default function NavigationDrawer() {
                   {link.comingSoon && (
                     <span style={{
                       marginLeft: 'auto',
-                      fontSize: '10px',
-                      backgroundColor: 'var(--color-border)',
-                      padding: '2px 6px',
-                      borderRadius: '10px',
+                      fontSize: 'var(--text-xs)',
+                      color: 'var(--color-bg)',
+                      backgroundColor: 'var(--color-text)',
+                      padding: 'var(--space-1) var(--space-2)',
+                      borderRadius: 'var(--radius-full)',
                       textTransform: 'uppercase'
                     }}>
                       Soon

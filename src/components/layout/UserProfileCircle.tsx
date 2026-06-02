@@ -59,16 +59,16 @@ export default function UserProfileCircle() {
           top: 'calc(100% + var(--space-2))',
           right: 0,
           backgroundColor: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
+          border: 'var(--border-thin, 1px) solid var(--color-border)',
           borderRadius: 'var(--radius-md)',
           boxShadow: 'var(--shadow-lg)',
-          minWidth: '200px',
+          minWidth: '16rem',
           zIndex: 100,
           overflow: 'hidden'
         }}>
           {user ? (
             <>
-              <div style={{ padding: 'var(--space-4)', borderBottom: '1px solid var(--color-border)' }}>
+              <div style={{ padding: 'var(--space-4)', borderBottom: 'var(--border-thin, 1px) solid var(--color-border)' }}>
                 <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Signed in as</p>
                 <p style={{ margin: 0, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
               </div>
