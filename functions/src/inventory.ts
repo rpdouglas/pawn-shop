@@ -440,3 +440,52 @@ export const resetExpiredHolds = onSchedule('every 30 minutes', async () => {
     })
   )
 })
+
+// ── retryImageProcessing ──────────────────────────────────────────────────────
+// Callable CF. Called by MobileIntakePage if the onObjectFinalized trigger fails
+// or times out. Manually kicks off the image processing pipeline.
+
+export const retryImageProcessing = onCall<{ filePath: string }>({ cors: true }, async (request) => {
+  if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
+    throw new HttpsError('permission-denied', 'Staff role required')
+  }
+
+  const { filePath } = request.data
+  if (!filePath) throw new HttpsError('invalid-argument', 'filePath is required')
+
+  const match = filePath.match(/^items\/([^/]+)\/uploads\/([^/]+)$/)
+  if (!match) throw new HttpsError('invalid-argument', 'Invalid filePath format')
+
+  const [, itemId, filename] = match
+  const bucket = getStorage().bucket()
+  const tempFile = bucket.file(filePath)
+
+  const [exists] = await tempFile.exists()
+  if (!exists) throw new HttpsError('not-found', 'Temporary image file not found')
+
+  const [buffer] = await tempFile.download()
+
+  const watermarked = await sharp(buffer)
+    .composite([{ input: WATERMARK_SVG, gravity: "southeast" }])
+    .webp({ quality: 85 })
+    .toBuffer()
+
+  const finalPath = `items/${itemId}/images/${path.parse(filename).name}.webp`
+  const finalFile = bucket.file(finalPath)
+  
+  await finalFile.save(watermarked, {
+    contentType: "image/webp",
+    public: true,
+  })
+
+  const finalUrl = finalFile.publicUrl()
+
+  await getFirestore().collection("items").doc(itemId).update({
+    images: FieldValue.arrayUnion(finalUrl),
+    updatedAt: FieldValue.serverTimestamp(),
+  })
+
+  await tempFile.delete()
+
+  return { success: true, url: finalUrl }
+})

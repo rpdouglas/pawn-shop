@@ -312,5 +312,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-02 — E47: Increased `processImageUpload` Cloud Function memory limit to `1GiB` to prevent silent OOM crashes on large smartphone photo uploads (12MP-48MP). Implemented a 20-second safety timeout on the frontend UI to gracefully handle OS-level WebSocket disconnects during camera app suspension.
 
+2026-06-02 — E48: Implemented `retryImageProcessing` Callable Cloud Function and 30-second/3-retry logic in MobileIntakePage to handle sporadic image processing stalls. Chosen over client-side re-upload to drastically save mobile bandwidth since the file already exists in Storage.
+
 *Add new entries above this line.*
 

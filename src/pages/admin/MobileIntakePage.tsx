@@ -22,6 +22,12 @@ const publishItemFn = httpsCallable<
   { success: boolean }
 >(functions, 'publishItem')
 
+const retryImageProcessingFn = httpsCallable<
+  { filePath: string },
+  { success: boolean }
+>(functions, 'retryImageProcessing')
+
+
 // ── Types ───────────────────────────────────────────────────────────────────
 
 type Step = 'capture' | 'details' | 'review' | 'published'
@@ -224,18 +230,36 @@ export default function MobileIntakePage() {
         // Storage upload done — transition to "Processing…"
         setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 100, processing: true }))
         
-        // Safety timeout to prevent permanent UI lockup if WebSocket drops or CF crashes
-        setTimeout(() => {
-          setUploads(currentUploads => {
-            const entry = currentUploads.get(key)
-            if (entry && entry.processing) {
-              const updated = new Map(currentUploads)
-              updated.set(key, { ...entry, processing: false, error: 'Processing timed out. Please try again.' })
-              return updated
+        // Safety timeout with 3 retries for processImageUpload drops
+        const triggerTimeout = (attempt: number) => {
+          setTimeout(() => {
+            let isStillProcessing = false
+            setUploads(currentUploads => {
+              const entry = currentUploads.get(key)
+              if (entry && entry.processing) isStillProcessing = true
+              return currentUploads
+            })
+
+            if (isStillProcessing) {
+              if (attempt < 3) {
+                retryImageProcessingFn({ filePath: storagePath }).catch(() => {})
+                triggerTimeout(attempt + 1)
+              } else {
+                setUploads(currentUploads => {
+                  const entry = currentUploads.get(key)
+                  if (entry && entry.processing) {
+                    const updated = new Map(currentUploads)
+                    updated.set(key, { ...entry, processing: false, error: 'Processing timed out. Please try again.' })
+                    return updated
+                  }
+                  return currentUploads
+                })
+              }
             }
-            return currentUploads
-          })
-        }, 20000)
+          }, 30000)
+        }
+        
+        triggerTimeout(0)
       }
     )
   }, [])
