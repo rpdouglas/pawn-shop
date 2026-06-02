@@ -85,6 +85,7 @@ export default function BundleCollectionPage() {
             {bundles.map((item) => (
               <BundleCard
                 key={item.id}
+                itemId={item.id}
                 title={item.title}
                 price={item.price}
                 itemCount={item.bundleIds?.length ?? 1}

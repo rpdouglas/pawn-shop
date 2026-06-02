@@ -8,7 +8,8 @@ interface ViewContextValue {
   view: ViewType
 }
 
-const ViewContext = createContext<ViewContextValue>({ view: 'pawn' })
+// eslint-disable-next-line react-refresh/only-export-components
+export const ViewContext = createContext<ViewContextValue>({ view: 'pawn' })
 
 function deriveView(pathname: string): ViewType {
   if (pathname.startsWith('/cannabis')) return 'cannabis'

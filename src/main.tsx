@@ -82,6 +82,7 @@ const router = createBrowserRouter([
       { path: 'accessibility', lazy: () => import('./pages/AccessibilityPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'privacy',       lazy: () => import('./pages/PrivacyPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'terms',         lazy: () => import('./pages/TermsPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'item/:id',      lazy: () => import('./pages/ItemDetailPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'staff', children: [
         { path: 'schedule', lazy: () => import('./pages/staff/SchedulePage.tsx').then(m => ({ Component: m.default })) },
       ]},

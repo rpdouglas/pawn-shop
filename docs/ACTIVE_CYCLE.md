@@ -59,6 +59,10 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E51 CLOSED** | E51 | 2026-06-02 |
 | `E52 Inventory Management CRUD` — Hard delete & archive UI + deleteInventoryItem CF | E52 | 2026-06-02 |
 | **E52 CLOSED** | E52 | 2026-06-02 |
+| `E53 Native Web Share` — navigator.share component with clipboard fallback | E53 | 2026-06-02 |
+| **E53 CLOSED** | E53 | 2026-06-02 |
+| `E54 Item Landing Pages` — Dedicated `/item/:id` route with dynamic AgeGate and SEO tags | E54 | 2026-06-02 |
+| **E54 CLOSED** | E54 | 2026-06-02 |
 
 ---
 

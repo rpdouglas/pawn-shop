@@ -316,6 +316,10 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-02 — E48: Implemented `retryImageProcessing` Callable Cloud Function and 30-second/3-retry logic in MobileIntakePage to handle sporadic image processing stalls. Chosen over client-side re-upload to drastically save mobile bandwidth since the file already exists in Storage.
 
+2026-06-02 — E53: Implemented Native Web Share (navigator.share) with clipboard fallback rather than a custom modal to provide a familiar OS-level share sheet and minimize UI bloat.
+
+2026-06-02 — E54: Implemented dedicated SEO-optimized Item Landing Pages (ItemDetailPage) instead of modal redirects to guarantee distinct document titles/metadata for search indexability and provide a standalone desktop-class layout.
+
 *Add new entries above this line.*
 
 2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.

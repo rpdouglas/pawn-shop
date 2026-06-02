@@ -181,6 +181,7 @@ export default function FireworksPage() {
                   </div>
                 )}
                 <BundleCard
+                  itemId={item.id}
                   title={item.title}
                   price={item.price}
                   itemCount={item.bundleIds?.length ?? 1}

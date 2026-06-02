@@ -205,6 +205,29 @@
 
 ---
 
+### E53 · Native Web Share
+
+> **Persona Gate — E53:**
+> - **Sandra:** Quickly share items with friends. Uses native OS-level share sheet (iOS/Android).
+
+- [x] ShareButton component using `navigator.share` with clipboard fallback `[San]`
+- [x] Integrate ShareButton in ItemQuickView and BundleCard `[San]`
+
+---
+
+### E54 · Dedicated Item Landing Pages
+
+> **Persona Gate — E54:**
+> - **Kevin / Marie / Tanya:** Links directly to an item provide a premium, full-page desktop/mobile layout.
+> - **Compliance:** Direct links to age-gated items (Cannabis/Fireworks/Tobacco) must enforce the router-level Age Gate. Police holds hide the item.
+
+- [x] Create `ItemDetailPage` full-page component `[All]`
+- [x] Map `/item/:id` route in `main.tsx` `[All]`
+- [x] Dynamic `ViewContext` wrapping and `AgeGate` injection `[Comp]`
+- [x] SEO `<title>` and `<meta name="description">` injection `[Jord]` `[Marc]`
+
+---
+
 ### E06 · eBay Cross-Posting
 
 > **Persona Gate — E06:**

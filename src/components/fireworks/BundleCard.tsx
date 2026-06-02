@@ -1,7 +1,9 @@
 import { formatPrice } from '../../lib/format'
 import Button from '../ui/Button'
+import ShareButton from '../ui/ShareButton'
 
 interface BundleCardProps {
+  itemId: string
   title: string
   price: number
   itemCount: number
@@ -11,6 +13,7 @@ interface BundleCardProps {
 }
 
 export default function BundleCard({
+  itemId,
   title,
   price,
   itemCount,
@@ -101,11 +104,19 @@ export default function BundleCard({
           }}>
             {formatPrice(price)}
           </span>
-          {isAvailable && onClick && (
-            <Button variant="primary" size="md" onClick={onClick}>
-              Reserve
-            </Button>
-          )}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <ShareButton 
+              title={title} 
+              url={`${window.location.origin}/item/${itemId}`} 
+              variant="icon"
+              style={{ width: '44px', height: '44px' }} 
+            />
+            {isAvailable && onClick && (
+              <Button variant="primary" size="md" onClick={onClick}>
+                Reserve
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </article>

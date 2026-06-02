@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useFavourites } from '../../hooks/useFavourites'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
+import ShareButton from '../ui/ShareButton'
 import MerchandisingBadge from '../MerchandisingBadge'
 import RelatedItems from '../RelatedItems'
 import HoldCountdownBadge from './HoldCountdownBadge'
@@ -334,6 +335,11 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
                     <Button variant="primary" size="lg" style={{ flex: 1 }}>
                       Enquire about this item
                     </Button>
+                    <ShareButton 
+                      title={item.title} 
+                      url={`${window.location.origin}/item/${item.id}`} 
+                      variant="icon" 
+                    />
                     {user && (
                       <button
                         onClick={() => toggleFavourite(item.id)}
