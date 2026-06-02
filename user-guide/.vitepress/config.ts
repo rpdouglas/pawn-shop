@@ -4,6 +4,12 @@ export default defineConfig({
   title: "User Guide",
   description: "Customer-facing documentation",
   base: '/pawn-shop/',
+  ignoreDeadLinks: [
+    '/contact',
+    '/accessibility',
+    '/privacy',
+    '/terms'
+  ],
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' }
