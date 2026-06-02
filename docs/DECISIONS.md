@@ -317,3 +317,5 @@ YYYY-MM-DD — Decision. Brief reason.
 *Add new entries above this line.*
 
 2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.
+
+2026-06-02 — Photo Upload: Replaced asynchronous Storage trigger (onObjectFinalized) with synchronous HTTPS Callable (processUploadedImage) to eliminate spinner deadlocks and provide immediate error feedback to staff.

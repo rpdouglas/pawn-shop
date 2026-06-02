@@ -1,6 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { assertMfaEnrolled } from './auth'
-import { onObjectFinalized } from 'firebase-functions/v2/storage'
 import { onSchedule } from 'firebase-functions/v2/scheduler'
 import { onDocumentUpdated } from 'firebase-functions/v2/firestore'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
@@ -149,77 +148,6 @@ const WATERMARK_SVG = Buffer.from(
           fill="white" fill-opacity="0.60" font-weight="bold">© The Pawn Shop</text>
   </svg>`
 );
-
-export const processImageUpload = onObjectFinalized(
-  {
-    region: "us-east1",
-    memory: "1GiB"
-  },
-  async (event) => {
-    const filePath = event.data.name;
-    if (!filePath) return;
-
-    const match = filePath.match(/^items\/([^/]+)\/uploads\/([^/]+)$/);
-    if (!match) return;
-
-    const [, itemId, filename] = match;
-    const bucket = getStorage().bucket(event.data.bucket);
-    const tempFile = bucket.file(filePath);
-
-    const db = getFirestore();
-    const jobRef = db.collection("items").doc(itemId).collection("imageJobs").doc(filename);
-
-    try {
-      await jobRef.set({
-        fileName: filename,
-        status: 'processing',
-        attempt: 1,
-        updatedAt: FieldValue.serverTimestamp()
-      }, { merge: true });
-
-      // Ingest the raw temporary artifact
-      const [buffer] = await tempFile.download();
-
-      // Process processing operations via Sharp
-      const watermarked = await sharp(buffer)
-        .composite([{ input: WATERMARK_SVG, gravity: "southeast" }])
-        .webp({ quality: 85 })
-        .toBuffer();
-
-      const finalPath = `items/${itemId}/images/${path.parse(filename).name}.webp`;
-      const finalFile = bucket.file(finalPath);
-      
-      // Save the finalized client-ready production WebP back to the Cloud Storage bucket
-      await finalFile.save(watermarked, {
-        contentType: "image/webp",
-        public: true,
-      });
-
-      const finalUrl = finalFile.publicUrl();
-
-      // Append the direct URL destination string array element securely inside Firestore
-      await db.collection("items").doc(itemId).update({
-        images: FieldValue.arrayUnion(finalUrl),
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-
-      // Clean up the temporary original upload object path safely
-      await tempFile.delete();
-
-      await jobRef.update({
-        status: 'completed',
-        updatedAt: FieldValue.serverTimestamp()
-      });
-    } catch (e) {
-      await jobRef.update({
-        status: 'failed',
-        error: e instanceof Error ? e.message : 'Unknown error processing image',
-        updatedAt: FieldValue.serverTimestamp()
-      }).catch(() => {});
-      console.error('Image processing failed:', e);
-    }
-  }
-)
 
 // ── publishItem ───────────────────────────────────────────────────────────────
 // Validates required fields, generates searchTokens, transitions draft → active,
@@ -465,11 +393,11 @@ export const resetExpiredHolds = onSchedule('every 30 minutes', async () => {
   )
 })
 
-// ── retryImageProcessing ──────────────────────────────────────────────────────
-// Callable CF. Called by MobileIntakePage if the onObjectFinalized trigger fails
-// or times out. Manually kicks off the image processing pipeline.
+// ── processUploadedImage ──────────────────────────────────────────────────────
+// Callable CF. Called by MobileIntakePage after successful storage upload.
+// Manually kicks off the image processing pipeline.
 
-export const retryImageProcessing = onCall<{ filePath: string }>({ cors: true }, async (request) => {
+export const processUploadedImage = onCall<{ filePath: string }>({ cors: true }, async (request) => {
   if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
     throw new HttpsError('permission-denied', 'Staff role required')
   }

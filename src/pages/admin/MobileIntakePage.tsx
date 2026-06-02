@@ -22,10 +22,10 @@ const publishItemFn = httpsCallable<
   { success: boolean }
 >(functions, 'publishItem')
 
-const retryImageProcessingFn = httpsCallable<
+const processUploadedImageFn = httpsCallable<
   { filePath: string },
   { success: boolean }
->(functions, 'retryImageProcessing')
+>(functions, 'processUploadedImage')
 
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -226,55 +226,27 @@ export default function MobileIntakePage() {
       () => {
         setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 0, error: 'Upload failed — try again.' }))
       },
-      () => {
-        // Storage upload done — write initial job and watch it via Firestore
+      async () => {
+        // Storage upload done — instantly trigger processing
         setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 100, processing: true }))
         
-        const jobRef = doc(db, `items/${id}/imageJobs/${key}`)
-        
-        // Ensure doc exists so listener doesn't just hang if backend is slow to start
-        setDoc(jobRef, {
-          fileName: file.name,
-          status: 'processing',
-          attempt: 1,
-          updatedAt: serverTimestamp()
-        }, { merge: true }).catch(console.error)
-
-        const unsubscribe = onSnapshot(jobRef, (docSnap) => {
-          if (!docSnap.exists()) return
-          const data = docSnap.data()
+        try {
+          await processUploadedImageFn({ filePath: storagePath })
           
-          if (data.status === 'completed') {
-            setUploads(prev => {
-              const updated = new Map(prev)
-              const entry = updated.get(key)
-              if (entry) updated.set(key, { ...entry, processing: false })
-              return updated
-            })
-            unsubscribe()
-          } else if (data.status === 'failed') {
-             if (data.attempt < 3) {
-                // Client automatically triggers retry if attempts < 3
-                retryImageProcessingFn({ filePath: storagePath }).catch(() => {})
-             } else {
-                setUploads(prev => {
-                  const updated = new Map(prev)
-                  const entry = updated.get(key)
-                  if (entry) updated.set(key, { ...entry, processing: false, error: data.error || 'Processing failed after 3 attempts' })
-                  return updated
-                })
-                unsubscribe()
-             }
-          } else if (data.status === 'retrying' || data.status === 'processing') {
-            setUploads(prev => {
-              const updated = new Map(prev)
-              const entry = updated.get(key)
-              // Only append error text to show retry attempt
-              if (entry) updated.set(key, { ...entry, processing: true, error: data.attempt > 1 ? `Retrying... (Attempt ${data.attempt}/3)` : undefined })
-              return updated
-            })
-          }
-        })
+          setUploads(prev => {
+            const updated = new Map(prev)
+            const entry = updated.get(key)
+            if (entry) updated.set(key, { ...entry, processing: false })
+            return updated
+          })
+        } catch (err) {
+          setUploads(prev => {
+            const updated = new Map(prev)
+            const entry = updated.get(key)
+            if (entry) updated.set(key, { ...entry, processing: false, error: err instanceof Error ? err.message : 'Processing failed' })
+            return updated
+          })
+        }
       }
     )
   }, [])
