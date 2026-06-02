@@ -10,6 +10,7 @@ Access to the staff management tools is restricted to **Admins**.
   - **Manager:** High-level access for scheduling, inventory management, and enquiry handling.
   - **Inventory Staff:** Access to intake forms and item status updates.
   - **Marketing Staff:** Access to staff picks and editorial content management.
+  - **Customer:** Default role assigned to users upon first login. Restricted to public storefronts and personal account features; no admin access.
 
 ## Updating Permissions
 
