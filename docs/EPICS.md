@@ -235,6 +235,7 @@
 - [x] `/accessibility` page live `[Mak]` `[Comp]`
 - [ ] Lighthouse: ≥90 performance, ≥90 accessibility, ≥95 SEO `[Jord]` `[Marc]`
 - [x] Kanien'kéha copy community-reviewed before any publication `[Mak]` `[Marc]` `[Comp]`
+- [x] E45 Pawn Readability Improvements — Lora font substitution and text contrast `[Mak]` `[UX]`
 
 ---
 

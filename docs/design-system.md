@@ -20,7 +20,7 @@ All tokens are defined as CSS custom properties using Tailwind v4 `@theme`. Per-
 | `--color-text` (primary) | `#F5F0E8` Off-white | `#F0EAF8` Lavender tint | `#F8F0EA` Warm white |
 | `--color-text-muted` | `#8A7E72` Warm muted | `#9B8AAE` Muted lavender | `#9A8070` Muted ember |
 | `--font-display` | Playfair Display | Cormorant Garamond | Bebas Neue |
-| `--font-body` | IM Fell English | DM Sans | Oswald |
+| `--font-body` | Lora | DM Sans | Oswald |
 | `--motion-speed` | 400ms | 600ms | 300ms |
 | `--motion-easing` | `cubic-bezier(0.4, 0, 0.2, 1)` | `cubic-bezier(0.6, 0, 0.4, 1)` | `cubic-bezier(0.25, 0, 0.5, 1)` |
 
@@ -53,7 +53,7 @@ WCAG AA minimum: **4.5:1 body text · 3:1 large text**. Lighthouse Accessibility
 
 | View | Display Font | Weights | Body Font | Weights |
 |---|---|---|---|---|
-| Pawn | Playfair Display | 400, 700, 900 | IM Fell English | 400, 400i |
+| Pawn | Playfair Display | 400, 700, 900 | Lora | 400, 500, 600 |
 | Cannabis | Cormorant Garamond | 300, 400, 600 | DM Sans | 300, 400, 500 |
 | Fireworks | Bebas Neue | 400 (single) | Oswald | 300, 400, 500 |
 

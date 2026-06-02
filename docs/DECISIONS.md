@@ -306,5 +306,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-22 — E29: `cannabisProfile` submap added to `items/{id}` schema to store cannabis-specific attributes (THC, CBD, terpenes, lineage, brand, format). Allows rich, compliant merchandising on the Cannabis storefront while protecting the primary items collection from bloat. Terpene spider chart (`TerpeneProfile.tsx`) uses raw SVG without external charting dependencies.
 
+2026-06-02 — E45: Replaced IM Fell English with Lora font for .view-pawn body text and improved muted text contrast to ~8:1. Decision driven by Makoonsii persona readability constraint (UX plain language and clarity).
+
 *Add new entries above this line.*
 

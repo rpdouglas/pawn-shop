@@ -42,6 +42,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | `TerpeneProfile` SVG spider chart + `CannabisProductData` detail panel built | E29 | 2026-05-22 |
 | `CannabisPage` updated to show `ItemQuickView` with wellness profile | E29 | 2026-05-22 |
 | **E29 CLOSED** | E29 | 2026-05-22 |
+| `E45 Pawn Readability` — Lora font swap & contrast | E09 | 2026-06-02 |
+| **E45 CLOSED** | E09 | 2026-06-02 |
 
 ---
 

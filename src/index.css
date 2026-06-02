@@ -24,7 +24,7 @@
 
   /* Font family stacks (self-hosted via @fontsource) */
   --font-playfair:  "Playfair Display", Georgia, serif;
-  --font-im-fell:   "IM Fell English", Georgia, serif;
+  --font-lora:      "Lora", Georgia, serif;
   --font-cormorant: "Cormorant Garamond", Georgia, serif;
   --font-dm-sans:   "DM Sans", system-ui, sans-serif;
   --font-bebas:     "Bebas Neue", Impact, sans-serif;
@@ -71,10 +71,10 @@
   --color-accent:        #B8963E;
   --color-highlight:     rgba(200, 161, 74, 0.12);
   --color-text:          #F5F0E8;
-  --color-text-muted:    #8A7E72;
+  --color-text-muted:    #A69B8F;
   --color-border:        #2A2318;
   --font-display:        var(--font-playfair);
-  --font-body:           var(--font-im-fell);
+  --font-body:           var(--font-lora);
   --motion-speed:        var(--motion-speed-standard);
   --motion-easing:       cubic-bezier(0.4, 0, 0.2, 1);
 }
