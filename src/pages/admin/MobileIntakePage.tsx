@@ -3,6 +3,7 @@ import { doc, onSnapshot, updateDoc, setDoc, serverTimestamp } from 'firebase/fi
 import { ref, uploadBytesResumable } from 'firebase/storage'
 import { httpsCallable } from 'firebase/functions'
 import { useNavigate } from 'react-router-dom'
+import imageCompression from 'browser-image-compression'
 import { db, functions, storage } from '../../lib/firebase'
 import ProtectedRoute from '../../components/auth/ProtectedRoute'
 import ConditionSelector from '../../components/admin/ConditionSelector'
@@ -196,7 +197,7 @@ export default function MobileIntakePage() {
 
   // ── Upload logic ──────────────────────────────────────────────────────────
 
-  const uploadFile = useCallback((file: File) => {
+  const uploadFile = useCallback(async (file: File) => {
     const id = itemIdRef.current
     if (!id) return
 
@@ -211,11 +212,22 @@ export default function MobileIntakePage() {
       return
     }
 
+    setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 0 }))
+
+    let fileToUpload = file
+    try {
+      fileToUpload = await imageCompression(file, {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      })
+    } catch (error) {
+      console.error('Image compression failed:', error)
+    }
+
     const storagePath = `items/${id}/uploads/${key}`
     const storageRef = ref(storage, storagePath)
-    const task = uploadBytesResumable(storageRef, file)
-
-    setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 0 }))
+    const task = uploadBytesResumable(storageRef, fileToUpload)
 
     task.on(
       'state_changed',

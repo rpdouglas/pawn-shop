@@ -55,6 +55,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | `E49 Mobile Intake Image Job Tracker` — Firestore Job Tracking | E49 | 2026-06-02 |
 | **E49 CLOSED** | E49 | 2026-06-02 |
 | `Photo Upload Synchronous Architecture` — Replaced async trigger with HTTPS Callable | Fix | 2026-06-02 |
+| `E51 Photo Upload Compression & Resilience` — Client-side compression and 1GiB memory bump | E51 | 2026-06-02 |
+| **E51 CLOSED** | E51 | 2026-06-02 |
 
 ---
 

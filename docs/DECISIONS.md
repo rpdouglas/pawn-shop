@@ -319,3 +319,5 @@ YYYY-MM-DD — Decision. Brief reason.
 2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.
 
 2026-06-02 — Photo Upload: Replaced asynchronous Storage trigger (onObjectFinalized) with synchronous HTTPS Callable (processUploadedImage) to eliminate spinner deadlocks and provide immediate error feedback to staff.
+
+2026-06-02 — E51: Implemented client-side browser-image-compression for mobile intake uploads and bumped processUploadedImage CF memory to 1GiB to eliminate OOM crashes.
