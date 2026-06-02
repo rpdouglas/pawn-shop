@@ -18,7 +18,7 @@ All tokens are defined as CSS custom properties using Tailwind v4 `@theme`. Per-
 | `--color-surface` | `#1A1714` Charcoal | `#2D1B4E` Midnight plum | `#2D0808` Deep maroon |
 | `--color-highlight` | Warm gold glow | Soft ambient glow | Ember glow |
 | `--color-text` (primary) | `#F5F0E8` Off-white | `#F0EAF8` Lavender tint | `#F8F0EA` Warm white |
-| `--color-text-muted` | `#8A7E72` Warm muted | `#9B8AAE` Muted lavender | `#9A8070` Muted ember |
+| `--color-text-muted` | `#D1C9BE` Light beige | `#9B8AAE` Muted lavender | `#9A8070` Muted ember |
 | `--font-display` | Playfair Display | Cormorant Garamond | Bebas Neue |
 | `--font-body` | Lora | DM Sans | Oswald |
 | `--motion-speed` | 400ms | 600ms | 300ms |

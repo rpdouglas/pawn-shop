@@ -12,6 +12,7 @@
    - `aiDescription` is NEVER customer-visible.
    - **Strict Firestore Data Handling:** NEVER cast Firestore data using `as any`. When reading `snap.data()`, cast it to `Record<string, unknown>` or use a dedicated type guard. For Firestore Timestamps, strictly assert the type (e.g., `(data.createdAt as unknown as Timestamp).toDate()`).
 5. **Strict Planning & Specs-First Gate:** You are **strictly prohibited** from creating or editing any source code files (under `src/` or `functions/src/`) or running code execution commands until a project spec exists in `docs/projects/`, a 3-strategy plan has been drafted to `docs/plans/[EPIC]_[FEATURE]_PLAN.md`, and the user has explicitly approved a strategy in writing. Any bypass of this gate is a hard architectural failure.
+6. **Artifact Output Routing:** Any report, audit, or review generated as a markdown artifact for the user MUST be saved directly into the `docs/reports/` directory.
 
 ## Operational Workflow
 Follow the **Research -> Strategy -> Execution** cycle for every task.

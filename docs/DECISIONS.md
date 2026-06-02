@@ -308,5 +308,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-02 — E45: Replaced IM Fell English with Lora font for .view-pawn body text and improved muted text contrast to ~8:1. Decision driven by Makoonsii persona readability constraint (UX plain language and clarity).
 
+2026-06-02 — E46: Globally lightened `--color-text-muted` in Pawn view to `#D1C9BE` to drastically improve accessibility and readability in staff intake forms, passing Makoonsii and staff usability gates.
+
 *Add new entries above this line.*
 

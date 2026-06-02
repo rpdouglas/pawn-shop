@@ -44,6 +44,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E29 CLOSED** | E29 | 2026-05-22 |
 | `E45 Pawn Readability` — Lora font swap & contrast | E09 | 2026-06-02 |
 | **E45 CLOSED** | E09 | 2026-06-02 |
+| `E46 Admin Text Contrast` — Muted text visibility | E09 | 2026-06-02 |
+| **E46 CLOSED** | E09 | 2026-06-02 |
 
 ---
 
