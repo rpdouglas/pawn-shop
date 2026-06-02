@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore'
+import { updateDoc, doc, arrayUnion } from 'firebase/firestore'
+import { httpsCallable } from 'firebase/functions'
 import { Link } from 'react-router-dom'
-import { db } from '../../lib/firebase'
+import { db, functions } from '../../lib/firebase'
 import { docToItem } from '../../hooks/useItems'
 import { formatPrice } from '../../lib/format'
 import ProtectedRoute from '../../components/auth/ProtectedRoute'
 import Badge from '../../components/ui/Badge'
 import AiAssistantPanel from '../../components/admin/AiAssistantPanel'
 import QuantityAdjustControl from '../../components/admin/QuantityAdjustControl'
-import { updateDoc, doc, arrayUnion } from 'firebase/firestore'
 import type { Item, ItemStatus } from '../../lib/types'
 
 const STATUS_FILTERS: Array<{ value: 'all' | ItemStatus; label: string }> = [
@@ -58,6 +59,31 @@ export default function InventoryPage() {
       alert('Midpoint price applied!')
     } catch {
       alert('Failed to apply price.')
+    }
+  }
+
+  const handleArchive = async (item: Item, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!window.confirm(`Archive "${item.title}"?`)) return
+    try {
+      await updateDoc(doc(db, 'items', item.id), { status: 'archived' })
+    } catch (err) {
+      alert(`Failed to archive: ${err instanceof Error ? err.message : 'Unknown error'}`)
+    }
+  }
+
+  const handleDelete = async (item: Item, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!window.confirm(`PERMANENTLY delete "${item.title}"? This cannot be undone.`)) return
+    try {
+      setLoading(true)
+      const deleteInventoryItem = httpsCallable<{ itemId: string }, { success: boolean }>(functions, 'deleteInventoryItem')
+      await deleteInventoryItem({ itemId: item.id })
+      if (selectedItem?.id === item.id) setSelectedItem(null)
+    } catch (err) {
+      alert(`Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -253,6 +279,24 @@ export default function InventoryPage() {
                             />
                           </div>
                         )}
+                        <div style={{ marginTop: 'var(--space-3)', display: 'flex', gap: 'var(--space-2)' }}>
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={(e) => handleArchive(item, e)}
+                            style={{ padding: '0 var(--space-2)', minHeight: '32px' }}
+                          >
+                            Archive
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={(e) => handleDelete(item, e)}
+                            style={{ padding: '0 var(--space-2)', minHeight: '32px', color: 'var(--color-error)' }}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -353,19 +397,51 @@ export default function InventoryPage() {
                         )}
                       </td>
                       <td style={{ padding: 'var(--space-4)' }}>
-                        <button
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: 'var(--color-primary)',
-                            cursor: 'pointer',
-                            fontSize: 'var(--text-small)',
-                            padding: 'var(--space-2)',
-                            minHeight: '48px'
-                          }}
-                        >
-                          {selectedItem?.id === item.id ? 'Close AI' : 'AI Help'}
-                        </button>
+                        <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                          <button
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--color-primary)',
+                              cursor: 'pointer',
+                              fontSize: 'var(--text-small)',
+                              padding: 'var(--space-2)',
+                              minHeight: '48px'
+                            }}
+                          >
+                            {selectedItem?.id === item.id ? 'Close AI' : 'AI Help'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleArchive(item, e)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--color-text-muted)',
+                              cursor: 'pointer',
+                              fontSize: 'var(--text-small)',
+                              padding: 'var(--space-2)',
+                              minHeight: '48px'
+                            }}
+                          >
+                            Archive
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDelete(item, e)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--color-error)',
+                              cursor: 'pointer',
+                              fontSize: 'var(--text-small)',
+                              padding: 'var(--space-2)',
+                              minHeight: '48px'
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

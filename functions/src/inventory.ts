@@ -467,3 +467,59 @@ export const processUploadedImage = onCall<{ filePath: string }>({ cors: true, m
     throw new HttpsError('internal', 'Retry failed')
   }
 })
+
+// ── deleteInventoryItem ───────────────────────────────────────────────────────
+// Hard deletes an item, its internal subcollections, and all its Storage files.
+// Requires Admin or Manager role.
+
+interface DeleteInventoryItemData {
+  itemId: string
+}
+
+export const deleteInventoryItem = onCall<DeleteInventoryItemData>({ cors: true }, async (request) => {
+  const token = request.auth?.token as Record<string, unknown> | undefined
+  if (!request.auth || (token?.['admin'] !== true && token?.['manager'] !== true)) {
+    throw new HttpsError('permission-denied', 'Admin or Manager role required to delete')
+  }
+  assertMfaEnrolled(request)
+
+  const { itemId } = request.data
+  if (!itemId) throw new HttpsError('invalid-argument', 'itemId is required')
+
+  const db = getFirestore()
+  const itemRef = db.collection('items').doc(itemId)
+  const snap = await itemRef.get()
+
+  if (!snap.exists) throw new HttpsError('not-found', `Item ${itemId} not found`)
+  
+  const itemData = snap.data() as Record<string, unknown>
+
+  // 1. Delete internal subcollections
+  const internalStaff = await itemRef.collection('internal').doc('staff').get()
+  const internalAi = await itemRef.collection('internal').doc('ai').get()
+  if (internalStaff.exists) await internalStaff.ref.delete()
+  if (internalAi.exists) await internalAi.ref.delete()
+
+  // 2. Delete Storage folder (images and uploads)
+  const bucket = getStorage().bucket()
+  try {
+    await bucket.deleteFiles({ prefix: `items/${itemId}/` })
+  } catch (e) {
+    console.warn(`Storage deletion failed or no files found for items/${itemId}/`, e)
+  }
+
+  // 3. Delete item doc
+  await itemRef.delete()
+
+  // 4. Audit Log
+  await db.collection('auditLogs').add({
+    eventType: 'item_deleted',
+    uid: request.auth.uid,
+    targetId: itemId,
+    details: { itemId, title: itemData['title'] ?? 'Unknown' },
+    createdAt: FieldValue.serverTimestamp(),
+  })
+
+  return { success: true }
+})
+

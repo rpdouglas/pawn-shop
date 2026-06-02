@@ -148,6 +148,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-05-18 — E10: UTM params captured at module load in main.tsx (captureUtm() called before router creation). sessionStorage-only — never written to Firestore or included in auditLogs. Attribution data for future campaign analysis without PII exposure.
 
+2026-06-02 — E52: Inventory hard deletes executed via deleteInventoryItem Cloud Function rather than client-side deleteDoc. Prevents orphaned images in Firebase Storage and internal subcollections by enforcing backend cleanup and guaranteeing an auditLogs entry. Admin/Manager claims required.
+
 2026-05-18 — E10: setPoliceHold CF restricted to admin claim only (not manager). policeHold is a compliance action tied to law enforcement contact — a higher bar than operational staff decisions. Managers may request a hold via an admin.
 
 2026-05-18 — E10: DashboardPage uses getDocs for active-by-view breakdown (client-side count) to avoid composite indexes. getCountFromServer is used for single-field status counts and pawn request volume where it is efficient without index overhead.

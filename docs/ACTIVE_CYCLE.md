@@ -57,6 +57,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | `Photo Upload Synchronous Architecture` — Replaced async trigger with HTTPS Callable | Fix | 2026-06-02 |
 | `E51 Photo Upload Compression & Resilience` — Client-side compression and 1GiB memory bump | E51 | 2026-06-02 |
 | **E51 CLOSED** | E51 | 2026-06-02 |
+| `E52 Inventory Management CRUD` — Hard delete & archive UI + deleteInventoryItem CF | E52 | 2026-06-02 |
+| **E52 CLOSED** | E52 | 2026-06-02 |
 
 ---
 
