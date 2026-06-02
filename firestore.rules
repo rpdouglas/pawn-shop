@@ -43,6 +43,11 @@ service cloud.firestore {
       match /internal/{doc} {
         allow read, write: if isStaff();
       }
+      
+      // Image processing jobs (E49)
+      match /imageJobs/{jobId} {
+        allow read, write: if isStaff();
+      }
     }
 
     // ── pawnRequests/{id} ─────────────────────────────────────────────────────

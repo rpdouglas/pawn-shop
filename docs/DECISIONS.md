@@ -316,3 +316,4 @@ YYYY-MM-DD — Decision. Brief reason.
 
 *Add new entries above this line.*
 
+2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.

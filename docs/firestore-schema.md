@@ -331,3 +331,4 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | `pickupReminderSentAt` | timestamp | Set by `sendPickupReminders` CF when the 24-hour pre-pickup SMS has been dispatched. Null until sent. Prevents duplicate sends. |
 | `updatedAt` | timestamp | Set by CF on every status transition (confirm, ready, collect, cancel) |
 | `createdAt` | timestamp | Server timestamp |
+\n- items/{itemId}/imageJobs/{jobId} — [Document] Temporary tracking document for background processing.

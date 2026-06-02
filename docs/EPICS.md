@@ -505,6 +505,19 @@
 
 ---
 
+### E49 · Mobile Intake Image Job Tracker
+
+> **Persona Gate:** Makoonsii — Provides exact real-time UI feedback for upload drops.
+
+- [x] Replace `setTimeout` polling with Firestore tracker in `MobileIntakePage.tsx` `[Comp]`
+
+- [x] Add job tracking `set`/`update` logic to `processImageUpload` and `retryImageProcessing` `[Comp]`
+
+- [x] Add `/imageJobs/{jobId}` rule to `firestore.rules` `[Comp]`
+
+---
+
+
 ### E03-QA · MFA Bypass Confirmation
 
 > Identity Platform upgrade required for production gate.

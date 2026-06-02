@@ -227,39 +227,54 @@ export default function MobileIntakePage() {
         setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 0, error: 'Upload failed — try again.' }))
       },
       () => {
-        // Storage upload done — transition to "Processing…"
+        // Storage upload done — write initial job and watch it via Firestore
         setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 100, processing: true }))
         
-        // Safety timeout with 3 retries for processImageUpload drops
-        const triggerTimeout = (attempt: number) => {
-          setTimeout(() => {
-            let isStillProcessing = false
-            setUploads(currentUploads => {
-              const entry = currentUploads.get(key)
-              if (entry && entry.processing) isStillProcessing = true
-              return currentUploads
-            })
-
-            if (isStillProcessing) {
-              if (attempt < 3) {
-                retryImageProcessingFn({ filePath: storagePath }).catch(() => {})
-                triggerTimeout(attempt + 1)
-              } else {
-                setUploads(currentUploads => {
-                  const entry = currentUploads.get(key)
-                  if (entry && entry.processing) {
-                    const updated = new Map(currentUploads)
-                    updated.set(key, { ...entry, processing: false, error: 'Processing timed out. Please try again.' })
-                    return updated
-                  }
-                  return currentUploads
-                })
-              }
-            }
-          }, 30000)
-        }
+        const jobRef = doc(db, `items/${id}/imageJobs/${key}`)
         
-        triggerTimeout(0)
+        // Ensure doc exists so listener doesn't just hang if backend is slow to start
+        setDoc(jobRef, {
+          fileName: file.name,
+          status: 'processing',
+          attempt: 1,
+          updatedAt: serverTimestamp()
+        }, { merge: true }).catch(console.error)
+
+        const unsubscribe = onSnapshot(jobRef, (docSnap) => {
+          if (!docSnap.exists()) return
+          const data = docSnap.data()
+          
+          if (data.status === 'completed') {
+            setUploads(prev => {
+              const updated = new Map(prev)
+              const entry = updated.get(key)
+              if (entry) updated.set(key, { ...entry, processing: false })
+              return updated
+            })
+            unsubscribe()
+          } else if (data.status === 'failed') {
+             if (data.attempt < 3) {
+                // Client automatically triggers retry if attempts < 3
+                retryImageProcessingFn({ filePath: storagePath }).catch(() => {})
+             } else {
+                setUploads(prev => {
+                  const updated = new Map(prev)
+                  const entry = updated.get(key)
+                  if (entry) updated.set(key, { ...entry, processing: false, error: data.error || 'Processing failed after 3 attempts' })
+                  return updated
+                })
+                unsubscribe()
+             }
+          } else if (data.status === 'retrying' || data.status === 'processing') {
+            setUploads(prev => {
+              const updated = new Map(prev)
+              const entry = updated.get(key)
+              // Only append error text to show retry attempt
+              if (entry) updated.set(key, { ...entry, processing: true, error: data.attempt > 1 ? `Retrying... (Attempt ${data.attempt}/3)` : undefined })
+              return updated
+            })
+          }
+        })
       }
     )
   }, [])

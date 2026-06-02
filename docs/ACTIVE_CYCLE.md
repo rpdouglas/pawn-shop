@@ -52,6 +52,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E48 CLOSED** | E48 | 2026-06-02 |
 | `E24 QA Token Fixes` — Removed hardcoded px & fixed WCAG contrast | E24 | 2026-06-02 |
 | **E24 CLOSED** | E24 | 2026-06-02 |
+| `E49 Mobile Intake Image Job Tracker` — Firestore Job Tracking | E49 | 2026-06-02 |
+| **E49 CLOSED** | E49 | 2026-06-02 |
 
 ---
 

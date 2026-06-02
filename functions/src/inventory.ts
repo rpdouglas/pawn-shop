@@ -166,34 +166,58 @@ export const processImageUpload = onObjectFinalized(
     const bucket = getStorage().bucket(event.data.bucket);
     const tempFile = bucket.file(filePath);
 
-    // Ingest the raw temporary artifact
-    const [buffer] = await tempFile.download();
+    const db = getFirestore();
+    const jobRef = db.collection("items").doc(itemId).collection("imageJobs").doc(filename);
 
-    // Process processing operations via Sharp
-    const watermarked = await sharp(buffer)
-      .composite([{ input: WATERMARK_SVG, gravity: "southeast" }])
-      .webp({ quality: 85 })
-      .toBuffer();
+    try {
+      await jobRef.set({
+        fileName: filename,
+        status: 'processing',
+        attempt: 1,
+        updatedAt: FieldValue.serverTimestamp()
+      }, { merge: true });
 
-    const finalPath = `items/${itemId}/images/${path.parse(filename).name}.webp`;
-    const finalFile = bucket.file(finalPath);
-    
-    // Save the finalized client-ready production WebP back to the Cloud Storage bucket
-    await finalFile.save(watermarked, {
-      contentType: "image/webp",
-      public: true,
-    });
+      // Ingest the raw temporary artifact
+      const [buffer] = await tempFile.download();
 
-    const finalUrl = finalFile.publicUrl();
+      // Process processing operations via Sharp
+      const watermarked = await sharp(buffer)
+        .composite([{ input: WATERMARK_SVG, gravity: "southeast" }])
+        .webp({ quality: 85 })
+        .toBuffer();
 
-    // Append the direct URL destination string array element securely inside Firestore
-    await getFirestore().collection("items").doc(itemId).update({
-      images: FieldValue.arrayUnion(finalUrl),
-      updatedAt: FieldValue.serverTimestamp(),
-    });
+      const finalPath = `items/${itemId}/images/${path.parse(filename).name}.webp`;
+      const finalFile = bucket.file(finalPath);
+      
+      // Save the finalized client-ready production WebP back to the Cloud Storage bucket
+      await finalFile.save(watermarked, {
+        contentType: "image/webp",
+        public: true,
+      });
 
-    // Clean up the temporary original upload object path safely
-    await tempFile.delete();
+      const finalUrl = finalFile.publicUrl();
+
+      // Append the direct URL destination string array element securely inside Firestore
+      await db.collection("items").doc(itemId).update({
+        images: FieldValue.arrayUnion(finalUrl),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+
+      // Clean up the temporary original upload object path safely
+      await tempFile.delete();
+
+      await jobRef.update({
+        status: 'completed',
+        updatedAt: FieldValue.serverTimestamp()
+      });
+    } catch (e) {
+      await jobRef.update({
+        status: 'failed',
+        error: e instanceof Error ? e.message : 'Unknown error processing image',
+        updatedAt: FieldValue.serverTimestamp()
+      }).catch(() => {});
+      console.error('Image processing failed:', e);
+    }
   }
 )
 
@@ -457,35 +481,61 @@ export const retryImageProcessing = onCall<{ filePath: string }>({ cors: true },
   if (!match) throw new HttpsError('invalid-argument', 'Invalid filePath format')
 
   const [, itemId, filename] = match
+  const db = getFirestore()
   const bucket = getStorage().bucket()
   const tempFile = bucket.file(filePath)
+  const jobRef = db.collection("items").doc(itemId).collection("imageJobs").doc(filename)
 
-  const [exists] = await tempFile.exists()
-  if (!exists) throw new HttpsError('not-found', 'Temporary image file not found')
+  try {
+    const jobSnap = await jobRef.get()
+    const attempt = jobSnap.exists ? ((jobSnap.data()?.attempt as number) || 1) + 1 : 2
 
-  const [buffer] = await tempFile.download()
+    await jobRef.set({
+      fileName: filename,
+      status: 'retrying',
+      attempt,
+      updatedAt: FieldValue.serverTimestamp()
+    }, { merge: true })
 
-  const watermarked = await sharp(buffer)
-    .composite([{ input: WATERMARK_SVG, gravity: "southeast" }])
-    .webp({ quality: 85 })
-    .toBuffer()
+    const [exists] = await tempFile.exists()
+    if (!exists) throw new HttpsError('not-found', 'Temporary image file not found')
 
-  const finalPath = `items/${itemId}/images/${path.parse(filename).name}.webp`
-  const finalFile = bucket.file(finalPath)
-  
-  await finalFile.save(watermarked, {
-    contentType: "image/webp",
-    public: true,
-  })
+    const [buffer] = await tempFile.download()
 
-  const finalUrl = finalFile.publicUrl()
+    const watermarked = await sharp(buffer)
+      .composite([{ input: WATERMARK_SVG, gravity: "southeast" }])
+      .webp({ quality: 85 })
+      .toBuffer()
 
-  await getFirestore().collection("items").doc(itemId).update({
-    images: FieldValue.arrayUnion(finalUrl),
-    updatedAt: FieldValue.serverTimestamp(),
-  })
+    const finalPath = `items/${itemId}/images/${path.parse(filename).name}.webp`
+    const finalFile = bucket.file(finalPath)
+    
+    await finalFile.save(watermarked, {
+      contentType: "image/webp",
+      public: true,
+    })
 
-  await tempFile.delete()
+    const finalUrl = finalFile.publicUrl()
 
-  return { success: true, url: finalUrl }
+    await db.collection("items").doc(itemId).update({
+      images: FieldValue.arrayUnion(finalUrl),
+      updatedAt: FieldValue.serverTimestamp(),
+    })
+
+    await tempFile.delete()
+
+    await jobRef.update({
+      status: 'completed',
+      updatedAt: FieldValue.serverTimestamp()
+    })
+
+    return { success: true, url: finalUrl }
+  } catch (e) {
+    await jobRef.update({
+      status: 'failed',
+      error: e instanceof Error ? e.message : 'Unknown error during retry',
+      updatedAt: FieldValue.serverTimestamp()
+    }).catch(() => {})
+    throw new HttpsError('internal', 'Retry failed')
+  }
 })
