@@ -310,5 +310,7 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-02 — E46: Globally lightened `--color-text-muted` in Pawn view to `#D1C9BE` to drastically improve accessibility and readability in staff intake forms, passing Makoonsii and staff usability gates.
 
+2026-06-02 — E47: Increased `processImageUpload` Cloud Function memory limit to `1GiB` to prevent silent OOM crashes on large smartphone photo uploads (12MP-48MP). Implemented a 20-second safety timeout on the frontend UI to gracefully handle OS-level WebSocket disconnects during camera app suspension.
+
 *Add new entries above this line.*
 

@@ -153,6 +153,7 @@ export default function MobileIntakePage() {
   const galleryRef = useRef<HTMLInputElement>(null)
   const itemIdRef = useRef<string | null>(null)
   const isCreatingRef = useRef(false)
+  const prevImageCountRef = useRef(0)
 
   const set = (field: keyof FormState) => (value: unknown) =>
     setForm(prev => ({ ...prev, [field]: value }))
@@ -167,12 +168,18 @@ export default function MobileIntakePage() {
       const data = snap.data()
       const newImages = (data['images'] as string[] | undefined) ?? []
       setImages(newImages)
-      if (newImages.length > 0) {
-        // CF has processed at least one image — clear any "Processing…" entries
+      
+      const newlyProcessedCount = newImages.length - prevImageCountRef.current
+      if (newlyProcessedCount > 0) {
+        prevImageCountRef.current = newImages.length
         setUploads(prev => {
           const next = new Map(prev)
+          let toRemove = newlyProcessedCount
           for (const [k, entry] of prev) {
-            if (entry.processing) next.delete(k)
+            if (entry.processing && toRemove > 0) {
+              next.delete(k)
+              toRemove--
+            }
           }
           return next
         })
@@ -214,8 +221,21 @@ export default function MobileIntakePage() {
         setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 0, error: 'Upload failed — try again.' }))
       },
       () => {
-        // Storage upload done — transition to "Processing…" until the CF writes to Firestore
+        // Storage upload done — transition to "Processing…"
         setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 100, processing: true }))
+        
+        // Safety timeout to prevent permanent UI lockup if WebSocket drops or CF crashes
+        setTimeout(() => {
+          setUploads(currentUploads => {
+            const entry = currentUploads.get(key)
+            if (entry && entry.processing) {
+              const updated = new Map(currentUploads)
+              updated.set(key, { ...entry, processing: false, error: 'Processing timed out. Please try again.' })
+              return updated
+            }
+            return currentUploads
+          })
+        }, 20000)
       }
     )
   }, [])
@@ -355,6 +375,7 @@ export default function MobileIntakePage() {
     setForm(EMPTY_FORM)
     setItemId(null)
     itemIdRef.current = null
+    prevImageCountRef.current = 0
     setImages([])
     setUploads(new Map())
     setErrors({})

@@ -237,6 +237,7 @@
 - [x] Kanien'kéha copy community-reviewed before any publication `[Mak]` `[Marc]` `[Comp]`
 - [x] E45 Pawn Readability Improvements — Lora font substitution and text contrast `[Mak]` `[UX]`
 - [x] E46 Admin Text Contrast — Global lightening of muted text `[Mak]` `[Staff]`
+- [x] E47 Mobile Intake Reliability — CF memory bump and frontend state recovery `[Staff]`
 
 ---
 

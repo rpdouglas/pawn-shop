@@ -152,7 +152,8 @@ const WATERMARK_SVG = Buffer.from(
 
 export const processImageUpload = onObjectFinalized(
   {
-    region: "us-east1"
+    region: "us-east1",
+    memory: "1GiB"
   },
   async (event) => {
     const filePath = event.data.name;

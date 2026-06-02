@@ -46,6 +46,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E45 CLOSED** | E09 | 2026-06-02 |
 | `E46 Admin Text Contrast` — Muted text visibility | E09 | 2026-06-02 |
 | **E46 CLOSED** | E09 | 2026-06-02 |
+| `E47 Mobile Intake Reliability` — CF Memory & UI State Fixes | E09 | 2026-06-02 |
+| **E47 CLOSED** | E09 | 2026-06-02 |
 
 ---
 
