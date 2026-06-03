@@ -4,10 +4,18 @@ import TerpeneProfile from './TerpeneProfile'
 
 export default function CannabisProductData({ profile }: { profile: CannabisProfile }) {
   if (!profile) return null
+  const unit = profile.cannabinoidUnit || '%'
 
   return (
     <div className="cannabis-product-data" style={{ padding: 'var(--space-16) 0', marginTop: 'var(--space-16)', borderTop: '1px solid var(--color-border)' }}>
-      <h3 style={{ margin: '0 0 var(--space-16) 0', color: 'var(--color-text-lead)' }}>Wellness Profile</h3>
+      <h3 style={{ margin: '0 0 var(--space-16) 0', color: 'var(--color-text-lead)', display: 'flex', alignItems: 'center', gap: 'var(--space-8)' }}>
+        Wellness Profile
+        {profile.strainType && (
+          <span className="badge" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)', fontSize: '0.75rem', textTransform: 'capitalize' }}>
+            {profile.strainType.replace('-', ' ')}
+          </span>
+        )}
+      </h3>
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-16)', marginBottom: 'var(--space-24)' }}>
         {profile.brand && (
@@ -25,16 +33,24 @@ export default function CannabisProductData({ profile }: { profile: CannabisProf
         {profile.format && (
           <div>
             <div style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Format</div>
-            <div>{profile.format} {profile.weight ? `(${profile.weight})` : ''}</div>
+            <div>
+              {profile.format} {profile.subCategory ? `— ${profile.subCategory}` : ''}
+              <br/>
+              <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+                {profile.servings && profile.weightPerServing 
+                  ? `${profile.servings} x ${profile.weightPerServing} (${profile.weight} total)`
+                  : profile.weight}
+              </span>
+            </div>
           </div>
         )}
         {(profile.thcMin !== undefined || profile.cbdMin !== undefined) && (
           <div>
             <div style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Potency</div>
             <div>
-              {profile.thcMin !== undefined && `THC: ${profile.thcMin}${profile.thcMax ? '-' + profile.thcMax : ''}%`}
+              {profile.thcMin !== undefined && `THC: ${profile.thcMin}${profile.thcMax ? '-' + profile.thcMax : ''}${unit}`}
               {profile.thcMin !== undefined && profile.cbdMin !== undefined && ' | '}
-              {profile.cbdMin !== undefined && `CBD: ${profile.cbdMin}${profile.cbdMax ? '-' + profile.cbdMax : ''}%`}
+              {profile.cbdMin !== undefined && `CBD: ${profile.cbdMin}${profile.cbdMax ? '-' + profile.cbdMax : ''}${unit}`}
             </div>
           </div>
         )}

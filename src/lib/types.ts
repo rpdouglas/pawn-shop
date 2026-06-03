@@ -118,6 +118,12 @@ export interface CannabisProfile {
   weight?: string
   lotNumber?: string
   packagedDate?: Date
+  // E56 Fields
+  subCategory?: string
+  servings?: number
+  weightPerServing?: string
+  strainType?: 'sativa' | 'indica' | 'hybrid' | 'blend' | 'high-cbd' | ''
+  cannabinoidUnit?: '%' | 'mg' | ''
 }
 
 // Firestore Timestamps are converted to Date before being assigned here

@@ -42,6 +42,13 @@ interface FormState {
   condition: ConditionGrade | ''
   costInput: string      // Purchase cost — optional, staff-only, writes to internal/staff subcollection
   quantityInput: string  // Initial stock count — defaults to 1
+
+  // Cannabis Profile (E56 fields)
+  subCategory?: string
+  servings?: string
+  weightPerServing?: string
+  strainType?: string
+  cannabinoidUnit?: string
 }
 
 interface UploadEntry {
@@ -63,6 +70,11 @@ const EMPTY_FORM: FormState = {
   condition: '',
   costInput: '',
   quantityInput: '1',
+  subCategory: '',
+  servings: '',
+  weightPerServing: '',
+  strainType: '',
+  cannabinoidUnit: '%',
 }
 
 function parseQuantity(input: string): number {
@@ -184,10 +196,15 @@ export default function MobileIntakePage() {
               description: data.description || '',
               category: data.category || '',
               viewTag: (data.viewTag as ViewType) || '',
-              priceInput: data.price ? (data.price / 100).toString() : '',
-              condition: (data.condition as ConditionGrade) || '',
-              costInput: costData?.cost ? (costData.cost / 100).toString() : '',
-              quantityInput: data.quantity ? data.quantity.toString() : '1',
+              priceInput: data.price ? (data.price / 100).toFixed(2) : '',
+              condition: data.condition || '',
+              quantityInput: data.quantity !== undefined ? data.quantity.toString() : '1',
+              costInput: costData?.cost ? (costData.cost / 100).toFixed(2) : '',
+              subCategory: data.cannabisProfile?.subCategory || '',
+              servings: data.cannabisProfile?.servings ? data.cannabisProfile.servings.toString() : '',
+              weightPerServing: data.cannabisProfile?.weightPerServing || '',
+              strainType: data.cannabisProfile?.strainType || '',
+              cannabinoidUnit: data.cannabisProfile?.cannabinoidUnit || '%',
             }))
             
             // Advance step if we have minimal data
@@ -380,7 +397,7 @@ export default function MobileIntakePage() {
     if (!itemId) return
     setIsSaving(true)
     try {
-      await updateDoc(doc(db, 'items', itemId), {
+      const updateData: Record<string, unknown> = {
         title: form.title.trim(),
         category: form.category.trim(),
         description: form.description.trim(),
@@ -389,7 +406,23 @@ export default function MobileIntakePage() {
         price: parsePriceCents(form.priceInput),
         quantity: parseQuantity(form.quantityInput),
         updatedAt: serverTimestamp(),
-      })
+      }
+
+      if (form.viewTag === 'cannabis') {
+        const profile: Record<string, unknown> = {
+          subCategory: form.subCategory?.trim() || undefined,
+          servings: form.servings ? parseInt(form.servings, 10) : undefined,
+          weightPerServing: form.weightPerServing?.trim() || undefined,
+          strainType: form.strainType || undefined,
+          cannabinoidUnit: form.cannabinoidUnit || undefined,
+        }
+        Object.keys(profile).forEach(k => profile[k] === undefined && delete profile[k])
+        if (Object.keys(profile).length > 0) {
+          updateData.cannabisProfile = profile
+        }
+      }
+
+      await updateDoc(doc(db, 'items', itemId), updateData)
       const costCents = parsePriceCents(form.costInput)
       if (form.costInput.trim() && !isNaN(costCents) && costCents > 0) {
         await setDoc(doc(db, 'items', itemId, 'internal', 'staff'), { cost: costCents }, { merge: true })
@@ -407,7 +440,7 @@ export default function MobileIntakePage() {
     setIsPublishing(true)
     setPublishError('')
     try {
-      await updateDoc(doc(db, 'items', itemId), {
+      const updateData: Record<string, unknown> = {
         title: form.title.trim(),
         category: form.category.trim(),
         description: form.description.trim(),
@@ -416,7 +449,23 @@ export default function MobileIntakePage() {
         price: parsePriceCents(form.priceInput),
         quantity: parseQuantity(form.quantityInput),
         updatedAt: serverTimestamp(),
-      })
+      }
+
+      if (form.viewTag === 'cannabis') {
+        const profile: Record<string, unknown> = {
+          subCategory: form.subCategory?.trim() || undefined,
+          servings: form.servings ? parseInt(form.servings, 10) : undefined,
+          weightPerServing: form.weightPerServing?.trim() || undefined,
+          strainType: form.strainType || undefined,
+          cannabinoidUnit: form.cannabinoidUnit || undefined,
+        }
+        Object.keys(profile).forEach(k => profile[k] === undefined && delete profile[k])
+        if (Object.keys(profile).length > 0) {
+          updateData.cannabisProfile = profile
+        }
+      }
+
+      await updateDoc(doc(db, 'items', itemId), updateData)
       const costCents = parsePriceCents(form.costInput)
       if (form.costInput.trim() && !isNaN(costCents) && costCents > 0) {
         await setDoc(doc(db, 'items', itemId, 'internal', 'staff'), { cost: costCents }, { merge: true })

@@ -324,6 +324,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-03 — E55: Implemented Edit Inventory Item feature by refactoring `IntakeForm` and `MobileIntakePage` to accept an `initialItemId` URL parameter, reusing the existing creation components for the edit flow to maintain a perfect mobile/desktop UX separation.
 
+2026-06-03 — E56: Expanded `CannabisProfile` schema to include `subCategory`, `servings`, `weightPerServing`, `strainType`, and `cannabinoidUnit`. Implemented Strategy A to provide explicit UI controls in Intake forms (dropdowns/radios) ensuring data consistency over free-text tags.
+
 *Add new entries above this line.*
 
 2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.

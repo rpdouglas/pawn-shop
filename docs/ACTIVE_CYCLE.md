@@ -67,6 +67,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **BUGFIX CLOSED** | BUGFIX | 2026-06-03 |
 | `E55 Edit Inventory Item` — Refactored intake flows to accept `initialItemId` for edits | E55 | 2026-06-03 |
 | **E55 CLOSED** | E55 | 2026-06-03 |
+| `E56 Cannabis Data Model` — Expanded `CannabisProfile` schema to support subcategories, servings, strain types, and unit toggles | E56 | 2026-06-03 |
+| **E56 CLOSED** | E56 | 2026-06-03 |
 
 ---
 

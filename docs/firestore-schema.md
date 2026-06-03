@@ -43,7 +43,7 @@
 | `posId` | string | Brother POS external identifier. Null until synced. |
 | `posSyncStatus` | string | `'not_synced'` \| `'synced'` \| `'pending'` \| `'error'` |
 | `posLastSyncAt` | timestamp | Last successful POS sync. Null until first sync. |
-| `cannabisProfile` | map | specialized data. `{ thcMin, thcMax, cbdMin, cbdMax, terpenes[], geneticLineage, effectProfile[], brand, format, weight, lotNumber, packagedDate }` |
+| `cannabisProfile` | map | specialized data. `{ thcMin, thcMax, cbdMin, cbdMax, terpenes[], geneticLineage, effectProfile[], brand, format, weight, lotNumber, packagedDate, subCategory, servings, weightPerServing, strainType, cannabinoidUnit }` |
 
 ---
 
