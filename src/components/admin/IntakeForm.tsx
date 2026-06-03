@@ -142,6 +142,11 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
   const [phase, setPhase] = useState<Phase>(initialItemId ? 'editing' : 'creating')
   const [itemId, setItemId] = useState<string | null>(initialItemId || null)
   const [images, setImages] = useState<string[]>([])
+  const [marketPricing, setMarketPricing] = useState<{
+    avgRegularPriceCents?: number;
+    avgSalePriceCents?: number;
+    avgRefurbPriceCents?: number;
+  } | null>(null)
   const [formState, setFormState] = useState<FormState>(EMPTY_FORM)
   const [errors, setErrors] = useState<FormErrors>({})
   const [publishError, setPublishError] = useState('')
@@ -229,6 +234,9 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
           brand: !prev.brand && fields.brand ? fields.brand : prev.brand,
           format: !prev.format && fields.format ? fields.format : prev.format
         }))
+      }
+      if (data.intakeExtraction && data.intakeExtraction.marketPricing) {
+        setMarketPricing(data.intakeExtraction.marketPricing)
       }
     })
     return unsubscribe
@@ -450,6 +458,48 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
           onChange={set('condition')}
           error={errors.condition}
         />
+
+        {/* AI Pricing Insight */}
+        {marketPricing && (
+          <div style={{
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+            padding: 'var(--space-4)',
+            marginBottom: 'var(--space-6)'
+          }}>
+            <h3 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--text-small)',
+              color: 'var(--color-primary)',
+              margin: '0 0 var(--space-3) 0',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}>
+              ✨ AI Market Pricing
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 'var(--space-4)' }}>
+              <div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Avg Regular Price</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-subheading)', color: 'var(--color-text)' }}>
+                  ${((marketPricing.avgRegularPriceCents || 0) / 100).toFixed(2)}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Avg Sale Price</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-subheading)', color: 'var(--color-text)' }}>
+                  ${((marketPricing.avgSalePriceCents || 0) / 100).toFixed(2)}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Avg Open-Box</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-subheading)', color: 'var(--color-text)' }}>
+                  ${((marketPricing.avgRefurbPriceCents || 0) / 100).toFixed(2)}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="intake-row intake-row-2">
           <div className="input-wrapper">

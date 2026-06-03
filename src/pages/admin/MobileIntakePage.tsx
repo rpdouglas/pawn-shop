@@ -165,6 +165,11 @@ export default function MobileIntakePage() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [itemId, setItemId] = useState<string | null>(initialItemId || null)
   const [images, setImages] = useState<string[]>([])
+  const [marketPricing, setMarketPricing] = useState<{
+    avgRegularPriceCents?: number;
+    avgSalePriceCents?: number;
+    avgRefurbPriceCents?: number;
+  } | null>(null)
   const [uploads, setUploads] = useState<Map<string, UploadEntry>>(new Map())
   const [isCreating, setIsCreating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -273,6 +278,9 @@ export default function MobileIntakePage() {
         }))
         // Automatically advance if we were waiting on capture
         setStep(prevStep => prevStep === 'capture' ? 'details' : prevStep)
+      }
+      if (data.intakeExtraction && data.intakeExtraction.marketPricing) {
+        setMarketPricing(data.intakeExtraction.marketPricing)
       }
     })
     return unsubscribe
@@ -747,6 +755,48 @@ export default function MobileIntakePage() {
             />
             {errors.description && <span id="mi-description-error" style={ERROR_TEXT} role="alert">{errors.description}</span>}
           </div>
+
+          {/* AI Pricing Insight */}
+          {marketPricing && (
+            <div style={{
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-4)',
+              marginBottom: 'var(--space-6)'
+            }}>
+              <h3 style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--text-small)',
+                color: 'var(--color-primary)',
+                margin: '0 0 var(--space-3) 0',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                ✨ AI Market Pricing
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--space-2)' }}>
+                <div>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Regular</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-small)', color: 'var(--color-text)' }}>
+                    ${((marketPricing.avgRegularPriceCents || 0) / 100).toFixed(2)}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Sale</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-small)', color: 'var(--color-text)' }}>
+                    ${((marketPricing.avgSalePriceCents || 0) / 100).toFixed(2)}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>Open-Box</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-small)', color: 'var(--color-text)' }}>
+                    ${((marketPricing.avgRefurbPriceCents || 0) / 100).toFixed(2)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Price */}
           <div style={FIELD}>
