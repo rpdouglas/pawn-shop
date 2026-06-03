@@ -225,8 +225,8 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
   `
 
   try {
-    const { model } = getModels()
-    const result = await model.generateContent([
+    const { model, flashModel } = getModels()
+    const promptParts = [
       systemPrompt,
       {
         inlineData: {
@@ -234,7 +234,17 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
           mimeType: mimeType
         }
       }
-    ])
+    ]
+
+    let result
+    try {
+      // Attempt with Flash first for speed
+      result = await flashModel.generateContent(promptParts)
+    } catch (flashErr) {
+      console.warn('Gemini Flash failed during intake extraction, falling back to Pro:', flashErr)
+      result = await model.generateContent(promptParts)
+    }
+
     const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
     return JSON.parse(jsonStr)
   } catch (err: unknown) {

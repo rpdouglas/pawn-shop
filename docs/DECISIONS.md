@@ -330,6 +330,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-03 — E58: Re-architected desktop IntakeForm to support a photo-first flow. Upload zone moved to the top; dragging a photo instantly creates a draft item and triggers AI extraction, mirroring the mobile intake philosophy to reduce manual typing.
 
+2026-06-03 — Switched `extractIntakeData` AI Vision model to Gemini Flash to significantly reduce intake latency, maintaining a resilient fallback to Gemini Pro upon failure (Strategy B).
+
 *Add new entries above this line.*
 
 2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.

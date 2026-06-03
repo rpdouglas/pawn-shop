@@ -14,7 +14,7 @@ Brand voice: **Dapper. Debonair. Distinctly Akwesasne.**
 ## Step 1 — Load Technical Context
 
 **Stack:**
-- Frontend: React 18 + Vite + TypeScript + Tailwind v4
+- Frontend: React 18 + React Router v7 + Vite + TypeScript + Tailwind v4
 - Database: Cloud Firestore — `nats-rack` (dev) / `the-addicts-agenda` (prod)
 - Auth: Firebase Auth (email/password + Google SSO)
 - Functions: Cloud Functions v2 (Node/TypeScript) in `/functions`
@@ -94,4 +94,4 @@ Read:
 
 Reply exactly:
 
-> **Pawn Shop loaded.** Stack: React 18 / Firestore / Firebase / Tailwind v4. Compliance guardrails active. Persona lens on. Schema source of truth: `docs/firestore-schema.md`. Ready for task — state which persona and epic this session serves.
+> **Pawn Shop loaded.** Stack: React 18 / React Router v7 / Firestore / Firebase / Tailwind v4. Compliance guardrails active. Persona lens on. Schema source of truth: `docs/firestore-schema.md`. Ready for task — state which persona and epic this session serves.

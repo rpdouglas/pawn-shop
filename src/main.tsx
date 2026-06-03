@@ -32,6 +32,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    hydrateFallbackElement: <div className="flex h-screen items-center justify-center text-stone-500">Loading...</div>,
     errorElement: <NotFoundPage />,
     children: [
       { index: true, lazy: () => import('./pages/HomePage.tsx').then(m => ({ Component: m.default })) },
