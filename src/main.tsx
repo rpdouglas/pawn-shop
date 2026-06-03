@@ -91,6 +91,7 @@ const router = createBrowserRouter([
       { path: 'local/:location', lazy: () => import('./pages/LocalSeoPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'admin', element: <AdminLayout />, children: [
         { path: 'intake',            lazy: () => import('./pages/admin/IntakePage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'intake/edit/:id',   lazy: () => import('./pages/admin/IntakePage.tsx').then(m => ({ Component: m.default })) },
         { path: 'inventory',         lazy: () => import('./pages/admin/InventoryPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'pawn-inbox',        lazy: () => import('./pages/admin/PawnInboxPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'reservations',      lazy: () => import('./pages/admin/ReservationsPage.tsx').then(m => ({ Component: m.default })) },
@@ -109,6 +110,7 @@ const router = createBrowserRouter([
         { path: 'articles/:id/edit', lazy: () => import('./pages/admin/ArticleEditorPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'faqs',              lazy: () => import('./pages/admin/FaqAdminPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'mobile-intake',     lazy: () => import('./pages/admin/MobileIntakePage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'mobile-intake/edit/:id', lazy: () => import('./pages/admin/MobileIntakePage.tsx').then(m => ({ Component: m.default })) },
       ]},
       { path: '*', element: <NotFoundPage /> },
     ],

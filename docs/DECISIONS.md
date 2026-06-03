@@ -322,6 +322,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-03 — Bug Fix: Updated `ImageUploadZone.tsx` (Desktop Intake) to synchronously invoke the `processUploadedImage` HTTPS Callable, mirroring the mobile intake architecture and fixing an infinite spinner bug caused by the deprecation of the async Storage trigger.
 
+2026-06-03 — E55: Implemented Edit Inventory Item feature by refactoring `IntakeForm` and `MobileIntakePage` to accept an `initialItemId` URL parameter, reusing the existing creation components for the edit flow to maintain a perfect mobile/desktop UX separation.
+
 *Add new entries above this line.*
 
 2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.

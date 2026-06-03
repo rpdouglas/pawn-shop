@@ -279,7 +279,15 @@ export default function InventoryPage() {
                             />
                           </div>
                         )}
-                        <div style={{ marginTop: 'var(--space-3)', display: 'flex', gap: 'var(--space-2)' }}>
+                        <div style={{ marginTop: 'var(--space-3)', display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                          <Link
+                            to={`/admin/mobile-intake/edit/${item.id}`}
+                            className="btn btn-secondary btn-sm"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ padding: '0 var(--space-2)', minHeight: '32px', textDecoration: 'none', display: 'flex', alignItems: 'center' }}
+                          >
+                            Edit
+                          </Link>
                           <button
                             type="button"
                             className="btn btn-secondary btn-sm"
@@ -398,6 +406,21 @@ export default function InventoryPage() {
                       </td>
                       <td style={{ padding: 'var(--space-4)' }}>
                         <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                          <Link
+                            to={`/admin/intake/edit/${item.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              color: 'var(--color-primary)',
+                              textDecoration: 'none',
+                              fontSize: 'var(--text-small)',
+                              padding: 'var(--space-2)',
+                              minHeight: '48px',
+                              display: 'flex',
+                              alignItems: 'center'
+                            }}
+                          >
+                            Edit
+                          </Link>
                           <button
                             style={{
                               background: 'none',

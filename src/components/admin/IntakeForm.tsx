@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { doc, onSnapshot, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, onSnapshot, updateDoc, setDoc, serverTimestamp, getDoc } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { db, functions } from '../../lib/firebase'
 import type { ConditionGrade, MerchandisingTag, ViewType } from '../../lib/types'
@@ -124,9 +124,13 @@ function validateForPublish(form: FormState, images: string[]): FormErrors {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function IntakeForm() {
-  const [phase, setPhase] = useState<Phase>('creating')
-  const [itemId, setItemId] = useState<string | null>(null)
+interface IntakeFormProps {
+  initialItemId?: string
+}
+
+export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
+  const [phase, setPhase] = useState<Phase>(initialItemId ? 'editing' : 'creating')
+  const [itemId, setItemId] = useState<string | null>(initialItemId || null)
   const [images, setImages] = useState<string[]>([])
   const [formState, setFormState] = useState<FormState>(EMPTY_FORM)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -135,6 +139,54 @@ export default function IntakeForm() {
   const [isPublishing, setIsPublishing] = useState(false)
 
   // Real-time listener for images — CF processImageUpload writes to items/{id}.images[]
+  useEffect(() => {
+    if (initialItemId) {
+      const fetchItem = async () => {
+        try {
+          const snap = await getDoc(doc(db, 'items', initialItemId))
+          if (snap.exists()) {
+            const data = snap.data()
+            const costSnap = await getDoc(doc(db, 'items', initialItemId, 'internal', 'staff'))
+            const costData = costSnap.exists() ? costSnap.data() : null
+
+            setFormState(prev => ({
+              ...prev,
+              title: data.title || '',
+              description: data.description || '',
+              category: data.category || '',
+              viewTag: (data.viewTag as ViewType) || '',
+              priceInput: data.price ? (data.price / 100).toString() : '',
+              condition: (data.condition as ConditionGrade) || '',
+              serialNumber: data.serialNumber || '',
+              provenanceNotes: data.provenanceNotes || '',
+              isSeasonalItem: !!data.isSeasonalItem,
+              merchandisingTags: data.merchandisingTags || [],
+              costInput: costData?.cost ? (costData.cost / 100).toString() : '',
+              quantityInput: data.quantity ? data.quantity.toString() : '1',
+
+              // Cannabis Profile
+              thcMin: data.cannabisProfile?.thcMin?.toString() || '',
+              thcMax: data.cannabisProfile?.thcMax?.toString() || '',
+              cbdMin: data.cannabisProfile?.cbdMin?.toString() || '',
+              cbdMax: data.cannabisProfile?.cbdMax?.toString() || '',
+              terpenes: data.cannabisProfile?.terpenes?.join(', ') || '',
+              geneticLineage: data.cannabisProfile?.geneticLineage || '',
+              effectProfile: data.cannabisProfile?.effectProfile?.join(', ') || '',
+              brand: data.cannabisProfile?.brand || '',
+              format: data.cannabisProfile?.format || '',
+              weight: data.cannabisProfile?.weight || '',
+              lotNumber: data.cannabisProfile?.lotNumber || '',
+              packagedDate: data.cannabisProfile?.packagedDate ? new Date(data.cannabisProfile.packagedDate.seconds * 1000).toISOString().split('T')[0] : '',
+            }))
+          }
+        } catch (err) {
+          console.error("Failed to load item:", err)
+        }
+      }
+      fetchItem()
+    }
+  }, [initialItemId])
+
   useEffect(() => {
     if (!itemId) return
     const unsubscribe = onSnapshot(doc(db, 'items', itemId), (snap) => {
@@ -283,7 +335,7 @@ export default function IntakeForm() {
 
   return (
     <form onSubmit={(e) => e.preventDefault()} noValidate className="intake-form">
-      <h1 className="intake-title">New Item</h1>
+      <h1 className="intake-title">{initialItemId ? 'Edit Item' : 'New Item'}</h1>
 
       {/* ── Basic Information ── */}
       <section className="intake-section">

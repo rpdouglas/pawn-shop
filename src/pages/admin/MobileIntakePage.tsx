@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
-import { doc, onSnapshot, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, onSnapshot, updateDoc, setDoc, serverTimestamp, getDoc } from 'firebase/firestore'
 import { ref, uploadBytesResumable } from 'firebase/storage'
 import { httpsCallable } from 'firebase/functions'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import imageCompression from 'browser-image-compression'
 import { db, functions, storage } from '../../lib/firebase'
 import ProtectedRoute from '../../components/auth/ProtectedRoute'
@@ -144,9 +144,10 @@ const ERROR_TEXT: React.CSSProperties = {
 
 export default function MobileIntakePage() {
   const navigate = useNavigate()
+  const { id: initialItemId } = useParams()
   const [step, setStep] = useState<Step>('capture')
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
-  const [itemId, setItemId] = useState<string | null>(null)
+  const [itemId, setItemId] = useState<string | null>(initialItemId || null)
   const [images, setImages] = useState<string[]>([])
   const [uploads, setUploads] = useState<Map<string, UploadEntry>>(new Map())
   const [isCreating, setIsCreating] = useState(false)
@@ -166,6 +167,41 @@ export default function MobileIntakePage() {
     setForm(prev => ({ ...prev, [field]: value }))
 
   useEffect(() => { itemIdRef.current = itemId }, [itemId])
+
+  useEffect(() => {
+    if (initialItemId) {
+      const fetchItem = async () => {
+        try {
+          const snap = await getDoc(doc(db, 'items', initialItemId))
+          if (snap.exists()) {
+            const data = snap.data()
+            const costSnap = await getDoc(doc(db, 'items', initialItemId, 'internal', 'staff'))
+            const costData = costSnap.exists() ? costSnap.data() : null
+
+            setForm(prev => ({
+              ...prev,
+              title: data.title || '',
+              description: data.description || '',
+              category: data.category || '',
+              viewTag: (data.viewTag as ViewType) || '',
+              priceInput: data.price ? (data.price / 100).toString() : '',
+              condition: (data.condition as ConditionGrade) || '',
+              costInput: costData?.cost ? (costData.cost / 100).toString() : '',
+              quantityInput: data.quantity ? data.quantity.toString() : '1',
+            }))
+            
+            // Advance step if we have minimal data
+            if (data.title && data.viewTag) {
+              setStep('details')
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load item:", err)
+        }
+      }
+      fetchItem()
+    }
+  }, [initialItemId])
 
   // Real-time listener for CF-processed images once draft exists
   useEffect(() => {
@@ -436,7 +472,7 @@ export default function MobileIntakePage() {
         <div style={PAGE}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-8)' }}>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-heading)', color: 'var(--color-text)', margin: 0 }}>
-              New Item
+              {initialItemId ? 'Edit Item' : 'New Item'}
             </h1>
             <button
               onClick={() => navigate('/admin/inventory')}

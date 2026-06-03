@@ -65,6 +65,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E54 CLOSED** | E54 | 2026-06-02 |
 | `Fix Desktop Photo Upload` — Migrated `ImageUploadZone.tsx` to `processUploadedImage` Callable | BUGFIX | 2026-06-03 |
 | **BUGFIX CLOSED** | BUGFIX | 2026-06-03 |
+| `E55 Edit Inventory Item` — Refactored intake flows to accept `initialItemId` for edits | E55 | 2026-06-03 |
+| **E55 CLOSED** | E55 | 2026-06-03 |
 
 ---
 
