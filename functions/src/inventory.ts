@@ -7,7 +7,7 @@ import { getStorage } from 'firebase-admin/storage'
 import sharp from 'sharp'
 import * as path from 'node:path'
 import { dispatchSms } from './lib/sms'
-import { extractIntakeData } from './ai'
+import { extractIntakeData, geminiApiKey } from './ai'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -398,7 +398,7 @@ export const resetExpiredHolds = onSchedule('every 30 minutes', async () => {
 // Callable CF. Called by MobileIntakePage after successful storage upload.
 // Manually kicks off the image processing pipeline.
 
-export const processUploadedImage = onCall<{ filePath: string, extractData?: boolean, viewTag?: string }>({ cors: true, memory: '1GiB', timeoutSeconds: 120 }, async (request) => {
+export const processUploadedImage = onCall<{ filePath: string, extractData?: boolean, viewTag?: string }>({ cors: true, memory: '1GiB', timeoutSeconds: 120, secrets: [geminiApiKey] }, async (request) => {
   if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
     throw new HttpsError('permission-denied', 'Staff role required')
   }

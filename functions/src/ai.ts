@@ -1,19 +1,25 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { defineSecret } from 'firebase-functions/params'
 import { assertStaff } from './auth'
 
 const db = getFirestore()
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' })
-const flashModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+export const geminiApiKey = defineSecret('GEMINI_API_KEY')
+
+function getModels() {
+  const genAI = new GoogleGenerativeAI(geminiApiKey.value())
+  return {
+    model: genAI.getGenerativeModel({ model: 'gemini-1.5-pro' }),
+    flashModel: genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+  }
+}
 
 /**
  * Generate AI Description Draft
  */
-export const generateAIDescription = onCall(async (request) => {
+export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (request) => {
   const { uid } = await assertStaff(request)
   const { itemId, title, category, viewTag, condition, provenanceNotes, serialNumber, staffNotes } = request.data
 
@@ -54,6 +60,7 @@ export const generateAIDescription = onCall(async (request) => {
   `
 
   try {
+    const { model } = getModels()
     const result = await model.generateContent([systemPrompt, userPrompt])
     const response = result.response
     const text = response.text()
@@ -88,7 +95,7 @@ export const generateAIDescription = onCall(async (request) => {
 /**
  * Suggest AI Pricing
  */
-export const suggestAiPrice = onCall(async (request) => {
+export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request) => {
   const { uid } = await assertStaff(request)
   const { itemId, title, category, condition, brandModel, staffNotes } = request.data
 
@@ -124,6 +131,7 @@ export const suggestAiPrice = onCall(async (request) => {
   `
 
   try {
+    const { model } = getModels()
     const result = await model.generateContent([systemPrompt, userPrompt])
     const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
     const parsed = JSON.parse(jsonStr)
@@ -153,7 +161,7 @@ export const suggestAiPrice = onCall(async (request) => {
 /**
  * Suggest AI Tags
  */
-export const suggestAiTags = onCall(async (request) => {
+export const suggestAiTags = onCall({ secrets: [geminiApiKey] }, async (request) => {
   const { uid } = await assertStaff(request)
   const { itemId, title, category, condition, provenanceNotes } = request.data
 
@@ -168,6 +176,7 @@ export const suggestAiTags = onCall(async (request) => {
   const userPrompt = `Suggest tags for: ${title} (${category}, ${condition}). Provenance: ${provenanceNotes || 'None'}`
 
   try {
+    const { flashModel } = getModels()
     const result = await flashModel.generateContent([systemPrompt, userPrompt])
     const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
     const parsed = JSON.parse(jsonStr)
@@ -216,6 +225,7 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
   `
 
   try {
+    const { model } = getModels()
     const result = await model.generateContent([
       systemPrompt,
       {
