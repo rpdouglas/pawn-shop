@@ -35,3 +35,4 @@ user-guide/.vitepress/cache
 # Lighthouse CI output and Chrome binary
 .lighthouseci/
 chrome/
+functions/.env
