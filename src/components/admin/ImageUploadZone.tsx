@@ -20,13 +20,15 @@ interface UploadEntry {
 }
 
 interface ImageUploadZoneProps {
-  itemId: string
+  itemId: string | null
+  onRequireItemId?: () => Promise<string | null>
+  onProcessingChange?: (isProcessing: boolean) => void
   images: string[]  // watermarked URLs — written to Firestore by processImageUpload CF
   extractData?: boolean
   viewTag?: string
 }
 
-type UploadFn = (key: string, blob: Blob, fileName: string, attempt: number) => void
+type UploadFn = (key: string, blob: Blob, fileName: string, attempt: number, resolvedItemId: string) => void
 
 const ACCEPTED_MIME = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_BYTES = 20 * 1024 * 1024  // 20 MB
@@ -37,7 +39,7 @@ const COMPRESSION_OPTIONS = {
   useWebWorker: true,
 }
 
-export default function ImageUploadZone({ itemId, images, extractData, viewTag }: ImageUploadZoneProps) {
+export default function ImageUploadZone({ itemId, onRequireItemId, onProcessingChange, images, extractData, viewTag }: ImageUploadZoneProps) {
   const [uploads, setUploads] = useState<Map<string, UploadEntry>>(new Map())
   const [isDragging, setIsDragging] = useState(false)
   const [isMobile, setIsMobile] = useState(window.matchMedia('(max-width: 767px)').matches)
@@ -90,8 +92,15 @@ export default function ImageUploadZone({ itemId, images, extractData, viewTag }
     })
   }, [images.length])
 
-  const doUpload = useCallback<UploadFn>((key, blob, fileName, attempt) => {
-    const storageRef = ref(storage, `items/${itemId}/uploads/${key}`)
+  useEffect(() => {
+    if (onProcessingChange) {
+      const isProcessing = Array.from(uploads.values()).some(u => !u.error)
+      onProcessingChange(isProcessing)
+    }
+  }, [uploads, onProcessingChange])
+
+  const doUpload = useCallback<UploadFn>((key, blob, fileName, attempt, resolvedItemId) => {
+    const storageRef = ref(storage, `items/${resolvedItemId}/uploads/${key}`)
     const task = uploadBytesResumable(storageRef, blob)
 
     task.on(
@@ -108,7 +117,7 @@ export default function ImageUploadZone({ itemId, images, extractData, viewTag }
         if (attempt < MAX_RETRIES - 1) {
           // Auto-retry with exponential backoff: 500 ms, 1 s, 2 s
           // Use ref to avoid circular useCallback dependency on doUpload itself
-          setTimeout(() => doUploadRef.current?.(key, blob, fileName, attempt + 1), 500 * Math.pow(2, attempt))
+          setTimeout(() => doUploadRef.current?.(key, blob, fileName, attempt + 1, resolvedItemId), 500 * Math.pow(2, attempt))
         } else {
           // All retries exhausted — keep optimistic URL and blob for manual retry
           setUploads(prev => {
@@ -147,12 +156,21 @@ export default function ImageUploadZone({ itemId, images, extractData, viewTag }
         }
       }
     )
-  }, [itemId, extractData, viewTag])
+  }, [extractData, viewTag])
 
   // Keep ref in sync so the retry setTimeout always calls the latest closure
   useEffect(() => { doUploadRef.current = doUpload }, [doUpload])
 
   const uploadFile = useCallback(async (file: File) => {
+    let resolvedItemId = itemId
+    if (!resolvedItemId && onRequireItemId) {
+      resolvedItemId = await onRequireItemId()
+    }
+    if (!resolvedItemId) {
+      // Failed to get an item ID; cannot upload
+      return
+    }
+
     const key = `${Date.now()}-${file.name}`
 
     if (!ACCEPTED_MIME.includes(file.type)) {
@@ -184,10 +202,11 @@ export default function ImageUploadZone({ itemId, images, extractData, viewTag }
       fileName: file.name, progress: 0, optimisticUrl, hasBlob: true, retryCount: 0,
     }))
 
-    doUpload(key, blob, file.name, 0)
-  }, [doUpload])
+    doUpload(key, blob, file.name, 0, resolvedItemId)
+  }, [itemId, onRequireItemId, doUpload])
 
   const retryUpload = useCallback((key: string, fileName: string) => {
+    if (!itemId) return // Shouldn't happen on retry
     const blob = blobsRef.current.get(key)
     if (!blob) return
     setUploads(prev => {
@@ -195,8 +214,8 @@ export default function ImageUploadZone({ itemId, images, extractData, viewTag }
       if (!entry) return prev
       return new Map(prev).set(key, { ...entry, progress: 0, error: undefined, retryCount: 0 })
     })
-    doUpload(key, blob, fileName, 0)
-  }, [doUpload])
+    doUpload(key, blob, fileName, 0, itemId)
+  }, [itemId, doUpload])
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (!files) return

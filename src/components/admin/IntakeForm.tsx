@@ -116,15 +116,15 @@ function parsePriceCents(input: string): number {
 
 function validateForSave(form: FormState): FormErrors {
   const errors: FormErrors = {}
-  if (!form.title.trim())    errors.title    = 'Title is required'
-  if (!form.category.trim()) errors.category = 'Category is required'
   if (!form.viewTag)         errors.viewTag  = 'View is required'
   return errors
 }
 
 function validateForPublish(form: FormState, images: string[]): FormErrors {
   const errors = validateForSave(form)
-  if (!form.description.trim()) errors.description = 'Description is required'
+  if (!form.title.trim())       errors.title        = 'Title is required'
+  if (!form.category.trim())    errors.category     = 'Category is required'
+  if (!form.description.trim()) errors.description  = 'Description is required'
   if (!form.condition)          errors.condition    = 'Condition is required'
   const cents = parsePriceCents(form.priceInput)
   if (isNaN(cents) || cents <= 0) errors.price = 'Valid price is required (e.g. 49.99)'
@@ -152,6 +152,38 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
   const [publishError, setPublishError] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
+  const [isAiProcessing, setIsAiProcessing] = useState(false)
+
+  const ensureItemCreated = async (): Promise<string | null> => {
+    if (itemId) return itemId
+    if (isCreating) return null
+    
+    if (!formState.viewTag) {
+      setErrors({ viewTag: 'Please select a view before uploading a photo' })
+      return null
+    }
+
+    setIsCreating(true)
+    setPublishError('')
+    try {
+      const result = await createDraftItemFn({
+        title: formState.title.trim() || 'AI Draft Intake',
+        category: formState.category.trim() || 'general',
+        viewTag: formState.viewTag,
+      })
+      
+      const newId = result.data.itemId
+      setItemId(newId)
+      setPhase('editing')
+      return newId
+    } catch (err) {
+      setPublishError(err instanceof Error ? err.message : 'Could not start item for upload.')
+      return null
+    } finally {
+      setIsCreating(false)
+    }
+  }
 
   // Real-time listener for images — CF processImageUpload writes to items/{id}.images[]
   useEffect(() => {
@@ -387,9 +419,82 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
     <form onSubmit={(e) => e.preventDefault()} noValidate className="intake-form">
       <h1 className="intake-title">{initialItemId ? 'Edit Item' : 'New Item'}</h1>
 
+      {/* ── Photo & View (AI Trigger) ── */}
+      <section className="intake-section" style={{ position: 'relative' }}>
+        <h2 className="intake-section-heading">Capture & View</h2>
+        
+        {isAiProcessing && (
+          <div style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'var(--color-bg-subtle)',
+            opacity: 0.85,
+            zIndex: 10,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--color-border)',
+          }}>
+            <span style={{ 
+              fontFamily: 'var(--font-display)', 
+              fontSize: 'var(--text-subheading)', 
+              color: 'var(--color-primary)',
+              animation: 'pulse 2s infinite' 
+            }}>
+              ✨ AI Extracting...
+            </span>
+          </div>
+        )}
+
+        <div className="input-wrapper" style={{ marginBottom: 'var(--space-6)' }}>
+          <label className="input-label" htmlFor="viewTag">View (Required first)</label>
+          <select
+            id="viewTag"
+            className="input-field input-field-select"
+            value={formState.viewTag}
+            onChange={(e) => set('viewTag')(e.target.value as ViewType | '')}
+            aria-invalid={errors.viewTag ? 'true' : undefined}
+            aria-describedby={errors.viewTag ? 'viewTag-error' : undefined}
+          >
+            <option value="">Select view…</option>
+            <option value="pawn">Pawn</option>
+            <option value="cannabis">Cannabis</option>
+            <option value="fireworks">Fireworks</option>
+          </select>
+          {errors.viewTag && (
+            <span id="viewTag-error" className="input-error" role="alert">{errors.viewTag}</span>
+          )}
+        </div>
+
+        {errors.images && (
+          <span className="input-error" role="alert" style={{ marginBottom: 'var(--space-4)', display: 'block' }}>{errors.images}</span>
+        )}
+
+        <ImageUploadZone 
+          itemId={itemId} 
+          onRequireItemId={ensureItemCreated}
+          onProcessingChange={setIsAiProcessing}
+          images={images} 
+          extractData={images.length === 0} 
+          viewTag={formState.viewTag || undefined} 
+        />
+      </section>
+
       {/* ── Basic Information ── */}
-      <section className="intake-section">
+      <section className="intake-section" style={{ position: 'relative' }}>
         <h2 className="intake-section-heading">Basic Information</h2>
+
+        {isAiProcessing && (
+          <div style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'var(--color-bg-subtle)',
+            opacity: 0.6,
+            zIndex: 10,
+            borderRadius: 'var(--radius-md)',
+          }} />
+        )}
 
         <Input
           id="title"
@@ -400,36 +505,14 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
           error={errors.title}
         />
 
-        <div className="intake-row intake-row-2">
-          <div className="input-wrapper">
-            <label className="input-label" htmlFor="viewTag">View</label>
-            <select
-              id="viewTag"
-              className="input-field input-field-select"
-              value={formState.viewTag}
-              onChange={(e) => set('viewTag')(e.target.value as ViewType | '')}
-              aria-invalid={errors.viewTag ? 'true' : undefined}
-              aria-describedby={errors.viewTag ? 'viewTag-error' : undefined}
-            >
-              <option value="">Select view…</option>
-              <option value="pawn">Pawn</option>
-              <option value="cannabis">Cannabis</option>
-              <option value="fireworks">Fireworks</option>
-            </select>
-            {errors.viewTag && (
-              <span id="viewTag-error" className="input-error" role="alert">{errors.viewTag}</span>
-            )}
-          </div>
-
-          <Input
-            id="category"
-            label="Category"
-            value={formState.category}
-            onChange={set('category')}
-            placeholder="e.g. Watches"
-            error={errors.category}
-          />
-        </div>
+        <Input
+          id="category"
+          label="Category"
+          value={formState.category}
+          onChange={set('category')}
+          placeholder="e.g. Watches"
+          error={errors.category}
+        />
 
         <div className="input-wrapper">
           <label className="input-label" htmlFor="description">Description</label>
@@ -558,17 +641,7 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
         </div>
       </section>
 
-      {/* ── Photos ── */}
-      <section className="intake-section">
-        <h2 className="intake-section-heading">Photos</h2>
-        {errors.images && (
-          <span className="input-error" role="alert">{errors.images}</span>
-        )}
-        {itemId
-          ? <ImageUploadZone itemId={itemId} images={images} extractData={images.length === 0} viewTag={formState.viewTag} />
-          : <p className="intake-upload-locked">Save the item first to enable photo upload.</p>
-        }
-      </section>
+
 
       {/* ── Merchandising ── */}
       <section className="intake-section">

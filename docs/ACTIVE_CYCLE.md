@@ -71,6 +71,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E56 CLOSED** | E56 | 2026-06-03 |
 | `E57 AI-First Inventory Intake` — Flipped intake flow to upload photo first, triggering Gemini to hydrate form data automatically | E57 | 2026-06-03 |
 | **E57 CLOSED** | E57 | 2026-06-03 |
+| `E58 Desktop Photo First` — Re-architected desktop IntakeForm to auto-create drafts and trigger AI extraction on photo drop | E58 | 2026-06-03 |
+| **E58 CLOSED** | E58 | 2026-06-03 |
 
 ---
 
