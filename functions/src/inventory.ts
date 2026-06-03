@@ -456,7 +456,9 @@ export const processUploadedImage = onCall<{ filePath: string, extractData?: boo
       const [meta] = await tempFile.getMetadata()
       const mimeType = meta.contentType || 'image/jpeg'
       const aiResult = await extractIntakeData(buffer, mimeType, viewTag)
-      if (aiResult) {
+      if (aiResult && aiResult.error) {
+        throw new HttpsError('internal', `AI Extraction Failed: ${aiResult.error}`)
+      } else if (aiResult) {
         await db.collection("items").doc(itemId).collection("internal").doc("ai").set({
           intakeExtraction: {
             ...aiResult,

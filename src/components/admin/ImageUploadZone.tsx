@@ -142,8 +142,11 @@ export default function ImageUploadZone({ itemId, onRequireItemId, onProcessingC
         })
 
         try {
+          console.log(`[AI Intake] Calling processUploadedImage for ${storageRef.fullPath}...`)
           await processUploadedImageFn({ filePath: storageRef.fullPath, extractData, viewTag })
+          console.log(`[AI Intake] processUploadedImage completed successfully.`)
         } catch (err) {
+          console.error(`[AI Intake] processUploadedImage failed:`, err)
           setUploads(prev => {
             const entry = prev.get(key)
             if (!entry) return prev

@@ -252,10 +252,16 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
   // Real-time listener for AI extraction data
   useEffect(() => {
     if (!itemId) return
+    console.log(`[AI Intake] Starting real-time listener for item: ${itemId}`)
     const unsubscribe = onSnapshot(doc(db, 'items', itemId, 'internal', 'ai'), (snap) => {
-      if (!snap.exists()) return
+      if (!snap.exists()) {
+        console.log(`[AI Intake] 'internal/ai' document does not exist yet for item ${itemId}.`)
+        return
+      }
       const data = snap.data()
+      console.log(`[AI Intake] Received update from 'internal/ai':`, data)
       if (data.intakeExtraction && data.intakeExtraction.suggestedFields) {
+        console.log(`[AI Intake] Hydrating form with AI suggested fields:`, data.intakeExtraction.suggestedFields)
         const fields = data.intakeExtraction.suggestedFields
         setFormState(prev => ({
           ...prev,
@@ -268,6 +274,7 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
         }))
       }
       if (data.intakeExtraction && data.intakeExtraction.marketPricing) {
+        console.log(`[AI Intake] Hydrating market pricing:`, data.intakeExtraction.marketPricing)
         setMarketPricing(data.intakeExtraction.marketPricing)
       }
     })

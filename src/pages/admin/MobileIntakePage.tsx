@@ -262,10 +262,16 @@ export default function MobileIntakePage() {
   // Real-time listener for AI extraction data
   useEffect(() => {
     if (!itemId) return
+    console.log(`[AI Intake] Starting real-time listener for item: ${itemId}`)
     const unsubscribe = onSnapshot(doc(db, 'items', itemId, 'internal', 'ai'), (snap) => {
-      if (!snap.exists()) return
+      if (!snap.exists()) {
+        console.log(`[AI Intake] 'internal/ai' document does not exist yet for item ${itemId}.`)
+        return
+      }
       const data = snap.data()
+      console.log(`[AI Intake] Received update from 'internal/ai':`, data)
       if (data.intakeExtraction && data.intakeExtraction.suggestedFields) {
+        console.log(`[AI Intake] Hydrating form with AI suggested fields:`, data.intakeExtraction.suggestedFields)
         const fields = data.intakeExtraction.suggestedFields
         setForm(prev => ({
           ...prev,
@@ -280,6 +286,7 @@ export default function MobileIntakePage() {
         setStep(prevStep => prevStep === 'capture' ? 'details' : prevStep)
       }
       if (data.intakeExtraction && data.intakeExtraction.marketPricing) {
+        console.log(`[AI Intake] Hydrating market pricing:`, data.intakeExtraction.marketPricing)
         setMarketPricing(data.intakeExtraction.marketPricing)
       }
     })
@@ -334,7 +341,9 @@ export default function MobileIntakePage() {
         setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 100, processing: true }))
         
         try {
+          console.log(`[AI Intake] Calling processUploadedImage for ${storagePath}...`)
           await processUploadedImageFn({ filePath: storagePath, extractData: true, viewTag: form.viewTag })
+          console.log(`[AI Intake] processUploadedImage completed successfully.`)
           
           setUploads(prev => {
             const updated = new Map(prev)
@@ -343,6 +352,7 @@ export default function MobileIntakePage() {
             return updated
           })
         } catch (err) {
+          console.error(`[AI Intake] processUploadedImage failed:`, err)
           setUploads(prev => {
             const updated = new Map(prev)
             const entry = updated.get(key)

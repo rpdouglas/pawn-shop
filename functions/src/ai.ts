@@ -245,10 +245,15 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
       result = await model.generateContent(promptParts)
     }
 
-    const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
-    return JSON.parse(jsonStr)
-  } catch (err: unknown) {
+    try {
+      const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
+      return JSON.parse(jsonStr)
+    } catch (parseErr) {
+      console.error('Failed to parse Gemini output. Raw text:', result.response.text())
+      return { error: 'Failed to parse AI output into JSON.' }
+    }
+  } catch (err: any) {
     console.error('Gemini Intake Extraction Error:', err)
-    return null
+    return { error: err.message || 'Unknown AI Error' }
   }
 }
