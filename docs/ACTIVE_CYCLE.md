@@ -69,6 +69,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E55 CLOSED** | E55 | 2026-06-03 |
 | `E56 Cannabis Data Model` — Expanded `CannabisProfile` schema to support subcategories, servings, strain types, and unit toggles | E56 | 2026-06-03 |
 | **E56 CLOSED** | E56 | 2026-06-03 |
+| `E57 AI-First Inventory Intake` — Flipped intake flow to upload photo first, triggering Gemini to hydrate form data automatically | E57 | 2026-06-03 |
+| **E57 CLOSED** | E57 | 2026-06-03 |
 
 ---
 

@@ -185,3 +185,50 @@ export const suggestAiTags = onCall(async (request) => {
     throw new HttpsError('internal', 'Failed to suggest AI tags.')
   }
 })
+
+/**
+ * Extract Intake Data (Image Vision)
+ * Called internally by processUploadedImage CF.
+ */
+export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTag: string) {
+  const systemPrompt = `
+    You are an expert AI receiving an image of an item being brought into a pawn shop or retail store.
+    The store section is: ${viewTag}.
+    Analyse the image and extract the fields required for the intake form.
+    Also, provide a market pricing deep dive estimating the Average Regular Price, Average Sale Price, and Average Refurbished/Open-Box Price in CAD cents (integer).
+    Return strictly JSON with NO markdown formatting, matching this structure:
+    {
+      "suggestedFields": {
+        "title": "string",
+        "category": "string",
+        "description": "string (1-2 sentences)",
+        "condition": "new | like-new | good | fair | poor",
+        "brand": "string (if cannabis or relevant)",
+        "format": "string (if cannabis)"
+      },
+      "marketPricing": {
+        "avgRegularPriceCents": 0,
+        "avgSalePriceCents": 0,
+        "avgRefurbPriceCents": 0,
+        "currency": "CAD"
+      }
+    }
+  `
+
+  try {
+    const result = await model.generateContent([
+      systemPrompt,
+      {
+        inlineData: {
+          data: buffer.toString('base64'),
+          mimeType: mimeType
+        }
+      }
+    ])
+    const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
+    return JSON.parse(jsonStr)
+  } catch (err: unknown) {
+    console.error('Gemini Intake Extraction Error:', err)
+    return null
+  }
+}

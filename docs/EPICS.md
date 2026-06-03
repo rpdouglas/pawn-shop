@@ -634,6 +634,20 @@
 
 ---
 
+### E57 · AI-First Inventory Intake
+
+> **Persona Gate — E57:**
+> - **Jordan + Marcus:** AI descriptions and pricing deep-dives are strictly isolated in `internal/ai` — never exposed directly to the public view without staff review.
+> - **Staff:** The first photo uploaded triggers a Gemini Vision background job that automatically fills the form details, reducing manual entry.
+
+- [x] **Schema first:** Update `docs/firestore-schema.md` — add `intakeExtraction` submap to `items/{id}/internal/ai`. Log in `DECISIONS.md`. `[Comp]`
+- [x] Extend `functions/src/ai.ts` — add `extractIntakeData` to perform structured data extraction and pricing deep-dive. `[Staff]`
+- [x] Update `processUploadedImage` CF to accept `extractData` and trigger `extractIntakeData`. `[Staff]`
+- [x] Update Mobile Intake UI to flip the flow: select View -> Photo Upload -> wait for AI -> Form Hydration. `[Staff]`
+- [x] Update Desktop Intake UI to trigger AI extraction on the first uploaded photo. `[Staff]`
+
+---
+
 ## Phase 12 — Pawn Services Deepening
 
 > **Goal:** Deepen the customer relationship post-sale with mobile loan management and wallet passes. E31 must land before E32 — wallet passes reference loan ticket data.

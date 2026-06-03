@@ -18,7 +18,7 @@ Staff members begin by entering the basic details:
 - **View:** Select where the item should appear (Pawn, Cannabis, or Fireworks).
 - **Category:** The specific type of item (e.g., Watches, Flower, Roman Candles).
 
-Saving these details creates a **Draft** in the system.
+Saving these details creates a **Draft** in the system. However, the most efficient way to start is to select the View and then immediately upload a photo to trigger the **AI Assistant** (see below).
 
 ## Step 2: Details and Media
 
@@ -30,11 +30,12 @@ Once a draft is created, staff can add more detailed information:
 - **Initial Stock:** How many units you have on hand. Defaults to `1`. Can be adjusted at any time from the Inventory Management page.
 - **Photos:** Upload at least one high-quality photo.
 
-### Automated Image Processing
+### Automated Image Processing & AI Extraction
 When you upload a photo:
-1.  The system adds a "The Pawn Shop" watermark.
-2.  The image is converted to WebP for fast loading.
-3.  The original file is deleted to save space.
+1. Gemini Vision analyzes the item based on the selected View.
+2. The AI automatically extracts product details (Title, Description, Category, etc.) and deep-dives pricing data, hydrating the form fields.
+3. The system adds a "The Pawn Shop" watermark.
+4. The image is compressed and saved as a WebP for fast loading.
 
 ## Step 3: Publication
 

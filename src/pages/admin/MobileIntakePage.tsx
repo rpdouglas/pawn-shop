@@ -24,7 +24,7 @@ const publishItemFn = httpsCallable<
 >(functions, 'publishItem')
 
 const processUploadedImageFn = httpsCallable<
-  { filePath: string },
+  { filePath: string, extractData?: boolean, viewTag?: string },
   { success: boolean }
 >(functions, 'processUploadedImage')
 
@@ -44,6 +44,8 @@ interface FormState {
   quantityInput: string  // Initial stock count — defaults to 1
 
   // Cannabis Profile (E56 fields)
+  brand?: string
+  format?: string
   subCategory?: string
   servings?: string
   weightPerServing?: string
@@ -75,6 +77,8 @@ const EMPTY_FORM: FormState = {
   weightPerServing: '',
   strainType: '',
   cannabinoidUnit: '%',
+  brand: '',
+  format: '',
 }
 
 function parseQuantity(input: string): number {
@@ -200,6 +204,8 @@ export default function MobileIntakePage() {
               condition: data.condition || '',
               quantityInput: data.quantity !== undefined ? data.quantity.toString() : '1',
               costInput: costData?.cost ? (costData.cost / 100).toFixed(2) : '',
+              brand: data.cannabisProfile?.brand || '',
+              format: data.cannabisProfile?.format || '',
               subCategory: data.cannabisProfile?.subCategory || '',
               servings: data.cannabisProfile?.servings ? data.cannabisProfile.servings.toString() : '',
               weightPerServing: data.cannabisProfile?.weightPerServing || '',
@@ -243,6 +249,30 @@ export default function MobileIntakePage() {
           }
           return next
         })
+      }
+    })
+    return unsubscribe
+  }, [itemId])
+
+  // Real-time listener for AI extraction data
+  useEffect(() => {
+    if (!itemId) return
+    const unsubscribe = onSnapshot(doc(db, 'items', itemId, 'internal', 'ai'), (snap) => {
+      if (!snap.exists()) return
+      const data = snap.data()
+      if (data.intakeExtraction && data.intakeExtraction.suggestedFields) {
+        const fields = data.intakeExtraction.suggestedFields
+        setForm(prev => ({
+          ...prev,
+          title: prev.title === 'AI Draft Intake' || !prev.title ? fields.title || prev.title : prev.title,
+          category: prev.category === 'general' || !prev.category ? fields.category || prev.category : prev.category,
+          description: !prev.description ? fields.description || prev.description : prev.description,
+          condition: !prev.condition ? fields.condition || prev.condition : prev.condition,
+          brand: !prev.brand && fields.brand ? fields.brand : prev.brand,
+          format: !prev.format && fields.format ? fields.format : prev.format
+        }))
+        // Automatically advance if we were waiting on capture
+        setStep(prevStep => prevStep === 'capture' ? 'details' : prevStep)
       }
     })
     return unsubscribe
@@ -296,7 +326,7 @@ export default function MobileIntakePage() {
         setUploads(prev => new Map(prev).set(key, { fileName: file.name, progress: 100, processing: true }))
         
         try {
-          await processUploadedImageFn({ filePath: storagePath })
+          await processUploadedImageFn({ filePath: storagePath, extractData: true, viewTag: form.viewTag })
           
           setUploads(prev => {
             const updated = new Map(prev)
@@ -314,7 +344,7 @@ export default function MobileIntakePage() {
         }
       }
     )
-  }, [])
+  }, [form.viewTag])
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (!files) return
@@ -328,7 +358,6 @@ export default function MobileIntakePage() {
     if (isCreatingRef.current) return false
 
     const errs: Record<string, string> = {}
-    if (!form.title.trim()) errs.title = 'Name this item first'
     if (!form.viewTag) errs.viewTag = 'Select a view first'
     if (Object.keys(errs).length > 0) { setErrors(errs); return false }
     setErrors({})
@@ -337,7 +366,7 @@ export default function MobileIntakePage() {
     setIsCreating(true)
     try {
       const result = await createDraftItemFn({
-        title: form.title.trim(),
+        title: form.title.trim() || 'AI Draft Intake',
         category: 'general',
         viewTag: form.viewTag as string,
       })
@@ -365,7 +394,6 @@ export default function MobileIntakePage() {
 
   const advanceToDetails = () => {
     const errs: Record<string, string> = {}
-    if (!form.title.trim()) errs.title = 'Name this item first'
     if (!form.viewTag) errs.viewTag = 'Select a view first'
     const hasActiveUpload = Array.from(uploads.values()).some(u => !u.error && !u.processing)
     const hasProcessing = Array.from(uploads.values()).some(u => u.processing)
@@ -546,25 +574,8 @@ export default function MobileIntakePage() {
           </div>
 
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-8)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Step 1 of 3 — Photo
+            Step 1 of 3 — Upload Photo to start AI Extraction
           </p>
-
-          {/* Title */}
-          <div style={FIELD}>
-            <label htmlFor="mi-title" style={LABEL}>Item Name</label>
-            <input
-              id="mi-title"
-              type="text"
-              value={form.title}
-              onChange={e => set('title')(e.target.value)}
-              placeholder="e.g. Seiko 5 Automatic"
-              autoFocus
-              style={INPUT}
-              aria-invalid={errors.title ? 'true' : undefined}
-              aria-describedby={errors.title ? 'mi-title-error' : undefined}
-            />
-            {errors.title && <span id="mi-title-error" style={ERROR_TEXT} role="alert">{errors.title}</span>}
-          </div>
 
           {/* View */}
           <div style={FIELD}>
@@ -583,6 +594,23 @@ export default function MobileIntakePage() {
               <option value="fireworks">Fireworks</option>
             </select>
             {errors.viewTag && <span id="mi-view-error" style={ERROR_TEXT} role="alert">{errors.viewTag}</span>}
+          </div>
+
+          {/* Title - Now optional since AI will suggest one */}
+          <div style={FIELD}>
+            <label htmlFor="mi-title" style={LABEL}>Item Name (Optional - AI will fill this)</label>
+            <input
+              id="mi-title"
+              type="text"
+              value={form.title === 'AI Draft Intake' ? '' : form.title}
+              onChange={e => set('title')(e.target.value)}
+              placeholder="e.g. Seiko 5 Automatic"
+              autoFocus
+              style={INPUT}
+              aria-invalid={errors.title ? 'true' : undefined}
+              aria-describedby={errors.title ? 'mi-title-error' : undefined}
+            />
+            {errors.title && <span id="mi-title-error" style={ERROR_TEXT} role="alert">{errors.title}</span>}
           </div>
 
           {/* Photo guidance */}

@@ -7,6 +7,7 @@ import { getStorage } from 'firebase-admin/storage'
 import sharp from 'sharp'
 import * as path from 'node:path'
 import { dispatchSms } from './lib/sms'
+import { extractIntakeData } from './ai'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -397,12 +398,12 @@ export const resetExpiredHolds = onSchedule('every 30 minutes', async () => {
 // Callable CF. Called by MobileIntakePage after successful storage upload.
 // Manually kicks off the image processing pipeline.
 
-export const processUploadedImage = onCall<{ filePath: string }>({ cors: true, memory: '1GiB', timeoutSeconds: 120 }, async (request) => {
+export const processUploadedImage = onCall<{ filePath: string, extractData?: boolean, viewTag?: string }>({ cors: true, memory: '1GiB', timeoutSeconds: 120 }, async (request) => {
   if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
     throw new HttpsError('permission-denied', 'Staff role required')
   }
 
-  const { filePath } = request.data
+  const { filePath, extractData, viewTag } = request.data
   if (!filePath) throw new HttpsError('invalid-argument', 'filePath is required')
 
   const match = filePath.match(/^items\/([^/]+)\/uploads\/([^/]+)$/)
@@ -449,6 +450,26 @@ export const processUploadedImage = onCall<{ filePath: string }>({ cors: true, m
       images: FieldValue.arrayUnion(finalUrl),
       updatedAt: FieldValue.serverTimestamp(),
     })
+
+    if (extractData && viewTag) {
+      await jobRef.update({ status: 'analyzing' })
+      const [meta] = await tempFile.getMetadata()
+      const mimeType = meta.contentType || 'image/jpeg'
+      const aiResult = await extractIntakeData(buffer, mimeType, viewTag)
+      if (aiResult) {
+        await db.collection("items").doc(itemId).collection("internal").doc("ai").set({
+          intakeExtraction: {
+            ...aiResult,
+            marketPricing: {
+              ...aiResult.marketPricing,
+              retrievedAt: FieldValue.serverTimestamp()
+            }
+          },
+          updatedAt: FieldValue.serverTimestamp(),
+          generatedBy: request.auth.uid
+        }, { merge: true })
+      }
+    }
 
     await tempFile.delete()
 

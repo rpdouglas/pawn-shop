@@ -326,6 +326,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-03 — E56: Expanded `CannabisProfile` schema to include `subCategory`, `servings`, `weightPerServing`, `strainType`, and `cannabinoidUnit`. Implemented Strategy A to provide explicit UI controls in Intake forms (dropdowns/radios) ensuring data consistency over free-text tags.
 
+2026-06-03 — E57: Implemented AI-first inventory intake using the Strategy B Async Job Tracker pattern. The UI uploads an image, and a background Cloud Function triggers Gemini Vision to extract form fields and market pricing, writing to `items/{id}/internal/ai.intakeExtraction`. The UI polls the `imageJobs` doc to display progress before hydrating the draft form. This prevents 15s loading spinners on mobile from failing due to connectivity issues.
+
 *Add new entries above this line.*
 
 2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.

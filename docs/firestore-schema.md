@@ -66,6 +66,7 @@
 | `aiDescription` | string | Gemini draft — staff must promote to `items/{id}.description` before publishing |
 | `aiPriceSuggestion` | map | `{ low: number, high: number, source: string }` — guidance only, never a published price |
 | `aiTagSuggestions` | array\<string\> | Gemini suggested tags (e.g. `rare-find`, `just-arrived`). Staff reviewed. |
+| `intakeExtraction` | map | `{ suggestedFields: map, marketPricing: { avgRegularPriceCents: number, avgSalePriceCents: number, avgRefurbPriceCents: number, currency: string, retrievedAt: timestamp } }` |
 
 ---
 

@@ -212,6 +212,28 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
     return unsubscribe
   }, [itemId])
 
+  // Real-time listener for AI extraction data
+  useEffect(() => {
+    if (!itemId) return
+    const unsubscribe = onSnapshot(doc(db, 'items', itemId, 'internal', 'ai'), (snap) => {
+      if (!snap.exists()) return
+      const data = snap.data()
+      if (data.intakeExtraction && data.intakeExtraction.suggestedFields) {
+        const fields = data.intakeExtraction.suggestedFields
+        setFormState(prev => ({
+          ...prev,
+          title: !prev.title || prev.title === 'AI Draft Intake' ? fields.title || prev.title : prev.title,
+          category: !prev.category || prev.category === 'general' ? fields.category || prev.category : prev.category,
+          description: !prev.description ? fields.description || prev.description : prev.description,
+          condition: !prev.condition ? fields.condition || prev.condition : prev.condition,
+          brand: !prev.brand && fields.brand ? fields.brand : prev.brand,
+          format: !prev.format && fields.format ? fields.format : prev.format
+        }))
+      }
+    })
+    return unsubscribe
+  }, [itemId])
+
   const set = (field: keyof FormState) => (value: unknown) =>
     setFormState((prev) => ({ ...prev, [field]: value }))
 
@@ -493,7 +515,7 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
           <span className="input-error" role="alert">{errors.images}</span>
         )}
         {itemId
-          ? <ImageUploadZone itemId={itemId} images={images} />
+          ? <ImageUploadZone itemId={itemId} images={images} extractData={images.length === 0} viewTag={formState.viewTag} />
           : <p className="intake-upload-locked">Save the item first to enable photo upload.</p>
         }
       </section>

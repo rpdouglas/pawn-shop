@@ -5,7 +5,7 @@ import imageCompression from 'browser-image-compression'
 import { storage, functions } from '../../lib/firebase'
 
 const processUploadedImageFn = httpsCallable<
-  { filePath: string },
+  { filePath: string, extractData?: boolean, viewTag?: string },
   { success: boolean }
 >(functions, 'processUploadedImage')
 
@@ -22,6 +22,8 @@ interface UploadEntry {
 interface ImageUploadZoneProps {
   itemId: string
   images: string[]  // watermarked URLs — written to Firestore by processImageUpload CF
+  extractData?: boolean
+  viewTag?: string
 }
 
 type UploadFn = (key: string, blob: Blob, fileName: string, attempt: number) => void
@@ -35,7 +37,7 @@ const COMPRESSION_OPTIONS = {
   useWebWorker: true,
 }
 
-export default function ImageUploadZone({ itemId, images }: ImageUploadZoneProps) {
+export default function ImageUploadZone({ itemId, images, extractData, viewTag }: ImageUploadZoneProps) {
   const [uploads, setUploads] = useState<Map<string, UploadEntry>>(new Map())
   const [isDragging, setIsDragging] = useState(false)
   const [isMobile, setIsMobile] = useState(window.matchMedia('(max-width: 767px)').matches)
@@ -131,7 +133,7 @@ export default function ImageUploadZone({ itemId, images }: ImageUploadZoneProps
         })
 
         try {
-          await processUploadedImageFn({ filePath: storageRef.fullPath })
+          await processUploadedImageFn({ filePath: storageRef.fullPath, extractData, viewTag })
         } catch (err) {
           setUploads(prev => {
             const entry = prev.get(key)
@@ -145,7 +147,7 @@ export default function ImageUploadZone({ itemId, images }: ImageUploadZoneProps
         }
       }
     )
-  }, [itemId])
+  }, [itemId, extractData, viewTag])
 
   // Keep ref in sync so the retry setTimeout always calls the latest closure
   useEffect(() => { doUploadRef.current = doUpload }, [doUpload])

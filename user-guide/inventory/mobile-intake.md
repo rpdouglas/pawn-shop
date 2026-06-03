@@ -21,12 +21,11 @@ A thumbnail preview appears once an image is selected. You can proceed without a
 
 ### What happens to the image
 
-Once the item is saved in Step 2, your photo is sent to the processing pipeline:
-1. A "The Pawn Shop" watermark is applied.
-2. The image is converted to WebP for fast loading.
-3. The original file is deleted.
-
-The processed image appears in your draft within a few seconds.
+Once uploaded, your photo is sent to the AI processing pipeline:
+1. Gemini Vision analyzes the item based on the selected storefront view.
+2. The AI automatically extracts product details (Title, Description, Category, Brand, Format) and pricing data (Regular, Sale, and Open-Box prices).
+3. The image is compressed, watermarked, and saved as a WebP.
+4. Your form is automatically hydrated with the drafted data in seconds.
 
 ---
 
@@ -46,7 +45,7 @@ Fill in the item's core attributes. Fields marked with an asterisk are required 
 | **Condition** | Yes | New / Like New / Good / Fair / Poor |
 | **Serial Number** | No | Recommended for electronics and jewellery — triggers automatic blacklist check |
 
-Tapping **Next** validates the required fields and creates a draft item in the system.
+Tapping **Next** validates the required fields. You only need to verify or adjust what the AI filled out, adding any missing fields like Condition and Initial Stock.
 
 ---
 
