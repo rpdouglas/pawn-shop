@@ -1,7 +1,13 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { ref, uploadBytesResumable } from 'firebase/storage'
+import { httpsCallable } from 'firebase/functions'
 import imageCompression from 'browser-image-compression'
-import { storage } from '../../lib/firebase'
+import { storage, functions } from '../../lib/firebase'
+
+const processUploadedImageFn = httpsCallable<
+  { filePath: string },
+  { success: boolean }
+>(functions, 'processUploadedImage')
 
 interface UploadEntry {
   fileName: string
@@ -116,13 +122,27 @@ export default function ImageUploadZone({ itemId, images }: ImageUploadZoneProps
           })
         }
       },
-      () => {
+      async () => {
         // Upload complete — transition to processing state until CF writes to Firestore
         setUploads(prev => {
           const entry = prev.get(key)
           if (!entry) return prev
           return new Map(prev).set(key, { ...entry, progress: 100, processing: true, error: undefined })
         })
+
+        try {
+          await processUploadedImageFn({ filePath: storageRef.fullPath })
+        } catch (err) {
+          setUploads(prev => {
+            const entry = prev.get(key)
+            if (!entry) return prev
+            return new Map(prev).set(key, { 
+              ...entry, 
+              processing: false, 
+              error: err instanceof Error ? err.message : 'Processing failed — tap to retry.' 
+            })
+          })
+        }
       }
     )
   }, [itemId])

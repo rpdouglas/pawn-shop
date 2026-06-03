@@ -320,6 +320,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-02 — E54: Implemented dedicated SEO-optimized Item Landing Pages (ItemDetailPage) instead of modal redirects to guarantee distinct document titles/metadata for search indexability and provide a standalone desktop-class layout.
 
+2026-06-03 — Bug Fix: Updated `ImageUploadZone.tsx` (Desktop Intake) to synchronously invoke the `processUploadedImage` HTTPS Callable, mirroring the mobile intake architecture and fixing an infinite spinner bug caused by the deprecation of the async Storage trigger.
+
 *Add new entries above this line.*
 
 2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.

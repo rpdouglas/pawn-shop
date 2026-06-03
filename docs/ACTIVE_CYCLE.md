@@ -63,6 +63,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E53 CLOSED** | E53 | 2026-06-02 |
 | `E54 Item Landing Pages` — Dedicated `/item/:id` route with dynamic AgeGate and SEO tags | E54 | 2026-06-02 |
 | **E54 CLOSED** | E54 | 2026-06-02 |
+| `Fix Desktop Photo Upload` — Migrated `ImageUploadZone.tsx` to `processUploadedImage` Callable | BUGFIX | 2026-06-03 |
+| **BUGFIX CLOSED** | BUGFIX | 2026-06-03 |
 
 ---
 
