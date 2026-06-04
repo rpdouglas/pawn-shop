@@ -20,5 +20,11 @@ The scheduling system allows Managers to coordinate store coverage across all th
 
 Use the schedule to ensure that specialized staff are available for the Cannabis and Fireworks sections during peak hours, satisfying the regulatory requirements for those views.
 
+## Scheduling Preferences
+
+To aid in coverage planning, Managers can reference an employee's established availability. 
+- **Viewing Availability:** Navigate to the **Staff Management** page and click the **HR** button next to a staff member.
+- **Preference Grid:** The HR Profile contains a day-by-day availability grid (start/end times) and a maximum weekly hours cap. This data will be used to flag shift overlaps or over-scheduling.
+
 ---
 *Primary Persona: Marie (Manager)*

@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext'
 import type { AuthUser, Reservation, Preorder, PawnRequest } from '../lib/types'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
+import HRTab from '../components/profile/HRTab'
 
 const ProfilePage: React.FC = () => {
   const { user, refreshUser } = useAuth()
@@ -18,7 +19,7 @@ const ProfilePage: React.FC = () => {
   
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [activeTab, setActiveTab] = useState<'info' | 'activity'>('info')
+  const [activeTab, setActiveTab] = useState<'info' | 'activity' | 'hr'>('info')
 
   const [displayName, setDisplayName] = useState(user?.displayName || '')
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -98,6 +99,9 @@ const ProfilePage: React.FC = () => {
       <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-8)', borderBottom: '1px solid var(--color-border)' }}>
         <button onClick={() => setActiveTab('info')} style={tabStyle(activeTab === 'info')}>Account Info</button>
         <button onClick={() => setActiveTab('activity')} style={tabStyle(activeTab === 'activity')}>Activity History</button>
+        {user.isStaff && (
+          <button onClick={() => setActiveTab('hr')} style={tabStyle(activeTab === 'hr')}>HR & Scheduling</button>
+        )}
       </div>
 
       {activeTab === 'info' && (
@@ -208,6 +212,10 @@ const ProfilePage: React.FC = () => {
             </>
           )}
         </div>
+      )}
+
+      {activeTab === 'hr' && user.isStaff && (
+        <HRTab uid={user.uid} />
       )}
     </div>
   )

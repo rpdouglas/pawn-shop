@@ -25,5 +25,12 @@ The staff list displays the MFA (Multi-Factor Authentication) enrollment status 
 - **Strongly Recommended:** All staff members should enroll in TOTP (Time-based One-Time Password) MFA. Full enforcement at the platform level is on the roadmap pending an Identity Platform upgrade.
 - **Compliance:** Once enforcement is active, Marie's Discretion Test requires that no staff account without MFA can access cannabis purchase history. Admins should proactively track enrollment status and encourage all team members to enroll now.
 
+## Managing HR Profiles
+
+The Staff Management page also provides a secure gateway to employee **HR Profiles**.
+- **Data Encapsulation:** Sensitive PII (SIN, direct deposit banking, Status Card numbers) and emergency contacts are stored in an encrypted vault (`hrData`), securely isolated from standard user queries.
+- **Admin Access:** Admins can click the **HR** button next to any employee's role dropdown to open their HR Profile modal. From here, Admins can review or override scheduling availability, banking details, and tax exemption information.
+- **Employee Self-Service:** Employees can manage their own HR Profile by navigating to their personal **My Profile** page and clicking the "HR & Scheduling" tab.
+
 ---
 *Primary Persona: Admin*

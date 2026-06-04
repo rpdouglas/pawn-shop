@@ -95,6 +95,11 @@ service cloud.firestore {
                     || isAdmin()
                     || hasRole('manager');
 
+      // Employee HR Data (E20)
+      match /hrData/{docId} {
+        allow read, write: if isOwner(uid) || isAdmin();
+      }
+
       // Favourites (E12)
       match /favourites/{itemId} {
         allow read, write: if isOwner(uid);

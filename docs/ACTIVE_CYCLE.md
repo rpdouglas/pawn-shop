@@ -93,6 +93,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E67 CLOSED** | E67 | 2026-06-04 |
 | `Cannabis AI Intake Enhancement` — Augmented AI Intake prompt to extract cannabisProfile specifically for Cannabis views | E57 | 2026-06-04 |
 | `Cannabis Dataset Seeding Pipeline` — Built an ETL seeder script (`scripts/seed-public-dataset.mjs`) to aggressively clean, parse, and batch-upload public CSV strain data into the `cannabisStrains` schema | E57 | 2026-06-04 |
+| `E20 Employee Profiles & HR Data` — Created secure `hrData` sub-collection, day-by-day scheduling preferences grid, and integrated into `ProfilePage` and `StaffList` | E20 | 2026-06-04 |
+| **E20 CLOSED** | E20 | 2026-06-04 |
 
 ---
 

@@ -305,7 +305,9 @@
 - [x] Shift Scheduling UI: calendar-style list, create/delete shifts `[Staff]`
 - [x] Personal Schedule UI: staff see their own shifts only `[Staff]`
 - [x] `auditLogs` for `shift_created`, `shift_updated`, `shift_deleted` `[Comp]`
-
+- [x] Create `users/{uid}/hrData` secure sub-collection for sensitive employee PII and HR data `[Comp]`
+- [x] Add detailed `schedulePreferences` day-by-day availability grid to support future automated scheduling engines `[Staff]`
+- [x] Build `HRTab` component and integrate into Employee `ProfilePage` and Admin `StaffList` override modal `[Staff]`
 ---
 
 ### E17 · Conversion Optimisation

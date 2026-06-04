@@ -3,6 +3,9 @@ import { httpsCallable } from 'firebase/functions'
 import { functions } from '../../lib/firebase'
 import type { StaffMember, StaffRole } from '../../lib/types'
 import Badge from '../ui/Badge'
+import Modal from '../ui/Modal'
+import HRTab from '../profile/HRTab'
+import Button from '../ui/Button'
 
 const getStaffMembersFn = httpsCallable<unknown, { staff: StaffMember[] }>(functions, 'getStaffMembers')
 const assignRoleFn = httpsCallable<{ uid: string; role: StaffRole }, { success: boolean }>(functions, 'assignRole')
@@ -14,6 +17,8 @@ export default function StaffList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [updatingUid, setUpdatingUid] = useState<string | null>(null)
+  
+  const [selectedHrUid, setSelectedHrUid] = useState<string | null>(null)
 
   useEffect(() => {
     getStaffMembersFn()
@@ -80,28 +85,43 @@ export default function StaffList() {
                 <Badge variant={member.mfaEnrolled ? 'active' : 'archived'} label={member.mfaEnrolled ? 'Enrolled' : 'Missing'} />
               </td>
               <td style={{ padding: 'var(--space-4)' }}>
-                <select
-                  style={{
-                    backgroundColor: 'var(--color-bg)',
-                    color: 'var(--color-text)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    padding: 'var(--space-1) var(--space-2)',
-                    fontSize: 'var(--text-small)',
-                  }}
-                  value={member.role}
-                  disabled={updatingUid === member.uid}
-                  onChange={(e) => handleRoleChange(member.uid, e.target.value as StaffRole)}
-                >
-                  {ROLES.map(r => (
-                    <option key={r} value={r}>{r}</option>
-                  ))}
-                </select>
+                <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                  <select
+                    style={{
+                      backgroundColor: 'var(--color-bg)',
+                      color: 'var(--color-text)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: 'var(--space-1) var(--space-2)',
+                      fontSize: 'var(--text-small)',
+                    }}
+                    value={member.role}
+                    disabled={updatingUid === member.uid}
+                    onChange={(e) => handleRoleChange(member.uid, e.target.value as StaffRole)}
+                  >
+                    {ROLES.map(r => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
+                  </select>
+                  <Button variant="secondary" onClick={() => setSelectedHrUid(member.uid)}>HR</Button>
+                </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {selectedHrUid && (
+        <Modal
+          isOpen={!!selectedHrUid}
+          onClose={() => setSelectedHrUid(null)}
+          title="Staff HR Profile"
+        >
+          <div style={{ padding: 'var(--space-4)' }}>
+            <HRTab uid={selectedHrUid} isAdminView />
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }

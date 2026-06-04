@@ -46,6 +46,42 @@ export interface StaffMember {
   createdAt: Date
 }
 
+export interface DailySchedulePreference {
+  start: string // HH:MM
+  end: string   // HH:MM
+}
+
+export interface SchedulePreferences {
+  monday?: DailySchedulePreference
+  tuesday?: DailySchedulePreference
+  wednesday?: DailySchedulePreference
+  thursday?: DailySchedulePreference
+  friday?: DailySchedulePreference
+  saturday?: DailySchedulePreference
+  sunday?: DailySchedulePreference
+  maxHoursPerWeek?: number
+}
+
+export interface HRProfile {
+  legalName?: string
+  sinNumber?: string
+  statusCardNumber?: string
+  bankingDetails?: {
+    institution: string
+    transit: string
+    account: string
+  }
+  emergencyContact?: {
+    name: string
+    relationship: string
+    phone: string
+  }
+  schedulePreferences?: SchedulePreferences
+  startDate?: Date
+  rateOfPay?: number
+  updatedAt?: Date
+}
+
 export interface Shift {
   id: string
   staffUid: string

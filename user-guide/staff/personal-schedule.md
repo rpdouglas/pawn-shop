@@ -18,5 +18,12 @@ Your schedule includes:
 
 While you should check your schedule regularly, any critical changes or reminders will be sent via "The Pawn Shop Update" (following the Marie Discretion Test to ensure your privacy).
 
+## Setting Your Availability
+
+To ensure you are scheduled appropriately, keep your availability up to date.
+- Navigate to your **My Profile** page via the main navigation.
+- Click on the **HR & Scheduling** tab.
+- Update your day-by-day availability matrix and set your maximum weekly hours. Your manager will use these preferences when building the store schedule.
+
 ---
 *Primary Persona: Kevin (Staff)*
