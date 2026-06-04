@@ -574,6 +574,19 @@
 
 ---
 
+### E68-QA · Secret Manager Production Provisioning
+
+> **Persona Gate:** Infrastructure and Operations epic.
+> Currently, the backend gracefully skips external integrations if a `dummy` key is used. These must be replaced with live keys prior to launch.
+
+- [ ] Obtain production `SENDGRID_API_KEY` and `SENDGRID_FROM_EMAIL`. Update via `firebase functions:secrets:set`. `[Staff]`
+- [ ] Obtain production `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER`. Update via `firebase functions:secrets:set`. `[Staff]`
+- [ ] Obtain `EBAY_USER_TOKEN` and `EBAY_VERIFICATION_TOKEN`. Update via `firebase functions:secrets:set`. `[Staff]`
+- [ ] Obtain `BROTHER_POS_HMAC_SECRET`. Update via `firebase functions:secrets:set`. `[Staff]`
+- [ ] Configure `BACKUP_BUCKET_NAME` for disaster recovery. Update via `firebase functions:secrets:set`. `[Staff]`
+
+---
+
 ### E09-QA · Lighthouse Performance Decision Gate
 
 > Confirm non-negotiable Lighthouse gates pass. Log SSR decision for Phase 14 planning.

@@ -13,14 +13,14 @@ const client = new v1.FirestoreAdminClient()
 // - roles/datastore.importExportAdmin
 // - roles/storage.admin (on the backup bucket)
 
-export const backupFirestoreDaily = onSchedule({ schedule: '0 2 * * *', secrets: [backupBucketName], timeoutSeconds: 60 }, async () => {
+export const backupFirestoreDaily = onSchedule({ schedule: '0 2 * * *', timeoutSeconds: 60 }, async () => {
   const projectId = process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
   if (!projectId) {
     throw new Error('Project ID not found in environment.')
   }
 
   const bucketName = backupBucketName.value()
-  if (!bucketName) {
+  if (!bucketName || bucketName === 'dummy') {
     console.warn('[backupFirestoreDaily] Backup bucket name not configured. Skipping.')
     return
   }

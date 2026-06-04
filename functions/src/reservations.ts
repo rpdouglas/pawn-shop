@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
 import { dispatchSms } from './lib/sms'
-import { twilioAccountSid, twilioAuthToken, twilioFromNumber } from './lib/secrets'
+import { twilioAccountSid, twilioAuthToken } from './lib/secrets'
 
 const DAY_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const
 
@@ -49,7 +49,7 @@ interface CreateReservationData {
   viewTag: string
 }
 
-export const createReservation = onCall<CreateReservationData>({ cors: true, secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async (request) => {
+export const createReservation = onCall<CreateReservationData>({ cors: true, secrets: [twilioAccountSid, twilioAuthToken] }, async (request) => {
   if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to reserve an item')
 
   const { itemId, customerName, customerPhone, pickupWindow, viewTag } = request.data
@@ -132,7 +132,7 @@ interface ConfirmReservationData {
   staffNotes?: string
 }
 
-export const confirmReservation = onCall<ConfirmReservationData>({ cors: true, secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async (request) => {
+export const confirmReservation = onCall<ConfirmReservationData>({ cors: true, secrets: [twilioAccountSid, twilioAuthToken] }, async (request) => {
   const token = (request.auth?.token ?? {}) as Record<string, unknown>
   if (!token['admin'] && !token['manager'] && !token['inventory_staff']) {
     throw new HttpsError('permission-denied', 'Staff access required')

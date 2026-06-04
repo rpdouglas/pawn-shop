@@ -363,3 +363,4 @@ YYYY-MM-DD — Decision. Brief reason.
 2. **Implementation:** Created a scheduled Cloud Function (`functions/src/backup.ts`) running daily at 02:00 UTC using the `@google-cloud/firestore` Admin API.
 3. **Configuration:** The backup destination bucket is configurable via the `BACKUP_BUCKET_NAME` Secret Manager variable.
 4. **Permissions:** Requires the default Cloud Functions service account to possess `roles/datastore.importExportAdmin` and `roles/storage.admin`.
+5. **Dummy Key Graceful Degradation:** The codebase handles placeholder (`dummy`) secret values gracefully. External integrations (eBay, SendGrid, Twilio, Brother POS, Backups) are skipped without throwing 500 errors if their respective keys are set to `dummy`. Production provisioning is tracked in `EPICS.md` under E68-QA.

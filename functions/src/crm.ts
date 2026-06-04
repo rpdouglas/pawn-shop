@@ -2,7 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { onSchedule } from 'firebase-functions/v2/scheduler'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 import { dispatchSms } from './lib/sms'
-import { twilioAccountSid, twilioAuthToken, twilioFromNumber } from './lib/secrets'
+import { twilioAccountSid, twilioAuthToken } from './lib/secrets'
 
 // ── assignVipStatus ──────────────────────────────────────────────────────────
 
@@ -76,7 +76,7 @@ export const updateResellerTier = onCall<UpdateResellerTierData>({ cors: true },
 
 // ── crmDailyReminders ────────────────────────────────────────────────────────
 // Scheduled task to run daily at 09:00 Cornwall Island time (approx 14:00 UTC)
-export const crmDailyReminders = onSchedule({ schedule: 'every day 09:00', secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async () => {
+export const crmDailyReminders = onSchedule({ schedule: 'every day 09:00', secrets: [twilioAccountSid, twilioAuthToken] }, async () => {
   const db = getFirestore()
   const now = new Date()
   

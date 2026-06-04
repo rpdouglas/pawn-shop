@@ -60,8 +60,18 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
   `
 
   try {
-    const { model } = getModels()
-    const result = await model.generateContent([systemPrompt, userPrompt])
+    const { model, flashModel } = getModels()
+    let result
+    try {
+      result = await model.generateContent([systemPrompt, userPrompt])
+    } catch (err: any) {
+      if (err?.message?.includes('429') || err?.status === 429) {
+        console.warn('Gemini Pro quota exceeded, falling back to Flash model...')
+        result = await flashModel.generateContent([systemPrompt, userPrompt])
+      } else {
+        throw err
+      }
+    }
     const response = result.response
     const text = response.text()
     
@@ -131,8 +141,18 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
   `
 
   try {
-    const { model } = getModels()
-    const result = await model.generateContent([systemPrompt, userPrompt])
+    const { model, flashModel } = getModels()
+    let result
+    try {
+      result = await model.generateContent([systemPrompt, userPrompt])
+    } catch (err: any) {
+      if (err?.message?.includes('429') || err?.status === 429) {
+        console.warn('Gemini Pro quota exceeded, falling back to Flash model...')
+        result = await flashModel.generateContent([systemPrompt, userPrompt])
+      } else {
+        throw err
+      }
+    }
     const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
     const parsed = JSON.parse(jsonStr)
 

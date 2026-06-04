@@ -2,7 +2,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
 import { dispatchSms } from './lib/sms'
 import { dispatchEmail } from './lib/email'
-import { twilioAccountSid, twilioAuthToken, twilioFromNumber, sendgridApiKey, sendgridFromEmail, siteUrl } from './lib/secrets'
+import { twilioAccountSid, twilioAuthToken, sendgridApiKey, siteUrl } from './lib/secrets'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -88,7 +88,7 @@ function buildDigestHtml(items: DigestItem[]): string {
 // phone number. Sets reminderSentAt after the batch — prevents duplicate sends.
 // SMS body uses no category words (Tanya / Marie Discretion Test).
 
-export const sendSeasonalReminders = onSchedule({ schedule: '0 * * * *', secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async () => {
+export const sendSeasonalReminders = onSchedule({ schedule: '0 * * * *', secrets: [twilioAccountSid, twilioAuthToken] }, async () => {
   const db = getFirestore()
 
   const campaignSnap = await db.collection('campaigns')
@@ -146,7 +146,7 @@ export const sendSeasonalReminders = onSchedule({ schedule: '0 * * * *', secrets
 // pickup window opens in 20–28 hours. Sends a day-before reminder SMS with the
 // specific pickup window — no category words. Idempotency via pickupReminderSentAt.
 
-export const sendPickupReminders = onSchedule({ schedule: '0 * * * *', secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async () => {
+export const sendPickupReminders = onSchedule({ schedule: '0 * * * *', secrets: [twilioAccountSid, twilioAuthToken] }, async () => {
   const db   = getFirestore()
   const now  = new Date()
   const from = new Date(now.getTime() + 20 * 60 * 60 * 1000)
@@ -239,7 +239,7 @@ export const sendPickupReminders = onSchedule({ schedule: '0 * * * *', secrets: 
 // Subject is hard-coded "The Pawn Shop Update" — Marie Discretion Test passed
 // by design. No category words appear in subject, preheader, or email body.
 
-export const sendWeeklyDigest = onSchedule({ schedule: '0 14 * * 1', secrets: [sendgridApiKey, sendgridFromEmail, siteUrl] }, async () => {
+export const sendWeeklyDigest = onSchedule({ schedule: '0 14 * * 1', secrets: [sendgridApiKey] }, async () => {
   const db      = getFirestore()
   const siteUrlStr = siteUrl.value() || 'https://thepawnshop.ca'
 

@@ -8,7 +8,7 @@ export async function dispatchEmail(
 ): Promise<boolean> {
   const apiKey = sendgridApiKey.value()
   const from   = sendgridFromEmail.value()
-  if (!apiKey || !from) {
+  if (!apiKey || !from || apiKey === 'dummy' || from === 'dummy') {
     console.warn('[Email] SendGrid credentials not configured — skipping')
     return false
   }

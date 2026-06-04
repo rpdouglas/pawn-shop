@@ -5,7 +5,7 @@ export async function dispatchSms(to: string, body: string): Promise<boolean> {
   const accountSid = twilioAccountSid.value()
   const authToken = twilioAuthToken.value()
   const fromNumber = twilioFromNumber.value()
-  if (!accountSid || !authToken || !fromNumber) {
+  if (!accountSid || !authToken || !fromNumber || accountSid === 'dummy') {
     console.warn('[SMS] Twilio credentials not configured — skipping')
     return false
   }

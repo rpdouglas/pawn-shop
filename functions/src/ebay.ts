@@ -1,7 +1,7 @@
 import { onCall, onRequest, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 import { createHash } from 'node:crypto'
-import { ebayUserToken, ebaySandbox, ebayLocationKey, ebayVerificationToken, ebayWebhookUrl } from './lib/secrets'
+import { ebayUserToken, ebayVerificationToken, ebaySandbox, ebayLocationKey, ebayWebhookUrl } from './lib/secrets'
 
 // ── Category & condition maps ─────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ async function ebayRequest(
   body?: unknown,
 ): Promise<{ ok: boolean; status: number; data: unknown }> {
   const token = ebayUserToken.value()
-  if (!token) throw new HttpsError('internal', 'EBAY_USER_TOKEN not configured')
+  if (!token || token === 'dummy') throw new HttpsError('internal', 'EBAY_USER_TOKEN not configured')
 
   const res = await fetch(`${getEbayBase()}${path}`, {
     method,
@@ -86,7 +86,7 @@ interface PushToEbayResult {
 }
 
 export const pushToEbay = onCall<PushToEbayData, Promise<PushToEbayResult>>(
-  { cors: true, secrets: [ebayUserToken, ebaySandbox, ebayLocationKey] },
+  { cors: true, secrets: [ebayUserToken] },
   async (request) => {
     if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
       throw new HttpsError('permission-denied', 'Admin or manager role required')
@@ -224,7 +224,7 @@ interface EbayNotificationPayload {
   notification?: { data?: Record<string, unknown> }
 }
 
-export const ebayWebhook = onRequest({ secrets: [ebayVerificationToken, ebayWebhookUrl] }, async (req, res) => {
+export const ebayWebhook = onRequest({ secrets: [ebayVerificationToken] }, async (req, res) => {
   if (req.method === 'GET') {
     const challengeCode =
       typeof req.query['challenge_code'] === 'string' ? req.query['challenge_code'] : null

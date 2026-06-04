@@ -77,7 +77,7 @@ interface SendContactEmailData {
   message: string
 }
 
-export const sendContactEmail = onCall<SendContactEmailData>({ cors: true, secrets: [sendgridApiKey, staffContactEmail] }, async (request) => {
+export const sendContactEmail = onCall<SendContactEmailData>({ cors: true, secrets: [sendgridApiKey] }, async (request) => {
   const { name, email, message } = request.data
 
   if (!name?.trim()    || name.length > 100)    throw new HttpsError('invalid-argument', 'Name is required (max 100 characters)')

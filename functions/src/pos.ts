@@ -23,7 +23,7 @@ export const receivePosWebhook = onRequest({ secrets: [brotherPosHmacSecret] }, 
 
   // ── HMAC verification (skipped if secret not yet configured) ──────────────
   const secret = brotherPosHmacSecret.value()
-  if (secret) {
+  if (secret && secret !== 'dummy') {
     const signature = req.headers['x-brother-pos-signature']
     if (typeof signature !== 'string') {
       res.status(401).json({ error: 'Missing X-Brother-POS-Signature header' })

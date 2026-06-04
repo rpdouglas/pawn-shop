@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
 import { dispatchSms } from './lib/sms'
-import { twilioAccountSid, twilioAuthToken, twilioFromNumber } from './lib/secrets'
+import { twilioAccountSid, twilioAuthToken } from './lib/secrets'
 
 // ── createPreorder ───────────────────────────────────────────────────────────
 // Callable CF. Customer creates a fireworks pre-order.
@@ -82,7 +82,7 @@ interface ConfirmPreorderData {
   staffNotes?: string
 }
 
-export const confirmPreorder = onCall<ConfirmPreorderData>({ cors: true, secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async (request) => {
+export const confirmPreorder = onCall<ConfirmPreorderData>({ cors: true, secrets: [twilioAccountSid, twilioAuthToken] }, async (request) => {
   const token = (request.auth?.token ?? {}) as Record<string, unknown>
   if (!request.auth || !isStaffToken(token)) {
     throw new HttpsError('permission-denied', 'Staff access required')
@@ -139,7 +139,7 @@ interface MarkPreorderReadyData {
   staffNotes?: string
 }
 
-export const markPreorderReady = onCall<MarkPreorderReadyData>({ cors: true, secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async (request) => {
+export const markPreorderReady = onCall<MarkPreorderReadyData>({ cors: true, secrets: [twilioAccountSid, twilioAuthToken] }, async (request) => {
   const token = (request.auth?.token ?? {}) as Record<string, unknown>
   if (!request.auth || !isStaffToken(token)) {
     throw new HttpsError('permission-denied', 'Staff access required')
