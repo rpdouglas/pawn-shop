@@ -19,11 +19,11 @@ On viewports under 768px, items appear as a scrollable card list.
 
 ## Desktop View
 
-On viewports 768px and wider, items appear in a sortable table with columns for Item, Status, View, Price, Condition, Stock, and Actions.
+On viewports 768px and wider, the inventory transforms into a visual grid layout, grouped intuitively by store section (`Pawn`, `Cannabis`, `Fireworks`, `Tobacco`). 
 
-- **Stock column:** Displays the current quantity with `−` and `+` buttons for immediate adjustment. An **Out of Stock** label appears when the count reaches zero.
-- **Actions column:** Provides quick access to **Archive** and **Delete** actions for each row. Deleting an item is permanent and requires Manager/Admin privileges.
-- **AI Assistant:** Click any row to open the **AI Assistant Toolkit** in a side panel. From here you can:
+- **Grouped Categories:** Items are separated into distinct sections so you can see your stock for a particular vertical all at once.
+- **Card Actions:** Provides quick access to **Archive** and **Delete** actions on each grid card.
+- **AI Assistant Drawer:** Click any item card to open the **AI Assistant Toolkit** in a slide-out drawer. From here you can:
   1. **Generate Metadata:** Use Gemini to create editorial drafts and tag suggestions.
   2. **Verify Status:** Monitor items on **Police Hold** (marked with a red label).
   3. **Cross-Platform Sync:** Track items pushed to eBay via their listing IDs.

@@ -81,6 +81,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E61 CLOSED** | E61 | 2026-06-04 |
 | `E62 User Role Management` — Added RoleControls to CRM profile for Admins | E62 | 2026-06-04 |
 | **E62 CLOSED** | E62 | 2026-06-04 |
+| `E63 Inventory Desktop Layout` — Refactored inventory grid view and AI drawer | E63 | 2026-06-04 |
+| **E63 CLOSED** | E63 | 2026-06-04 |
 
 ---
 

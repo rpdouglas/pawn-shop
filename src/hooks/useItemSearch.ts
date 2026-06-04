@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   collection,
   query,
@@ -78,11 +78,12 @@ export function useItemSearch(viewTag: ViewType): {
     return unsubscribe
   }, [viewTag, debouncedSearch, limit])
 
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     if (!loading && hasMore) {
+      setLoading(true)
       setLimit((prev) => prev + BATCH_SIZE)
     }
-  }
+  }, [loading, hasMore])
 
   return { items, loading, error, hasMore, searchValue, setSearchValue, loadMore }
 }
