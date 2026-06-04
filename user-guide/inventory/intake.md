@@ -11,14 +11,13 @@ Both paths produce the same draft item and publish to the same storefront. Use M
 
 ---
 
-## Step 1: Create a Draft
+## Step 1: Photo & Auto-Draft
 
-Staff members begin by entering the basic details:
-- **Title:** A clear, concise name for the item.
-- **View:** Select where the item should appear (Pawn, Cannabis, or Fireworks).
-- **Category:** The specific type of item (e.g., Watches, Flower, Roman Candles).
+The fastest and most efficient way to start intake on desktop is the **Photo-First Workflow**. 
 
-Saving these details creates a **Draft** in the system. However, the most efficient way to start is to select the View and then immediately upload a photo to trigger the **AI Assistant** (see below).
+Simply select your target **View** (Pawn, Cannabis, or Fireworks) and immediately drag-and-drop a photo into the upload zone. This instantly triggers the **AI Assistant** (see below) to automatically create a draft and begin extracting data.
+
+*(Note: You can still manually create a draft by typing in a Title and Category first, but dropping a photo immediately bypasses manual entry.)*
 
 ## Step 2: Details and Media
 

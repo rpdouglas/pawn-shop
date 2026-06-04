@@ -10,22 +10,21 @@ On desktop, use the standard [Intake Process](/inventory/intake) instead.
 
 ---
 
-## Step 1 — Photo
+## Step 1 — Photo & View Selection
 
-The first thing the wizard asks for is a photo.
+The first thing the wizard asks for is a View (Pawn, Cannabis, or Fireworks) and a photo. The Item Name is intentionally left out of this step — the AI will handle it for you.
 
 - **Camera:** Tap **Take Photo** to open your device camera. The back (environment-facing) lens is selected by default for product shots.
-- **Gallery:** Tap **Choose from Gallery** to select an existing image.
+- **Gallery:** Tap **Choose from Library** to select an existing image.
 
-A thumbnail preview appears once an image is selected. You can proceed without a photo — it will be required before publishing.
-
-### What happens to the image
+### AI Processing & Auto-Advance
 
 Once uploaded, your photo is sent to the AI processing pipeline:
-1. Gemini Vision analyzes the item based on the selected storefront view.
-2. The AI automatically extracts product details (Title, Description, Category, Brand, Format) and pricing data (Regular, Sale, and Open-Box prices).
-3. The image is compressed, watermarked, and saved as a WebP.
-4. Your form is automatically hydrated with the drafted data in seconds.
+1. The UI will display interactive, playful loading statuses (e.g., "Analyzing image...", "Researching regular price...") while the cloud does the heavy lifting.
+2. Gemini Vision analyzes the item based on the selected storefront view.
+3. The AI automatically extracts product details (Title, Description, Category, Brand, Format) and pricing data (Regular, Sale, and Open-Box prices).
+4. The image is compressed, watermarked, and saved.
+5. The wizard **automatically advances** you to Step 2 as soon as the draft data is ready.
 
 ---
 

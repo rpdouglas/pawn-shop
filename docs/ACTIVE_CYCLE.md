@@ -77,6 +77,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E59 CLOSED** | E59 | 2026-06-04 |
 | `E60 AI Governance Subagents` — Defined Linguistic_Auditor, Data_Steward, Performance_Engineer, and Brand_Auditor | E60 | 2026-06-04 |
 | **E60 CLOSED** | E60 | 2026-06-04 |
+| `E61 Mobile Intake UX Refinement` — Moved title to details, added fun cycling loading state | E61 | 2026-06-04 |
+| **E61 CLOSED** | E61 | 2026-06-04 |
 
 ---
 

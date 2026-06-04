@@ -63,6 +63,14 @@ interface UploadEntry {
 const ACCEPTED_MIME = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_BYTES = 20 * 1024 * 1024
 
+const FUN_STATUSES = [
+  "Analyzing image...",
+  "Researching regular price...",
+  "Checking the bargain bin...",
+  "Guesstimating value...",
+  "Consulting the archives..."
+]
+
 const EMPTY_FORM: FormState = {
   title: '',
   viewTag: '',
@@ -176,6 +184,7 @@ export default function MobileIntakePage() {
   const [isPublishing, setIsPublishing] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [publishError, setPublishError] = useState('')
+  const [funStatusIndex, setFunStatusIndex] = useState(0)
 
   // Refs — itemId is needed inside callbacks without stale closure issues
   const cameraRef = useRef<HTMLInputElement>(null)
@@ -258,6 +267,19 @@ export default function MobileIntakePage() {
     })
     return unsubscribe
   }, [itemId])
+
+  // Cycle fun messages while waiting
+  useEffect(() => {
+    const hasProcessing = Array.from(uploads.values()).some(u => u.processing)
+    if (!hasProcessing) {
+      setFunStatusIndex(0)
+      return
+    }
+    const interval = setInterval(() => {
+      setFunStatusIndex(prev => (prev + 1) % FUN_STATUSES.length)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [uploads])
 
   // Real-time listener for AI extraction data
   useEffect(() => {
@@ -429,6 +451,7 @@ export default function MobileIntakePage() {
 
   const advanceToReview = async () => {
     const errs: Record<string, string> = {}
+    if (!form.title.trim() || form.title === 'AI Draft Intake') errs.title = 'Item Name is required'
     if (!form.category.trim()) errs.category = 'Category is required'
     if (!form.description.trim()) errs.description = 'Description is required'
     const cents = parsePriceCents(form.priceInput)
@@ -614,23 +637,6 @@ export default function MobileIntakePage() {
             {errors.viewTag && <span id="mi-view-error" style={ERROR_TEXT} role="alert">{errors.viewTag}</span>}
           </div>
 
-          {/* Title - Now optional since AI will suggest one */}
-          <div style={FIELD}>
-            <label htmlFor="mi-title" style={LABEL}>Item Name (Optional - AI will fill this)</label>
-            <input
-              id="mi-title"
-              type="text"
-              value={form.title === 'AI Draft Intake' ? '' : form.title}
-              onChange={e => set('title')(e.target.value)}
-              placeholder="e.g. Seiko 5 Automatic"
-              autoFocus
-              style={INPUT}
-              aria-invalid={errors.title ? 'true' : undefined}
-              aria-describedby={errors.title ? 'mi-title-error' : undefined}
-            />
-            {errors.title && <span id="mi-title-error" style={ERROR_TEXT} role="alert">{errors.title}</span>}
-          </div>
-
           {/* Photo guidance */}
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)' }}>
             Clear, well-lit photo — item front-facing, dark background.
@@ -666,7 +672,7 @@ export default function MobileIntakePage() {
                   {u.error
                     ? <span style={ERROR_TEXT}>{u.error}</span>
                     : u.processing
-                      ? <span style={{ ...LABEL, display: 'block', marginTop: 'var(--space-1)' }}>Processing…</span>
+                      ? <span style={{ ...LABEL, display: 'block', marginTop: 'var(--space-1)', color: 'var(--color-primary)', fontWeight: 500 }}>✨ {FUN_STATUSES[funStatusIndex]}</span>
                       : (
                         <div
                           role="progressbar"
@@ -710,7 +716,7 @@ export default function MobileIntakePage() {
             onClick={advanceToDetails}
             style={{
               ...BTN_PRIMARY,
-              opacity: (images.length === 0 || !form.title.trim() || !form.viewTag) ? 0.4 : 1,
+              opacity: (images.length === 0 || !form.viewTag) ? 0.4 : 1,
             }}
           >
             Next →
@@ -732,6 +738,23 @@ export default function MobileIntakePage() {
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: 0, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Step 2 of 3 — Details
             </p>
+          </div>
+
+          {/* Title */}
+          <div style={FIELD}>
+            <label htmlFor="mi-title" style={LABEL}>Item Name</label>
+            <input
+              id="mi-title"
+              type="text"
+              value={form.title === 'AI Draft Intake' ? '' : form.title}
+              onChange={e => set('title')(e.target.value)}
+              placeholder="e.g. Seiko 5 Automatic"
+              autoFocus
+              style={INPUT}
+              aria-invalid={errors.title ? 'true' : undefined}
+              aria-describedby={errors.title ? 'mi-title-error' : undefined}
+            />
+            {errors.title && <span id="mi-title-error" style={ERROR_TEXT} role="alert">{errors.title}</span>}
           </div>
 
           {/* Category */}
