@@ -132,16 +132,19 @@ export default function MasonryGrid({
   const sentinelRef = useRef<HTMLDivElement>(null)
 
   const onLoadMoreRef = useRef(onLoadMore)
+  const loadingRef = useRef(loading)
+  
   useEffect(() => {
     onLoadMoreRef.current = onLoadMore
-  }, [onLoadMore])
+    loadingRef.current = loading
+  }, [onLoadMore, loading])
 
   // Infinite scroll — trigger at 80% viewport (threshold 0.1 on sentinel below the fold)
   useEffect(() => {
     if (!sentinelRef.current || !hasMore) return
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting && !loading) {
+        if (entries[0]?.isIntersecting && !loadingRef.current) {
           onLoadMoreRef.current()
         }
       },
@@ -149,7 +152,7 @@ export default function MasonryGrid({
     )
     observer.observe(sentinelRef.current)
     return () => observer.disconnect()
-  }, [hasMore, loading])
+  }, [hasMore])
 
   if (!loading && items.length === 0) {
     return (

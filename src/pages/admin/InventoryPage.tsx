@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore'
+import { collection, query, orderBy, limit, onSnapshot, serverTimestamp, deleteField } from 'firebase/firestore'
 import { updateDoc, doc, arrayUnion } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { Link } from 'react-router-dom'
 import { db, functions } from '../../lib/firebase'
 import { docToItem } from '../../hooks/useItems'
+import { useAuth } from '../../context/AuthContext'
 import { formatPrice } from '../../lib/format'
 import ProtectedRoute from '../../components/auth/ProtectedRoute'
 import Badge from '../../components/ui/Badge'
@@ -18,9 +19,11 @@ const STATUS_FILTERS: Array<{ value: 'all' | ItemStatus; label: string }> = [
   { value: 'draft',    label: 'Draft' },
   { value: 'reserved', label: 'Reserved' },
   { value: 'sold',     label: 'Sold' },
+  { value: 'deleted',  label: 'Recycle Bin' },
 ]
 
 export default function InventoryPage() {
+  const { user } = useAuth()
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -73,14 +76,33 @@ export default function InventoryPage() {
 
   const handleDelete = async (item: Item, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!window.confirm(`PERMANENTLY delete "${item.title}"? This cannot be undone.`)) return
+    if (!window.confirm(`Move "${item.title}" to the Recycle Bin?`)) return
     try {
-      setLoading(true)
-      const deleteInventoryItem = httpsCallable<{ itemId: string }, { success: boolean }>(functions, 'deleteInventoryItem')
-      await deleteInventoryItem({ itemId: item.id })
+      await updateDoc(doc(db, 'items', item.id), { status: 'deleted', deletedAt: serverTimestamp() })
       if (selectedItem?.id === item.id) setSelectedItem(null)
     } catch (err) {
-      alert(`Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      alert(`Failed to move to recycle bin: ${err instanceof Error ? err.message : 'Unknown error'}`)
+    }
+  }
+
+  const handleRestore = async (item: Item, e: React.MouseEvent) => {
+    e.stopPropagation()
+    try {
+      await updateDoc(doc(db, 'items', item.id), { status: 'draft', deletedAt: deleteField() })
+    } catch (err) {
+      alert(`Failed to restore: ${err instanceof Error ? err.message : 'Unknown error'}`)
+    }
+  }
+
+  const handleEmptyRecycleBin = async () => {
+    if (!window.confirm("Are you sure you want to permanently delete all items in the Recycle Bin? This cannot be undone.")) return
+    try {
+      setLoading(true)
+      const clearRecycleBin = httpsCallable(functions, 'clearRecycleBin')
+      await clearRecycleBin()
+      alert('Recycle Bin emptied.')
+    } catch (err) {
+      alert(`Failed to empty recycle bin: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
@@ -109,7 +131,11 @@ export default function InventoryPage() {
 
   const filteredItems = items.filter(item => {
     const matchesSearch = !searchQuery || item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    if (statusFilter !== 'deleted' && item.status === 'deleted') return false
+    
     const matchesStatus = statusFilter === 'all' || item.status === statusFilter
+    
     return matchesSearch && matchesStatus
   })
 
@@ -166,40 +192,58 @@ export default function InventoryPage() {
               }}
             />
 
-            {/* Status filter chips */}
-            <div
-              role="group"
-              aria-label="Filter by status"
-              style={{
-                display: 'flex',
-                gap: 'var(--space-2)',
-                overflowX: 'auto',
-                paddingBottom: 'var(--space-2)',
-                marginBottom: 'var(--space-6)',
-              }}
-            >
-              {STATUS_FILTERS.map(f => (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
+              <div
+                role="group"
+                aria-label="Filter by status"
+                style={{
+                  display: 'flex',
+                  gap: 'var(--space-2)',
+                  overflowX: 'auto',
+                  paddingBottom: 'var(--space-2)',
+                }}
+              >
+                {STATUS_FILTERS.map(f => (
+                  <button
+                    key={f.value}
+                    onClick={() => setStatusFilter(f.value)}
+                    aria-pressed={statusFilter === f.value}
+                    style={{
+                      flexShrink: 0,
+                      minHeight: '44px',
+                      padding: '0 var(--space-4)',
+                      borderRadius: 'var(--radius-lg)',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: statusFilter === f.value ? 'var(--color-primary)' : 'var(--color-surface)',
+                      color: statusFilter === f.value ? 'var(--color-on-primary)' : 'var(--color-text-muted)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--text-small)',
+                      cursor: 'pointer',
+                      transition: `background-color var(--motion-speed-fast) var(--motion-easing), color var(--motion-speed-fast) var(--motion-easing)`,
+                    }}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+              
+              {statusFilter === 'deleted' && user?.isAdmin && (
                 <button
-                  key={f.value}
-                  onClick={() => setStatusFilter(f.value)}
-                  aria-pressed={statusFilter === f.value}
+                  onClick={handleEmptyRecycleBin}
                   style={{
-                    flexShrink: 0,
-                    minHeight: '44px',
-                    padding: '0 var(--space-4)',
-                    borderRadius: 'var(--radius-lg)',
-                    border: '1px solid var(--color-border)',
-                    backgroundColor: statusFilter === f.value ? 'var(--color-primary)' : 'var(--color-surface)',
-                    color: statusFilter === f.value ? 'var(--color-on-primary)' : 'var(--color-text-muted)',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 'var(--text-small)',
+                    backgroundColor: 'var(--color-error)',
+                    color: 'white',
+                    border: 'none',
+                    padding: 'var(--space-3) var(--space-4)',
+                    borderRadius: 'var(--radius-md)',
                     cursor: 'pointer',
-                    transition: `background-color var(--motion-speed-fast) var(--motion-easing), color var(--motion-speed-fast) var(--motion-easing)`,
+                    fontWeight: 'bold',
+                    fontSize: 'var(--text-small)'
                   }}
                 >
-                  {f.label}
+                  Empty Recycle Bin
                 </button>
-              ))}
+              )}
             </div>
 
             {/* Grouped Grid View */}
@@ -317,22 +361,35 @@ export default function InventoryPage() {
                               >
                                 Edit
                               </Link>
-                              <button
-                                type="button"
-                                className="btn btn-secondary btn-sm"
-                                onClick={(e) => handleArchive(item, e)}
-                                style={{ padding: '0 var(--space-2)', minHeight: '32px' }}
-                              >
-                                Archive
-                              </button>
-                              <button
-                                type="button"
-                                className="btn btn-secondary btn-sm"
-                                onClick={(e) => handleDelete(item, e)}
-                                style={{ padding: '0 var(--space-2)', minHeight: '32px', color: 'var(--color-error)' }}
-                              >
-                                Delete
-                              </button>
+                              {item.status === 'deleted' ? (
+                                <button
+                                  type="button"
+                                  className="btn btn-secondary btn-sm"
+                                  onClick={(e) => handleRestore(item, e)}
+                                  style={{ padding: '0 var(--space-2)', minHeight: '32px', color: 'var(--color-primary)' }}
+                                >
+                                  Restore
+                                </button>
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    className="btn btn-secondary btn-sm"
+                                    onClick={(e) => handleArchive(item, e)}
+                                    style={{ padding: '0 var(--space-2)', minHeight: '32px' }}
+                                  >
+                                    Archive
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-secondary btn-sm"
+                                    onClick={(e) => handleDelete(item, e)}
+                                    style={{ padding: '0 var(--space-2)', minHeight: '32px', color: 'var(--color-error)' }}
+                                  >
+                                    Delete
+                                  </button>
+                                </>
+                              )}
                             </div>
                           </div>
                         ))}

@@ -85,6 +85,12 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E63 CLOSED** | E63 | 2026-06-04 |
 | `E64 Profile and Customers` — Created ProfilePage and renamed CRM to Customers | E64 | 2026-06-04 |
 | **E64 CLOSED** | E64 | 2026-06-04 |
+| `E65 Frontend Optimizations` — Fixed observer loops, added prefetching, E2E roles test | E65 | 2026-06-04 |
+| **E65 CLOSED** | E65 | 2026-06-04 |
+| `E66 Backend Optimizations` — Migrated Cloud Functions to v2 with high concurrency | E66 | 2026-06-04 |
+| **E66 CLOSED** | E66 | 2026-06-04 |
+| `E67 Inventory Recycle Bin` — Soft delete with 30 day purge and Admin override | E67 | 2026-06-04 |
+| **E67 CLOSED** | E67 | 2026-06-04 |
 
 ---
 

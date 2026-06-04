@@ -3,7 +3,7 @@ export type PosSyncStatus = 'not_synced' | 'synced' | 'pending' | 'error'
 export type ReservationStatus = 'pending' | 'confirmed' | 'declined' | 'completed'
 export type PawnRequestStatus = 'pending' | 'reviewed' | 'quoted' | 'declined' | 'completed'
 export type ConditionGrade = 'new' | 'like-new' | 'good' | 'fair' | 'poor'
-export type ItemStatus = 'draft' | 'active' | 'reserved' | 'sold' | 'archived'
+export type ItemStatus = 'draft' | 'active' | 'reserved' | 'sold' | 'archived' | 'deleted'
 export type MerchandisingTag = 'just-arrived' | 'rare-find' | 'limited-edition' | 'staff-pick'
 export type MoodCategory = 'relax' | 'focus' | 'social' | 'ceremony'
 export type ResellerTier = 'bronze' | 'silver' | 'gold'
@@ -157,6 +157,7 @@ export interface Item {
   soldAt?: Date
   createdAt?: Date
   updatedAt?: Date
+  deletedAt?: Date
   publishedBy?: string
   quantity?: number        // Stock count. 0 = out of stock. Staff-set. Customer-visible.
   posId?: string           // Brother POS external identifier

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { prefetchRoute } from '../../lib/prefetch'
 
 interface NavLink {
   to: string
@@ -121,6 +122,7 @@ export default function NavigationDrawer() {
               <div key={link.label} style={{ position: 'relative' }}>
                 <Link
                   to={link.to}
+                  onMouseEnter={() => prefetchRoute(link.to)}
                   onClick={() => setIsOpen(false)}
                   style={{
                     display: 'flex',
@@ -161,6 +163,7 @@ export default function NavigationDrawer() {
                 }} />
                 <Link
                   to="/admin/dashboard"
+                  onMouseEnter={() => prefetchRoute('/admin/dashboard')}
                   onClick={() => setIsOpen(false)}
                   style={{
                     display: 'flex',

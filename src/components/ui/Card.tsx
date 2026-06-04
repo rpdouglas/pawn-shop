@@ -16,6 +16,7 @@ const STATUS_LABELS: Record<ItemStatus, string> = {
   reserved: 'Reserved',
   sold:     'Sold',
   archived: 'Archived',
+  deleted:  'Deleted',
 }
 
 interface CardProps {

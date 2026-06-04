@@ -15,7 +15,7 @@
 | `category` | string | e.g. `electronics`, `jewellery`, `cannabis-flower` |
 | `viewTag` | string | Primary view: `pawn` \| `cannabis` \| `fireworks` \| `tobacco` |
 | `viewTags` | array\<string\> | Multi-view items |
-| `status` | string | `draft` \| `active` \| `reserved` \| `sold` \| `archived` |
+| `status` | string | `draft` \| `active` \| `reserved` \| `sold` \| `archived` \| `deleted` |
 | `price` | number | CAD cents (e.g. 1999 = $19.99) |
 | `condition` | string | `new` \| `like-new` \| `good` \| `fair` \| `poor` |
 | `images` | array\<string\> | Firebase Storage URLs (WebP/AVIF, watermarked) |
@@ -38,6 +38,7 @@
 | `soldAt` | timestamp | Set by `completeReservation` and `ebayWebhook` CFs when status transitions to `'sold'`. Null until sold. |
 | `createdAt` | timestamp | Server timestamp |
 | `updatedAt` | timestamp | Server timestamp |
+| `deletedAt` | timestamp | Server timestamp (set when status = `deleted`) |
 | `publishedBy` | string | UID of staff who published |
 | `quantity` | number | Stock count integer. 0 = out of stock. Staff-set. Customer-readable (safe — it is stock level, not cost). |
 | `posId` | string | Brother POS external identifier. Null until synced. |

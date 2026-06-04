@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { prefetchRoute } from '../../lib/prefetch'
 
 interface PortalCardProps {
   to: string
@@ -9,7 +10,7 @@ interface PortalCardProps {
 
 export default function PortalCard({ to, icon, title, description }: PortalCardProps) {
   return (
-    <Link to={to} className="portal-card">
+    <Link to={to} className="portal-card" onMouseEnter={() => prefetchRoute(to)}>
       <div className="portal-card-icon">
         {icon}
       </div>

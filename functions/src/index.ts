@@ -1,6 +1,13 @@
 import { initializeApp } from 'firebase-admin/app'
+import { setGlobalOptions } from 'firebase-functions/v2'
 
 initializeApp()
+
+setGlobalOptions({
+  maxInstances: 10,
+  concurrency: 80,
+  minInstances: 0,
+})
 
 export * from './auth'
 export * from './inventory'

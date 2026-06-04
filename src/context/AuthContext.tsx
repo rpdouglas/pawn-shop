@@ -52,6 +52,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      // @ts-expect-error - E2E testing hook
+      if (typeof window !== 'undefined' && window.__PLAYWRIGHT_MOCK_USER__) {
+        // @ts-expect-error - E2E testing hook
+        setUser(window.__PLAYWRIGHT_MOCK_USER__)
+        setLoading(false)
+        return
+      }
+
       if (!firebaseUser) {
         setUser(null)
         setLoading(false)

@@ -43,6 +43,7 @@ export function docToItem(doc: DocumentSnapshot): Item {
     ebayListingId: d['ebayListingId'] as string | undefined,
     createdAt: (d['createdAt'] as Timestamp | undefined)?.toDate(),
     updatedAt: (d['updatedAt'] as Timestamp | undefined)?.toDate(),
+    deletedAt: (d['deletedAt'] as Timestamp | undefined)?.toDate(),
     publishedBy: d['publishedBy'] as string | undefined,
     quantity: d['quantity'] as number | undefined,
     posId: d['posId'] as string | undefined,

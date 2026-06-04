@@ -546,3 +546,88 @@ export const deleteInventoryItem = onCall<DeleteInventoryItemData>({ cors: true 
   return { success: true }
 })
 
+// ── clearRecycleBin ───────────────────────────────────────────────────────────
+// Hard deletes all items with status = 'deleted'. Admin only.
+
+export const clearRecycleBin = onCall<void>({ cors: true, timeoutSeconds: 300 }, async (request) => {
+  const token = request.auth?.token as Record<string, unknown> | undefined
+  if (!request.auth || token?.['admin'] !== true) {
+    throw new HttpsError('permission-denied', 'Admin role required to clear recycle bin')
+  }
+  assertMfaEnrolled(request)
+
+  const db = getFirestore()
+  const snap = await db.collection('items').where('status', '==', 'deleted').get()
+  if (snap.empty) return { success: true, deletedCount: 0 }
+  
+  const bucket = getStorage().bucket()
+  let deletedCount = 0
+
+  for (const doc of snap.docs) {
+    const itemId = doc.id
+    await doc.ref.collection('internal').doc('staff').delete().catch(() => {})
+    await doc.ref.collection('internal').doc('ai').delete().catch(() => {})
+    
+    try {
+      await bucket.deleteFiles({ prefix: `items/${itemId}/` })
+    } catch (e) {
+      console.warn(`Storage deletion failed for items/${itemId}/`, e)
+    }
+
+    await doc.ref.delete()
+    deletedCount++
+  }
+
+  await db.collection('auditLogs').add({
+    eventType: 'data_purged',
+    uid: request.auth.uid,
+    targetId: 'items',
+    details: { collection: 'items', recordsDeleted: deletedCount, action: 'clearRecycleBin' },
+    createdAt: FieldValue.serverTimestamp(),
+  })
+
+  return { success: true, deletedCount }
+})
+
+// ── purgeRecycledItems ────────────────────────────────────────────────────────
+// Scheduled daily. Hard deletes items that have been in the recycle bin > 30 days.
+
+export const purgeRecycledItems = onSchedule('every day 03:00', async () => {
+  const db = getFirestore()
+  const now = Date.now()
+  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000
+  const cutoff = Timestamp.fromMillis(now - thirtyDaysMs)
+
+  const snap = await db.collection('items')
+    .where('status', '==', 'deleted')
+    .where('deletedAt', '<', cutoff)
+    .limit(500)
+    .get()
+
+  if (snap.empty) return
+
+  const bucket = getStorage().bucket()
+  let deletedCount = 0
+
+  for (const doc of snap.docs) {
+    const itemId = doc.id
+    await doc.ref.collection('internal').doc('staff').delete().catch(() => {})
+    await doc.ref.collection('internal').doc('ai').delete().catch(() => {})
+    try {
+      await bucket.deleteFiles({ prefix: `items/${itemId}/` })
+    } catch {
+      // Ignore storage deletion errors
+    }
+    await doc.ref.delete()
+    deletedCount++
+  }
+
+  await db.collection('auditLogs').add({
+    eventType: 'data_purged',
+    uid: 'system',
+    targetId: 'items',
+    details: { collection: 'items', recordsDeleted: deletedCount, reason: '30_day_recycle_bin_purge' },
+    createdAt: FieldValue.serverTimestamp(),
+  })
+})
+
