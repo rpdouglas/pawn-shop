@@ -79,6 +79,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E60 CLOSED** | E60 | 2026-06-04 |
 | `E61 Mobile Intake UX Refinement` — Moved title to details, added fun cycling loading state | E61 | 2026-06-04 |
 | **E61 CLOSED** | E61 | 2026-06-04 |
+| `E62 User Role Management` — Added RoleControls to CRM profile for Admins | E62 | 2026-06-04 |
+| **E62 CLOSED** | E62 | 2026-06-04 |
 
 ---
 

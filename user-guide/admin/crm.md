@@ -14,6 +14,10 @@ Each customer has a dedicated profile page (`/admin/crm/:uid`) containing:
 3.  **Inquiry History:** A record of every pawn enquiry submitted.
 4.  **Cross-View Flag:** Indicates if the customer has browsed multiple storefronts (Pawn, Cannabis, or Fireworks) in a single session.
 
+### Role & Permissions Management (Admins Only)
+
+Staff members with the `admin` claim have access to the **Role & Permissions** controls directly on the Customer Profile. This allows Admins to securely promote a standard `customer` to `staff` (admin, manager, inventory_staff, or marketing_staff) directly from the CRM without navigating away.
+
 ## Rewarding Loyalty
 
 We cater to the **Kevin** and **Marcus** personas through structured loyalty tiers.

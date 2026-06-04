@@ -38,7 +38,8 @@ When execution is verified, autonomously perform close-out tasks without asking 
 1. Update `docs/firestore-schema.md` if fields changed.
 2. Log new decisions in `docs/DECISIONS.md`.
 3. Tick off completed tasks in `docs/EPICS.md`.
-4. Update `docs/ACTIVE_CYCLE.md` and the epic's project file status.
+4. **Documentation Audit:** Update the `user-guide/` markdown files so that all feature changes are accurately reflected in the customer and staff documentation.
+5. Update `docs/ACTIVE_CYCLE.md` and the epic's project file status.
 Once all docs are synced, present the user with the final, closed PR summary.
 
 ## 3. Domain Extension Guardrails

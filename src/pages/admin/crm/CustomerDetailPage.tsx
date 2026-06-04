@@ -3,10 +3,13 @@ import { useParams, Link } from 'react-router-dom'
 import { doc, onSnapshot, Timestamp } from 'firebase/firestore'
 import { db } from '../../../lib/firebase'
 import TierControls from '../../../components/admin/crm/TierControls'
+import RoleControls from '../../../components/admin/crm/RoleControls'
+import { useAuth } from '../../../context/AuthContext'
 import type { AuthUser } from '../../../lib/types'
 
 const CustomerDetailPage: React.FC = () => {
   const { uid } = useParams<{ uid: string }>()
+  const { user: currentUser } = useAuth()
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -75,6 +78,7 @@ const CustomerDetailPage: React.FC = () => {
 
         <aside className="space-y-6">
           <TierControls user={user} />
+          {currentUser?.isAdmin && <RoleControls user={user} />}
           
           <div className="p-6 rounded-lg border border-[var(--color-primary)]/20 space-y-4">
             <h3 className="text-[var(--text-xs)] uppercase tracking-wider opacity-60">Engagement Score</h3>

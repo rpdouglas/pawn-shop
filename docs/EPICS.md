@@ -817,6 +817,15 @@
 - [x] Refactor `InventoryPage.tsx` — card layout on mobile, table preserved on desktop `[Staff]` `[Mak]`
 - [x] Add client-side search + status filter chips to mobile inventory view `[Staff]` `[Dale]`
 - [x] Update `ImageUploadZone.tsx` — add `capture="environment"` for native camera on mobile `[Staff]` `[Marc]`
+
+### Phase 14: E61 — Mobile Intake UX Refinement
+- [x] Refactor `MobileIntakePage.tsx` to move title to Details step
+- [x] Implement cycling AI loading states during image processing
+
+### Phase 14: E62 — User Role Management
+- [x] Write `E62_USER_ROLE_MANAGEMENT.md` Spec and Plan
+- [x] Create `RoleControls.tsx` for CRM
+- [x] Update `CustomerDetailPage.tsx` to include `RoleControls` for Admins
 - [x] Create `MobileIntakePage.tsx` — 3-step camera-first intake flow (`/admin/mobile-intake`) `[Staff]` `[Marc]` `[Mak]`
 - [x] Register `/admin/mobile-intake` route in `main.tsx` `[Staff]`
 

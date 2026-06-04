@@ -347,3 +347,4 @@ YYYY-MM-DD — Decision. Brief reason.
 2026-06-04 — E60: Registered `Linguistic_Auditor`, `Data_Steward`, `Performance_Engineer`, and `Brand_Auditor` subagents via Antigravity `define_subagent` and saved configurations to `docs/subagents/`. Ensures AI governance over cultural and technical strictures.
 2026-06-04 — Linguistic Audit: Intercepted proposed website copy containing Kanien'kéha ("Shé:kon"). Progression halted pending manual community review and indigenousLanguageReviewed flag per the Kanien'kéha Rule.
 2026-06-04 — E61: Selected Strategy B for Mobile Intake UX. Title input removed from capture step and placed in details step. Added cycling fun status messages during AI extraction.
+2026-06-04 — E62: Implemented Strategy B for User Role Management. Created `RoleControls` component and added it to CRM Customer Detail page, restricting visibility to users with the `admin` claim.
