@@ -200,6 +200,15 @@ export interface CannabisProfile {
   cannabinoidUnit?: '%' | 'mg' | ''
 }
 
+export interface FireworksProfile {
+  explosiveWeight?: string
+  classificationClass?: string
+  effectType?: string
+  shots?: number
+  duration?: number
+  noiseLevel?: 'low' | 'medium' | 'high' | ''
+}
+
 // Firestore Timestamps are converted to Date before being assigned here
 export interface Item {
   id: string
@@ -238,6 +247,7 @@ export interface Item {
   posSyncStatus?: PosSyncStatus
   posLastSyncAt?: Date
   cannabisProfile?: CannabisProfile
+  fireworksProfile?: FireworksProfile
 }
 
 // items/{id}/internal/staff — staff-only subcollection document

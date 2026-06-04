@@ -58,6 +58,14 @@ interface FormState {
   weightPerServing: string
   strainType: string
   cannabinoidUnit: string
+
+  // Fireworks Profile
+  explosiveWeight: string
+  classificationClass: string
+  effectType: string
+  shots: string
+  duration: string
+  noiseLevel: string
 }
 
 interface FormErrors {
@@ -102,6 +110,12 @@ const EMPTY_FORM: FormState = {
   weightPerServing: '',
   strainType: '',
   cannabinoidUnit: '%',
+  explosiveWeight: '',
+  classificationClass: '',
+  effectType: '',
+  shots: '',
+  duration: '',
+  noiseLevel: '',
 }
 
 function parseQuantity(input: string): number {
@@ -229,6 +243,14 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
               weightPerServing: data.cannabisProfile?.weightPerServing || '',
               strainType: data.cannabisProfile?.strainType || '',
               cannabinoidUnit: data.cannabisProfile?.cannabinoidUnit || '%',
+
+              // Fireworks Profile
+              explosiveWeight: data.fireworksProfile?.explosiveWeight || '',
+              classificationClass: data.fireworksProfile?.classificationClass || '',
+              effectType: data.fireworksProfile?.effectType || '',
+              shots: data.fireworksProfile?.shots ? data.fireworksProfile.shots.toString() : '',
+              duration: data.fireworksProfile?.duration ? data.fireworksProfile.duration.toString() : '',
+              noiseLevel: data.fireworksProfile?.noiseLevel || '',
             }))
           }
         } catch (err) {
@@ -301,6 +323,19 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
           strainType: !prev.strainType && cFields.strainType ? cFields.strainType : prev.strainType,
         }))
       }
+      if (data.intakeExtraction && data.intakeExtraction.fireworksProfile) {
+        console.log(`[AI Intake] Hydrating fireworks profile:`, data.intakeExtraction.fireworksProfile)
+        const fFields = data.intakeExtraction.fireworksProfile
+        setFormState(prev => ({
+          ...prev,
+          explosiveWeight: !prev.explosiveWeight && fFields.explosiveWeight ? fFields.explosiveWeight : prev.explosiveWeight,
+          classificationClass: !prev.classificationClass && fFields.classificationClass ? fFields.classificationClass : prev.classificationClass,
+          effectType: !prev.effectType && fFields.effectType ? fFields.effectType : prev.effectType,
+          shots: !prev.shots && fFields.shots != null ? String(fFields.shots) : prev.shots,
+          duration: !prev.duration && fFields.duration != null ? String(fFields.duration) : prev.duration,
+          noiseLevel: !prev.noiseLevel && fFields.noiseLevel ? fFields.noiseLevel : prev.noiseLevel,
+        }))
+      }
     })
     return unsubscribe
   }, [itemId])
@@ -349,6 +384,21 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
         profile[key] === undefined && delete profile[key]
       )
       payload.cannabisProfile = profile
+    }
+    
+    if (formState.viewTag === 'fireworks') {
+      const profile: Record<string, unknown> = {
+        explosiveWeight: formState.explosiveWeight.trim() || undefined,
+        classificationClass: formState.classificationClass.trim() || undefined,
+        effectType: formState.effectType.trim() || undefined,
+        shots: formState.shots ? parseInt(formState.shots, 10) : undefined,
+        duration: formState.duration ? parseInt(formState.duration, 10) : undefined,
+        noiseLevel: formState.noiseLevel || undefined,
+      }
+      Object.keys(profile).forEach(key => 
+        profile[key] === undefined && delete profile[key]
+      )
+      payload.fireworksProfile = profile
     }
 
     return payload
@@ -880,6 +930,72 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
               value={formState.packagedDate}
               onChange={set('packagedDate')}
               placeholder="2026-05-01"
+            />
+          </div>
+        </section>
+      )}
+
+      {formState.viewTag === 'fireworks' && (
+        <section className="intake-section">
+          <h2 className="intake-section-heading">Fireworks Profile</h2>
+          
+          <div className="intake-row intake-row-2">
+            <Input
+              id="explosiveWeight"
+              label="Explosive Weight"
+              value={formState.explosiveWeight}
+              onChange={set('explosiveWeight')}
+              placeholder="e.g. 500g"
+            />
+            <Input
+              id="classificationClass"
+              label="Classification Class"
+              value={formState.classificationClass}
+              onChange={set('classificationClass')}
+              placeholder="e.g. 1.4G Consumer"
+            />
+          </div>
+
+          <div className="intake-row intake-row-2">
+            <Input
+              id="effectType"
+              label="Effect Type"
+              value={formState.effectType}
+              onChange={set('effectType')}
+              placeholder="e.g. Aerial Repeater"
+            />
+            <div className="input-wrapper">
+              <label className="input-label" htmlFor="noiseLevel">Noise Level</label>
+              <select
+                id="noiseLevel"
+                className="input-field"
+                value={formState.noiseLevel}
+                onChange={(e) => set('noiseLevel')(e.target.value)}
+              >
+                <option value="">Select Noise Level</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="intake-row intake-row-2">
+            <Input
+              id="shots"
+              label="Shots (Count)"
+              type="number"
+              value={formState.shots}
+              onChange={set('shots')}
+              placeholder="e.g. 25"
+            />
+            <Input
+              id="duration"
+              label="Duration (Seconds)"
+              type="number"
+              value={formState.duration}
+              onChange={set('duration')}
+              placeholder="e.g. 45"
             />
           </div>
         </section>

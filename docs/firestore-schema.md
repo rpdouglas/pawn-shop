@@ -45,6 +45,7 @@
 | `posSyncStatus` | string | `'not_synced'` \| `'synced'` \| `'pending'` \| `'error'` |
 | `posLastSyncAt` | timestamp | Last successful POS sync. Null until first sync. |
 | `cannabisProfile` | map | specialized data. `{ thcMin, thcMax, cbdMin, cbdMax, terpenes[], geneticLineage, effectProfile[], brand, format, weight, lotNumber, packagedDate, subCategory, servings, weightPerServing, strainType, cannabinoidUnit }` |
+| `fireworksProfile` | map | specialized data. `{ explosiveWeight, classificationClass, effectType, shots, duration, noiseLevel }` |
 
 ---
 
