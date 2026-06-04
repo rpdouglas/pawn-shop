@@ -6,6 +6,7 @@ type BadgeVariant =
   | DisputeStatus
   | DisputeType
   | 'tag'
+  | 'error'
 
 interface BadgeProps {
   variant: BadgeVariant

@@ -216,6 +216,24 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | `read` | boolean | Status flag |
 | `createdAt` | timestamp | |
 
+### `users/{uid}/hrData/{docId}` — staff-only subcollection (E20)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `hireDate` | timestamp | |
+| `emergencyContact` | string | |
+| `schedulePreferences` | map | `{ monday: 'morning', tuesday: 'off', ... }` |
+| `updatedAt` | timestamp | |
+
+### `users/{uid}/signatures/{id}` — staff-only subcollection (E69)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `documentId` | string | Reference to `documents/{id}` |
+| `version` | string | The version slug signed (e.g., `v1.0`) |
+| `ipAddress` | string | For compliance audit trails |
+| `signedAt` | timestamp | |
+
 ---
 
 ## `shifts/{id}`
@@ -354,4 +372,20 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | `pickupReminderSentAt` | timestamp | Set by `sendPickupReminders` CF when the 24-hour pre-pickup SMS has been dispatched. Null until sent. Prevents duplicate sends. |
 | `updatedAt` | timestamp | Set by CF on every status transition (confirm, ready, collect, cancel) |
 | `createdAt` | timestamp | Server timestamp |
-\n- items/{itemId}/imageJobs/{jobId} — [Document] Temporary tracking document for background processing.
+
+---
+
+## `documents/{id}` (E69)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `title` | string | E.g., `"Age Gating SOP"` |
+| `content` | string | Markdown content |
+| `type` | string | `'sop'` \| `'contract'` |
+| `version` | string | E.g., `"v1.2"` |
+| `isRequired` | boolean | If true, staff must acknowledge before accessing POS |
+| `createdBy` | string | Admin UID |
+| `updatedAt` | timestamp | |
+| `createdAt` | timestamp | |
+
+- items/{itemId}/imageJobs/{jobId} — [Document] Temporary tracking document for background processing.

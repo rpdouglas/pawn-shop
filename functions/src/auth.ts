@@ -42,6 +42,12 @@ interface AssignRoleData {
   role: StaffRole
 }
 
+interface InviteEmployeeData {
+  email: string
+  displayName: string
+  role: StaffRole
+}
+
 interface RecordLoginData {
   method: 'email' | 'google'
 }
@@ -76,6 +82,56 @@ export const assignRole = onCall<AssignRoleData>({ cors: true }, async (request)
   })
 
   return { success: true }
+})
+
+export const inviteEmployee = onCall<InviteEmployeeData>({ cors: true }, async (request) => {
+  if (!request.auth || request.auth.token['admin'] !== true) {
+    throw new HttpsError('permission-denied', 'Admin role required')
+  }
+  assertMfaEnrolled(request)
+
+  const { email, displayName, role } = request.data
+
+  if (!VALID_ROLES.includes(role)) {
+    throw new HttpsError('invalid-argument', `Invalid role: ${role}`)
+  }
+  if (!email) {
+    throw new HttpsError('invalid-argument', 'Email is required')
+  }
+
+  try {
+    const userRecord = await getAuth().createUser({
+      email,
+      displayName,
+      emailVerified: true
+    })
+
+    const claims = Object.fromEntries(VALID_ROLES.map((r) => [r, r === role]))
+    await getAuth().setCustomUserClaims(userRecord.uid, claims)
+
+    await getFirestore().collection('users').doc(userRecord.uid).set({
+      email,
+      displayName,
+      role,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+      lifetimeValue: 0
+    })
+
+    const resetLink = await getAuth().generatePasswordResetLink(email)
+
+    await getFirestore().collection('auditLogs').add({
+      eventType: 'role_change',
+      uid: request.auth.uid,
+      targetId: userRecord.uid,
+      details: { email, role, action: 'invite' },
+      createdAt: FieldValue.serverTimestamp(),
+    })
+
+    return { success: true, uid: userRecord.uid, resetLink }
+  } catch (error: unknown) {
+    throw new HttpsError('internal', error instanceof Error ? error.message : 'Failed to invite employee')
+  }
 })
 
 // Called by the client after every successful sign-in.

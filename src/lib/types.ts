@@ -82,6 +82,26 @@ export interface HRProfile {
   updatedAt?: Date
 }
 
+export interface StaffDocument {
+  id: string
+  title: string
+  content: string
+  type: 'sop' | 'contract'
+  version: string
+  isRequired: boolean
+  createdBy: string
+  updatedAt: Date
+  createdAt: Date
+}
+
+export interface DocumentSignature {
+  id: string
+  documentId: string
+  version: string
+  ipAddress?: string
+  signedAt: Date
+}
+
 export interface Shift {
   id: string
   staffUid: string

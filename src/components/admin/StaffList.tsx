@@ -9,6 +9,7 @@ import Button from '../ui/Button'
 
 const getStaffMembersFn = httpsCallable<unknown, { staff: StaffMember[] }>(functions, 'getStaffMembers')
 const assignRoleFn = httpsCallable<{ uid: string; role: StaffRole }, { success: boolean }>(functions, 'assignRole')
+const inviteEmployeeFn = httpsCallable<{ email: string; displayName: string; role: StaffRole }, { success: boolean; resetLink: string }>(functions, 'inviteEmployee')
 
 const ROLES: StaffRole[] = ['admin', 'manager', 'inventory_staff', 'marketing_staff', 'customer']
 
@@ -19,6 +20,12 @@ export default function StaffList() {
   const [updatingUid, setUpdatingUid] = useState<string | null>(null)
   
   const [selectedHrUid, setSelectedHrUid] = useState<string | null>(null)
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteName, setInviteName] = useState('')
+  const [inviteRole, setInviteRole] = useState<StaffRole>('inventory_staff')
+  const [inviting, setInviting] = useState(false)
+  const [resetLink, setResetLink] = useState<string | null>(null)
 
   useEffect(() => {
     getStaffMembersFn()
@@ -44,12 +51,35 @@ export default function StaffList() {
     }
   }
 
+  const handleInvite = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setInviting(true)
+    setError(null)
+    try {
+      const res = await inviteEmployeeFn({ email: inviteEmail, displayName: inviteName, role: inviteRole })
+      setResetLink(res.data.resetLink)
+      // Refresh staff list
+      const updatedStaff = await getStaffMembersFn()
+      setStaff(updatedStaff.data.staff)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to invite')
+    } finally {
+      setInviting(false)
+    }
+  }
+
   if (loading) return <p style={{ padding: 'var(--space-4)', color: 'var(--color-text-muted)' }}>Loading staff...</p>
   if (error) return <p style={{ padding: 'var(--space-4)', color: 'var(--color-error)' }}>Error: {error}</p>
 
   return (
-    <div style={{ overflowX: 'auto', backgroundColor: 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Button variant="primary" onClick={() => { setShowInviteModal(true); setResetLink(null) }}>
+          Invite Employee
+        </Button>
+      </div>
+      <div style={{ overflowX: 'auto', backgroundColor: 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ borderBottom: '1px solid var(--color-border)', textAlign: 'left' }}>
             {['Name', 'Email', 'Role', 'MFA', 'Actions'].map((col) => (
@@ -110,6 +140,7 @@ export default function StaffList() {
           ))}
         </tbody>
       </table>
+      </div>
 
       {selectedHrUid && (
         <Modal
@@ -119,6 +150,65 @@ export default function StaffList() {
         >
           <div style={{ padding: 'var(--space-4)' }}>
             <HRTab uid={selectedHrUid} isAdminView />
+          </div>
+        </Modal>
+      )}
+
+      {showInviteModal && (
+        <Modal
+          isOpen={showInviteModal}
+          onClose={() => { setShowInviteModal(false); setResetLink(null) }}
+          title="Invite Employee"
+        >
+          <div style={{ padding: 'var(--space-4)' }}>
+            {resetLink ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                <p style={{ color: 'var(--color-text)' }}>
+                  Employee invited successfully! Since we are in development/MVP mode, please send them this secure password setup link directly:
+                </p>
+                <div style={{ padding: 'var(--space-4)', backgroundColor: 'var(--color-bg)', wordBreak: 'break-all', fontFamily: 'monospace', fontSize: 'var(--text-xs)', borderRadius: 'var(--radius-sm)' }}>
+                  {resetLink}
+                </div>
+                <Button variant="primary" onClick={() => setShowInviteModal(false)}>Done</Button>
+              </div>
+            ) : (
+              <form onSubmit={handleInvite} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                  <label style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>Display Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={inviteName}
+                    onChange={e => setInviteName(e.target.value)}
+                    style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                  <label style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                  <label style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>Initial Role</label>
+                  <select
+                    value={inviteRole}
+                    onChange={e => setInviteRole(e.target.value as StaffRole)}
+                    style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
+                  >
+                    {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)', marginTop: 'var(--space-4)' }}>
+                  <Button variant="secondary" onClick={() => setShowInviteModal(false)} type="button">Cancel</Button>
+                  <Button variant="primary" disabled={inviting} type="submit">{inviting ? 'Inviting...' : 'Invite'}</Button>
+                </div>
+              </form>
+            )}
           </div>
         </Modal>
       )}

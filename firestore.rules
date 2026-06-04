@@ -109,6 +109,11 @@ service cloud.firestore {
       match /notifications/{notifId} {
         allow read, update, delete: if isOwner(uid);
       }
+
+      // Signatures (E69)
+      match /signatures/{docId} {
+        allow read, write: if isOwner(uid) || isAdmin();
+      }
     }
 
     // ── auditLogs/{id} — immutable, no delete ever ───────────────────────────
@@ -175,6 +180,13 @@ service cloud.firestore {
     match /faqs/{faqId} {
       allow read: if true;
       allow write: if isStaff() || hasRole('marketing_staff');
+    }
+
+    // ── documents/{id} ───────────────────────────────────────────────────────
+    // SOPs and Contracts (E69)
+    match /documents/{docId} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
     }
 
     // Deny everything else

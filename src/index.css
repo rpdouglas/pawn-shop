@@ -360,6 +360,7 @@ h1, h2, h3, h4, h5, h6 {
   .badge-active    { color: var(--color-primary); background-color: color-mix(in srgb, var(--color-primary) 15%, transparent); border-color: color-mix(in srgb, var(--color-primary) 35%, transparent); }
   .badge-reserved  { color: var(--color-warning); background-color: color-mix(in srgb, var(--color-warning) 15%, transparent); border-color: color-mix(in srgb, var(--color-warning) 35%, transparent); }
   .badge-sold      { color: var(--color-danger);  background-color: color-mix(in srgb, var(--color-danger)  15%, transparent); border-color: color-mix(in srgb, var(--color-danger)  35%, transparent); }
+  .badge-error     { color: var(--color-danger);  background-color: color-mix(in srgb, var(--color-danger)  15%, transparent); border-color: color-mix(in srgb, var(--color-danger)  35%, transparent); }
   .badge-archived  { color: var(--color-neutral); background-color: color-mix(in srgb, var(--color-neutral) 15%, transparent); border-color: color-mix(in srgb, var(--color-neutral) 35%, transparent); }
 
   .badge-condition-new      { color: color-mix(in srgb, var(--color-success) 85%, #ffffff); background-color: color-mix(in srgb, var(--color-success) 15%, transparent); border-color: color-mix(in srgb, var(--color-success) 35%, transparent); }
