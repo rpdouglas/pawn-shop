@@ -2,6 +2,11 @@
   "name": "pawn-shop-functions",
   "private": true,
   "version": "0.0.0",
+  "workspaces": [
+    "core",
+    "operations",
+    "shared"
+  ],
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
@@ -10,10 +15,11 @@
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test": "vitest run"
   },
   "engines": {
-    "node": "20"
+    "node": "24"
   },
   "main": "lib/index.js",
   "dependencies": {
@@ -29,6 +35,8 @@
     "@typescript-eslint/eslint-plugin": "^8.35.0",
     "@typescript-eslint/parser": "^8.35.0",
     "eslint": "^9.29.0",
-    "typescript": "~6.0.2"
+    "firebase-functions-test": "^3.5.0",
+    "typescript": "~6.0.2",
+    "vitest": "^4.1.8"
   }
 }

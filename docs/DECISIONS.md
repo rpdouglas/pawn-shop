@@ -379,3 +379,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-04 — Added FireworksProfile to AI Extraction and IntakeForm. AI now extracts explosive weight, classification, effect type, shots, duration, and noise level for fireworks view tags.
 2026-06-04 — Hid TestimonialsModule on PawnPage. Fake testimonials violate the authenticity trust signal. A pending governance task was added to E17 to gather real customer stories before restoring the module.
+2026-06-04 — E72 Phase 1: Added `wait-on` and `@vitest/coverage-v8`. Synchronized Vite and Firebase Emulators in Playwright `globalSetup` to prevent race conditions during E2E tests.
+2026-06-04 — E72 Phase 2: Restructured `functions` directory into an npm workspace to hoist `firebase-admin` and resolve singleton initialization errors during unit tests.
+2026-06-04 — E72 Phase 2: Mapped `getAuth` in unit tests via `vi.mock` for `firebase-admin/auth` since the Auth emulator does not support `setCustomUserClaims` offline without Identity Platform initialization.
+2026-06-04 — E72 Phase 3: Executed Strategy B (Strategic Extraction) for `IntakeForm.tsx`. Extracted `CannabisFields.tsx` and `FireworksFields.tsx` to reduce cognitive load and established component-level unit testing using Vitest and RTL.
+2026-06-04 — E72 Phase 3: Tested TanStack query hooks (`useItems`, `useStaffMembers`) using `renderHook` and `QueryClientProvider` to ensure proper React Query cache handling.

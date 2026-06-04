@@ -24,7 +24,7 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 
 | Task | Epic | Persona | Owner | Notes |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| `E72 Phase 4` Persona E2E Suites | E72 | All | Antigravity | Build Playwright tests for core personas |
 
 ---
 
@@ -103,6 +103,9 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E71 CLOSED** | E71 | 2026-06-04 |
 | `E34 Cloud Functions Modular Refactor` — Split monolithic codebase into core and operations | E34 | 2026-06-04 |
 | **E34 CLOSED** | E34 | 2026-06-04 |
+| `E72 Phase 1` — Boot Firebase Emulators + Vite via `wait-on` for stable Playwright execution. Added Vitest coverage reporting. | E72 | 2026-06-04 |
+| `E72 Phase 2` — Implemented Firebase Cloud Function unit testing via `firebase-functions-test` and Vitest across `core` and `operations` modules. Restructured npm workspaces for singleton isolation. | E72 | 2026-06-04 |
+| `E72 Phase 3` — Executed Strategic Extraction of `IntakeForm.tsx` (CannabisFields, FireworksFields) and built component and hook test coverage using Vitest and RTL. | E72 | 2026-06-04 |
 
 ---
 
