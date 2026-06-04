@@ -277,6 +277,30 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
         console.log(`[AI Intake] Hydrating market pricing:`, data.intakeExtraction.marketPricing)
         setMarketPricing(data.intakeExtraction.marketPricing)
       }
+      if (data.intakeExtraction && data.intakeExtraction.cannabisProfile) {
+        console.log(`[AI Intake] Hydrating cannabis profile:`, data.intakeExtraction.cannabisProfile)
+        const cFields = data.intakeExtraction.cannabisProfile
+        setFormState(prev => ({
+          ...prev,
+          thcMin: !prev.thcMin && cFields.thcMin != null ? String(cFields.thcMin) : prev.thcMin,
+          thcMax: !prev.thcMax && cFields.thcMax != null ? String(cFields.thcMax) : prev.thcMax,
+          cbdMin: !prev.cbdMin && cFields.cbdMin != null ? String(cFields.cbdMin) : prev.cbdMin,
+          cbdMax: !prev.cbdMax && cFields.cbdMax != null ? String(cFields.cbdMax) : prev.cbdMax,
+          cannabinoidUnit: !prev.cannabinoidUnit || prev.cannabinoidUnit === '%' ? cFields.cannabinoidUnit || prev.cannabinoidUnit : prev.cannabinoidUnit,
+          terpenes: !prev.terpenes && cFields.terpenes?.length ? cFields.terpenes.join(', ') : prev.terpenes,
+          geneticLineage: !prev.geneticLineage && cFields.geneticLineage ? cFields.geneticLineage : prev.geneticLineage,
+          effectProfile: !prev.effectProfile && cFields.effectProfile?.length ? cFields.effectProfile.join(', ') : prev.effectProfile,
+          brand: !prev.brand && cFields.brand ? cFields.brand : prev.brand,
+          format: !prev.format && cFields.format ? cFields.format : prev.format,
+          weight: !prev.weight && cFields.weight != null ? String(cFields.weight) : prev.weight,
+          lotNumber: !prev.lotNumber && cFields.lotNumber ? cFields.lotNumber : prev.lotNumber,
+          packagedDate: !prev.packagedDate && cFields.packagedDate ? cFields.packagedDate : prev.packagedDate,
+          subCategory: !prev.subCategory && cFields.subCategory ? cFields.subCategory : prev.subCategory,
+          servings: !prev.servings && cFields.servings != null ? String(cFields.servings) : prev.servings,
+          weightPerServing: !prev.weightPerServing && cFields.weightPerServing != null ? String(cFields.weightPerServing) : prev.weightPerServing,
+          strainType: !prev.strainType && cFields.strainType ? cFields.strainType : prev.strainType,
+        }))
+      }
     })
     return unsubscribe
   }, [itemId])
