@@ -22,6 +22,7 @@ The first thing the wizard asks for is a View (Pawn, Cannabis, or Fireworks) and
 Once uploaded, your photo is sent to the AI processing pipeline:
 1. The UI will display interactive, playful loading statuses (e.g., "Analyzing image...", "Researching regular price...") while the cloud does the heavy lifting.
 2. Gemini Vision analyzes the item based on the selected storefront view.
+   - **Cannabis View:** The AI automatically extracts specialized fields such as THC/CBD percentages, terpenes, genetic lineage, and product formats directly from the visible package label.
 3. The AI automatically extracts product details (Title, Description, Category, Brand, Format) and pricing data (Regular, Sale, and Open-Box prices).
 4. The image is compressed, watermarked, and saved.
 5. The wizard **automatically advances** you to Step 2 as soon as the draft data is ready.

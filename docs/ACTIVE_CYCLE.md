@@ -91,6 +91,7 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E66 CLOSED** | E66 | 2026-06-04 |
 | `E67 Inventory Recycle Bin` — Soft delete with 30 day purge and Admin override | E67 | 2026-06-04 |
 | **E67 CLOSED** | E67 | 2026-06-04 |
+| `Cannabis AI Intake Enhancement` — Augmented AI Intake prompt to extract cannabisProfile specifically for Cannabis views | E57 | 2026-06-04 |
 
 ---
 

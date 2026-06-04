@@ -233,11 +233,20 @@ export const suggestAiTags = onCall({ secrets: [geminiApiKey] }, async (request)
  * Called internally by processUploadedImage CF.
  */
 export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTag: string) {
-  const systemPrompt = `
+  let systemPrompt = `
     You are an expert AI receiving an image of an item being brought into a pawn shop or retail store.
     The store section is: ${viewTag}.
     Analyse the image and extract the fields required for the intake form.
     Also, provide a market pricing deep dive estimating the Average Regular Price, Average Sale Price, and Average Refurbished/Open-Box Price in CAD cents (integer).
+  `
+
+  if (viewTag === 'cannabis') {
+    systemPrompt += `
+    CRITICAL CANNABIS INSTRUCTIONS:
+    - Strictly extract only what is visibly printed on the package. If a field is missing, return null or an empty array. Do not guess or infer missing details based on the strain name.
+    - If a single value is provided for THC/CBD (e.g. "20%"), set both the min and max fields to that same value.
+    - Extract the cannabinoid unit (e.g., "%" or "mg/g").
+    
     Return strictly JSON with NO markdown formatting, matching this structure:
     {
       "suggestedFields": {
@@ -245,8 +254,27 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
         "category": "string",
         "description": "string (1-2 sentences)",
         "condition": "new | like-new | good | fair | poor",
-        "brand": "string (if cannabis or relevant)",
-        "format": "string (if cannabis)"
+        "brand": "string",
+        "format": "string"
+      },
+      "cannabisProfile": {
+        "thcMin": "number | null",
+        "thcMax": "number | null",
+        "cbdMin": "number | null",
+        "cbdMax": "number | null",
+        "cannabinoidUnit": "string | null",
+        "terpenes": ["string"],
+        "geneticLineage": "string | null",
+        "effectProfile": ["string"],
+        "brand": "string | null",
+        "format": "string | null",
+        "weight": "number | null",
+        "lotNumber": "string | null",
+        "packagedDate": "string | null",
+        "subCategory": "string | null",
+        "servings": "number | null",
+        "weightPerServing": "number | null",
+        "strainType": "string | null"
       },
       "marketPricing": {
         "avgRegularPriceCents": 0,
@@ -255,7 +283,28 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
         "currency": "CAD"
       }
     }
-  `
+    `
+  } else {
+    systemPrompt += `
+    Return strictly JSON with NO markdown formatting, matching this structure:
+    {
+      "suggestedFields": {
+        "title": "string",
+        "category": "string",
+        "description": "string (1-2 sentences)",
+        "condition": "new | like-new | good | fair | poor",
+        "brand": "string",
+        "format": "string"
+      },
+      "marketPricing": {
+        "avgRegularPriceCents": 0,
+        "avgSalePriceCents": 0,
+        "avgRefurbPriceCents": 0,
+        "currency": "CAD"
+      }
+    }
+    `
+  }
 
   try {
     const { model, flashModel } = getModels()
