@@ -2,6 +2,8 @@
 
 The **Inventory Management** page (`/admin/inventory`) is the central hub for overseeing all items across The Pawn Shop's four storefronts. The layout adapts to your device — cards on mobile, a full table on desktop.
 
+![Admin Inventory List](/screenshots/admin-inventory-list.png)
+
 ---
 
 ## Mobile View

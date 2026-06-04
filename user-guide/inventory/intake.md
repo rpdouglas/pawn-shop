@@ -9,6 +9,8 @@ The Pawn Shop offers two intake paths — choose the one that fits your situatio
 
 Both paths produce the same draft item and publish to the same storefront. Use Mobile Intake when speed and camera access matter most; use the Desktop form when you need the full AI Assistant or eBay push controls at the same time.
 
+![Admin Intake Form](/screenshots/admin-intake-form.png)
+
 ---
 
 ## Step 1: Photo & Auto-Draft

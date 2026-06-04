@@ -6,6 +6,8 @@ The **Customers Dashboard** is the primary tool for Managers to track customer e
 
 Access the directory at `/admin/customers`. This view provides a high-level list of all registered customers, including their current engagement score and VIP status.
 
+![Customers Dashboard](/screenshots/admin-customers-crm.png)
+
 ### Customer Profiles
 
 Each customer has a dedicated profile page (`/admin/customers/:uid`) containing:

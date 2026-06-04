@@ -2,6 +2,8 @@
 
 Welcome to The Pawn Shop — a multi-vertical retail platform serving Cornwall Island, Akwesasne across three distinct storefronts. This page orients you to the platform shell before you dive into any specific workflow.
 
+![Home Page](/screenshots/home-page.png)
+
 ---
 
 ## The Three Views
@@ -50,6 +52,8 @@ All staff tools are accessible from a single entry point: the navigation drawer.
 1. Tap **☰** in the top-left corner of any page
 2. Select **Admin Dashboard** at the foot of the drawer
 3. From the dashboard, use the sidebar or Quick Actions to navigate to any admin tool
+
+![Admin Dashboard](/screenshots/admin-dashboard.png)
 
 > The Admin Dashboard link is only shown to accounts with a staff role (`admin`, `manager`, `inventory_staff`, or `marketing_staff`). If you do not see it, contact your Admin.
 
