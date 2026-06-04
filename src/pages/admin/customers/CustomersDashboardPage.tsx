@@ -9,10 +9,10 @@ const CrmDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // For MVP, we query users ordered by lifetimeValue descending
+    // For MVP, we query users ordered by newest first
     const q = query(
       collection(db, 'users'),
-      orderBy('lifetimeValue', 'desc'),
+      orderBy('createdAt', 'desc'),
       limit(50)
     )
 

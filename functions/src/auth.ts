@@ -111,6 +111,7 @@ export const recordLogin = onCall<RecordLoginData>({ cors: true }, async (reques
       displayName: firebaseUser.displayName ?? '',
       role,
       mfaEnrolled,
+      lifetimeValue: 0,
       lastLoginAt: now,
       lastLoginIp: hashedIp,
       createdAt: now,
