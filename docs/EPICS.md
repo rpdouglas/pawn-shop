@@ -858,5 +858,18 @@
 
 ---
 
+### E60 · AI Governance & Automation Subagents
+
+> **Persona Gate — E60:**
+> - **Marcus:** Subagents enforce cultural and merchandising integrity.
+> - **Compliance:** Enforces all rules automatically during development.
+
+- [x] Define `Linguistic_Auditor` subagent `[Marc]` `[Comp]`
+- [x] Define `Data_Steward` subagent `[Staff]`
+- [x] Define `Performance_Engineer` subagent `[Jord]`
+- [x] Define `Brand_Auditor` subagent `[Comp]`
+
+---
+
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*

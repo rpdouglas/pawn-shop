@@ -73,6 +73,10 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E57 CLOSED** | E57 | 2026-06-03 |
 | `E58 Desktop Photo First` — Re-architected desktop IntakeForm to auto-create drafts and trigger AI extraction on photo drop | E58 | 2026-06-03 |
 | **E58 CLOSED** | E58 | 2026-06-03 |
+| `E59 Pawn Page Multiple Views` — Refactored LayoutToggle for Pawn view | E59 | 2026-06-04 |
+| **E59 CLOSED** | E59 | 2026-06-04 |
+| `E60 AI Governance Subagents` — Defined Linguistic_Auditor, Data_Steward, Performance_Engineer, and Brand_Auditor | E60 | 2026-06-04 |
+| **E60 CLOSED** | E60 | 2026-06-04 |
 
 ---
 
