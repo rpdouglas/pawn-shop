@@ -24,7 +24,7 @@ if (import.meta.env.VITE_USE_EMULATORS === 'true') {
 
 // Always enable debug token in local development so it prints to the console
 if (import.meta.env.DEV) {
-  ;(self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true
+  Object.assign(self, { FIREBASE_APPCHECK_DEBUG_TOKEN: true })
 }
 
 export const appCheck = initializeAppCheck(app, {
