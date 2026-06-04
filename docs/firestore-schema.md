@@ -388,4 +388,22 @@ Read access: public (no auth required — displayed on public Pawn page). Write 
 | `updatedAt` | timestamp | |
 | `createdAt` | timestamp | |
 
+---
+
+## `socialPosts/{id}` (E70)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `content` | string | Post copy |
+| `mediaUrls` | array | Links to Firebase Storage assets |
+| `platforms` | array | `['facebook', 'instagram', 'twitter', 'tiktok']` |
+| `status` | string | `draft` \| `pending_review` \| `approved` \| `published` \| `failed` |
+| `authorUid` | string | Staff who created the draft |
+| `reviewerUid` | string | Manager/Admin who approved |
+| `scheduledFor` | timestamp | Optional. Date/Time to publish |
+| `publishedAt` | timestamp | Actual publish time |
+| `apiResponseId` | string | External ID from aggregator API |
+| `createdAt` | timestamp | |
+| `updatedAt` | timestamp | |
+
 - items/{itemId}/imageJobs/{jobId} — [Document] Temporary tracking document for background processing.

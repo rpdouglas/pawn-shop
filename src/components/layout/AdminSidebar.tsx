@@ -34,6 +34,7 @@ const GROUPS = [
       { to: '/admin/campaigns', label: 'Campaigns', icon: '📢' },
       { to: '/admin/articles', label: 'Articles', icon: '📄' },
       { to: '/admin/faqs', label: 'FAQs', icon: '❓' },
+      { to: '/admin/social', label: 'Social Media', icon: '📱' },
     ]
   },
   {

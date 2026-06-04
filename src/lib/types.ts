@@ -102,6 +102,24 @@ export interface DocumentSignature {
   signedAt: Date
 }
 
+export type SocialPlatform = 'facebook' | 'instagram' | 'twitter' | 'tiktok'
+export type SocialPostStatus = 'draft' | 'pending_review' | 'approved' | 'published' | 'failed'
+
+export interface SocialPost {
+  id: string
+  content: string
+  mediaUrls: string[]
+  platforms: SocialPlatform[]
+  status: SocialPostStatus
+  authorUid: string
+  reviewerUid?: string
+  scheduledFor?: Date
+  publishedAt?: Date
+  apiResponseId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface Shift {
   id: string
   staffUid: string

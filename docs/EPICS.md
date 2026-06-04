@@ -899,3 +899,4 @@
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*
 \n### Phase 15: E69 — Onboarding & SOP Management\n- [x] Write `E69_ONBOARDING_SOP_PLAN.md` Spec and Plan\n- [x] Update `firestore.rules` and `firestore-schema.md`\n- [x] Implement `inviteEmployee` Cloud Function\n- [x] Implement `DocumentsPage` Admin UI for SOPs\n- [x] Implement `AcknowledgmentWall` middleware\n- [x] Add `Invite Staff` Modal to `StaffList`\n
+\n### Phase 16: E70 — Social Media Campaign Management\n- [x] Write `E70_SOCIAL_MEDIA_PLAN.md` Spec and Plan\n- [x] Update `firestore.rules` and `firestore-schema.md` with `socialPosts`\n- [x] Implement `approveAndSchedulePost` Cloud Function (Ayrshare Stub)\n- [x] Implement `SocialDashboardPage.tsx`\n- [x] Implement `SocialComposerPage.tsx` with Canva media upload\n

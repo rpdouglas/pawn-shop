@@ -112,6 +112,8 @@ const router = createBrowserRouter([
         { path: 'articles',          lazy: () => import('./pages/admin/ArticleListPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'articles/:id/edit', lazy: () => import('./pages/admin/ArticleEditorPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'faqs',              lazy: () => import('./pages/admin/FaqAdminPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'social',            lazy: () => import('./pages/admin/social/SocialDashboardPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'social/compose',    lazy: () => import('./pages/admin/social/SocialComposerPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'mobile-intake',     lazy: () => import('./pages/admin/MobileIntakePage.tsx').then(m => ({ Component: m.default })) },
         { path: 'mobile-intake/edit/:id', lazy: () => import('./pages/admin/MobileIntakePage.tsx').then(m => ({ Component: m.default })) },
       ]},

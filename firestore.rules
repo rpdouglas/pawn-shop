@@ -189,6 +189,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── socialPosts/{id} ─────────────────────────────────────────────────────
+    match /socialPosts/{postId} {
+      allow read: if isStaff() || hasRole('marketing_staff');
+      allow write: if isStaff() || hasRole('marketing_staff');
+    }
+
     // Deny everything else
     match /{document=**} {
       allow read, write: if false;
