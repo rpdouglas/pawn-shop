@@ -63,7 +63,7 @@ export default function PawnHero() {
           letterSpacing: '-0.01em',
           marginBottom: 'var(--space-6)',
         }}>
-          Objects with stories deserve presentation with meaning.
+          Quiet confidence. Curated objects of distinction.
         </h1>
 
         <p style={{
@@ -76,14 +76,14 @@ export default function PawnHero() {
           maxWidth: '540px',
           margin: '0 auto var(--space-8) auto'
         }}>
-          Curated inventory — timepieces, instruments, cameras, and rare finds — presented to the standard they deserve.
+          An uncompromising collection of timepieces, instruments, and heirlooms—presented with editorial precision.
         </p>
 
-        <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center' }}>
-          <Button variant="primary" size="lg" onClick={scrollToDiscovery}>
+        <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center', width: '100%', maxWidth: '380px', margin: '0 auto' }}>
+          <Button variant="primary" onClick={scrollToDiscovery} style={{ flex: 1, paddingLeft: 0, paddingRight: 0, whiteSpace: 'nowrap' }}>
             Browse Inventory
           </Button>
-          <Button variant="secondary" size="lg" onClick={() => navigate('/pawn/sell')}>
+          <Button variant="secondary" onClick={() => navigate('/pawn/sell')} style={{ flex: 1, paddingLeft: 0, paddingRight: 0, whiteSpace: 'nowrap' }}>
             Pawn or Sell
           </Button>
         </div>
