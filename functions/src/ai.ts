@@ -64,7 +64,8 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
     let result
     try {
       result = await model.generateContent([systemPrompt, userPrompt])
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string; status?: number };
       if (err?.message?.includes('429') || err?.status === 429) {
         console.warn('Gemini Pro quota exceeded, falling back to Flash model...')
         result = await flashModel.generateContent([systemPrompt, userPrompt])
@@ -145,7 +146,8 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
     let result
     try {
       result = await model.generateContent([systemPrompt, userPrompt])
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string; status?: number };
       if (err?.message?.includes('429') || err?.status === 429) {
         console.warn('Gemini Pro quota exceeded, falling back to Flash model...')
         result = await flashModel.generateContent([systemPrompt, userPrompt])
@@ -196,8 +198,19 @@ export const suggestAiTags = onCall({ secrets: [geminiApiKey] }, async (request)
   const userPrompt = `Suggest tags for: ${title} (${category}, ${condition}). Provenance: ${provenanceNotes || 'None'}`
 
   try {
-    const { flashModel } = getModels()
-    const result = await flashModel.generateContent([systemPrompt, userPrompt])
+    const { model, flashModel } = getModels()
+    let result
+    try {
+      result = await flashModel.generateContent([systemPrompt, userPrompt])
+    } catch (error: unknown) {
+      const err = error as { message?: string; status?: number };
+      if (err?.message?.includes('429') || err?.status === 429) {
+        console.warn('Gemini Flash quota exceeded, falling back to Pro model...')
+        result = await model.generateContent([systemPrompt, userPrompt])
+      } else {
+        throw err
+      }
+    }
     const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
     const parsed = JSON.parse(jsonStr)
 
@@ -260,9 +273,14 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
     try {
       // Attempt with Flash first for speed
       result = await flashModel.generateContent(promptParts)
-    } catch (flashErr) {
-      console.warn('Gemini Flash failed during intake extraction, falling back to Pro:', flashErr)
-      result = await model.generateContent(promptParts)
+    } catch (error: unknown) {
+      const err = error as { message?: string; status?: number };
+      if (err?.message?.includes('429') || err?.status === 429) {
+        console.warn('Gemini Flash quota exceeded during intake extraction, falling back to Pro:', err.message)
+        result = await model.generateContent(promptParts)
+      } else {
+        throw error
+      }
     }
 
     try {
