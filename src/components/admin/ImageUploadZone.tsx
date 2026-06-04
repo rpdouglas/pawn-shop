@@ -150,10 +150,19 @@ export default function ImageUploadZone({ itemId, onRequireItemId, onProcessingC
           setUploads(prev => {
             const entry = prev.get(key)
             if (!entry) return prev
+            
+            let errorMessage = 'Processing failed — tap to retry.'
+            if (err instanceof Error) {
+              errorMessage = err.message
+              if (errorMessage.includes('429') || errorMessage.toLowerCase().includes('quota')) {
+                errorMessage = 'AI API Quota Exceeded. The photo is saved, but auto-fill is disabled until the limit resets.'
+              }
+            }
+
             return new Map(prev).set(key, { 
               ...entry, 
               processing: false, 
-              error: err instanceof Error ? err.message : 'Processing failed — tap to retry.' 
+              error: errorMessage
             })
           })
         }

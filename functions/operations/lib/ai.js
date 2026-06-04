@@ -314,6 +314,38 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
     }
     `;
     }
+    else if (viewTag === 'fireworks') {
+        systemPrompt += `
+    CRITICAL FIREWORKS INSTRUCTIONS:
+    - Extract fireworks specific details from the package.
+    
+    Return strictly JSON with NO markdown formatting, matching this structure:
+    {
+      "suggestedFields": {
+        "title": "string",
+        "category": "string",
+        "description": "string (1-2 sentences)",
+        "condition": "new | like-new | good | fair | poor",
+        "brand": "string",
+        "format": "string"
+      },
+      "fireworksProfile": {
+        "explosiveWeight": "string | null",
+        "classificationClass": "string | null",
+        "effectType": "string | null",
+        "shots": "number | null",
+        "duration": "number | null",
+        "noiseLevel": "low | medium | high | null"
+      },
+      "marketPricing": {
+        "avgRegularPriceCents": 0,
+        "avgSalePriceCents": 0,
+        "avgRefurbPriceCents": 0,
+        "currency": "CAD"
+      }
+    }
+    `;
+    }
     else {
         systemPrompt += `
     Return strictly JSON with NO markdown formatting, matching this structure:

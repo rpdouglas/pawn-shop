@@ -378,7 +378,16 @@ export default function MobileIntakePage() {
           setUploads(prev => {
             const updated = new Map(prev)
             const entry = updated.get(key)
-            if (entry) updated.set(key, { ...entry, processing: false, error: err instanceof Error ? err.message : 'Processing failed' })
+            if (entry) {
+              let errorMessage = 'Processing failed'
+              if (err instanceof Error) {
+                errorMessage = err.message
+                if (errorMessage.includes('429') || errorMessage.toLowerCase().includes('quota')) {
+                  errorMessage = 'AI API Quota Exceeded. The photo is saved, but auto-fill is disabled.'
+                }
+              }
+              updated.set(key, { ...entry, processing: false, error: errorMessage })
+            }
             return updated
           })
         }
