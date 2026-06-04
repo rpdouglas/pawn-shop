@@ -9,7 +9,7 @@ import ClickCollectModal from '../components/pawn/ClickCollectModal'
 import StaffPicksSection from '../components/StaffPicksSection'
 import RecentlySoldStrip from '../components/pawn/RecentlySoldStrip'
 import YearsInBusinessBadge from '../components/pawn/YearsInBusinessBadge'
-import TestimonialsModule from '../components/pawn/TestimonialsModule'
+// import TestimonialsModule from '../components/pawn/TestimonialsModule'
 import ActivityFeed from '../components/pawn/ActivityFeed'
 import CampaignBanner from '../components/CampaignBanner'
 import LayoutToggle, { type LayoutMode } from '../components/ui/LayoutToggle'
@@ -227,7 +227,7 @@ export default function PawnPage() {
         {!searchValue && <ArticleSection viewTag="pawn" title="Akwesasne Narrative" />}
 
         {/* Community testimonials — Makoonsii trust signal */}
-        {!searchValue && <TestimonialsModule />}
+        {/* HIDDEN PENDING REAL STORIES: {!searchValue && <TestimonialsModule />} */}
 
         {/* Trust strip — years in business (Makoonsii + Dale) */}
         {!searchValue && (

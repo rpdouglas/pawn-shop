@@ -320,6 +320,7 @@
 
 - [x] Recently sold strip on homepage (sourced from `onItemSold` Firestore events — real data only) `[Dale]` `[San]`
 - [x] Years in business badge + testimonials module `[Mak]`
+- [ ] **[PENDING MARKETING CONTENT]** Gather real customer stories for the TestimonialsModule. Fake/placeholder testimonials are hidden in `PawnPage.tsx`. Do not restore until real data is sourced. `[Mak]` `[Comp]`
 - [x] Privacy-safe live activity feed (city-level only, rate-limited, no PII) `[San]` `[Comp]`
 - [x] `limited-edition` / `rare-find` display (staff-set only — never manufactured) `[Marc]` `[Comp]`
 - [x] Hold countdown badge on reserved items `[Kev]` `[Dale]`

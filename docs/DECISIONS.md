@@ -378,3 +378,4 @@ YYYY-MM-DD — Decision. Brief reason.
 2026-06-04 — Technical Debt Cleanup: Formally deprecated the manual 'Claude' markdown prompt workflow (`docs/prompts/`) in favor of native Antigravity Slash Commands and Subagents. Rewrote `docs/AI_WORKFLOW.md` and updated `docs/CONTEXT.md` to eliminate confusion. Updated `QA_Engineer.md` to explicitly map the new modular Cloud Functions boundaries.
 
 2026-06-04 — Added FireworksProfile to AI Extraction and IntakeForm. AI now extracts explosive weight, classification, effect type, shots, duration, and noise level for fireworks view tags.
+2026-06-04 — Hid TestimonialsModule on PawnPage. Fake testimonials violate the authenticity trust signal. A pending governance task was added to E17 to gather real customer stories before restoring the module.
