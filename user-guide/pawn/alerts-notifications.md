@@ -68,7 +68,7 @@ Every Monday morning, opted-in customers receive **The Pawn Shop Update** — a 
 
 All outbound messages from The Pawn Shop — saved search alerts, seasonal reminders, pickup reminders, and the weekly digest — require your explicit consent under Canada's Anti-Spam Legislation (CASL).
 
-**How to opt in:** A staff member or CRM manager can enable notifications on your account via the customer profile in the admin dashboard. You may also be prompted during account registration.
+**How to opt in:** A staff member or manager can enable notifications on your account via the customer profile in the admin dashboard. You may also be prompted during account registration.
 
 **How to opt out:** Contact us at any time to remove your consent. Your preferences will be updated immediately and no further messages will be sent.
 

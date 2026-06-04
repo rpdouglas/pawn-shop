@@ -45,7 +45,7 @@ const CustomerList: React.FC<CustomerListProps> = ({ customers }) => {
               </td>
               <td className="px-6 py-4 text-right">
                 <Link
-                  to={`/admin/crm/${c.uid}`}
+                  to={`/admin/customers/${c.uid}`}
                   className="inline-flex items-center px-3 py-1 rounded border border-[var(--color-primary)] text-[var(--color-primary)] text-[var(--text-xs)] hover:bg-[var(--color-primary)] hover:text-[var(--color-bg)] transition-colors"
                 >
                   View Profile

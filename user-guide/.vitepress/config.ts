@@ -87,7 +87,7 @@ export default defineConfig({
           { text: 'Audit Logs', link: '/admin/audit-logs' },
           { text: 'Police Holds', link: '/admin/police-holds' },
           { text: 'Serial Blacklist', link: '/admin/serial-blacklist' },
-          { text: 'CRM & Retention', link: '/admin/crm' },
+          { text: 'Customers & Retention', link: '/admin/customers' },
           { text: 'eBay Sync', link: '/ebay/cross-posting' }
         ]
       }

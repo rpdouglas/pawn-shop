@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { doc, onSnapshot, Timestamp } from 'firebase/firestore'
 import { db } from '../../../lib/firebase'
-import TierControls from '../../../components/admin/crm/TierControls'
-import RoleControls from '../../../components/admin/crm/RoleControls'
+import TierControls from '../../../components/admin/customers/TierControls'
+import RoleControls from '../../../components/admin/customers/RoleControls'
 import { useAuth } from '../../../context/AuthContext'
 import type { AuthUser } from '../../../lib/types'
 
@@ -25,13 +25,13 @@ const CustomerDetailPage: React.FC = () => {
   }, [uid])
 
   if (loading) return <div className="p-12 text-center opacity-50">Loading profile...</div>
-  if (!user) return <div className="p-12 text-center">Customer not found. <Link to="/admin/crm" className="text-[var(--color-primary)] underline">Back to list</Link></div>
+  if (!user) return <div className="p-12 text-center">Customer not found. <Link to="/admin/customers" className="text-[var(--color-primary)] underline">Back to list</Link></div>
 
   return (
     <div className="space-y-8 animate-fade-up">
       <header className="flex items-center justify-between">
         <div className="space-y-1">
-          <Link to="/admin/crm" className="text-[var(--text-xs)] text-[var(--color-primary)] hover:underline">← Back to CRM</Link>
+          <Link to="/admin/customers" className="text-[var(--text-xs)] text-[var(--color-primary)] hover:underline">← Back to Customers</Link>
           <h1 className="text-[var(--text-3xl)] font-display text-[var(--color-primary)]">{user.displayName || 'Anonymous Customer'}</h1>
           <div className="flex items-center gap-4 text-[var(--text-sm)] opacity-60">
             <span>{user.email}</span>

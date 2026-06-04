@@ -72,7 +72,7 @@ See [Age Verification](/compliance/age-gates) for full details.
 | I want to… | Go to |
 |---|---|
 | Receive and publish a new item | [Intake Process](/inventory/intake) |
-| Manage customer profiles and VIPs | [CRM Dashboard](/admin/crm) |
+| Manage customer profiles and VIPs | [Customers Dashboard](/admin/customers) |
 | Create editorial content | [Editorial CMS](/admin/editorial-cms) |
 | See live inventory and stats | [Admin Dashboard](/admin/dashboard) |
 | Review incoming pawn enquiries | [Pawn Inbox](/admin/pawn-inbox) |

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore'
 import { db } from '../../../lib/firebase'
-import CustomerList from '../../../components/admin/crm/CustomerList'
+import CustomerList from '../../../components/admin/customers/CustomerList'
 import type { AuthUser } from '../../../lib/types'
 
 const CrmDashboardPage: React.FC = () => {

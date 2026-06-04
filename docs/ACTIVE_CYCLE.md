@@ -83,6 +83,8 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E62 CLOSED** | E62 | 2026-06-04 |
 | `E63 Inventory Desktop Layout` — Refactored inventory grid view and AI drawer | E63 | 2026-06-04 |
 | **E63 CLOSED** | E63 | 2026-06-04 |
+| `E64 Profile and Customers` — Created ProfilePage and renamed CRM to Customers | E64 | 2026-06-04 |
+| **E64 CLOSED** | E64 | 2026-06-04 |
 
 ---
 

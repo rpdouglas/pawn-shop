@@ -24,7 +24,7 @@ The "Top Trending" section displays items with the highest engagement scores.
 ## Quick Actions
 
 From the dashboard, you can quickly jump to:
-- **CRM Dashboard:** Manage high-value customer profiles and reseller tiers.
+- **Customers Dashboard:** Manage high-value customer profiles and reseller tiers.
 - **Police Hold Manager:** Search by Firestore ID to immediately secure an item.
 - **Inventory Overview:** View the complete list of items in the collection.
 

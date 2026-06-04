@@ -14,7 +14,7 @@ Access to the Cannabis vertical is strictly age-gated:
 The Cannabis experience is built on the **Marie Discretion Test**:
 - **No Aggressive Marketing:** The copy is warm, premium, and focused on wellness.
 - **Private Browsing:** Filter selections (e.g., mood, category) are not stored in browser history or URLs.
-- **Discreet Notifications:** CRM emails and SMS alerts use generic descriptors (e.g., "The Pawn Shop Update" or "Wellness Item") and never expose cannabis-specific terminology.
+- **Discreet Notifications:** Customer emails and SMS alerts use generic descriptors (e.g., "The Pawn Shop Update" or "Wellness Item") and never expose cannabis-specific terminology.
 
 ## Discovery
 

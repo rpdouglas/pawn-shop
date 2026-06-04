@@ -15,7 +15,7 @@ Administrative functions are organized into five logical groups:
 
 -   **Operations:** Overview (Dashboard), Inventory, and Intake.
 -   **Customer:** Pawn Inbox, Reservations, Preorders, and Disputes.
--   **People:** Staff Management, Scheduling, and CRM.
+-   **People:** Staff Management, Scheduling, and Customers.
 -   **Content:** Staff Picks, Campaigns, Articles, and FAQs.
 -   **Config:** Store Hours and Serial Blacklist.
 

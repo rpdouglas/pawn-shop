@@ -1,14 +1,14 @@
-# CRM & Retention
+# Customers & Retention
 
-The **CRM Dashboard** is the primary tool for Managers to track customer engagement, reward loyalty, and manage long-term relationships across all three storefronts.
+The **Customers Dashboard** is the primary tool for Managers to track customer engagement, reward loyalty, and manage long-term relationships across all three storefronts.
 
 ## The Customer Directory
 
-Access the directory at `/admin/crm`. This view provides a high-level list of all registered customers, including their current engagement score and VIP status.
+Access the directory at `/admin/customers`. This view provides a high-level list of all registered customers, including their current engagement score and VIP status.
 
 ### Customer Profiles
 
-Each customer has a dedicated profile page (`/admin/crm/:uid`) containing:
+Each customer has a dedicated profile page (`/admin/customers/:uid`) containing:
 1.  **Lifetime Value (LTV):** The total value of all completed reservations and purchases (stored in CAD cents).
 2.  **Purchase History:** A complete log of every item they have successfully collected.
 3.  **Inquiry History:** A record of every pawn enquiry submitted.
@@ -16,7 +16,7 @@ Each customer has a dedicated profile page (`/admin/crm/:uid`) containing:
 
 ### Role & Permissions Management (Admins Only)
 
-Staff members with the `admin` claim have access to the **Role & Permissions** controls directly on the Customer Profile. This allows Admins to securely promote a standard `customer` to `staff` (admin, manager, inventory_staff, or marketing_staff) directly from the CRM without navigating away.
+Staff members with the `admin` claim have access to the **Role & Permissions** controls directly on the Customer Profile. This allows Admins to securely promote a standard `customer` to `staff` (admin, manager, inventory_staff, or marketing_staff) directly from the Customers dashboard without navigating away.
 
 ## Rewarding Loyalty
 

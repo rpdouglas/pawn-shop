@@ -23,7 +23,7 @@ const GROUPS = [
     items: [
       { to: '/admin/staff', label: 'Staff', icon: '👥' },
       { to: '/admin/scheduling', label: 'Scheduling', icon: '🗓️' },
-      { to: '/admin/crm', label: 'CRM', icon: '📈' },
+      { to: '/admin/customers', label: 'Customers', icon: '👥' },
     ]
   },
   {

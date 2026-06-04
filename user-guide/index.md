@@ -40,9 +40,9 @@ Maintaining the "Dapper and Debonair" identity through our Markdown CMS and stri
 - [Branding & Visual Identity](/admin/branding)
 - [Admin Desktop Portal](/admin/portal)
 
-### 📈 CRM & Retention
+### 📈 Customers & Retention
 Tools for tracking customer lifetime value (LTV), managing reseller tiers, and automated follow-ups.
-- [CRM & Profiles](/admin/crm)
+- [Customers & Profiles](/admin/customers)
 - [Saved Search Alerts](/pawn/alerts-notifications)
 - [Seasonal Campaigns](/admin/campaigns)
 

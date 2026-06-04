@@ -76,6 +76,7 @@ const router = createBrowserRouter([
       { path: 'login',      lazy: () => import('./pages/auth/LoginPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'signup',     lazy: () => import('./pages/auth/SignUpPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'favourites', lazy: () => import('./pages/FavouritesPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'profile',    lazy: () => import('./pages/ProfilePage.tsx').then(m => ({ Component: m.default })) },
       { path: 'auth', children: [
         { path: 'mfa-enroll', lazy: () => import('./pages/auth/MfaEnrollPage.tsx').then(m => ({ Component: m.default })) },
       ]},
@@ -102,8 +103,8 @@ const router = createBrowserRouter([
         { path: 'staff',             lazy: () => import('./pages/admin/StaffManagementPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'scheduling',        lazy: () => import('./pages/admin/SchedulingPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'dashboard',         lazy: () => import('./pages/admin/DashboardPage.tsx').then(m => ({ Component: m.default })) },
-        { path: 'crm',               lazy: () => import('./pages/admin/crm/CrmDashboardPage.tsx').then(m => ({ Component: m.default })) },
-        { path: 'crm/:uid',          lazy: () => import('./pages/admin/crm/CustomerDetailPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'customers',         lazy: () => import('./pages/admin/customers/CustomersDashboardPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'customers/:uid',    lazy: () => import('./pages/admin/customers/CustomerDetailPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'preorders',         lazy: () => import('./pages/admin/PreorderInboxPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'campaigns',         lazy: () => import('./pages/admin/CampaignAdminPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'disputes',          lazy: () => import('./pages/admin/DisputeAdminPage.tsx').then(m => ({ Component: m.default })) },
