@@ -1,24 +1,16 @@
-import { useState, useEffect } from 'react'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../../lib/firebase'
+import { useStoreConfig } from '../../lib/useStoreConfig'
 import type { ShopInfo } from '../../lib/types'
 
 export default function YearsInBusinessBadge() {
-  const [years, setYears] = useState<number | null>(null)
-
-  useEffect(() => {
-    getDoc(doc(db, 'config', 'shopInfo'))
-      .then((snap) => {
-        if (!snap.exists()) return
-        const data = snap.data() as ShopInfo
-        if (typeof data.foundedYear === 'number' && data.foundedYear > 0) {
-          setYears(new Date().getFullYear() - data.foundedYear)
-        }
-      })
-      .catch(() => { /* non-critical — badge simply stays hidden */ })
-  }, [])
-
-  if (years === null || years <= 0) return null
+  const { data: config } = useStoreConfig('shopInfo')
+  
+  if (!config) return null
+  
+  const shopInfo = config as ShopInfo
+  if (typeof shopInfo.foundedYear !== 'number' || shopInfo.foundedYear <= 0) return null
+  
+  const years = new Date().getFullYear() - shopInfo.foundedYear
+  if (years <= 0) return null
 
   return (
     <div

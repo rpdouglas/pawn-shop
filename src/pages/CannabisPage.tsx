@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react'
-import { doc, getDoc } from 'firebase/firestore'
 import CinematicHero from '../components/cannabis/CinematicHero'
 import MoodCard from '../components/cannabis/MoodCard'
 import LuxuryProductCard from '../components/cannabis/LuxuryProductCard'
@@ -13,7 +12,7 @@ import ItemQuickView from '../components/pawn/ItemQuickView'
 import { useItems } from '../hooks/useItems'
 import type { Item, MoodCategory, ShopInfo } from '../lib/types'
 import { Analytics } from '../lib/analytics'
-import { db } from '../lib/firebase'
+import { useStoreConfig } from '../lib/useStoreConfig'
 
 const MOOD_CATEGORY: Record<MoodCategory, string> = {
   relax:    'flower',
@@ -35,24 +34,17 @@ export default function CannabisPage() {
   const { items, loading, error } = useItems('cannabis')
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS)
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('grid3')
-  const [whatsappHref, setWhatsappHref] = useState<string | null>(null)
+  const { data: config } = useStoreConfig('shopInfo')
+  const shopInfo = config as ShopInfo | undefined
+  const whatsappHref = shopInfo?.phoneNumber ? `https://wa.me/${shopInfo.phoneNumber}` : null
+
+
+
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
 
   useEffect(() => {
     Analytics.pageView({ view: 'cannabis', page_path: '/cannabis' })
   }, [])
-
-  useEffect(() => {
-    getDoc(doc(db, 'config', 'shopInfo'))
-      .then((snap) => {
-        if (!snap.exists()) return
-        const data = snap.data() as ShopInfo
-        if (data.phoneNumber) setWhatsappHref(`https://wa.me/${data.phoneNumber}`)
-      })
-      .catch(() => { /* non-critical */ })
-  }, [])
-
-
 
   // Per-mood item counts (no extra Firestore queries)
   const moodCounts: Record<MoodCategory, number> = useMemo(() => ({

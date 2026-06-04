@@ -2,17 +2,17 @@ import { useState, useEffect } from 'react'
 import { collection, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { db, functions } from '../../lib/firebase'
-import type { Shift, StaffMember, ViewType } from '../../lib/types'
+import type { Shift, ViewType } from '../../lib/types'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 
 const createShiftFn = httpsCallable<{ staffUid: string; startTime: string; endTime: string; viewTag: string; notes?: string }, { success: boolean }>(functions, 'createShift')
 const deleteShiftFn = httpsCallable<{ shiftId: string }, { success: boolean }>(functions, 'deleteShift')
-const getStaffMembersFn = httpsCallable<unknown, { staff: StaffMember[] }>(functions, 'getStaffMembers')
+import { useStaffMembers } from '../../lib/useStaffMembers'
 
 export default function ShiftCalendar() {
   const [shifts, setShifts] = useState<Shift[]>([])
-  const [staff, setStaff] = useState<StaffMember[]>([])
+  const { data: staff = [] } = useStaffMembers()
   const [loading, setLoading] = useState(true)
   const [isAdding, setIsAdding] = useState(false)
   const [newShift, setNewShift] = useState({
@@ -25,7 +25,6 @@ export default function ShiftCalendar() {
   })
 
   useEffect(() => {
-    getStaffMembersFn().then(res => setStaff(res.data.staff))
 
     const q = query(collection(db, 'shifts'), orderBy('startTime', 'asc'))
     const unsubscribe = onSnapshot(q, (snap) => {

@@ -34,6 +34,8 @@
     "@fontsource/lora": "^5.2.8",
     "@fontsource/oswald": "^5.2.8",
     "@fontsource/playfair-display": "^5.2.8",
+    "@tanstack/react-query": "^5.101.0",
+    "@tanstack/react-query-devtools": "^5.101.0",
     "browser-image-compression": "^2.0.2",
     "csv-parse": "^6.2.1",
     "firebase": "^12.13.0",

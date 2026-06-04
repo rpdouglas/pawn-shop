@@ -99,6 +99,7 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | **E69 CLOSED** | E69 | 2026-06-04 |
 | `E70 Social Media Campaign Management` — Built SocialDashboardPage, Composer with Canva media support, and integrated approveAndSchedulePost Cloud Function for Unified API broadcasting | E70 | 2026-06-04 |
 | **E70 CLOSED** | E70 | 2026-06-04 |
+| `E71 State Management Refactor` — Replaced duplicate Firestore snapshot listeners with TanStack React Query caching for performance optimization. Refactored configs and dashboard. | E71 | 2026-06-04 |
 
 ---
 

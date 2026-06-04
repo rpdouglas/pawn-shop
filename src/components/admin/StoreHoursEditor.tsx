@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { doc, getDoc } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
-import { db, functions } from '../../lib/firebase'
+import { functions } from '../../lib/firebase'
 import type { StoreHours, StoreHoursDay } from '../../lib/types'
-
+import { useStoreConfig } from '../../lib/useStoreConfig'
+import { useQueryClient } from '@tanstack/react-query'
 const DAY_KEYS: (keyof Omit<StoreHours, 'updatedBy' | 'updatedAt'>)[] = [
   'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
 ]
@@ -51,20 +51,20 @@ function toHoursDraft(data: StoreHours): HoursDraft {
 const updateStoreHoursFn = httpsCallable(functions, 'updateStoreHours')
 
 export default function StoreHoursEditor() {
+  const queryClient = useQueryClient()
+  const { data: config, isLoading: loading } = useStoreConfig('storeHours')
+  
   const [draft, setDraft]           = useState<HoursDraft>(DEFAULT_HOURS)
-  const [loading, setLoading]       = useState(true)
   const [saving, setSaving]         = useState(false)
   const [saveError, setSaveError]   = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
   useEffect(() => {
-    getDoc(doc(db, 'config', 'storeHours'))
-      .then(snap => {
-        if (snap.exists()) setDraft(toHoursDraft(snap.data() as StoreHours))
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+    if (config) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDraft(toHoursDraft(config as StoreHours))
+    }
+  }, [config])
 
   const updateDay = (key: keyof HoursDraft, field: keyof DayDraft, value: string | boolean) => {
     setDraft(prev => ({
@@ -80,6 +80,7 @@ export default function StoreHoursEditor() {
     setSaveSuccess(false)
     try {
       await updateStoreHoursFn(draft)
+      await queryClient.invalidateQueries({ queryKey: ['storeConfig', 'storeHours'] })
       setSaveSuccess(true)
     } catch (err) {
       setSaveError((err as { message?: string }).message ?? 'Failed to save — please try again')

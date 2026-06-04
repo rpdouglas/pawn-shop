@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+
 import { Link, Navigate } from 'react-router-dom'
 import {
   collection,
@@ -15,6 +15,7 @@ import { useAuth } from '../../context/AuthContext'
 import { formatPrice } from '../../lib/format'
 import PoliceHoldManager from '../../components/admin/PoliceHoldManager'
 import type { Item } from '../../lib/types'
+import { useQuery } from '@tanstack/react-query'
 
 interface DashboardStats {
   activeCount: number
@@ -62,85 +63,75 @@ function StatCard({ label, value }: { label: string; value: number }) {
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()
-  const [stats, setStats] = useState<DashboardStats | null>(null)
-  const [statsLoading, setStatsLoading] = useState(true)
-  const [statsError, setStatsError] = useState<string | null>(null)
 
-  const loadStats = useCallback(async () => {
-    setStatsLoading(true)
-    setStatsError(null)
-    try {
-      const sevenDaysAgo = new Date()
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+  const fetchDashboardStats = async (): Promise<DashboardStats> => {
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
-      const [
-        activeResult,
-        soldResult,
-        reservedResult,
-        draftResult,
-        policeHoldResult,
-        pawnVolumeResult,
-        activeItemsSnap,
-        topItemsSnap,
-      ] = await Promise.all([
-        getCountFromServer(query(collection(db, 'items'), where('status', '==', 'active'))),
-        getCountFromServer(query(collection(db, 'items'), where('status', '==', 'sold'))),
-        getCountFromServer(query(collection(db, 'items'), where('status', '==', 'reserved'))),
-        getCountFromServer(query(collection(db, 'items'), where('status', '==', 'draft'))),
-        getCountFromServer(query(collection(db, 'items'), where('policeHold', '==', true))),
-        getCountFromServer(query(
-          collection(db, 'pawnRequests'),
-          where('createdAt', '>=', Timestamp.fromDate(sevenDaysAgo)),
-        )),
-        getDocs(query(collection(db, 'items'), where('status', '==', 'active'))),
-        getDocs(query(
-          collection(db, 'items'),
-          orderBy('trendingScore', 'desc'),
-          limit(5),
-        )),
-      ])
+    const [
+      activeResult,
+      soldResult,
+      reservedResult,
+      draftResult,
+      policeHoldResult,
+      pawnVolumeResult,
+      activeItemsSnap,
+      topItemsSnap,
+    ] = await Promise.all([
+      getCountFromServer(query(collection(db, 'items'), where('status', '==', 'active'))),
+      getCountFromServer(query(collection(db, 'items'), where('status', '==', 'sold'))),
+      getCountFromServer(query(collection(db, 'items'), where('status', '==', 'reserved'))),
+      getCountFromServer(query(collection(db, 'items'), where('status', '==', 'draft'))),
+      getCountFromServer(query(collection(db, 'items'), where('policeHold', '==', true))),
+      getCountFromServer(query(
+        collection(db, 'pawnRequests'),
+        where('createdAt', '>=', Timestamp.fromDate(sevenDaysAgo)),
+      )),
+      getDocs(query(collection(db, 'items'), where('status', '==', 'active'))),
+      getDocs(query(
+        collection(db, 'items'),
+        orderBy('trendingScore', 'desc'),
+        limit(5),
+      )),
+    ])
 
-      const pawnActive     = activeItemsSnap.docs.filter(d => d.data()['viewTag'] === 'pawn').length
-      const cannabisActive = activeItemsSnap.docs.filter(d => d.data()['viewTag'] === 'cannabis').length
-      const fireworksActive = activeItemsSnap.docs.filter(d => d.data()['viewTag'] === 'fireworks').length
+    const pawnActive     = activeItemsSnap.docs.filter(d => d.data()['viewTag'] === 'pawn').length
+    const cannabisActive = activeItemsSnap.docs.filter(d => d.data()['viewTag'] === 'cannabis').length
+    const fireworksActive = activeItemsSnap.docs.filter(d => d.data()['viewTag'] === 'fireworks').length
 
-      const topItems = topItemsSnap.docs.map(d => {
-        const data = d.data() as Record<string, unknown>
-        return {
-          id:            d.id,
-          title:         String(data['title'] ?? ''),
-          price:         typeof data['price'] === 'number' ? data['price'] : 0,
-          viewTag:       (data['viewTag'] as Item['viewTag']) ?? 'pawn',
-          status:        (data['status'] as Item['status']) ?? 'draft',
-          trendingScore: typeof data['trendingScore'] === 'number' ? data['trendingScore'] : 0,
-        }
-      })
+    const topItems = topItemsSnap.docs.map(d => {
+      const data = d.data() as Record<string, unknown>
+      return {
+        id:            d.id,
+        title:         String(data['title'] ?? ''),
+        price:         typeof data['price'] === 'number' ? data['price'] : 0,
+        viewTag:       (data['viewTag'] as Item['viewTag']) ?? 'pawn',
+        status:        (data['status'] as Item['status']) ?? 'draft',
+        trendingScore: typeof data['trendingScore'] === 'number' ? data['trendingScore'] : 0,
+      }
+    })
 
-      setStats({
-        activeCount:    activeResult.data().count,
-        soldCount:      soldResult.data().count,
-        reservedCount:  reservedResult.data().count,
-        draftCount:     draftResult.data().count,
-        policeHoldCount: policeHoldResult.data().count,
-        pawnVolumeCount: pawnVolumeResult.data().count,
-        pawnActive,
-        cannabisActive,
-        fireworksActive,
-        topItems,
-      })
-    } catch {
-      setStatsError('Could not load dashboard data. Check your connection and try again.')
-    } finally {
-      setStatsLoading(false)
+    return {
+      activeCount:    activeResult.data().count,
+      soldCount:      soldResult.data().count,
+      reservedCount:  reservedResult.data().count,
+      draftCount:     draftResult.data().count,
+      policeHoldCount: policeHoldResult.data().count,
+      pawnVolumeCount: pawnVolumeResult.data().count,
+      pawnActive,
+      cannabisActive,
+      fireworksActive,
+      topItems,
     }
-  }, [])
+  }
 
-  useEffect(() => {
-    if (!authLoading && user && (user.isAdmin || user.role === 'manager')) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      loadStats()
-    }
-  }, [authLoading, user, loadStats])
+  const { data: stats, isLoading: statsLoading, error, refetch } = useQuery({
+    queryKey: ['adminDashboardStats'],
+    queryFn: fetchDashboardStats,
+    enabled: !!user && (user.isAdmin || user.role === 'manager'),
+  })
+
+  const statsError = error ? (error as Error).message : null
 
   if (authLoading) {
     return (
@@ -350,7 +341,7 @@ export default function DashboardPage() {
             <button
               type="button"
               className="btn btn-ghost btn-md"
-              onClick={loadStats}
+              onClick={() => refetch()}
               disabled={statsLoading}
             >
               Refresh stats

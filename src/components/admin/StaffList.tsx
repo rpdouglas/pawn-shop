@@ -1,23 +1,23 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { httpsCallable } from 'firebase/functions'
 import { functions } from '../../lib/firebase'
-import type { StaffMember, StaffRole } from '../../lib/types'
+import type { StaffRole } from '../../lib/types'
 import Badge from '../ui/Badge'
 import Modal from '../ui/Modal'
 import HRTab from '../profile/HRTab'
 import Button from '../ui/Button'
+import { useStaffMembers } from '../../lib/useStaffMembers'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-const getStaffMembersFn = httpsCallable<unknown, { staff: StaffMember[] }>(functions, 'getStaffMembers')
 const assignRoleFn = httpsCallable<{ uid: string; role: StaffRole }, { success: boolean }>(functions, 'assignRole')
 const inviteEmployeeFn = httpsCallable<{ email: string; displayName: string; role: StaffRole }, { success: boolean; resetLink: string }>(functions, 'inviteEmployee')
 
 const ROLES: StaffRole[] = ['admin', 'manager', 'inventory_staff', 'marketing_staff', 'customer']
 
 export default function StaffList() {
-  const [staff, setStaff] = useState<StaffMember[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [updatingUid, setUpdatingUid] = useState<string | null>(null)
+  const queryClient = useQueryClient()
+  const { data: staff, isLoading: loading, error: queryError } = useStaffMembers()
+  const error = queryError ? (queryError as Error).message : null
   
   const [selectedHrUid, setSelectedHrUid] = useState<string | null>(null)
   const [showInviteModal, setShowInviteModal] = useState(false)
@@ -27,42 +27,35 @@ export default function StaffList() {
   const [inviting, setInviting] = useState(false)
   const [resetLink, setResetLink] = useState<string | null>(null)
 
-  useEffect(() => {
-    getStaffMembersFn()
-      .then(res => {
-        setStaff(res.data.staff)
-        setLoading(false)
-      })
-      .catch(err => {
-        setError(err.message)
-        setLoading(false)
-      })
-  }, [])
-
-  const handleRoleChange = async (uid: string, newRole: StaffRole) => {
-    setUpdatingUid(uid)
-    try {
+  const assignRoleMutation = useMutation({
+    mutationFn: async ({ uid, newRole }: { uid: string, newRole: StaffRole }) => {
       await assignRoleFn({ uid, role: newRole })
-      setStaff(prev => prev.map(s => s.uid === uid ? { ...s, role: newRole } : s))
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to update role')
-    } finally {
-      setUpdatingUid(null)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staffMembers'] })
+    },
+    onError: (err: Error) => {
+      alert(err.message || 'Failed to update role')
     }
+  })
+
+  const handleRoleChange = (uid: string, newRole: StaffRole) => {
+    assignRoleMutation.mutate({ uid, newRole })
   }
+
+  const [inviteError, setInviteError] = useState<string | null>(null)
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault()
     setInviting(true)
-    setError(null)
+    setInviteError(null)
     try {
       const res = await inviteEmployeeFn({ email: inviteEmail, displayName: inviteName, role: inviteRole })
       setResetLink(res.data.resetLink)
       // Refresh staff list
-      const updatedStaff = await getStaffMembersFn()
-      setStaff(updatedStaff.data.staff)
+      queryClient.invalidateQueries({ queryKey: ['staffMembers'] })
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to invite')
+      setInviteError(err instanceof Error ? err.message : 'Failed to invite')
     } finally {
       setInviting(false)
     }
@@ -100,7 +93,7 @@ export default function StaffList() {
           </tr>
         </thead>
         <tbody>
-          {staff.map((member) => (
+          {(staff ?? []).map((member) => (
             <tr key={member.uid} style={{ borderBottom: '1px solid var(--color-border)' }}>
               <td style={{ padding: 'var(--space-4)', fontFamily: 'var(--font-body)', fontSize: 'var(--text-body)', color: 'var(--color-text)' }}>
                 {member.displayName || 'Unnamed'}
@@ -126,7 +119,7 @@ export default function StaffList() {
                       fontSize: 'var(--text-small)',
                     }}
                     value={member.role}
-                    disabled={updatingUid === member.uid}
+                    disabled={assignRoleMutation.isPending && assignRoleMutation.variables?.uid === member.uid}
                     onChange={(e) => handleRoleChange(member.uid, e.target.value as StaffRole)}
                   >
                     {ROLES.map(r => (
@@ -173,6 +166,7 @@ export default function StaffList() {
               </div>
             ) : (
               <form onSubmit={handleInvite} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                {inviteError && <p style={{ color: 'var(--color-error)' }}>{inviteError}</p>}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                   <label style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>Display Name</label>
                   <input

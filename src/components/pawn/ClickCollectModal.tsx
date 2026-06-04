@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import { doc, getDoc } from 'firebase/firestore'
+import { useState } from 'react'
 import { httpsCallable } from 'firebase/functions'
-import { db, functions } from '../../lib/firebase'
+import { functions } from '../../lib/firebase'
 import { useAuth } from '../../context/AuthContext'
+import { useStoreConfig } from '../../lib/useStoreConfig'
+
 import Modal from '../ui/Modal'
 import type { Item, StoreHours, StoreHoursDay } from '../../lib/types'
 import { Analytics } from '../../lib/analytics'
@@ -85,8 +86,8 @@ const createReservationFn = httpsCallable(functions, 'createReservation')
 export default function ClickCollectModal({ item, onClose }: Props) {
   const { user, loading: authLoading } = useAuth()
 
-  const [storeHours, setStoreHours] = useState<StoreHours | null>(null)
-  const [hoursLoading, setHoursLoading] = useState(true)
+  const { data: config, isLoading: hoursLoading } = useStoreConfig('storeHours')
+  const storeHours = config as StoreHours | undefined
 
   const today = todayStr()
   const maxDate = addDays(today, 13)
@@ -99,14 +100,7 @@ export default function ClickCollectModal({ item, onClose }: Props) {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    getDoc(doc(db, 'config', 'storeHours'))
-      .then(snap => {
-        if (snap.exists()) setStoreHours(snap.data() as StoreHours)
-      })
-      .catch(() => {})
-      .finally(() => setHoursLoading(false))
-  }, [])
+
 
 
   const dayConfig = storeHours
