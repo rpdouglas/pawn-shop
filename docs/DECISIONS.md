@@ -339,3 +339,7 @@ YYYY-MM-DD — Decision. Brief reason.
 2026-06-02 — Photo Upload: Replaced asynchronous Storage trigger (onObjectFinalized) with synchronous HTTPS Callable (processUploadedImage) to eliminate spinner deadlocks and provide immediate error feedback to staff.
 
 2026-06-02 — E51: Implemented client-side browser-image-compression for mobile intake uploads and bumped processUploadedImage CF memory to 1GiB to eliminate OOM crashes.
+
+## 2026-06-03
+* **AI Error Propagation**: Propagated `extractIntakeData` errors from Cloud Functions to the client via `HttpsError` to ensure AI failures (like billing limits or bad mime types) are surfaced in the UI console instead of silently swallowing them.
+* **Backend API Keys**: Explicitly confirmed the `GEMINI_API_KEY` Firebase Secret manages backend Gemini API calls (and must have active prepay billing credits) independently from the `VITE_FIREBASE_API_KEY` used for frontend client SDKs.

@@ -248,12 +248,12 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
     try {
       const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
       return JSON.parse(jsonStr)
-    } catch (parseErr) {
+    } catch {
       console.error('Failed to parse Gemini output. Raw text:', result.response.text())
       return { error: 'Failed to parse AI output into JSON.' }
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Gemini Intake Extraction Error:', err)
-    return { error: err.message || 'Unknown AI Error' }
+    return { error: err instanceof Error ? err.message : 'Unknown AI Error' }
   }
 }
