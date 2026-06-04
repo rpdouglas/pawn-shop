@@ -7,6 +7,7 @@ import { getStorage } from 'firebase-admin/storage'
 import sharp from 'sharp'
 import * as path from 'node:path'
 import { dispatchSms } from './lib/sms'
+import { twilioAccountSid, twilioAuthToken, twilioFromNumber } from './lib/secrets'
 import { extractIntakeData, geminiApiKey } from './ai'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -35,7 +36,7 @@ function buildSearchTokens(title: string, category: string): string[] {
  * Triggered whenever an item is updated. 
  * If status transitions to 'active' and policeHold is false, dispatches alerts.
  */
-export const onItemPublished = onDocumentUpdated('items/{itemId}', async (event) => {
+export const onItemPublished = onDocumentUpdated({ document: 'items/{itemId}', secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async (event) => {
   const before = event.data?.before.data() as Record<string, unknown> | undefined
   const after = event.data?.after.data() as Record<string, unknown>
 

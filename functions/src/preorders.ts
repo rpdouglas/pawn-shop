@@ -1,23 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
-import twilio from 'twilio'
-
-function isStaffToken(token: Record<string, unknown>): boolean {
-  return token['admin'] === true || token['manager'] === true || token['inventory_staff'] === true
-}
-
-async function dispatchSms(to: string, body: string): Promise<boolean> {
-  const accountSid = process.env['TWILIO_ACCOUNT_SID']
-  const authToken  = process.env['TWILIO_AUTH_TOKEN']
-  const fromNumber = process.env['TWILIO_FROM_NUMBER']
-  if (!accountSid || !authToken || !fromNumber) {
-    console.warn('[SMS] Twilio credentials not configured — skipping')
-    return false
-  }
-  const client = twilio(accountSid, authToken)
-  await client.messages.create({ body, from: fromNumber, to })
-  return true
-}
+import { dispatchSms } from './lib/sms'
+import { twilioAccountSid, twilioAuthToken, twilioFromNumber } from './lib/secrets'
 
 // ── createPreorder ───────────────────────────────────────────────────────────
 // Callable CF. Customer creates a fireworks pre-order.
@@ -30,6 +14,10 @@ interface CreatePreorderData {
   customerPhone: string
   quantity: number
   campaignId?: string
+}
+
+function isStaffToken(token: Record<string, unknown>): boolean {
+  return token['admin'] === true || token['manager'] === true || token['inventory_staff'] === true
 }
 
 export const createPreorder = onCall<CreatePreorderData>({ cors: true }, async (request) => {
@@ -94,7 +82,7 @@ interface ConfirmPreorderData {
   staffNotes?: string
 }
 
-export const confirmPreorder = onCall<ConfirmPreorderData>({ cors: true }, async (request) => {
+export const confirmPreorder = onCall<ConfirmPreorderData>({ cors: true, secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async (request) => {
   const token = (request.auth?.token ?? {}) as Record<string, unknown>
   if (!request.auth || !isStaffToken(token)) {
     throw new HttpsError('permission-denied', 'Staff access required')
@@ -151,7 +139,7 @@ interface MarkPreorderReadyData {
   staffNotes?: string
 }
 
-export const markPreorderReady = onCall<MarkPreorderReadyData>({ cors: true }, async (request) => {
+export const markPreorderReady = onCall<MarkPreorderReadyData>({ cors: true, secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async (request) => {
   const token = (request.auth?.token ?? {}) as Record<string, unknown>
   if (!request.auth || !isStaffToken(token)) {
     throw new HttpsError('permission-denied', 'Staff access required')

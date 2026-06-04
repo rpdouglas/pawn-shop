@@ -1,5 +1,6 @@
 import { onRequest } from 'firebase-functions/v2/https'
-import { createHmac } from 'node:crypto'
+import * as crypto from 'crypto'
+import { brotherPosHmacSecret } from './lib/secrets'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 
 // ── receivePosWebhook ─────────────────────────────────────────────────────────
@@ -14,21 +15,21 @@ import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 // Brother POS must POST to this function's deployed URL and include:
 //   X-Brother-POS-Signature: hex(HMAC-SHA256(body, secret))
 
-export const receivePosWebhook = onRequest({ cors: false }, async (req, res) => {
+export const receivePosWebhook = onRequest({ secrets: [brotherPosHmacSecret] }, async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' })
     return
   }
 
   // ── HMAC verification (skipped if secret not yet configured) ──────────────
-  const secret = process.env['BROTHER_POS_HMAC_SECRET']
+  const secret = brotherPosHmacSecret.value()
   if (secret) {
     const signature = req.headers['x-brother-pos-signature']
     if (typeof signature !== 'string') {
       res.status(401).json({ error: 'Missing X-Brother-POS-Signature header' })
       return
     }
-    const expected = createHmac('sha256', secret)
+    const expected = crypto.createHmac('sha256', secret)
       .update(JSON.stringify(req.body))
       .digest('hex')
     if (signature !== expected) {

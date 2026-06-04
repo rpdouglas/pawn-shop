@@ -137,14 +137,17 @@ service cloud.firestore {
     // use resource.data (existing document). resource.data is null on create.
     match /savedSearches/{searchId} {
       allow create: if isOwner(request.resource.data.uid);
-      allow read, update, delete: if isOwner(resource.data.uid);
+      allow read, delete: if isOwner(resource.data.uid);
+      allow update: if isOwner(resource.data.uid)
+                       && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['active']);
       allow read: if isStaff();
     }
 
     // ── disputes/{id} ────────────────────────────────────────────────────────
     match /disputes/{disputeId} {
       allow create: if false;
-      allow read, update: if isStaff() || isOwner(resource.data.uid);
+      allow read: if isStaff() || isOwner(resource.data.uid);
+      allow update: if isStaff();
       allow delete: if isAdmin();
     }
 
@@ -157,8 +160,9 @@ service cloud.firestore {
 
     // ── preorders/{id} ───────────────────────────────────────────────────────
     match /preorders/{preorderId} {
-      allow create: if isSignedIn();
-      allow read, update: if isStaff() || isOwner(resource.data.uid);
+      allow create: if false;
+      allow read: if isStaff() || isOwner(resource.data.uid);
+      allow update: if isStaff();
       allow delete: if isAdmin();
     }
 

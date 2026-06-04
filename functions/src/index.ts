@@ -7,6 +7,7 @@ setGlobalOptions({
   maxInstances: 10,
   concurrency: 80,
   minInstances: 0,
+  enforceAppCheck: false, // Drops all traffic without valid attestation
 })
 
 export * from './auth'

@@ -2,6 +2,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
 import { dispatchSms } from './lib/sms'
 import { dispatchEmail } from './lib/email'
+import { twilioAccountSid, twilioAuthToken, twilioFromNumber, sendgridApiKey, sendgridFromEmail, siteUrl } from './lib/secrets'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -87,7 +88,7 @@ function buildDigestHtml(items: DigestItem[]): string {
 // phone number. Sets reminderSentAt after the batch — prevents duplicate sends.
 // SMS body uses no category words (Tanya / Marie Discretion Test).
 
-export const sendSeasonalReminders = onSchedule('0 * * * *', async () => {
+export const sendSeasonalReminders = onSchedule({ schedule: '0 * * * *', secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async () => {
   const db = getFirestore()
 
   const campaignSnap = await db.collection('campaigns')
@@ -145,7 +146,7 @@ export const sendSeasonalReminders = onSchedule('0 * * * *', async () => {
 // pickup window opens in 20–28 hours. Sends a day-before reminder SMS with the
 // specific pickup window — no category words. Idempotency via pickupReminderSentAt.
 
-export const sendPickupReminders = onSchedule('0 * * * *', async () => {
+export const sendPickupReminders = onSchedule({ schedule: '0 * * * *', secrets: [twilioAccountSid, twilioAuthToken, twilioFromNumber] }, async () => {
   const db   = getFirestore()
   const now  = new Date()
   const from = new Date(now.getTime() + 20 * 60 * 60 * 1000)
@@ -238,9 +239,9 @@ export const sendPickupReminders = onSchedule('0 * * * *', async () => {
 // Subject is hard-coded "The Pawn Shop Update" — Marie Discretion Test passed
 // by design. No category words appear in subject, preheader, or email body.
 
-export const sendWeeklyDigest = onSchedule('0 14 * * 1', async () => {
+export const sendWeeklyDigest = onSchedule({ schedule: '0 14 * * 1', secrets: [sendgridApiKey, sendgridFromEmail, siteUrl] }, async () => {
   const db      = getFirestore()
-  const siteUrl = process.env['SITE_URL'] ?? 'https://thepawnshop.ca'
+  const siteUrlStr = siteUrl.value() || 'https://thepawnshop.ca'
 
   // Pawn items only — cannabis/fireworks viewTags would expose category in the
   // item URL path, violating the Marie Discretion Test. Uses composite index:
@@ -263,7 +264,7 @@ export const sendWeeklyDigest = onSchedule('0 14 * * 1', async () => {
         title:     String(data['title'] ?? ''),
         condition: String(data['condition'] ?? ''),
         price:     Number(data['price'] ?? 0),
-        link:      `${siteUrl}/pawn/item/${d.id}`,
+        link:      `${siteUrlStr}/pawn/item/${d.id}`,
       }
     })
 

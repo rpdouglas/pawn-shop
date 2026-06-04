@@ -1,9 +1,10 @@
 import twilio from 'twilio'
+import { twilioAccountSid, twilioAuthToken, twilioFromNumber } from './secrets'
 
 export async function dispatchSms(to: string, body: string): Promise<boolean> {
-  const accountSid = process.env['TWILIO_ACCOUNT_SID']
-  const authToken = process.env['TWILIO_AUTH_TOKEN']
-  const fromNumber = process.env['TWILIO_FROM_NUMBER']
+  const accountSid = twilioAccountSid.value()
+  const authToken = twilioAuthToken.value()
+  const fromNumber = twilioFromNumber.value()
   if (!accountSid || !authToken || !fromNumber) {
     console.warn('[SMS] Twilio credentials not configured — skipping')
     return false

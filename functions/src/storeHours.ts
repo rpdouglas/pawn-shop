@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 import sgMail from '@sendgrid/mail'
+import { sendgridApiKey, staffContactEmail } from './lib/secrets'
 
 // ── updateStoreHours ─────────────────────────────────────────────────────────
 
@@ -76,15 +77,15 @@ interface SendContactEmailData {
   message: string
 }
 
-export const sendContactEmail = onCall<SendContactEmailData>({ cors: true }, async (request) => {
+export const sendContactEmail = onCall<SendContactEmailData>({ cors: true, secrets: [sendgridApiKey, staffContactEmail] }, async (request) => {
   const { name, email, message } = request.data
 
   if (!name?.trim()    || name.length > 100)    throw new HttpsError('invalid-argument', 'Name is required (max 100 characters)')
   if (!email?.trim()   || email.length > 200)   throw new HttpsError('invalid-argument', 'Email is required (max 200 characters)')
   if (!message?.trim() || message.length > 2000) throw new HttpsError('invalid-argument', 'Message is required (max 2000 characters)')
 
-  const apiKey = process.env['SENDGRID_API_KEY']
-  const staffEmail = process.env['STAFF_CONTACT_EMAIL']
+  const apiKey = sendgridApiKey.value()
+  const staffEmail = staffContactEmail.value()
 
   if (apiKey && staffEmail) {
     sgMail.setApiKey(apiKey)

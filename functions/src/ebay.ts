@@ -1,6 +1,7 @@
 import { onCall, onRequest, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 import { createHash } from 'node:crypto'
+import { ebayUserToken, ebaySandbox, ebayLocationKey, ebayVerificationToken, ebayWebhookUrl } from './lib/secrets'
 
 // ── Category & condition maps ─────────────────────────────────────────────────
 
@@ -29,7 +30,7 @@ function isStaffToken(token: Record<string, unknown>): boolean {
 }
 
 function getEbayBase(): string {
-  return process.env['EBAY_SANDBOX'] === 'true'
+  return ebaySandbox.value() === 'true'
     ? 'https://api.sandbox.ebay.com'
     : 'https://api.ebay.com'
 }
@@ -40,7 +41,7 @@ async function ebayRequest(
   path: string,
   body?: unknown,
 ): Promise<{ ok: boolean; status: number; data: unknown }> {
-  const token = process.env['EBAY_USER_TOKEN']
+  const token = ebayUserToken.value()
   if (!token) throw new HttpsError('internal', 'EBAY_USER_TOKEN not configured')
 
   const res = await fetch(`${getEbayBase()}${path}`, {
@@ -85,7 +86,7 @@ interface PushToEbayResult {
 }
 
 export const pushToEbay = onCall<PushToEbayData, Promise<PushToEbayResult>>(
-  { cors: true },
+  { cors: true, secrets: [ebayUserToken, ebaySandbox, ebayLocationKey] },
   async (request) => {
     if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
       throw new HttpsError('permission-denied', 'Admin or manager role required')
@@ -130,7 +131,7 @@ export const pushToEbay = onCall<PushToEbayData, Promise<PushToEbayResult>>(
     const condition   = String(item['condition'] ?? 'good')
     const priceCents  = Number(item['price'])
     const images      = (item['images'] as string[] | undefined) ?? []
-    const locationKey = process.env['EBAY_MERCHANT_LOCATION_KEY'] ?? 'main_store'
+    const locationKey = ebayLocationKey.value() || 'main_store'
     const sku         = itemId
 
     // Step 1: Create/update inventory item
@@ -223,7 +224,7 @@ interface EbayNotificationPayload {
   notification?: { data?: Record<string, unknown> }
 }
 
-export const ebayWebhook = onRequest(async (req, res) => {
+export const ebayWebhook = onRequest({ secrets: [ebayVerificationToken, ebayWebhookUrl] }, async (req, res) => {
   if (req.method === 'GET') {
     const challengeCode =
       typeof req.query['challenge_code'] === 'string' ? req.query['challenge_code'] : null
@@ -232,8 +233,8 @@ export const ebayWebhook = onRequest(async (req, res) => {
       return
     }
 
-    const verificationToken = process.env['EBAY_VERIFICATION_TOKEN']
-    const endpointUrl = process.env['EBAY_WEBHOOK_URL']
+    const verificationToken = ebayVerificationToken.value()
+    const endpointUrl = ebayWebhookUrl.value()
     if (!verificationToken || !endpointUrl) {
       res.status(500).json({ error: 'Webhook environment not configured' })
       return
@@ -252,7 +253,7 @@ export const ebayWebhook = onRequest(async (req, res) => {
     return
   }
 
-  const verificationToken = process.env['EBAY_VERIFICATION_TOKEN']
+  const verificationToken = ebayVerificationToken.value()
   if (!verificationToken) {
     res.status(500).json({ error: 'Webhook environment not configured' })
     return

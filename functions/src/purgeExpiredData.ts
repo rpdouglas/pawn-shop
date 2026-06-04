@@ -1,12 +1,13 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
+import { purgeRetentionDays } from './lib/secrets'
 
 const TERMINAL_STATUSES = ['declined', 'completed']
 const BATCH_SIZE = 500
 
 // Default 730 days (2 years) — configurable via environment variable
 function retentionDays(): number {
-  const val = parseInt(process.env['PURGE_RETENTION_DAYS'] ?? '730', 10)
+  const val = purgeRetentionDays.value()
   return isNaN(val) || val < 1 ? 730 : val
 }
 
