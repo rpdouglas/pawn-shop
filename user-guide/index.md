@@ -33,6 +33,7 @@ Day-to-day tools for managing the shop floor — reservations, store hours, and 
 - [Reservations Inbox](/admin/reservations)
 - [Store Hours](/admin/store-hours)
 - [Staff Scheduling](/admin/scheduling)
+- [Developer Deployments](/admin/developer-deployments)
 
 ### 💎 Editorial & Brand
 Maintaining the "Dapper and Debonair" identity through our Markdown CMS and strict visual standards.

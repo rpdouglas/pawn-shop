@@ -15,12 +15,20 @@
   "storage": {
     "rules": "storage.rules"
   },
-  "functions": [{
-    "source": "functions",
-    "codebase": "default",
-    "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"],
-    "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
-  }],
+  "functions": [
+    {
+      "source": "functions/core",
+      "codebase": "core",
+      "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"],
+      "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
+    },
+    {
+      "source": "functions/operations",
+      "codebase": "operations",
+      "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"],
+      "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
+    }
+  ],
   "emulators": {
     "auth":      { "host": "0.0.0.0", "port": 9099 },
     "firestore": { "host": "0.0.0.0", "port": 8080 },

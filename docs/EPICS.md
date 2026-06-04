@@ -741,11 +741,10 @@
 > **Persona Gate:** Infrastructure epic — no customer-facing persona directly served. Enables targeted deploys per function group, reducing CI/CD blast radius.
 > **Dependency:** All CFs from E28–E33 must be stable in production before restructure begins.
 
-- [ ] Define and document grouping strategy in `DECISIONS.md`: `inventory`, `reservations`, `pawn`, `ai`, `notifications`, `compliance`, `admin` groups `[Staff]`
-- [ ] Create group subdirectories under `functions/src/groups/` — move source files, create per-group `index.ts` `[Staff]`
-- [ ] Refactor `functions/src/index.ts` to import from group index files (no function name changes) `[Staff]`
-- [ ] Update `.github/workflows/deploy-dev.yml` and `deploy-prod.yml` — add path-aware targeted deploy steps (`firebase deploy --only functions:groupName`) `[Staff]`
-- [ ] Run full Emulator Suite regression after restructure — zero CF name or behaviour regressions `[Staff]` `[Comp]`
+- [x] Define and document grouping strategy in `DECISIONS.md`: `core`, `operations` groups `[Staff]`
+- [x] Create group subdirectories under `functions/` — move source files, create per-group `package.json` `[Staff]`
+- [x] Refactor `firebase.json` and `package.json` scripts to allow targeted deploys `[Staff]`
+- [x] Run full Emulator Suite regression after restructure — zero CF name or behaviour regressions `[Staff]` `[Comp]`
 
 ---
 
@@ -900,4 +899,4 @@
 *Dapper. Debonair. Distinctly Akwesasne.*
 \n### Phase 15: E69 — Onboarding & SOP Management\n- [x] Write `E69_ONBOARDING_SOP_PLAN.md` Spec and Plan\n- [x] Update `firestore.rules` and `firestore-schema.md`\n- [x] Implement `inviteEmployee` Cloud Function\n- [x] Implement `DocumentsPage` Admin UI for SOPs\n- [x] Implement `AcknowledgmentWall` middleware\n- [x] Add `Invite Staff` Modal to `StaffList`\n
 \n### Phase 16: E70 — Social Media Campaign Management\n- [x] Write `E70_SOCIAL_MEDIA_PLAN.md` Spec and Plan\n- [x] Update `firestore.rules` and `firestore-schema.md` with `socialPosts`\n- [x] Implement `approveAndSchedulePost` Cloud Function (Ayrshare Stub)\n- [x] Implement `SocialDashboardPage.tsx`\n- [x] Implement `SocialComposerPage.tsx` with Canva media upload\n
-\n### Phase 17: E71 — State Management Refactor (TanStack Query)\n- [ ] Install `@tanstack/react-query` and configure `QueryClientProvider`\n- [ ] Refactor `DashboardPage.tsx` to use `useQuery` for metrics\n- [ ] Create `useStaffMembers` hook wrapping the Cloud Function\n- [ ] Create `useStoreConfig` hook for global settings\n- [ ] Refactor `StaffList` and `ShiftCalendar` to use new hooks\n- [ ] Refactor admin mutations to use `useMutation`\n
+\n### Phase 17: E71 — State Management Refactor (TanStack Query)\n- [x] Install `@tanstack/react-query` and configure `QueryClientProvider`\n- [x] Refactor `DashboardPage.tsx` to use `useQuery` for metrics\n- [x] Create `useStaffMembers` hook wrapping the Cloud Function\n- [x] Create `useStoreConfig` hook for global settings\n- [x] Refactor `StaffList` and `ShiftCalendar` to use new hooks\n- [x] Refactor admin mutations to use `useMutation`\n

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { doc, onSnapshot, updateDoc, setDoc, serverTimestamp, getDoc } from 'firebase/firestore'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { httpsCallable } from 'firebase/functions'
 import { db, functions } from '../../lib/firebase'
 import type { ConditionGrade, MerchandisingTag, ViewType } from '../../lib/types'
@@ -150,8 +151,7 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
   const [formState, setFormState] = useState<FormState>(EMPTY_FORM)
   const [errors, setErrors] = useState<FormErrors>({})
   const [publishError, setPublishError] = useState('')
-  const [isSaving, setIsSaving] = useState(false)
-  const [isPublishing, setIsPublishing] = useState(false)
+  const queryClient = useQueryClient()
   const [isCreating, setIsCreating] = useState(false)
   const [isAiProcessing, setIsAiProcessing] = useState(false)
 
@@ -337,14 +337,8 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
     }
   }
 
-  const saveDraft = async () => {
-    const errs = validateForSave(formState)
-    if (Object.keys(errs).length > 0) { setErrors(errs); return }
-    setErrors({})
-    setPublishError('')
-    setIsSaving(true)
-
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async () => {
       let id = itemId
       if (!id) {
         const result = await createDraftItemFn({
@@ -358,12 +352,39 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
       }
       await updateDoc(doc(db, 'items', id), buildUpdatePayload())
       await writeCostIfProvided(id)
-    } catch (err) {
-      setPublishError(err instanceof Error ? err.message : 'Save failed. Please try again.')
-    } finally {
-      setIsSaving(false)
+      return id
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminDashboardStats'] })
+    },
+    onError: (err: Error) => {
+      setPublishError(err.message || 'Save failed. Please try again.')
     }
+  })
+
+  const saveDraft = async () => {
+    const errs = validateForSave(formState)
+    if (Object.keys(errs).length > 0) { setErrors(errs); return }
+    setErrors({})
+    setPublishError('')
+    saveMutation.mutate()
   }
+
+  const publishMutation = useMutation({
+    mutationFn: async () => {
+      if (!itemId) throw new Error('No item ID')
+      await updateDoc(doc(db, 'items', itemId), buildUpdatePayload())
+      await writeCostIfProvided(itemId)
+      await publishItemFn({ itemId })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminDashboardStats'] })
+      setPhase('published')
+    },
+    onError: (err: Error) => {
+      setPublishError(err.message || 'Publish failed. Please try again.')
+    }
+  })
 
   const publish = async () => {
     if (!itemId) return
@@ -371,18 +392,7 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setErrors({})
     setPublishError('')
-    setIsPublishing(true)
-
-    try {
-      await updateDoc(doc(db, 'items', itemId), buildUpdatePayload())
-      await writeCostIfProvided(itemId)
-      await publishItemFn({ itemId })
-      setPhase('published')
-    } catch (err) {
-      setPublishError(err instanceof Error ? err.message : 'Publish failed. Please try again.')
-    } finally {
-      setIsPublishing(false)
-    }
+    publishMutation.mutate()
   }
 
   // ── Published success view ────────────────────────────────────────────────
@@ -864,17 +874,17 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
           type="button"
           variant="secondary"
           onClick={saveDraft}
-          disabled={isSaving || isPublishing}
+          disabled={saveMutation.isPending || publishMutation.isPending}
         >
-          {isSaving ? 'Saving…' : itemId ? 'Save Draft' : 'Start Item'}
+          {saveMutation.isPending ? 'Saving…' : itemId ? 'Save Draft' : 'Start Item'}
         </Button>
         {itemId && (
           <Button
             type="button"
             onClick={publish}
-            disabled={isPublishing || isSaving}
+            disabled={publishMutation.isPending || saveMutation.isPending}
           >
-            {isPublishing ? 'Publishing…' : 'Publish Item'}
+            {publishMutation.isPending ? 'Publishing…' : 'Publish Item'}
           </Button>
         )}
       </div>

@@ -25,7 +25,7 @@ Brand voice: **"Dapper. Debonair. Distinctly Akwesasne."**
 - **Frontend:** React 18 + Vite + TypeScript + Tailwind v4
 - **Database:** Cloud Firestore (`nats-rack` / `the-addicts-agenda`)
 - **Auth:** Firebase Auth (email/password + Google SSO)
-- **Functions:** Cloud Functions v2 (Node/TypeScript) in `/functions`
+- **Functions:** Cloud Functions v2 (Node/TypeScript) in `/functions` (Modular codebases: `core`, `operations`, `shared`)
 - **Hosting:** Firebase Hosting
 - **Storage:** Firebase Storage (item images, pawn attachments)
 - **Dev environment:** GitHub Codespaces + Firebase Emulator Suite
@@ -112,11 +112,11 @@ Two AI systems — completely separate roles:
 
 | System | Role | Invoked by |
 |---|---|---|
-| **Claude** | Development workflow — planning, coding, review, docs | Developer session |
+| **Antigravity (AGY)** | Development workflow — autonomous goal execution, specs-first planning, review, docs, and subagent orchestration | Developer session |
 | **Gemini** | Runtime E18 staff feature — descriptions, pricing, tags | Staff in admin UI |
 
-**Start every Claude session with `docs/prompts/INITIALIZATION.md`.**
-Full prompt library: `docs/prompts/` — INITIALIZATION, PLANNING, APPROVAL, FIX, READ_STATE, TESTING, TICKET_CLOSE, POST_SPRINT_AUDIT, CODEBASE_AUDIT, GEMINI_INITIALIZATION.
+**Start every session relying on the `GEMINI.md` system prompt and `docs/CONTEXT.md`.**
+Rely on autonomous execution via `/goal` and slash commands rather than manual prompt templates.
 
 ---
 

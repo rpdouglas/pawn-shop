@@ -8,6 +8,8 @@
     "start:all": "npm run lint && npm run build && concurrently \"npm run dev\" \"npm run guide:dev\" \"npm run emulate\"",
     "build": "tsc -b && vite build",
     "deploy:fn": "firebase deploy --only functions",
+    "deploy:fn:core": "firebase deploy --only functions:core",
+    "deploy:fn:operations": "firebase deploy --only functions:operations",
     "deploy:rules": "firebase deploy --only firestore:rules,storage:rules",
     "deploy:hosting": "npm run build && firebase deploy --only hosting",
     "lint": "eslint .",

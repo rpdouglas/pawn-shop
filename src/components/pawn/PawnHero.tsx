@@ -13,7 +13,7 @@ export default function PawnHero() {
       aria-label="Pawn Shop — find your next discovery"
       style={{
         position: 'relative',
-        minHeight: '80vh',
+        minHeight: '50vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -79,7 +79,7 @@ export default function PawnHero() {
           Curated inventory — timepieces, instruments, cameras, and rare finds — presented to the standard they deserve.
         </p>
 
-        <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center' }}>
           <Button variant="primary" size="lg" onClick={scrollToDiscovery}>
             Browse Inventory
           </Button>

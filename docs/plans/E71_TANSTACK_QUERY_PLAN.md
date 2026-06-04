@@ -39,8 +39,8 @@ Refactor write operations to use `useMutation`:
 - [x] Create `useStaffMembers` custom hook wrapping the `getStaffMembers` Cloud Function.
 - [x] Create `useStoreConfig` custom hook for caching `storeHours` and `shopInfo`.
 - [x] Refactor `StaffList` and `ShiftCalendar` to use the new hooks.
-- [ ] Refactor one major mutation (e.g., `IntakeForm` publishing) to `useMutation` as a pattern template.
-- [ ] Review performance gains via React Query Devtools.
+- [x] Refactor one major mutation (e.g., `IntakeForm` publishing) to `useMutation` as a pattern template.
+- [x] Review performance gains via React Query Devtools.
 
 ---
 

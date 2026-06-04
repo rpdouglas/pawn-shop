@@ -1,0 +1,15 @@
+export declare const sendgridApiKey: import("firebase-functions/params").SecretParam;
+export declare const sendgridFromEmail: import("firebase-functions/params").StringParam;
+export declare const staffContactEmail: import("firebase-functions/params").StringParam;
+export declare const twilioAccountSid: import("firebase-functions/params").SecretParam;
+export declare const twilioAuthToken: import("firebase-functions/params").SecretParam;
+export declare const twilioFromNumber: import("firebase-functions/params").StringParam;
+export declare const ebayUserToken: import("firebase-functions/params").SecretParam;
+export declare const ebaySandbox: import("firebase-functions/params").StringParam;
+export declare const ebayLocationKey: import("firebase-functions/params").StringParam;
+export declare const ebayVerificationToken: import("firebase-functions/params").SecretParam;
+export declare const ebayWebhookUrl: import("firebase-functions/params").StringParam;
+export declare const brotherPosHmacSecret: import("firebase-functions/params").SecretParam;
+export declare const siteUrl: import("firebase-functions/params").StringParam;
+export declare const purgeRetentionDays: import("firebase-functions/params").IntParam;
+export declare const backupBucketName: import("firebase-functions/params").StringParam;

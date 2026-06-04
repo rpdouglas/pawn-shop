@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
 import { doc, onSnapshot, updateDoc, setDoc, serverTimestamp, getDoc } from 'firebase/firestore'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ref, uploadBytesResumable } from 'firebase/storage'
 import { httpsCallable } from 'firebase/functions'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -180,8 +181,7 @@ export default function MobileIntakePage() {
   } | null>(null)
   const [uploads, setUploads] = useState<Map<string, UploadEntry>>(new Map())
   const [isCreating, setIsCreating] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isPublishing, setIsPublishing] = useState(false)
+  const queryClient = useQueryClient()
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [publishError, setPublishError] = useState('')
   const [funStatusIndex, setFunStatusIndex] = useState(0)
@@ -449,23 +449,9 @@ export default function MobileIntakePage() {
     setStep('details')
   }
 
-  const advanceToReview = async () => {
-    const errs: Record<string, string> = {}
-    if (!form.title.trim() || form.title === 'AI Draft Intake') errs.title = 'Item Name is required'
-    if (!form.category.trim()) errs.category = 'Category is required'
-    if (!form.description.trim()) errs.description = 'Description is required'
-    const cents = parsePriceCents(form.priceInput)
-    if (isNaN(cents) || cents <= 0) errs.price = 'Valid price required (e.g. 49.99)'
-    if (!form.condition) errs.condition = 'Condition is required'
-    if (form.quantityInput.trim() && (isNaN(parseInt(form.quantityInput, 10)) || parseInt(form.quantityInput, 10) < 1)) {
-      errs.quantity = 'Stock must be a whole number of at least 1'
-    }
-    if (Object.keys(errs).length > 0) { setErrors(errs); return }
-    setErrors({})
-
-    if (!itemId) return
-    setIsSaving(true)
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      if (!itemId) throw new Error('No item ID')
       const updateData: Record<string, unknown> = {
         title: form.title.trim(),
         category: form.category.trim(),
@@ -496,19 +482,37 @@ export default function MobileIntakePage() {
       if (form.costInput.trim() && !isNaN(costCents) && costCents > 0) {
         await setDoc(doc(db, 'items', itemId, 'internal', 'staff'), { cost: costCents }, { merge: true })
       }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminDashboardStats'] })
       setStep('review')
-    } catch (err) {
-      setErrors({ save: err instanceof Error ? err.message : 'Save failed. Try again.' })
-    } finally {
-      setIsSaving(false)
+    },
+    onError: (err: Error) => {
+      setErrors({ save: err.message || 'Save failed. Try again.' })
     }
+  })
+
+  const advanceToReview = async () => {
+    const errs: Record<string, string> = {}
+    if (!form.title.trim() || form.title === 'AI Draft Intake') errs.title = 'Item Name is required'
+    if (!form.category.trim()) errs.category = 'Category is required'
+    if (!form.description.trim()) errs.description = 'Description is required'
+    const cents = parsePriceCents(form.priceInput)
+    if (isNaN(cents) || cents <= 0) errs.price = 'Valid price required (e.g. 49.99)'
+    if (!form.condition) errs.condition = 'Condition is required'
+    if (form.quantityInput.trim() && (isNaN(parseInt(form.quantityInput, 10)) || parseInt(form.quantityInput, 10) < 1)) {
+      errs.quantity = 'Stock must be a whole number of at least 1'
+    }
+    if (Object.keys(errs).length > 0) { setErrors(errs); return }
+    setErrors({})
+    if (!itemId) return
+
+    saveMutation.mutate()
   }
 
-  const publish = async () => {
-    if (!itemId) return
-    setIsPublishing(true)
-    setPublishError('')
-    try {
+  const publishMutation = useMutation({
+    mutationFn: async () => {
+      if (!itemId) throw new Error('No item ID')
       const updateData: Record<string, unknown> = {
         title: form.title.trim(),
         category: form.category.trim(),
@@ -540,12 +544,20 @@ export default function MobileIntakePage() {
         await setDoc(doc(db, 'items', itemId, 'internal', 'staff'), { cost: costCents }, { merge: true })
       }
       await publishItemFn({ itemId })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminDashboardStats'] })
       setStep('published')
-    } catch (err) {
-      setPublishError(err instanceof Error ? err.message : 'Publish failed. Try again.')
-    } finally {
-      setIsPublishing(false)
+    },
+    onError: (err: Error) => {
+      setPublishError(err.message || 'Publish failed. Try again.')
     }
+  })
+
+  const publish = async () => {
+    if (!itemId) return
+    setPublishError('')
+    publishMutation.mutate()
   }
 
   const reset = () => {
@@ -893,10 +905,10 @@ export default function MobileIntakePage() {
           <button
             type="button"
             onClick={advanceToReview}
-            disabled={isSaving}
-            style={{ ...BTN_PRIMARY, opacity: isSaving ? 0.6 : 1 }}
+            disabled={saveMutation.isPending}
+            style={{ ...BTN_PRIMARY, opacity: saveMutation.isPending ? 0.6 : 1 }}
           >
-            {isSaving ? 'Saving…' : 'Next →'}
+            {saveMutation.isPending ? 'Saving…' : 'Next →'}
           </button>
         </div>
       )}
@@ -970,10 +982,10 @@ export default function MobileIntakePage() {
           <button
             type="button"
             onClick={publish}
-            disabled={isPublishing}
-            style={{ ...BTN_PRIMARY, opacity: isPublishing ? 0.6 : 1 }}
+            disabled={publishMutation.isPending}
+            style={{ ...BTN_PRIMARY, opacity: publishMutation.isPending ? 0.6 : 1 }}
           >
-            {isPublishing ? 'Publishing…' : 'Publish Item'}
+            {publishMutation.isPending ? 'Publishing…' : 'Publish Item'}
           </button>
         </div>
       )}

@@ -56,21 +56,7 @@ export default function PawnPage() {
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: 'var(--space-8) var(--space-6)' }}>
 
-        {/* Trust strip — years in business + recently sold (Makoonsii + Dale) */}
-        {!searchValue && (
-          <section
-            aria-label="Store trust signals"
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 'var(--space-8)',
-              flexWrap: 'wrap',
-              marginBottom: 'var(--space-12)',
-            }}
-          >
-            <YearsInBusinessBadge />
-          </section>
-        )}
+
 
         {/* Recently sold strip — real sold data only (Dale persona) */}
         {!searchValue && <RecentlySoldStrip />}
@@ -242,6 +228,21 @@ export default function PawnPage() {
 
         {/* Community testimonials — Makoonsii trust signal */}
         {!searchValue && <TestimonialsModule />}
+
+        {/* Trust strip — years in business (Makoonsii + Dale) */}
+        {!searchValue && (
+          <section
+            aria-label="Store trust signals"
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: 'var(--space-16)',
+              marginBottom: 'var(--space-8)',
+            }}
+          >
+            <YearsInBusinessBadge />
+          </section>
+        )}
       </div>
 
       {/* Quick-view modal — data pre-fetched on hover; opens in < 200ms */}
