@@ -1,11 +1,24 @@
-export type LayoutMode = 'grid2' | 'grid3' | 'list' | 'magazine'
+export type LayoutMode = 'grid2' | 'grid3' | 'list' | 'magazine' | 'masonry'
 
 interface LayoutToggleProps {
   mode: LayoutMode
   onChange: (mode: LayoutMode) => void
+  allowedModes?: LayoutMode[]
 }
 
 const MODES: { mode: LayoutMode; label: string; icon: React.ReactNode }[] = [
+  {
+    mode: 'masonry',
+    label: 'Masonry',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="6" height="10" rx="1" fill="currentColor" />
+        <rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor" />
+        <rect x="1" y="12" width="6" height="3" rx="1" fill="currentColor" />
+        <rect x="9" y="8" width="6" height="7" rx="1" fill="currentColor" />
+      </svg>
+    ),
+  },
   {
     mode: 'grid2',
     label: 'Two columns',
@@ -51,7 +64,11 @@ const MODES: { mode: LayoutMode; label: string; icon: React.ReactNode }[] = [
   },
 ]
 
-export default function LayoutToggle({ mode, onChange }: LayoutToggleProps) {
+export default function LayoutToggle({ mode, onChange, allowedModes = ['grid2', 'grid3', 'list', 'magazine'] }: LayoutToggleProps) {
+  const visibleModes = MODES.filter(m => allowedModes.includes(m.mode))
+
+  if (visibleModes.length <= 1) return null
+
   return (
     <div
       role="group"
@@ -65,7 +82,7 @@ export default function LayoutToggle({ mode, onChange }: LayoutToggleProps) {
         padding: 'var(--space-1)',
       }}
     >
-      {MODES.map(({ mode: m, label, icon }) => (
+      {visibleModes.map(({ mode: m, label, icon }) => (
         <button
           key={m}
           onClick={() => onChange(m)}

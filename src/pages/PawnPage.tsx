@@ -12,6 +12,8 @@ import YearsInBusinessBadge from '../components/pawn/YearsInBusinessBadge'
 import TestimonialsModule from '../components/pawn/TestimonialsModule'
 import ActivityFeed from '../components/pawn/ActivityFeed'
 import CampaignBanner from '../components/CampaignBanner'
+import LayoutToggle, { type LayoutMode } from '../components/ui/LayoutToggle'
+import LuxuryProductCard from '../components/cannabis/LuxuryProductCard'
 import ArticleSection from '../components/ArticleSection'
 import Input from '../components/ui/Input'
 import SaveSearchButton from '../components/pawn/SaveSearchButton'
@@ -25,6 +27,7 @@ export default function PawnPage() {
   const { items, loading, hasMore, loadMore, searchValue, setSearchValue } = useItemSearch('pawn')
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
   const [collectItem, setCollectItem]   = useState<Item | null>(null)
+  const [layoutMode, setLayoutMode]     = useState<LayoutMode>('masonry')
   const { showStaffPicks, showRelatedItems } = useFeatureFlags()
 
   useEffect(() => {
@@ -119,6 +122,8 @@ export default function PawnPage() {
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 'var(--space-4)',
             marginBottom: 'var(--space-6)' 
           }}>
             <h2
@@ -134,19 +139,102 @@ export default function PawnPage() {
                 ? `Results for "${searchValue}"`
                 : 'Discover'}
             </h2>
-            {searchValue && (
-              <SaveSearchButton query={searchValue} viewTag="pawn" />
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+              <LayoutToggle 
+                mode={layoutMode} 
+                onChange={setLayoutMode} 
+                allowedModes={['masonry', 'grid3', 'list']}
+              />
+              {searchValue && (
+                <SaveSearchButton query={searchValue} viewTag="pawn" />
+              )}
+            </div>
           </div>
 
-          <MasonryGrid
-            items={items}
-            loading={loading}
-            hasMore={hasMore}
-            onLoadMore={loadMore}
-            onItemSelect={handleItemSelect}
-            onItemHover={handleItemHover}
-          />
+          {layoutMode === 'masonry' ? (
+            <MasonryGrid
+              items={items}
+              loading={loading}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              onItemSelect={handleItemSelect}
+              onItemHover={handleItemHover}
+            />
+          ) : (
+            <div>
+              {!loading && items.length === 0 ? (
+                <p style={{
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text-muted)',
+                  fontSize: 'var(--text-body)',
+                  fontStyle: 'italic',
+                  padding: 'var(--space-12) 0',
+                }}>
+                  No items found. Try a different search.
+                </p>
+              ) : (
+                <div style={{
+                  display: layoutMode === 'list' ? 'flex' : 'grid',
+                  flexDirection: layoutMode === 'list' ? 'column' : undefined,
+                  gridTemplateColumns: layoutMode === 'list' ? undefined : 'repeat(auto-fill, minmax(240px, 1fr))',
+                  gap: 'var(--space-6)'
+                }}>
+                  {items.map(item => (
+                    <div key={item.id} onMouseEnter={() => handleItemHover(item)}>
+                      <LuxuryProductCard
+                        title={item.title}
+                        price={item.price}
+                        description={item.description}
+                        imageUrl={item.images[0]}
+                        merchandisingTags={item.merchandisingTags}
+                        layoutMode={layoutMode}
+                        onClick={() => handleItemSelect(item)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {hasMore && (
+                <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
+                  <button 
+                    onClick={loadMore} 
+                    style={{
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text)',
+                      border: '1px solid var(--color-border)',
+                      padding: 'var(--space-3) var(--space-6)',
+                      borderRadius: 'var(--radius-full)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--text-small)',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all var(--motion-speed-fast) var(--motion-easing)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-bg)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-surface)'
+                    }}
+                  >
+                    {loading ? 'Loading...' : 'Load More'}
+                  </button>
+                </div>
+              )}
+              {loading && !hasMore && items.length > 0 && (
+                <p style={{
+                  textAlign: 'center',
+                  padding: 'var(--space-8)',
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text-muted)',
+                  fontSize: 'var(--text-small)',
+                }}>
+                  Loading more…
+                </p>
+              )}
+            </div>
+          )}
         </section>
 
         {/* Narrative & Stories — E19 Akwesasne identity foundation */}

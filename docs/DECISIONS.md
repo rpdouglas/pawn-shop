@@ -343,3 +343,4 @@ YYYY-MM-DD — Decision. Brief reason.
 ## 2026-06-03
 * **AI Error Propagation**: Propagated `extractIntakeData` errors from Cloud Functions to the client via `HttpsError` to ensure AI failures (like billing limits or bad mime types) are surfaced in the UI console instead of silently swallowing them.
 * **Backend API Keys**: Explicitly confirmed the `GEMINI_API_KEY` Firebase Secret manages backend Gemini API calls (and must have active prepay billing credits) independently from the `VITE_FIREBASE_API_KEY` used for frontend client SDKs.
+2026-06-04 — E59: Implemented Strategy B for Pawn Page Multiple Views. Abstracted LayoutToggle to ui/LayoutToggle and integrated it into the Pawn Page allowing toggling between masonry (default), grid3, and list views, mirroring Cannabis page UX but maintaining Pawn's masonry identity.

@@ -17,6 +17,7 @@ Premium domestic and reserve tobacco products, with dedicated sections for cigar
 
 ### 🤝 Pawn & Resale
 Details on our one-handed mobile pawn enquiry form, the server-side serial blacklist check, and our internal staff inbox management.
+- [Browsing the Collection](/pawn/browsing)
 - [Customer Pawn Enquiries](/pawn/selling)
 - [Staff Inbox Management](/admin/pawn-inbox)
 - [FAQ Management](/admin/faq-management)

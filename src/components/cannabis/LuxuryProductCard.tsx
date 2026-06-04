@@ -1,7 +1,7 @@
 import { formatPrice } from '../../lib/format'
 import TagBadge from './TagBadge'
 import type { MoodCategory, MerchandisingTag } from '../../lib/types'
-import type { LayoutMode } from './LayoutToggle'
+import type { LayoutMode } from '../ui/LayoutToggle'
 
 const MOOD_LABELS: Record<MoodCategory, string> = {
   relax:    'Relax',

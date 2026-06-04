@@ -5,7 +5,7 @@ import MoodCard from '../components/cannabis/MoodCard'
 import LuxuryProductCard from '../components/cannabis/LuxuryProductCard'
 import MoodPillStrip from '../components/cannabis/MoodPillStrip'
 import FilterPanel, { type FilterState } from '../components/cannabis/FilterPanel'
-import LayoutToggle, { type LayoutMode } from '../components/cannabis/LayoutToggle'
+import LayoutToggle, { type LayoutMode } from '../components/ui/LayoutToggle'
 import Button from '../components/ui/Button'
 import CampaignBanner from '../components/CampaignBanner'
 import ArticleSection from '../components/ArticleSection'
@@ -102,6 +102,7 @@ export default function CannabisPage() {
       case 'grid3':    return { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',   gap: 'var(--space-6)' }
       case 'list':     return { display: 'flex', flexDirection: 'column',                                        gap: 'var(--space-4)' }
       case 'magazine': return { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',                          gap: 'var(--space-6)' }
+      default:         return { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',   gap: 'var(--space-6)' }
     }
   }, [layoutMode])
 
