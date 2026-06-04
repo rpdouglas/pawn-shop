@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { defineSecret } from 'firebase-functions/params'
 import { assertStaff } from '@pawn-shop/shared/lib/authHelpers'
 
-const db = getFirestore()
+
 
 export const geminiApiKey = defineSecret('GEMINI_API_KEY')
 
@@ -20,6 +20,7 @@ function getModels() {
  * Generate AI Description Draft
  */
 export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (request) => {
+  const db = getFirestore()
   const { uid } = await assertStaff(request)
   const { itemId, title, category, viewTag, condition, provenanceNotes, serialNumber, staffNotes } = request.data
 
@@ -107,6 +108,7 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
  * Suggest AI Pricing
  */
 export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request) => {
+  const db = getFirestore()
   const { uid } = await assertStaff(request)
   const { itemId, title, category, condition, brandModel, staffNotes } = request.data
 
@@ -184,6 +186,7 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
  * Suggest AI Tags
  */
 export const suggestAiTags = onCall({ secrets: [geminiApiKey] }, async (request) => {
+  const db = getFirestore()
   const { uid } = await assertStaff(request)
   const { itemId, title, category, condition, provenanceNotes } = request.data
 
@@ -233,6 +236,7 @@ export const suggestAiTags = onCall({ secrets: [geminiApiKey] }, async (request)
  * Called internally by processUploadedImage CF.
  */
 export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTag: string) {
+  const db = getFirestore()
   const { model, flashModel } = getModels()
 
   let referenceContext = '';

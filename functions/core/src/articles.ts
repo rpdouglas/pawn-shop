@@ -2,7 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 import { assertStaff } from '@pawn-shop/shared/lib/authHelpers'
 
-const db = getFirestore()
+
 
 interface CreateArticleData {
   title: string
@@ -11,6 +11,7 @@ interface CreateArticleData {
 }
 
 export const createArticle = onCall<CreateArticleData>({ cors: true }, async (request) => {
+  const db = getFirestore()
   const { uid } = assertStaff(request)
   const { title, slug, viewTag } = request.data
 
@@ -49,6 +50,7 @@ interface PublishArticleData {
 }
 
 export const publishArticle = onCall<PublishArticleData>({ cors: true }, async (request) => {
+  const db = getFirestore()
   const { uid } = assertStaff(request)
   const { articleId } = request.data
 

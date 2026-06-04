@@ -2,7 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 import { assertStaff } from '@pawn-shop/shared/lib/authHelpers'
 
-const db = getFirestore()
+
 
 interface LogFaqActionData {
   action: 'faq_created' | 'faq_updated' | 'faq_deleted'
@@ -11,6 +11,7 @@ interface LogFaqActionData {
 }
 
 export const logFaqAction = onCall<LogFaqActionData>({ cors: true }, async (request) => {
+  const db = getFirestore()
   const { uid } = assertStaff(request)
   const { action, faqId, details } = request.data
 
