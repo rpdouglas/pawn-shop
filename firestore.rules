@@ -10,7 +10,7 @@ service cloud.firestore {
     }
 
     function hasRole(role) {
-      return isSignedIn() && request.auth.token[role] == true;
+      return isSignedIn() && role in request.auth.token && request.auth.token[role] == true;
     }
 
     function isStaff() {
