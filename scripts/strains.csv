@@ -1,0 +1,4 @@
+id,status,sort,name,slug,image,description,type,crosses,breeder,effects,ailment,flavor,location,thc,thca,thcv,cbd,cbda,cbdv,cbn,cbg,cbgm,cbgv,cbc,cbcv,cbv,cbe,cbt,cbl
+1,1,1,Blue Dream,blue-dream,,,"Hybrid","Blueberry, Haze",,"Creative, Uplifted, Energetic",,"Myrcene, Pinene",,18,,,,,1,,,,,,,,,,
+2,1,1,Sour Diesel,sour-diesel,,,"Sativa","Chemdawg, Super Skunk",,"Energetic, Talkative",,"Caryophyllene, Limonene",,21,,,,,0.5,,,,,,,,,,
+3,1,1,Granddaddy Purple,granddaddy-purple,,,"Indica","Purple Urkle, Big Bud",,"Sleepy, Relaxed",,"Myrcene, Pinene",,17,,,,,0.2,,,,,,,,,,

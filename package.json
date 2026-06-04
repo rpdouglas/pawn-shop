@@ -32,6 +32,7 @@
     "@fontsource/oswald": "^5.2.8",
     "@fontsource/playfair-display": "^5.2.8",
     "browser-image-compression": "^2.0.2",
+    "csv-parse": "^6.2.1",
     "firebase": "^12.13.0",
     "qrcode": "^1.5.4",
     "react": "19.2.6",

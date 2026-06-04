@@ -233,17 +233,63 @@ export const suggestAiTags = onCall({ secrets: [geminiApiKey] }, async (request)
  * Called internally by processUploadedImage CF.
  */
 export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTag: string) {
+  const { model, flashModel } = getModels()
+
+  let referenceContext = '';
+
+  if (viewTag === 'cannabis') {
+    // PASS 1: Extract strain name
+    const initialPrompt = `
+      You are an expert AI viewing a cannabis product package.
+      Return strictly JSON with NO markdown formatting, extracting only the strain name (e.g. "Blue Dream", "Sour Diesel").
+      { "strainName": "string | null" }
+    `;
+    try {
+      const initialParts = [
+        initialPrompt,
+        { inlineData: { data: buffer.toString('base64'), mimeType: mimeType } }
+      ];
+      const initialResult = await flashModel.generateContent(initialParts);
+      const jsonStr = initialResult.response.text().replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(jsonStr);
+      if (parsed.strainName) {
+        // Query database
+        const snap = await db.collection('cannabisStrains').where('strainName', '==', parsed.strainName).limit(1).get();
+        if (!snap.empty) {
+          const strainData = snap.docs[0].data();
+          referenceContext = `
+            REFERENCE CANNABIS DATA FROM DATABASE:
+            Strain Name: ${strainData.strainName}
+            Terpenes: ${strainData.terpenes?.join(', ')}
+            Genetic Lineage: ${strainData.geneticLineage}
+            Effect Profile: ${strainData.effectProfile?.join(', ')}
+            THC Range: ${strainData.thcMin} - ${strainData.thcMax}
+            CBD Range: ${strainData.cbdMin} - ${strainData.cbdMax}
+            Strain Type: ${strainData.strainType}
+            
+            Use this reference data to INTELLIGENTLY MERGE with what you see on the package. 
+            If the package explicitly contradicts the reference (e.g. shows different THC %), prefer the package.
+            Otherwise, use the reference data to fill in missing details like terpenes and genetic lineage.
+          `;
+        }
+      }
+    } catch (err) {
+      console.error('Initial cannabis pass failed, proceeding without reference data:', err);
+    }
+  }
+
   let systemPrompt = `
     You are an expert AI receiving an image of an item being brought into a pawn shop or retail store.
     The store section is: ${viewTag}.
     Analyse the image and extract the fields required for the intake form.
     Also, provide a market pricing deep dive estimating the Average Regular Price, Average Sale Price, and Average Refurbished/Open-Box Price in CAD cents (integer).
+    ${referenceContext}
   `
 
   if (viewTag === 'cannabis') {
     systemPrompt += `
     CRITICAL CANNABIS INSTRUCTIONS:
-    - Strictly extract only what is visibly printed on the package. If a field is missing, return null or an empty array. Do not guess or infer missing details based on the strain name.
+    - Extract details from the package, and merge with any provided REFERENCE CANNABIS DATA.
     - If a single value is provided for THC/CBD (e.g. "20%"), set both the min and max fields to that same value.
     - Extract the cannabinoid unit (e.g., "%" or "mg/g").
     
@@ -307,7 +353,6 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
   }
 
   try {
-    const { model, flashModel } = getModels()
     const promptParts = [
       systemPrompt,
       {

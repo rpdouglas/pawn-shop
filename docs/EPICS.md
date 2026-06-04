@@ -669,6 +669,7 @@
 - [x] Update `processUploadedImage` CF to accept `extractData` and trigger `extractIntakeData`. `[Staff]`
 - [x] Update Mobile Intake UI to flip the flow: select View -> Photo Upload -> wait for AI -> Form Hydration. `[Staff]`
 - [x] Update Desktop Intake UI to trigger AI extraction on the first uploaded photo. `[Staff]`
+- [x] Update AI Intake for Cannabis: Create `cannabisStrains` open dataset collection and implement 2-pass AI extraction (Flash -> DB -> Pro) to hydrate `cannabisProfile` reliably. `[Staff]`
 
 ---
 

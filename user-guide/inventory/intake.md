@@ -34,7 +34,7 @@ Once a draft is created, staff can add more detailed information:
 ### Automated Image Processing & AI Extraction
 When you upload a photo:
 1. Gemini Vision analyzes the item based on the selected View.
-   - **Cannabis View:** The AI automatically extracts specialized fields such as THC/CBD percentages, terpenes, genetic lineage, and product formats directly from the visible package label.
+   - **Cannabis View:** The AI automatically extracts specialized fields such as THC/CBD percentages directly from the visible package label. It also runs a 2-pass extraction: first determining the strain name, then looking up our internal reference database to securely auto-populate known strain properties (like terpenes, lineage, and effects) directly into the draft.
 2. The AI automatically extracts product details (Title, Description, Category, etc.) and deep-dives pricing data, hydrating the form fields.
 3. The system adds a "The Pawn Shop" watermark.
 4. The image is compressed and saved as a WebP for fast loading.

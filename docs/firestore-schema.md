@@ -71,6 +71,27 @@
 
 ---
 
+## `cannabisStrains/{id}`
+
+> Reference database of cannabis strains seeded from an open dataset. Read access for staff only via Cloud Functions.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `strainName` | string | Normalized strain name |
+| `brand` | string | Optional |
+| `terpenes` | array\<string\> | e.g. `["Myrcene", "Pinene"]` |
+| `geneticLineage` | string | e.g. `Og Kush x Sour Diesel` |
+| `effectProfile` | array\<string\> | e.g. `["Relaxed", "Happy"]` |
+| `thcMin` | number | Reference minimum THC % |
+| `thcMax` | number | Reference maximum THC % |
+| `cbdMin` | number | Reference minimum CBD % |
+| `cbdMax` | number | Reference maximum CBD % |
+| `cannabinoidUnit` | string | e.g. `%` or `mg/g` |
+| `strainType` | string | `sativa` \| `indica` \| `hybrid` |
+| `createdAt` | timestamp | |
+
+---
+
 ## `pawnRequests/{id}`
 
 | Field | Type | Notes |

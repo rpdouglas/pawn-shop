@@ -364,4 +364,7 @@ YYYY-MM-DD — Decision. Brief reason.
 3. **Configuration:** The backup destination bucket is configurable via the `BACKUP_BUCKET_NAME` Secret Manager variable.
 4. **Permissions:** Requires the default Cloud Functions service account to possess `roles/datastore.importExportAdmin` and `roles/storage.admin`.
 5. **Dummy Key Graceful Degradation:** The codebase handles placeholder (`dummy`) secret values gracefully. External integrations (eBay, SendGrid, Twilio, Brother POS, Backups) are skipped without throwing 500 errors if their respective keys are set to `dummy`. Production provisioning is tracked in `EPICS.md` under E68-QA.
-\n2026-06-04 — E57: Updated AI Intake prompt to extract cannabisProfile strictly based on visible package data when viewTag === 'cannabis'. No guessing missing details.
+
+2026-06-04 — E57: Updated AI Intake prompt to extract cannabisProfile strictly based on visible package data when viewTag === 'cannabis'. No guessing missing details.
+2026-06-04 — AI Intake: Decided to seed an open dataset of cannabis strains into Firestore (`cannabisStrains`) instead of relying on runtime community REST APIs, ensuring 100% uptime. Implementing a 2-pass AI extraction (Flash extracts strain name -> query DB -> Pro merges data).
+2026-06-04 — E57 DB Seeding: Built a robust ETL Node.js script (`scripts/seed-public-dataset.mjs`) utilizing `csv-parse` to aggressively clean, normalize, and batch (500 docs/batch) public CSV data into the `cannabisStrains` schema.
