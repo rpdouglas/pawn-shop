@@ -29,9 +29,9 @@ You are **strictly prohibited** from writing or editing source code until:
 ### Phase B: Autonomous Execution & Validation
 Once a strategy is approved, autonomously execute the changes:
 - Make surgical code changes.
-- **Invoke Subagents:** Leverage background subagents (`Brand_Auditor`, `Linguistic_Auditor`, `Data_Steward`, `Performance_Engineer`) for asynchronous governance if needed.
+- **Invoke Subagents:** Leverage background subagents (`Brand_Auditor`, `Linguistic_Auditor`, `Data_Steward`, `Performance_Engineer`, `Security_Auditor`) for asynchronous governance if needed.
 - **Anti-Regression Check:** Verify no hardcoded hexes, no PII in logs, and no AI keys on the client.
-- **Blocking Compiler Gate:** Run `npm run build && npm run lint`. Do not proceed until this passes with zero warnings or errors.
+- **Blocking Compiler & Testing Gate:** Run `npm run build && npm run lint`. Once passing, you MUST invoke the `QA_Engineer` subagent to run `npm run test` and `npm run test:e2e`. Do not proceed until the build compiles and the QA_Engineer signs off with zero test failures.
 
 ### Phase C: Autonomous Ticket Close (Drift Detection)
 When execution is verified, autonomously perform close-out tasks without asking the user:
