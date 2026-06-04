@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp, deleteField } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import type { HRProfile, SchedulePreferences } from '../../lib/types'
 import Button from '../ui/Button'
@@ -77,7 +77,7 @@ export default function HRTab({ uid }: Props) {
         },
         schedulePreferences: {
           ...schedule,
-          maxHoursPerWeek: maxHours === '' ? undefined : Number(maxHours)
+          maxHoursPerWeek: maxHours === '' ? deleteField() as unknown as number : Number(maxHours)
         },
         updatedAt: serverTimestamp() as unknown as Date
       }

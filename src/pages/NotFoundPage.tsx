@@ -1,7 +1,23 @@
-import { Link } from 'react-router-dom'
+import { Link, useRouteError } from 'react-router-dom'
+import { useEffect } from 'react'
 import Button from '../components/ui/Button'
 
 export default function NotFoundPage() {
+  const error = useRouteError() as unknown as Record<string, unknown> | null
+
+  useEffect(() => {
+    // If Vite throws a dynamic import error (meaning the host swapped out the JS chunks on deploy),
+    // immediately force a hard reload to fetch the new index.html and assets.
+    const errName = error?.name as string | undefined
+    const errMsg = error?.message as string | undefined
+    if (
+      error && 
+      (errName === 'ChunkLoadError' || String(errMsg || '').includes('Failed to fetch dynamically imported module'))
+    ) {
+      window.location.reload()
+    }
+  }, [error])
+
   return (
     <div className="view-pawn" style={{
       minHeight: '60vh',
