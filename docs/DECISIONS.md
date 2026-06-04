@@ -356,3 +356,10 @@ YYYY-MM-DD — Decision. Brief reason.
 2026-06-04 — Hotfix: Resolved an issue where new users did not appear in the Admin Portal's Customer list. The UI queried users ordered by `lifetimeValue`, but Firestore omitted users without this field. Changed the sort order to `createdAt` descending, and updated the `recordLogin` CF to initialize `lifetimeValue: 0` for all future signups.
 2026-06-04 — Security Audit: Tightened `firestore.rules` to eliminate data spoofing vulnerabilities. Locked down `preorders` and `disputes` collections by removing client-side `create` and `update` permissions (all writes must now go through Admin SDK in Cloud Functions). Restricted `savedSearches` updates to only allow mutating the `active` flag, preventing malicious reassignment of document `uid`s.
 2026-06-04 — Security & Cost Optimization: Implemented Firebase App Check. Initialized `ReCaptchaEnterpriseProvider` on the frontend and added `enforceAppCheck: true` to global Cloud Functions v2 options. This protects the backend from DDoS, runaway billing, and unauthenticated traffic.
+
+### Gap 4: Disaster Recovery & Database Backups
+
+1. **Objective:** Automate daily database exports to Cloud Storage to prevent catastrophic data loss (Gap 4).
+2. **Implementation:** Created a scheduled Cloud Function (`functions/src/backup.ts`) running daily at 02:00 UTC using the `@google-cloud/firestore` Admin API.
+3. **Configuration:** The backup destination bucket is configurable via the `BACKUP_BUCKET_NAME` Secret Manager variable.
+4. **Permissions:** Requires the default Cloud Functions service account to possess `roles/datastore.importExportAdmin` and `roles/storage.admin`.

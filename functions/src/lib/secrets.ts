@@ -23,3 +23,6 @@ export const brotherPosHmacSecret = defineSecret('BROTHER_POS_HMAC_SECRET')
 // Misc
 export const siteUrl = defineString('SITE_URL')
 export const purgeRetentionDays = defineInt('PURGE_RETENTION_DAYS', { default: 730 })
+
+// Backups
+export const backupBucketName = defineString('BACKUP_BUCKET_NAME')
