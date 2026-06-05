@@ -32,12 +32,17 @@ Once a draft is created, staff can add more detailed information:
 - **Photos:** Upload at least one high-quality photo.
 
 ### Automated Image Processing & AI Extraction
-When you upload a photo:
-1. Gemini Vision analyzes the item based on the selected View.
-   - **Cannabis View:** The AI automatically extracts specialized fields such as THC/CBD percentages directly from the visible package label. It also runs a 2-pass extraction: first determining the strain name, then looking up our internal reference database to securely auto-populate known strain properties (like terpenes, lineage, and effects) directly into the draft.
-2. The AI automatically extracts product details (Title, Description, Category, etc.) and deep-dives pricing data, hydrating the form fields.
-3. The system adds a "The Pawn Shop" watermark.
-4. The image is compressed and saved as a WebP for fast loading.
+Our AI Intake utilizes a powerful **3-stage pipeline** designed to keep staff in full control:
+
+1. **Stage 1: Image Processing & Baseline Extraction**
+   - The system adds a "The Pawn Shop" watermark, compresses the image to a WebP for fast loading, and saves it.
+   - Gemini Vision analyzes the image to extract baseline details (Title, Category, Brand, Format) and populates the initial draft.
+   - *Cannabis View Exception:* Runs a 2-pass extraction. First, it identifies the strain name from the package; then it queries our internal database to securely auto-populate known botanical properties (like terpenes, lineage, and effects).
+2. **Stage 2: Description Generation (Staff-in-the-Loop)**
+   - You can trigger "Generate AI Description" to draft a high-quality, persona-driven sales description optimized for eBay and our storefront.
+   - **Crucial Policy:** This description is saved as an *internal draft*. A staff member must review and explicitly click **Promote** to apply it to the live item, enforcing our "Staff-in-the-Loop" quality standard.
+3. **Stage 3: Pricing Analysis**
+   - You can trigger "Suggest AI Price" to execute a deep-dive market analysis. The AI calculates recommended pricing ranges (e.g., Regular, Pawn Value) based on market data, which you can review and accept.
 
 ## Step 3: Publication
 

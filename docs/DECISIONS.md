@@ -386,3 +386,5 @@ YYYY-MM-DD — Decision. Brief reason.
 2026-06-04 — E72 Phase 2: Mapped `getAuth` in unit tests via `vi.mock` for `firebase-admin/auth` since the Auth emulator does not support `setCustomUserClaims` offline without Identity Platform initialization.
 2026-06-04 — E72 Phase 3: Executed Strategy B (Strategic Extraction) for `IntakeForm.tsx`. Extracted `CannabisFields.tsx` and `FireworksFields.tsx` to reduce cognitive load and established component-level unit testing using Vitest and RTL.
 2026-06-04 — E72 Phase 3: Tested TanStack query hooks (`useItems`, `useStaffMembers`) using `renderHook` and `QueryClientProvider` to ensure proper React Query cache handling.
+
+2026-06-05 — Security: Temporarily disabled Firebase AppCheck initialization in frontend (`firebase-core.ts`) due to development environment friction with ReCaptcha tokens. Task added to E77 to re-enable prior to production launch.

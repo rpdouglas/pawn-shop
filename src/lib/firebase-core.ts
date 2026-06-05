@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, connectAuthEmulator } from 'firebase/auth'
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check'
+// import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check'
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions'
 
 const firebaseConfig = {
@@ -23,11 +23,11 @@ if (import.meta.env.VITE_USE_EMULATORS === 'true') {
 }
 
 // Always enable debug token in local development so it prints to the console
-if (import.meta.env.DEV) {
-  Object.assign(self, { FIREBASE_APPCHECK_DEBUG_TOKEN: true })
-}
+// if (import.meta.env.DEV) {
+//   Object.assign(self, { FIREBASE_APPCHECK_DEBUG_TOKEN: true })
+// }
 
-export const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_RECAPTCHA_SITE_KEY || 'dummy_site_key_for_dev'),
-  isTokenAutoRefreshEnabled: true
-})
+// export const appCheck = initializeAppCheck(app, {
+//   provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_RECAPTCHA_SITE_KEY || 'dummy_site_key_for_dev'),
+//   isTokenAutoRefreshEnabled: true
+// })

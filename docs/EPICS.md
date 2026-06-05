@@ -965,4 +965,5 @@
 - [ ] WCAG AA contrast passes on all three palettes (run axe-core in browser) `[Mak]` `[Comp]`
 - [ ] Vertical video on Cannabis + Fireworks pages (masonry grid: done E05; video: content dependency — deferred) `[San]` `[Marie]` `[Tan]`
 - [ ] **[PENDING MARKETING CONTENT]** Gather real customer stories for the TestimonialsModule. Fake/placeholder testimonials are hidden in `PawnPage.tsx`. Do not restore until real data is sourced. `[Mak]` `[Comp]`
+- [ ] **[PENDING SECURITY]** Re-enable Firebase AppCheck in `firebase-core.ts` and ensure the production ReCaptcha Enterprise Site Key is properly configured in Google Cloud before final launch. `[Comp]`
 - [ ] Lighthouse: ≥90 performance, ≥90 accessibility, ≥95 SEO `[Jord]` `[Marc]`

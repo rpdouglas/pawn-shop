@@ -19,13 +19,16 @@ The first thing the wizard asks for is a View (Pawn, Cannabis, or Fireworks) and
 
 ### AI Processing & Auto-Advance
 
-Once uploaded, your photo is sent to the AI processing pipeline:
-1. The UI will display interactive, playful loading statuses (e.g., "Analyzing image...", "Researching regular price...") while the cloud does the heavy lifting.
-2. Gemini Vision analyzes the item based on the selected storefront view.
-   - **Cannabis View:** The AI automatically extracts specialized fields such as THC/CBD percentages directly from the visible package label. It also runs a 2-pass extraction: first determining the strain name, then looking up our internal reference database to securely auto-populate known strain properties (like terpenes, lineage, and effects) directly into the draft.
-3. The AI automatically extracts product details (Title, Description, Category, Brand, Format) and pricing data (Regular, Sale, and Open-Box prices).
-4. The image is compressed, watermarked, and saved.
-5. The wizard **automatically advances** you to Step 2 as soon as the draft data is ready.
+Once uploaded, your photo is sent to the **3-stage AI processing pipeline**:
+1. The UI will display interactive, playful loading statuses while the cloud does the heavy lifting.
+2. **Stage 1: Image Processing & Extraction**
+   - The image is compressed, watermarked, and saved securely.
+   - Gemini Vision analyzes the item based on the selected storefront view to extract baseline product details (Title, Category, Brand, Format).
+   - *Cannabis View Exception:* Runs a 2-pass extraction to identify the strain name and cross-reference our internal database to auto-populate known botanical properties.
+3. **Stage 2 & 3: Deep-Dive Description & Pricing**
+   - The AI drafts a high-quality, persona-driven description and analyzes market data for suggested pricing.
+   - **Crucial Policy:** To enforce our "Staff-in-the-Loop" standard, the generated description is saved as an *internal draft*. You must review and explicitly **promote** the description to apply it to the live listing.
+4. The wizard **automatically advances** you to Step 2 as soon as the baseline draft data is ready.
 
 ---
 
