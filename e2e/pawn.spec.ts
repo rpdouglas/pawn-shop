@@ -12,6 +12,7 @@ const PAWN_ITEM_DATA = {
   price: 850000,
   condition: 'Good',
   images: ['https://example.com/rolex.jpg'],
+  createdAt: new Date(),
 }
 
 test.describe('Pawn Persona (Makoonsii)', () => {

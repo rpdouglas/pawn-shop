@@ -22,6 +22,7 @@ export async function seedFirestore(collection: string, docId: string, data: any
     }
     if (typeof val === 'string') return { stringValue: val }
     if (Array.isArray(val)) return { arrayValue: { values: val.map(formatValue) } }
+    if (val instanceof Date) return { timestampValue: val.toISOString() }
     if (typeof val === 'object') {
       const fields: Record<string, any> = {}
       for (const [k, v] of Object.entries(val)) {

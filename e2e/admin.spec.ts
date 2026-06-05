@@ -32,7 +32,7 @@ test.describe('Admin Persona (Tanya)', () => {
     // 4. Fill required fields
     await page.selectOption('select#viewTag', 'pawn')
     await page.fill('input#title', 'E2E Test Pawn Item')
-    await page.fill('input#priceInput', '250')
+    await page.fill('input#price', '250')
     await page.selectOption('select#condition', 'Good')
     
     // Ensure save draft button is available

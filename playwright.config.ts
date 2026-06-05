@@ -9,6 +9,7 @@ export default defineConfig({
   testDir: './e2e',
   timeout: 30_000,
   retries: 1,
+  workers: 1,
   globalSetup: path.resolve(__dirname, './e2e/global-setup.ts'),
   use: {
     baseURL: process.env['PLAYWRIGHT_BASE_URL'] ?? 'http://localhost:5173',

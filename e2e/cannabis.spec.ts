@@ -18,6 +18,7 @@ const CANNABIS_ITEM_DATA = {
   weight: '3.5g',
   cannabinoidUnit: '%',
   format: 'Dried Flower',
+  createdAt: new Date(),
 }
 
 test.describe('Cannabis Persona (Marie)', () => {
