@@ -29,16 +29,15 @@ test.describe('Pawn Persona (Makoonsii)', () => {
     const itemCard = page.locator('text="Vintage Rolex Submariner"').first()
     await expect(itemCard).toBeVisible()
 
-    // 3. Click to view details
+    // 3. Click to open Quick View modal
     await itemCard.click()
     
-    // Expect the URL to match the item
-    await expect(page).toHaveURL(new RegExp(`/item/${PAWN_ITEM_ID}`))
-    await expect(page.locator('h1', { hasText: 'Vintage Rolex Submariner' })).toBeVisible()
+    // Expect the Quick View modal to open instead of navigating
+    await expect(page.locator('h2', { hasText: 'Vintage Rolex Submariner' })).toBeVisible()
     await expect(page.locator('text="$8,500"')).toBeVisible()
 
-    // 4. Click the Click & Collect button
-    const clickCollectBtn = page.locator('button', { hasText: 'Click & Collect' })
+    // 4. Click the Reserve for Collection button
+    const clickCollectBtn = page.locator('button', { hasText: 'Reserve for Collection' })
     await clickCollectBtn.click()
 
     // 5. Fill out the reservation form

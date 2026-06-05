@@ -53,11 +53,9 @@ export default function AgeGate({ minAge, viewTag, children }: AgeGateProps) {
 
   const handleConfirm = async () => {
     setProcessing(true)
-    try {
-      await logAgeGateFn({ eventType: 'age_gate_pass', viewTag, policyVersion: POLICY_VERSION })
-    } catch {
-      // Best-effort audit log — never block the user due to a CF failure
-    }
+    setProcessing(true)
+    logAgeGateFn({ eventType: 'age_gate_pass', viewTag, policyVersion: POLICY_VERSION })
+      .catch(() => { /* Best-effort audit log */ })
     Analytics.ageGateEvent({ view: viewTag, result: 'pass' })
     try {
       sessionStorage.setItem(storageKey(viewTag), 'passed')
@@ -70,11 +68,8 @@ export default function AgeGate({ minAge, viewTag, children }: AgeGateProps) {
 
   const handleDeny = async () => {
     setProcessing(true)
-    try {
-      await logAgeGateFn({ eventType: 'age_gate_fail', viewTag, policyVersion: POLICY_VERSION })
-    } catch {
-      // Best-effort
-    }
+    logAgeGateFn({ eventType: 'age_gate_fail', viewTag, policyVersion: POLICY_VERSION })
+      .catch(() => { /* Best-effort */ })
     Analytics.ageGateEvent({ view: viewTag, result: 'fail' })
     setGateState('denied')
     setProcessing(false)

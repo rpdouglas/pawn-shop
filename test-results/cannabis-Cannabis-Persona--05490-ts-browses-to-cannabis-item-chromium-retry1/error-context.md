@@ -149,7 +149,7 @@ Call log:
   53 |     await expect(ageGateHeading).not.toBeVisible()
   54 | 
   55 |     // 5. Look for the product and verify Cannabis specific details render
-  56 |     const itemCard = page.locator('text="Organic Blue Dream 3.5g"')
+  56 |     const itemCard = page.locator('text="Organic Blue Dream 3.5g"').first()
   57 |     await expect(itemCard).toBeVisible()
   58 |     
   59 |     await itemCard.click()

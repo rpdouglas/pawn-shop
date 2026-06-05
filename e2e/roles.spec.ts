@@ -46,7 +46,7 @@ test.describe('Role Based UI', () => {
     await expect(page.locator('body')).toBeVisible({ timeout: 10000 })
     
     // The role controls component shouldn't be accessible/visible
-    const editRoleBtn = page.locator('text="Edit Role"')
-    await expect(editRoleBtn).not.toBeVisible()
+    const roleControls = page.locator('text="Role & Permissions"')
+    await expect(roleControls).not.toBeVisible()
   })
 })

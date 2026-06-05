@@ -12,91 +12,79 @@
 # Error details
 
 ```
-Error: expect(locator).toBeVisible() failed
+Error: expect(page).toHaveURL(expected) failed
 
-Locator: locator('text="Vintage Rolex Submariner"')
-Expected: visible
-Error: strict mode violation: locator('text="Vintage Rolex Submariner"') resolved to 2 elements:
-    1) <h3>Vintage Rolex Submariner</h3> aka getByRole('region', { name: 'Featured' }).getByLabel('Vintage Rolex Submariner — $')
-    2) <h3>Vintage Rolex Submariner</h3> aka getByRole('region', { name: 'Inventory discovery grid' }).getByLabel('Vintage Rolex Submariner — $')
+Expected pattern: /\/item\/test-pawn-item-123/
+Received string:  "http://localhost:5173/pawn"
+Timeout: 5000ms
 
 Call log:
-  - Expect "toBeVisible" with timeout 5000ms
-  - waiting for locator('text="Vintage Rolex Submariner"')
+  - Expect "toHaveURL" with timeout 5000ms
+    5 × unexpected value "http://localhost:5173/pawn"
 
 ```
 
-# Page snapshot
-
 ```yaml
-- generic [ref=e2]:
-  - generic [ref=e3]:
-    - banner "Site header" [ref=e4]:
-      - link "Skip to main content" [ref=e5] [cursor=pointer]:
-        - /url: "#main-content"
-      - generic [ref=e6]:
-        - button "Toggle navigation menu" [ref=e7] [cursor=pointer]
-        - generic [ref=e11]: The Pawn Shop - Pawn & Resale
-      - navigation "Account" [ref=e12]:
-        - button "User profile menu" [ref=e15] [cursor=pointer]:
-          - img [ref=e16]
-    - generic [ref=e19]:
-      - main [ref=e20]:
-        - generic [ref=e21]:
-          - region "Pawn Shop — find your next discovery" [ref=e22]:
-            - generic [ref=e24]:
-              - paragraph [ref=e25]: Cornwall Island · Akwesasne
-              - heading "Quiet confidence. Curated objects of distinction." [level=1] [ref=e26]
-              - paragraph [ref=e27]: An uncompromising collection of timepieces, instruments, and heirlooms—presented with editorial precision.
-              - generic [ref=e28]:
-                - button "Browse Inventory" [ref=e29] [cursor=pointer]
-                - button "Pawn or Sell" [ref=e30] [cursor=pointer]
-          - generic [ref=e32]:
-            - region "Search inventory" [ref=e33]:
-              - generic [ref=e34]:
-                - generic [ref=e35]: Search inventory
-                - searchbox "Search inventory" [ref=e36]
-            - region "Featured" [ref=e37]:
-              - heading "Featured" [level=2] [ref=e38]
-              - button "Vintage Rolex Submariner — $8500.00 CAD" [ref=e40] [cursor=pointer]:
-                - img "Vintage Rolex Submariner" [ref=e42]
-                - generic [ref=e43]:
-                  - heading "Vintage Rolex Submariner" [level=3] [ref=e44]
-                  - generic [ref=e45]: $8500.00 CAD
-            - region "Discover" [ref=e48]:
-              - generic [ref=e49]:
-                - heading "Discover" [level=2] [ref=e50]
-                - group "Layout" [ref=e52]:
-                  - button "Masonry" [pressed] [ref=e53] [cursor=pointer]:
-                    - img [ref=e54]
-                  - button "Three columns" [ref=e59] [cursor=pointer]:
-                    - img [ref=e60]
-                  - button "List" [ref=e64] [cursor=pointer]:
-                    - img [ref=e65]
-              - generic [ref=e69]:
-                - region "Inventory discovery grid" [ref=e70]:
-                  - button "Vintage Rolex Submariner — $8500.00 CAD" [ref=e71] [cursor=pointer]:
-                    - img "Vintage Rolex Submariner" [ref=e73]
-                    - generic [ref=e74]:
-                      - heading "Vintage Rolex Submariner" [level=3] [ref=e75]
-                      - generic [ref=e76]: $8500.00 CAD
-                - paragraph [ref=e79]: All 1 items shown
-            - region "Store trust signals"
-      - contentinfo [ref=e80]:
-        - navigation "Footer navigation" [ref=e81]:
-          - link "Contact" [ref=e82] [cursor=pointer]:
-            - /url: /contact
-          - link "Accessibility" [ref=e83] [cursor=pointer]:
-            - /url: /accessibility
-          - link "Privacy Policy" [ref=e84] [cursor=pointer]:
-            - /url: /privacy
-          - link "Terms of Use" [ref=e85] [cursor=pointer]:
-            - /url: /terms
-        - paragraph [ref=e86]: © 2026 The Pawn Shop · Cornwall Island, Akwesasne · v0.0.0-local
-  - generic [ref=e87]:
-    - img [ref=e89]
-    - button "Open Tanstack query devtools" [ref=e137] [cursor=pointer]:
-      - img [ref=e138]
+- banner "Site header":
+  - link "Skip to main content":
+    - /url: "#main-content"
+  - button "Toggle navigation menu"
+  - text: The Pawn Shop - Pawn & Resale
+  - navigation "Account":
+    - button "User profile menu":
+      - img
+- main:
+  - region "Pawn Shop — find your next discovery":
+    - paragraph: Cornwall Island · Akwesasne
+    - heading "Quiet confidence. Curated objects of distinction." [level=1]
+    - paragraph: An uncompromising collection of timepieces, instruments, and heirlooms—presented with editorial precision.
+    - button "Browse Inventory"
+    - button "Pawn or Sell"
+  - region "Search inventory":
+    - text: Search inventory
+    - searchbox "Search inventory"
+  - region "Featured":
+    - heading "Featured" [level=2]
+    - button "Vintage Rolex Submariner — $8500.00 CAD":
+      - img "Vintage Rolex Submariner"
+      - heading "Vintage Rolex Submariner" [level=3]
+      - text: $8500.00 CAD
+  - region "Discover":
+    - heading "Discover" [level=2]
+    - group "Layout":
+      - button "Masonry" [pressed]
+      - button "Three columns"
+      - button "List"
+    - region "Inventory discovery grid":
+      - button "Vintage Rolex Submariner — $8500.00 CAD":
+        - img "Vintage Rolex Submariner"
+        - heading "Vintage Rolex Submariner" [level=3]
+        - text: $8500.00 CAD
+    - paragraph: All 1 items shown
+  - region "Store trust signals"
+- contentinfo:
+  - navigation "Footer navigation":
+    - link "Contact":
+      - /url: /contact
+    - link "Accessibility":
+      - /url: /accessibility
+    - link "Privacy Policy":
+      - /url: /privacy
+    - link "Terms of Use":
+      - /url: /terms
+  - paragraph: © 2026 The Pawn Shop · Cornwall Island, Akwesasne · v0.0.0-local
+- button "Open Tanstack query devtools":
+  - img
+- dialog "Vintage Rolex Submariner":
+  - button "Close quick view": ✕
+  - img "Vintage Rolex Submariner — image 1 of 1"
+  - heading "Vintage Rolex Submariner" [level=2]
+  - text: $8500.00 CAD
+  - paragraph: A classic 1980s Rolex.
+  - button "Enquire about this item"
+  - button "Share this item": ➦
+  - button "Reserve for Collection"
+  - button "Close"
 ```
 
 # Test source
@@ -130,15 +118,15 @@ Call log:
   26 |     await page.goto('/pawn')
   27 |     
   28 |     // 2. See the item in the inventory feed
-  29 |     const itemCard = page.locator('text="Vintage Rolex Submariner"')
-> 30 |     await expect(itemCard).toBeVisible()
-     |                            ^ Error: expect(locator).toBeVisible() failed
+  29 |     const itemCard = page.locator('text="Vintage Rolex Submariner"').first()
+  30 |     await expect(itemCard).toBeVisible()
   31 | 
   32 |     // 3. Click to view details
   33 |     await itemCard.click()
   34 |     
   35 |     // Expect the URL to match the item
-  36 |     await expect(page).toHaveURL(new RegExp(`/item/${PAWN_ITEM_ID}`))
+> 36 |     await expect(page).toHaveURL(new RegExp(`/item/${PAWN_ITEM_ID}`))
+     |                        ^ Error: expect(page).toHaveURL(expected) failed
   37 |     await expect(page.locator('h1', { hasText: 'Vintage Rolex Submariner' })).toBeVisible()
   38 |     await expect(page.locator('text="$8,500"')).toBeVisible()
   39 | 

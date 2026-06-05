@@ -14,7 +14,7 @@
 ```
 Error: page.goto: Page crashed
 Call log:
-  - navigating to "http://localhost:5173/admin/dashboard", waiting until "load"
+  - navigating to "http://localhost:5173/", waiting until "load"
 
 ```
 
@@ -46,14 +46,14 @@ Call log:
   23 |     }, mockManager)
   24 | 
   25 |     // --- 1. Getting Started: Home Page ---
-  26 |     await page.goto('/')
+> 26 |     await page.goto('/')
+     |                ^ Error: page.goto: Page crashed
   27 |     // Wait for the app to settle
   28 |     await page.waitForTimeout(1000)
   29 |     await page.screenshot({ path: 'user-guide/public/screenshots/home-page.png' })
   30 | 
   31 |     // --- 2. Admin Dashboard ---
-> 32 |     await page.goto('/admin/dashboard')
-     |                ^ Error: page.goto: Page crashed
+  32 |     await page.goto('/admin/dashboard')
   33 |     await page.waitForTimeout(1000)
   34 |     await page.screenshot({ path: 'user-guide/public/screenshots/admin-dashboard.png' })
   35 | 

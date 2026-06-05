@@ -12,9 +12,19 @@
 # Error details
 
 ```
-Error: page.goto: Page crashed
+Test timeout of 30000ms exceeded.
+```
+
+```
+Error: expect(locator).not.toBeVisible() failed
+
+Locator:  locator('text="Edit Role"')
+Expected: not visible
+Received: visible
+
 Call log:
-  - navigating to "http://localhost:5173/admin/customers/some-uid", waiting until "load"
+  - Expect "not toBeVisible" with timeout 5000ms
+  - waiting for locator('text="Edit Role"')
 
 ```
 
@@ -65,13 +75,13 @@ Call log:
   42 |       ;(window as any).__PLAYWRIGHT_MOCK_USER__ = mock
   43 |     }, mockStaff)
   44 | 
-> 45 |     await page.goto('/admin/customers/some-uid')
-     |                ^ Error: page.goto: Page crashed
+  45 |     await page.goto('/admin/customers/some-uid')
   46 |     await expect(page.locator('body')).toBeVisible({ timeout: 10000 })
   47 |     
   48 |     // The role controls component shouldn't be accessible/visible
   49 |     const editRoleBtn = page.locator('text="Edit Role"')
-  50 |     await expect(editRoleBtn).not.toBeVisible()
+> 50 |     await expect(editRoleBtn).not.toBeVisible()
+     |                                   ^ Error: expect(locator).not.toBeVisible() failed
   51 |   })
   52 | })
   53 | 
