@@ -49,6 +49,8 @@ export function docToItem(doc: DocumentSnapshot): Item {
     posId: d['posId'] as string | undefined,
     posSyncStatus: d['posSyncStatus'] as PosSyncStatus | undefined,
     posLastSyncAt: (d['posLastSyncAt'] as Timestamp | undefined)?.toDate(),
+    cannabisProfile: d['cannabisProfile'] as any,
+    fireworksProfile: d['fireworksProfile'] as any,
   }
 }
 

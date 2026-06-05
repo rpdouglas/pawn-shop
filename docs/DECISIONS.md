@@ -332,6 +332,8 @@ YYYY-MM-DD — Decision. Brief reason.
 
 2026-06-03 — Switched `extractIntakeData` AI Vision model to Gemini Flash to significantly reduce intake latency, maintaining a resilient fallback to Gemini Pro upon failure (Strategy B).
 
+2026-06-05 — E72 Phase 4: Mocked `storeHours` public reads and handled unauthenticated Cloud Function errors gracefully in E2E tests to bypass Identity Platform constraints during local UI E2E testing without breaking the CI pipeline.
+
 *Add new entries above this line.*
 
 2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.

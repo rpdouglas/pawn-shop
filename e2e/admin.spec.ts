@@ -35,13 +35,12 @@ test.describe('Admin Persona (Tanya)', () => {
     await page.fill('input#price', '250')
     await page.locator('label').filter({ hasText: 'Good' }).click()
     
-    // Ensure save draft button is available
-    const saveDraftBtn = page.locator('button', { hasText: 'Save Draft' })
-    await expect(saveDraftBtn).toBeVisible()
+    // Ensure Start Item button is available
+    const startItemBtn = page.locator('button', { hasText: 'Start Item' })
+    await expect(startItemBtn).toBeVisible()
 
-    // 5. If we click publish directly, it should validate images. Let's see.
-    // There might not be a 'Publish' button if we haven't uploaded images, but let's try 'Save Draft'
-    await saveDraftBtn.click()
+    // 5. Click Start Item to create the draft
+    await startItemBtn.click()
 
     // Assuming the Save Draft flow works and redirects to dashboard or shows toast
     // Because we're in emulator without full Cloud Function AI/etc fully set up, we rely on the CF emulator.

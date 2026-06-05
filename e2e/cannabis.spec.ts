@@ -10,14 +10,18 @@ const CANNABIS_ITEM_DATA = {
   status: 'active',
   policeHold: false,
   price: 3500,
-  brand: 'Simply Bare',
-  strainType: 'sativa',
-  thcMin: '22',
-  thcMax: '28',
-  terpenes: 'Myrcene, Pinene',
-  weight: '3.5g',
-  cannabinoidUnit: '%',
-  format: 'Dried Flower',
+  condition: 'new',
+  images: ['https://example.com/cannabis.jpg'],
+  cannabisProfile: {
+    brand: 'Simply Bare',
+    strainType: 'sativa',
+    thcMin: 22,
+    thcMax: 28,
+    terpenes: ['Myrcene', 'Pinene'],
+    weight: '3.5g',
+    cannabinoidUnit: '%',
+    format: 'Dried Flower',
+  },
   createdAt: new Date(),
 }
 
@@ -58,13 +62,14 @@ test.describe('Cannabis Persona (Marie)', () => {
     
     await itemCard.click()
     
-    await expect(page).toHaveURL(new RegExp(`/item/${CANNABIS_ITEM_ID}`))
-    await expect(page.locator('h1', { hasText: 'Organic Blue Dream 3.5g' })).toBeVisible()
+    // Expect Quick View Modal to open instead of navigating
+    await expect(page.locator('h2', { hasText: 'Organic Blue Dream 3.5g' })).toBeVisible()
     
     // Check for wellness profile / AI generated panels
-    await expect(page.locator('text="Simply Bare"')).toBeVisible()
-    await expect(page.locator('text="sativa"')).toBeVisible()
-    await expect(page.locator('text="22"')).toBeVisible()
-    await expect(page.locator('text="Myrcene, Pinene"')).toBeVisible()
+    await expect(page.getByText('Simply Bare', { exact: false })).toBeVisible()
+    await expect(page.getByText('sativa', { exact: false }).first()).toBeVisible()
+    await expect(page.getByText('22', { exact: false })).toBeVisible()
+    await expect(page.getByText('Myrcene', { exact: false }).first()).toBeVisible()
+    await expect(page.getByText('Pinene', { exact: false }).first()).toBeVisible()
   })
 })

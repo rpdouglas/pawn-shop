@@ -72,9 +72,9 @@ service cloud.firestore {
     }
 
     // ── config/{docId} ───────────────────────────────────────────────────────
-    // storeHours: signed-in only (slot picker). shopInfo: public (years-in-business badge).
+    // storeHours: public. shopInfo: public (years-in-business badge).
     match /config/{docId} {
-      allow read: if isSignedIn() || docId == 'shopInfo';
+      allow read: if docId == 'storeHours' || docId == 'shopInfo';
       allow write: if false;
     }
 

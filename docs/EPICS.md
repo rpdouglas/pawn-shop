@@ -719,7 +719,7 @@
 - [x] Execute `docs/reports/testing_gap_analysis.md` Phase 1: Fix Playwright infrastructure & Emulators
 - [x] Execute `docs/reports/testing_gap_analysis.md` Phase 2: Firebase CF `firebase-functions-test` unit tests
 - [x] Execute `docs/reports/testing_gap_analysis.md` Phase 3: Component Coverage (`IntakeForm.tsx`, hooks)
-- [ ] Execute `docs/reports/testing_gap_analysis.md` Phase 4: Persona-driven Playwright E2E suites
+- [x] Execute `docs/reports/testing_gap_analysis.md` Phase 4: Persona-driven Playwright E2E suites
 
 ### E03-QA · MFA Bypass Confirmation
 
