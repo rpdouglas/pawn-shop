@@ -432,8 +432,11 @@ export const processUploadedImage = onCall<{ filePath: string, extractData?: boo
 
     const [buffer] = await tempFile.download()
 
-    const watermarked = await sharp(buffer)
-      .composite([{ input: WATERMARK_SVG, gravity: "southeast" }])
+    const image = sharp(buffer)
+    const metadata = await image.metadata()
+    const canWatermark = (metadata.width && metadata.width >= 260) && (metadata.height && metadata.height >= 36)
+
+    const watermarked = await (canWatermark ? image.composite([{ input: WATERMARK_SVG, gravity: "southeast" }]) : image)
       .webp({ quality: 85 })
       .toBuffer()
 
@@ -488,7 +491,7 @@ export const processUploadedImage = onCall<{ filePath: string, extractData?: boo
       error: e instanceof Error ? e.message : 'Unknown error during retry',
       updatedAt: FieldValue.serverTimestamp()
     }).catch(() => {})
-    throw new HttpsError('internal', 'Retry failed')
+    throw new HttpsError('internal', `Retry failed: ${e instanceof Error ? e.message : 'Unknown error'}`)
   }
 })
 

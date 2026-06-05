@@ -207808,7 +207808,10 @@ var processUploadedImage = (0, import_https2.onCall)({ cors: true, memory: "1GiB
     const [exists] = await tempFile.exists();
     if (!exists) throw new import_https2.HttpsError("not-found", "Temporary image file not found");
     const [buffer] = await tempFile.download();
-    const watermarked = await (0, import_sharp.default)(buffer).composite([{ input: WATERMARK_SVG, gravity: "southeast" }]).webp({ quality: 85 }).toBuffer();
+    const image = (0, import_sharp.default)(buffer);
+    const metadata = await image.metadata();
+    const canWatermark = metadata.width && metadata.width >= 260 && (metadata.height && metadata.height >= 36);
+    const watermarked = await (canWatermark ? image.composite([{ input: WATERMARK_SVG, gravity: "southeast" }]) : image).webp({ quality: 85 }).toBuffer();
     const finalPath = `items/${itemId}/images/${path.parse(filename).name}.webp`;
     const finalFile = bucket.file(finalPath);
     await finalFile.save(watermarked, {
@@ -207854,7 +207857,7 @@ var processUploadedImage = (0, import_https2.onCall)({ cors: true, memory: "1GiB
       updatedAt: import_firestore3.FieldValue.serverTimestamp()
     }).catch(() => {
     });
-    throw new import_https2.HttpsError("internal", "Retry failed");
+    throw new import_https2.HttpsError("internal", `Retry failed: ${e instanceof Error ? e.message : "Unknown error"}`);
   }
 });
 var deleteInventoryItem = (0, import_https2.onCall)({ cors: true }, async (request) => {
