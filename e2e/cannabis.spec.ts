@@ -53,7 +53,7 @@ test.describe('Cannabis Persona (Marie)', () => {
     await expect(ageGateHeading).not.toBeVisible()
 
     // 5. Look for the product and verify Cannabis specific details render
-    const itemCard = page.locator('text="Organic Blue Dream 3.5g"')
+    const itemCard = page.locator('text="Organic Blue Dream 3.5g"').first()
     await expect(itemCard).toBeVisible()
     
     await itemCard.click()

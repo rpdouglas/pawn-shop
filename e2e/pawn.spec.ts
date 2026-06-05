@@ -26,7 +26,7 @@ test.describe('Pawn Persona (Makoonsii)', () => {
     await page.goto('/pawn')
     
     // 2. See the item in the inventory feed
-    const itemCard = page.locator('text="Vintage Rolex Submariner"')
+    const itemCard = page.locator('text="Vintage Rolex Submariner"').first()
     await expect(itemCard).toBeVisible()
 
     // 3. Click to view details

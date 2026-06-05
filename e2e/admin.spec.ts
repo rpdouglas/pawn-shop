@@ -33,7 +33,7 @@ test.describe('Admin Persona (Tanya)', () => {
     await page.selectOption('select#viewTag', 'pawn')
     await page.fill('input#title', 'E2E Test Pawn Item')
     await page.fill('input#price', '250')
-    await page.selectOption('select#condition', 'Good')
+    await page.locator('label').filter({ hasText: 'Good' }).click()
     
     // Ensure save draft button is available
     const saveDraftBtn = page.locator('button', { hasText: 'Save Draft' })
