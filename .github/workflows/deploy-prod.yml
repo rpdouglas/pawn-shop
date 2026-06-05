@@ -78,6 +78,13 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Setup Java 21 for Firebase Emulators
+        if: steps.check.outputs.skip != 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       - name: Install dependencies
         if: steps.check.outputs.skip != 'true'
         run: npm ci
