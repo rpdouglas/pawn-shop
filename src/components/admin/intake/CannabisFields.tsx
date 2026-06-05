@@ -3,7 +3,7 @@ import type { FormState } from './types'
 
 interface CannabisFieldsProps {
   formState: FormState
-  set: (field: keyof FormState) => (value: any) => void
+  set: (field: keyof FormState) => (value: string | number) => void
 }
 
 export default function CannabisFields({ formState, set }: CannabisFieldsProps) {

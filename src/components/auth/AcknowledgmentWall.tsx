@@ -46,7 +46,7 @@ export default function AcknowledgmentWall({ children }: { children: React.React
     return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>Loading security context...</div>
   }
 
-  if (!user || !user.isStaff || (typeof window !== 'undefined' && (window as any).__PLAYWRIGHT_MOCK_USER__)) {
+  if (!user || !user.isStaff || (typeof window !== 'undefined' && (window as unknown as { __PLAYWRIGHT_MOCK_USER__?: boolean }).__PLAYWRIGHT_MOCK_USER__)) {
     return <>{children}</>
   }
 

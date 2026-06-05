@@ -1,4 +1,5 @@
-import { renderHook, waitFor } from '@testing-library/react'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { renderHook } from '@testing-library/react'
 import { vi } from 'vitest'
 import { useItems } from './useItems'
 import * as firestore from 'firebase/firestore'
@@ -25,7 +26,7 @@ describe('useItems', () => {
     const mockUnsubscribe = vi.fn()
     const mockOnSnapshot = firestore.onSnapshot as any
 
-    mockOnSnapshot.mockImplementation((q: any, onNext: any) => {
+    mockOnSnapshot.mockImplementation((_q: any, onNext: any) => {
       onNext({
         docs: [
           {
@@ -54,7 +55,7 @@ describe('useItems', () => {
     const mockUnsubscribe = vi.fn()
     const mockOnSnapshot = firestore.onSnapshot as any
 
-    mockOnSnapshot.mockImplementation((q: any, onNext: any, onError: any) => {
+    mockOnSnapshot.mockImplementation((_q: any, _onNext: any, onError: any) => {
       onError(new Error('Firestore error'))
       return mockUnsubscribe
     })
