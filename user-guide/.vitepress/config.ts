@@ -67,9 +67,11 @@ export default defineConfig({
         text: 'Pawn Services',
         items: [
           { text: 'Selling to Us', link: '/pawn/selling' },
+          { text: 'Pawn Loans', link: '/pawn/loans' },
           { text: 'Alerts & Notifications', link: '/pawn/alerts-notifications' },
           { text: 'Click & Collect Reservations', link: '/admin/reservations' },
           { text: 'Managing the Inbox', link: '/admin/pawn-inbox' },
+          { text: 'Managing Pawn Loans', link: '/admin/loans' },
           { text: 'Disputes & Returns', link: '/admin/disputes-returns' },
           { text: 'Seasonal Pre-Orders', link: '/admin/preorders' }
         ]

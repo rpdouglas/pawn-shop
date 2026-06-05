@@ -390,3 +390,5 @@ YYYY-MM-DD — Decision. Brief reason.
 2026-06-05 — Security: Temporarily disabled Firebase AppCheck initialization in frontend (`firebase-core.ts`) due to development environment friction with ReCaptcha tokens. Task added to E77 to re-enable prior to production launch.
 
 2026-06-05 — E73 AI Fallback: Updated Gemini models to 3.1-pro and 2.5-flash. Implemented graceful degradation during photo upload to prevent high demand errors (503/429) from blocking the intake workflow. Staff are now alerted via a popup while the image upload succeeds.
+
+2026-06-05 — E31 Pawn Loans: Added `loanTickets` collection and `pawnLoanId` to `pawnRequests` to track active pawn loans. All mutations to loanTickets are restricted to Cloud Functions for strict audit logging.

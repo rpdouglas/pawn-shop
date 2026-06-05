@@ -195,9 +195,18 @@ service cloud.firestore {
       allow write: if isStaff() || hasRole('marketing_staff');
     }
 
+    // ── loanTickets/{id} ─────────────────────────────────────────────────────
+    // All writes go through Cloud Functions (Admin SDK) to ensure status logic and audit logging.
+    match /loanTickets/{ticketId} {
+      allow create, update: if false;
+      allow read: if isStaff() || isOwner(resource.data.uid);
+      allow delete: if isAdmin();
+    }
+
     // Deny everything else
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+

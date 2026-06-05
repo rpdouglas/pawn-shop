@@ -154,6 +154,28 @@ export default function NavigationDrawer() {
               </div>
             ))}
 
+            {user && (
+              <div style={{ position: 'relative' }}>
+                <Link
+                  to="/pawn/my-loans"
+                  onMouseEnter={() => prefetchRoute('/pawn/my-loans')}
+                  onClick={() => setIsOpen(false)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: 'var(--space-4)',
+                    color: 'var(--color-text)',
+                    textDecoration: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: location.pathname === '/pawn/my-loans' ? 'var(--color-surface)' : 'transparent',
+                    minHeight: 'var(--space-12)'
+                  }}
+                >
+                  My Pawn Loans
+                </Link>
+              </div>
+            )}
+
             {user?.isStaff && (
               <>
                 <div style={{

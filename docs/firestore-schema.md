@@ -107,7 +107,29 @@
 | `status` | string | `pending` \| `reviewed` \| `quoted` \| `declined` \| `completed` |
 | `staffNotes` | string | Internal — never show to customer |
 | `serialBlacklistHit` | boolean | Set by Cloud Function on create |
+| `pawnLoanId` | string | Link to `loanTickets/{id}` if a loan is issued |
 | `createdAt` | timestamp | |
+
+---
+
+## `loanTickets/{id}`
+
+> Tracks active and historical pawn loans. Status changes must route through Cloud Functions.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `uid` | string | Customer UID |
+| `pawnRequestId` | string | Reference to `pawnRequests/{id}` |
+| `itemDescription` | string | Description of the pawned item |
+| `loanAmount` | number | CAD cents |
+| `interestRate` | number | e.g. 0.05 for 5% |
+| `periodDays` | number | Standard loan period in days |
+| `dueDate` | timestamp | Current due date for the loan |
+| `status` | string | `active` \| `extension_requested` \| `forfeited` \| `redeemed` |
+| `extensionCount` | number | Number of times extended |
+| `staffNotes` | string | Internal — never shown to customer |
+| `createdAt` | timestamp | Server timestamp |
+| `updatedAt` | timestamp | Server timestamp |
 
 ---
 

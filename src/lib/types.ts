@@ -370,3 +370,21 @@ export interface Faq {
   updatedAt: Date
   createdAt: Date
 }
+
+export type LoanTicketStatus = 'active' | 'extension_requested' | 'forfeited' | 'redeemed'
+
+export interface LoanTicket {
+  id: string
+  uid: string
+  pawnRequestId: string
+  itemDescription: string
+  loanAmount: number
+  interestRate: number
+  periodDays: number
+  dueDate: Date
+  status: LoanTicketStatus
+  extensionCount: number
+  staffNotes?: string
+  createdAt: Date
+  updatedAt: Date
+}

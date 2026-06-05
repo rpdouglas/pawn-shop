@@ -1,10 +1,11 @@
-import type { ConditionGrade, ItemStatus, DisputeStatus, DisputeType } from '../../lib/types'
+import type { ConditionGrade, ItemStatus, DisputeStatus, DisputeType, LoanTicketStatus } from '../../lib/types'
 
 type BadgeVariant =
   | ItemStatus
   | `condition-${ConditionGrade}`
   | DisputeStatus
   | DisputeType
+  | LoanTicketStatus
   | 'tag'
   | 'error'
 

@@ -207105,10 +207105,10 @@ var require_sms = __commonJS({
       return mod && mod.__esModule ? mod : { "default": mod };
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.dispatchSms = dispatchSms5;
+    exports2.dispatchSms = dispatchSms6;
     var twilio_1 = __importDefault(require_lib3());
     var secrets_1 = require_secrets();
-    async function dispatchSms5(to, body) {
+    async function dispatchSms6(to, body) {
       const accountSid = secrets_1.twilioAccountSid.value();
       const authToken = secrets_1.twilioAuthToken.value();
       const fromNumber = secrets_1.twilioFromNumber.value();
@@ -291561,7 +291561,7 @@ var require_field_value = __commonJS({
       }
     };
     exports2.VectorValue = VectorValue;
-    var FieldValue19 = class {
+    var FieldValue20 = class {
       /** @private */
       constructor() {
       }
@@ -291810,8 +291810,8 @@ var require_field_value = __commonJS({
         return this === other;
       }
     };
-    exports2.FieldValue = FieldValue19;
-    var FieldTransform = class extends FieldValue19 {
+    exports2.FieldValue = FieldValue20;
+    var FieldTransform = class extends FieldValue20 {
     };
     exports2.FieldTransform = FieldTransform;
     var DeleteTransform = class _DeleteTransform extends FieldTransform {
@@ -304330,12 +304330,14 @@ __export(index_exports, {
   assignVipStatus: () => assignVipStatus,
   backupFirestoreDaily: () => backupFirestoreDaily,
   cancelPreorder: () => cancelPreorder,
+  checkLoanDueDates: () => checkLoanDueDates,
   collectPreorder: () => collectPreorder,
   completeReservation: () => completeReservation,
   confirmPreorder: () => confirmPreorder,
   confirmReservation: () => confirmReservation,
   createArticle: () => createArticle,
   createDispute: () => createDispute,
+  createLoanTicket: () => createLoanTicket,
   createPreorder: () => createPreorder,
   createReservation: () => createReservation,
   createShift: () => createShift,
@@ -304348,12 +304350,15 @@ __export(index_exports, {
   logAgeGate: () => logAgeGate,
   logFaqAction: () => logFaqAction,
   markPreorderReady: () => markPreorderReady,
+  processExtension: () => processExtension,
   publishArticle: () => publishArticle,
   purgeExpiredData: () => purgeExpiredData,
   recordLogin: () => recordLogin,
   recordLogout: () => recordLogout,
   recordMfaEnrolled: () => recordMfaEnrolled,
+  redeemLoanTicket: () => redeemLoanTicket,
   removeSerialFromBlacklist: () => removeSerialFromBlacklist,
+  requestExtension: () => requestExtension,
   resolveDispute: () => resolveDispute,
   sendContactEmail: () => sendContactEmail,
   sendPickupReminders: () => sendPickupReminders,
@@ -304927,20 +304932,214 @@ var backupFirestoreDaily = (0, import_scheduler3.onSchedule)({ schedule: "0 2 * 
   }
 });
 
-// src/pawnRequests.ts
+// src/loanTickets.ts
 var import_https7 = require("firebase-functions/v2/https");
+var import_scheduler4 = require("firebase-functions/v2/scheduler");
 var import_firestore10 = require("firebase-admin/firestore");
-var submitPawnRequest = (0, import_https7.onCall)({ cors: true }, async (request) => {
+var import_sms2 = __toESM(require_sms());
+var import_secrets5 = __toESM(require_secrets());
+var createLoanTicket = (0, import_https7.onCall)({ cors: true }, async (request) => {
+  if (!request.auth?.token.admin && !request.auth?.token.manager && !request.auth?.token.inventory_staff) {
+    throw new import_https7.HttpsError("permission-denied", "Only staff can create loan tickets");
+  }
+  const { uid, pawnRequestId, itemDescription, loanAmount, interestRate, periodDays, dueDate } = request.data;
+  if (!uid || !pawnRequestId || !itemDescription || loanAmount == null || interestRate == null || periodDays == null || !dueDate) {
+    throw new import_https7.HttpsError("invalid-argument", "Missing required fields");
+  }
+  const db = (0, import_firestore10.getFirestore)();
+  const now = import_firestore10.FieldValue.serverTimestamp();
+  const docData = {
+    uid,
+    pawnRequestId,
+    itemDescription,
+    loanAmount,
+    interestRate,
+    periodDays,
+    dueDate: new Date(dueDate),
+    status: "active",
+    extensionCount: 0,
+    staffNotes: "",
+    createdAt: now,
+    updatedAt: now
+  };
+  const ref = await db.collection("loanTickets").add(docData);
+  await db.collection("pawnRequests").doc(pawnRequestId).update({
+    pawnLoanId: ref.id,
+    updatedAt: now
+  });
+  await db.collection("auditLogs").add({
+    eventType: "loan_ticket_created",
+    uid: request.auth.uid,
+    targetId: ref.id,
+    details: { loanTicketId: ref.id, pawnRequestId, loanAmount },
+    createdAt: now
+  });
+  return { success: true, loanTicketId: ref.id };
+});
+var requestExtension = (0, import_https7.onCall)({ cors: true }, async (request) => {
+  const { loanTicketId } = request.data;
+  const uid = request.auth?.uid;
+  if (!uid) {
+    throw new import_https7.HttpsError("unauthenticated", "Must be signed in");
+  }
+  if (!loanTicketId) {
+    throw new import_https7.HttpsError("invalid-argument", "loanTicketId required");
+  }
+  const db = (0, import_firestore10.getFirestore)();
+  const ref = db.collection("loanTickets").doc(loanTicketId);
+  const snap = await ref.get();
+  if (!snap.exists) {
+    throw new import_https7.HttpsError("not-found", "Loan ticket not found");
+  }
+  const data = snap.data();
+  if (data["uid"] !== uid) {
+    throw new import_https7.HttpsError("permission-denied", "You do not own this loan ticket");
+  }
+  if (data["status"] !== "active") {
+    throw new import_https7.HttpsError("failed-precondition", "Loan must be active to request extension");
+  }
+  const now = import_firestore10.FieldValue.serverTimestamp();
+  await ref.update({
+    status: "extension_requested",
+    updatedAt: now
+  });
+  await db.collection("auditLogs").add({
+    eventType: "extension_requested",
+    uid,
+    targetId: loanTicketId,
+    details: { loanTicketId },
+    createdAt: now
+  });
+  return { success: true };
+});
+var processExtension = (0, import_https7.onCall)({ cors: true }, async (request) => {
+  if (!request.auth?.token.admin && !request.auth?.token.manager && !request.auth?.token.inventory_staff) {
+    throw new import_https7.HttpsError("permission-denied", "Only staff can process extensions");
+  }
+  const { loanTicketId, approved, newDueDate, staffNotes } = request.data;
+  if (!loanTicketId) {
+    throw new import_https7.HttpsError("invalid-argument", "loanTicketId required");
+  }
+  if (approved && !newDueDate) {
+    throw new import_https7.HttpsError("invalid-argument", "newDueDate required if approved");
+  }
+  const db = (0, import_firestore10.getFirestore)();
+  const ref = db.collection("loanTickets").doc(loanTicketId);
+  const snap = await ref.get();
+  if (!snap.exists) {
+    throw new import_https7.HttpsError("not-found", "Loan ticket not found");
+  }
+  const data = snap.data();
+  const now = import_firestore10.FieldValue.serverTimestamp();
+  const updates = {
+    status: "active",
+    updatedAt: now
+  };
+  if (approved) {
+    updates["dueDate"] = new Date(newDueDate);
+    updates["extensionCount"] = (typeof data["extensionCount"] === "number" ? data["extensionCount"] : 0) + 1;
+  }
+  if (staffNotes) {
+    updates["staffNotes"] = staffNotes;
+  }
+  await ref.update(updates);
+  await db.collection("auditLogs").add({
+    eventType: approved ? "extension_approved" : "extension_declined",
+    uid: request.auth.uid,
+    targetId: loanTicketId,
+    details: { loanTicketId, approved, newDueDate },
+    createdAt: now
+  });
+  return { success: true };
+});
+var redeemLoanTicket = (0, import_https7.onCall)({ cors: true }, async (request) => {
+  if (!request.auth?.token.admin && !request.auth?.token.manager && !request.auth?.token.inventory_staff) {
+    throw new import_https7.HttpsError("permission-denied", "Only staff can redeem loan tickets");
+  }
+  const { loanTicketId } = request.data;
+  if (!loanTicketId) throw new import_https7.HttpsError("invalid-argument", "loanTicketId required");
+  const db = (0, import_firestore10.getFirestore)();
+  const ref = db.collection("loanTickets").doc(loanTicketId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new import_https7.HttpsError("not-found", "Loan ticket not found");
+  const now = import_firestore10.FieldValue.serverTimestamp();
+  await ref.update({
+    status: "redeemed",
+    updatedAt: now
+  });
+  await db.collection("auditLogs").add({
+    eventType: "loan_redeemed",
+    uid: request.auth.uid,
+    targetId: loanTicketId,
+    details: { loanTicketId },
+    createdAt: now
+  });
+  return { success: true };
+});
+var checkLoanDueDates = (0, import_scheduler4.onSchedule)({ schedule: "0 0 * * *", secrets: [import_secrets5.twilioAccountSid, import_secrets5.twilioAuthToken] }, async () => {
+  const db = (0, import_firestore10.getFirestore)();
+  const now = /* @__PURE__ */ new Date();
+  const fortyEightHoursFromNow = new Date(now.getTime() + 48 * 60 * 60 * 1e3);
+  const activeLoans = await db.collection("loanTickets").where("status", "==", "active").get();
+  for (const doc of activeLoans.docs) {
+    const data = doc.data();
+    const dueDateVal = data["dueDate"];
+    const dueDate = dueDateVal?.toDate?.();
+    if (!dueDate) continue;
+    const uid = String(data["uid"]);
+    const loanTicketId = doc.id;
+    if (dueDate < now) {
+      await doc.ref.update({
+        status: "forfeited",
+        updatedAt: import_firestore10.FieldValue.serverTimestamp()
+      });
+      await db.collection("auditLogs").add({
+        eventType: "loan_forfeited",
+        uid: "system",
+        targetId: loanTicketId,
+        details: { loanTicketId, dueDate: dueDate.toISOString() },
+        createdAt: import_firestore10.FieldValue.serverTimestamp()
+      });
+    } else if (dueDate < fortyEightHoursFromNow) {
+      const alertSentAt = data["forfeitAlertSentAt"];
+      if (!alertSentAt) {
+        const userSnap = await db.collection("users").doc(uid).get();
+        if (userSnap.exists) {
+          const userData = userSnap.data();
+          if (userData["alertOptIn"] === true) {
+            const phone = String(userData["phoneNumber"] ?? "");
+            if (phone.length > 0) {
+              const smsBody = "The Pawn Shop Update \u2014 Your pawn loan is due in less than 48 hours. Please visit us to redeem or request an extension.";
+              try {
+                await (0, import_sms2.dispatchSms)(phone, smsBody);
+                await doc.ref.update({
+                  forfeitAlertSentAt: import_firestore10.FieldValue.serverTimestamp()
+                });
+              } catch (err) {
+                console.error(`[checkLoanDueDates] SMS failed for user ${uid}:`, err.message);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+});
+
+// src/pawnRequests.ts
+var import_https8 = require("firebase-functions/v2/https");
+var import_firestore11 = require("firebase-admin/firestore");
+var submitPawnRequest = (0, import_https8.onCall)({ cors: true }, async (request) => {
   const { name, email, phone, itemDescription, serialNumber, imageUrls } = request.data;
   if (!name?.trim())
-    throw new import_https7.HttpsError("invalid-argument", "Your name is required");
+    throw new import_https8.HttpsError("invalid-argument", "Your name is required");
   if (!email?.trim())
-    throw new import_https7.HttpsError("invalid-argument", "Your email address is required");
+    throw new import_https8.HttpsError("invalid-argument", "Your email address is required");
   if (!itemDescription?.trim())
-    throw new import_https7.HttpsError("invalid-argument", "Please describe the item");
+    throw new import_https8.HttpsError("invalid-argument", "Please describe the item");
   if (!Array.isArray(imageUrls))
-    throw new import_https7.HttpsError("invalid-argument", "imageUrls must be an array");
-  const db = (0, import_firestore10.getFirestore)();
+    throw new import_https8.HttpsError("invalid-argument", "imageUrls must be an array");
+  const db = (0, import_firestore11.getFirestore)();
   const uid = request.auth?.uid ?? null;
   let serialBlacklistHit = false;
   const trimmedSerial = serialNumber?.trim() ?? "";
@@ -304948,7 +305147,7 @@ var submitPawnRequest = (0, import_https7.onCall)({ cors: true }, async (request
     const snap = await db.collection("serialBlacklist").where("serialNumber", "==", trimmedSerial).limit(1).get();
     serialBlacklistHit = !snap.empty;
   }
-  const now = import_firestore10.FieldValue.serverTimestamp();
+  const now = import_firestore11.FieldValue.serverTimestamp();
   const docData = {
     uid,
     name: name.trim(),
@@ -304964,7 +305163,7 @@ var submitPawnRequest = (0, import_https7.onCall)({ cors: true }, async (request
   const ref = await db.collection("pawnRequests").add(docData);
   if (uid) {
     await db.collection("users").doc(uid).update({
-      inquiryHistory: import_firestore10.FieldValue.arrayUnion(ref.id),
+      inquiryHistory: import_firestore11.FieldValue.arrayUnion(ref.id),
       updatedAt: now
     });
   }
@@ -304989,10 +305188,10 @@ var submitPawnRequest = (0, import_https7.onCall)({ cors: true }, async (request
 });
 
 // src/reservations.ts
-var import_https8 = require("firebase-functions/v2/https");
-var import_firestore11 = require("firebase-admin/firestore");
-var import_sms2 = __toESM(require_sms());
-var import_secrets5 = __toESM(require_secrets());
+var import_https9 = require("firebase-functions/v2/https");
+var import_firestore12 = require("firebase-admin/firestore");
+var import_sms3 = __toESM(require_sms());
+var import_secrets6 = __toESM(require_secrets());
 var DAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 function generateSlots(day) {
   const slots = [];
@@ -305018,35 +305217,35 @@ function isValidPickupWindow(pickupWindow, hoursDoc) {
   if (!dayConfig || dayConfig.closed) return false;
   return generateSlots(dayConfig).includes(startTime);
 }
-var createReservation = (0, import_https8.onCall)({ cors: true, secrets: [import_secrets5.twilioAccountSid, import_secrets5.twilioAuthToken] }, async (request) => {
-  if (!request.auth) throw new import_https8.HttpsError("unauthenticated", "Sign in to reserve an item");
+var createReservation = (0, import_https9.onCall)({ cors: true, secrets: [import_secrets6.twilioAccountSid, import_secrets6.twilioAuthToken] }, async (request) => {
+  if (!request.auth) throw new import_https9.HttpsError("unauthenticated", "Sign in to reserve an item");
   const { itemId, customerName, customerPhone, pickupWindow, viewTag } = request.data;
-  if (!itemId?.trim()) throw new import_https8.HttpsError("invalid-argument", "itemId is required");
-  if (!customerName?.trim()) throw new import_https8.HttpsError("invalid-argument", "Your name is required");
-  if (!customerPhone?.trim()) throw new import_https8.HttpsError("invalid-argument", "Your phone number is required");
-  if (!pickupWindow?.trim()) throw new import_https8.HttpsError("invalid-argument", "Please select a pickup window");
+  if (!itemId?.trim()) throw new import_https9.HttpsError("invalid-argument", "itemId is required");
+  if (!customerName?.trim()) throw new import_https9.HttpsError("invalid-argument", "Your name is required");
+  if (!customerPhone?.trim()) throw new import_https9.HttpsError("invalid-argument", "Your phone number is required");
+  if (!pickupWindow?.trim()) throw new import_https9.HttpsError("invalid-argument", "Please select a pickup window");
   if (!["pawn", "fireworks"].includes(viewTag)) {
-    throw new import_https8.HttpsError("invalid-argument", "Invalid viewTag");
+    throw new import_https9.HttpsError("invalid-argument", "Invalid viewTag");
   }
-  const db = (0, import_firestore11.getFirestore)();
+  const db = (0, import_firestore12.getFirestore)();
   const uid = request.auth.uid;
   const itemSnap = await db.collection("items").doc(itemId.trim()).get();
-  if (!itemSnap.exists) throw new import_https8.HttpsError("not-found", "Item not found");
+  if (!itemSnap.exists) throw new import_https9.HttpsError("not-found", "Item not found");
   const itemData = itemSnap.data();
   if (itemData["status"] !== "active") {
-    throw new import_https8.HttpsError("failed-precondition", "This item is no longer available");
+    throw new import_https9.HttpsError("failed-precondition", "This item is no longer available");
   }
   if (itemData["policeHold"] === true) {
-    throw new import_https8.HttpsError("failed-precondition", "This item is not available for reservation");
+    throw new import_https9.HttpsError("failed-precondition", "This item is not available for reservation");
   }
   const hoursSnap = await db.collection("config").doc("storeHours").get();
   if (!hoursSnap.exists) {
-    throw new import_https8.HttpsError("failed-precondition", "Reservation booking is not currently configured");
+    throw new import_https9.HttpsError("failed-precondition", "Reservation booking is not currently configured");
   }
   if (!isValidPickupWindow(pickupWindow.trim(), hoursSnap.data())) {
-    throw new import_https8.HttpsError("invalid-argument", "Selected pickup window is not within store hours");
+    throw new import_https9.HttpsError("invalid-argument", "Selected pickup window is not within store hours");
   }
-  const now = import_firestore11.FieldValue.serverTimestamp();
+  const now = import_firestore12.FieldValue.serverTimestamp();
   const resRef = await db.collection("reservations").add({
     uid,
     itemId: itemId.trim(),
@@ -305066,40 +305265,40 @@ var createReservation = (0, import_https8.onCall)({ cors: true, secrets: [import
     createdAt: now
   });
   await db.collection("items").doc(itemId.trim()).update({
-    enquiryCount: import_firestore11.FieldValue.increment(1)
+    enquiryCount: import_firestore12.FieldValue.increment(1)
   });
   try {
-    const sent = await (0, import_sms2.dispatchSms)(
+    const sent = await (0, import_sms3.dispatchSms)(
       customerPhone.trim(),
       `The Pawn Shop \u2014 your collection request has been received. Requested window: ${pickupWindow.trim()}. We will confirm shortly.`
     );
-    if (sent) await resRef.update({ smsDeliveredAt: import_firestore11.Timestamp.now() });
+    if (sent) await resRef.update({ smsDeliveredAt: import_firestore12.Timestamp.now() });
   } catch (err) {
     console.error("[createReservation] SMS failed:", err.message);
     await resRef.update({ staffNotes: "SMS failed on create \u2014 resend manually" });
   }
   return { success: true, reservationId: resRef.id };
 });
-var confirmReservation = (0, import_https8.onCall)({ cors: true, secrets: [import_secrets5.twilioAccountSid, import_secrets5.twilioAuthToken] }, async (request) => {
+var confirmReservation = (0, import_https9.onCall)({ cors: true, secrets: [import_secrets6.twilioAccountSid, import_secrets6.twilioAuthToken] }, async (request) => {
   const token = request.auth?.token ?? {};
   if (!token["admin"] && !token["manager"] && !token["inventory_staff"]) {
-    throw new import_https8.HttpsError("permission-denied", "Staff access required");
+    throw new import_https9.HttpsError("permission-denied", "Staff access required");
   }
   const { reservationId, decision, staffNotes } = request.data;
-  if (!reservationId?.trim()) throw new import_https8.HttpsError("invalid-argument", "reservationId is required");
+  if (!reservationId?.trim()) throw new import_https9.HttpsError("invalid-argument", "reservationId is required");
   if (decision !== "confirmed" && decision !== "declined") {
-    throw new import_https8.HttpsError("invalid-argument", "decision must be confirmed or declined");
+    throw new import_https9.HttpsError("invalid-argument", "decision must be confirmed or declined");
   }
-  const db = (0, import_firestore11.getFirestore)();
+  const db = (0, import_firestore12.getFirestore)();
   const uid = request.auth.uid;
   const resRef = db.collection("reservations").doc(reservationId.trim());
   const resSnap = await resRef.get();
-  if (!resSnap.exists) throw new import_https8.HttpsError("not-found", "Reservation not found");
+  if (!resSnap.exists) throw new import_https9.HttpsError("not-found", "Reservation not found");
   const resData = resSnap.data();
   if (resData["status"] !== "pending") {
-    throw new import_https8.HttpsError("failed-precondition", "Only pending reservations can be confirmed or declined");
+    throw new import_https9.HttpsError("failed-precondition", "Only pending reservations can be confirmed or declined");
   }
-  const now = import_firestore11.FieldValue.serverTimestamp();
+  const now = import_firestore12.FieldValue.serverTimestamp();
   const updatePayload = { status: decision, updatedAt: now };
   if (staffNotes?.trim()) updatePayload["staffNotes"] = staffNotes.trim();
   await resRef.update(updatePayload);
@@ -305122,30 +305321,30 @@ var confirmReservation = (0, import_https8.onCall)({ cors: true, secrets: [impor
   if (customerPhone) {
     const body = decision === "confirmed" ? `The Pawn Shop \u2014 your collection is confirmed. Pickup: ${pickupWindow}. See you then.` : `The Pawn Shop \u2014 we are unable to fulfill your collection request. Please contact us to rebook.`;
     try {
-      await (0, import_sms2.dispatchSms)(customerPhone, body);
+      await (0, import_sms3.dispatchSms)(customerPhone, body);
     } catch (err) {
       console.error("[confirmReservation] SMS failed:", err.message);
     }
   }
   return { success: true };
 });
-var completeReservation = (0, import_https8.onCall)({ cors: true }, async (request) => {
+var completeReservation = (0, import_https9.onCall)({ cors: true }, async (request) => {
   const token = request.auth?.token ?? {};
   if (!token["admin"] && !token["manager"] && !token["inventory_staff"]) {
-    throw new import_https8.HttpsError("permission-denied", "Staff access required");
+    throw new import_https9.HttpsError("permission-denied", "Staff access required");
   }
   const { reservationId } = request.data;
-  if (!reservationId?.trim()) throw new import_https8.HttpsError("invalid-argument", "reservationId is required");
-  const db = (0, import_firestore11.getFirestore)();
+  if (!reservationId?.trim()) throw new import_https9.HttpsError("invalid-argument", "reservationId is required");
+  const db = (0, import_firestore12.getFirestore)();
   const uid = request.auth.uid;
   const resRef = db.collection("reservations").doc(reservationId.trim());
   const resSnap = await resRef.get();
-  if (!resSnap.exists) throw new import_https8.HttpsError("not-found", "Reservation not found");
+  if (!resSnap.exists) throw new import_https9.HttpsError("not-found", "Reservation not found");
   const resData = resSnap.data();
   if (resData["status"] !== "confirmed") {
-    throw new import_https8.HttpsError("failed-precondition", "Only confirmed reservations can be completed");
+    throw new import_https9.HttpsError("failed-precondition", "Only confirmed reservations can be completed");
   }
-  const now = import_firestore11.FieldValue.serverTimestamp();
+  const now = import_firestore12.FieldValue.serverTimestamp();
   await resRef.update({ status: "completed", updatedAt: now });
   const itemRef = db.collection("items").doc(resData["itemId"]);
   const itemSnap = await itemRef.get();
@@ -305154,8 +305353,8 @@ var completeReservation = (0, import_https8.onCall)({ cors: true }, async (reque
   const customerUid = resData["uid"];
   if (customerUid) {
     await db.collection("users").doc(customerUid).update({
-      purchaseHistory: import_firestore11.FieldValue.arrayUnion(resData["itemId"]),
-      lifetimeValue: import_firestore11.FieldValue.increment(itemPrice),
+      purchaseHistory: import_firestore12.FieldValue.arrayUnion(resData["itemId"]),
+      lifetimeValue: import_firestore12.FieldValue.increment(itemPrice),
       updatedAt: now
     });
   }
@@ -305170,35 +305369,35 @@ var completeReservation = (0, import_https8.onCall)({ cors: true }, async (reque
 });
 
 // src/preorders.ts
-var import_https9 = require("firebase-functions/v2/https");
-var import_firestore12 = require("firebase-admin/firestore");
-var import_sms3 = __toESM(require_sms());
-var import_secrets6 = __toESM(require_secrets());
+var import_https10 = require("firebase-functions/v2/https");
+var import_firestore13 = require("firebase-admin/firestore");
+var import_sms4 = __toESM(require_sms());
+var import_secrets7 = __toESM(require_secrets());
 function isStaffToken(token) {
   return token["admin"] === true || token["manager"] === true || token["inventory_staff"] === true;
 }
-var createPreorder = (0, import_https9.onCall)({ cors: true }, async (request) => {
-  if (!request.auth) throw new import_https9.HttpsError("unauthenticated", "Sign in to pre-order");
+var createPreorder = (0, import_https10.onCall)({ cors: true }, async (request) => {
+  if (!request.auth) throw new import_https10.HttpsError("unauthenticated", "Sign in to pre-order");
   const { itemId, customerName, customerPhone, quantity, campaignId } = request.data;
-  if (!itemId?.trim()) throw new import_https9.HttpsError("invalid-argument", "itemId is required");
-  if (!customerName?.trim()) throw new import_https9.HttpsError("invalid-argument", "Your name is required");
-  if (!customerPhone?.trim()) throw new import_https9.HttpsError("invalid-argument", "Your phone number is required");
-  if (!quantity || quantity < 1) throw new import_https9.HttpsError("invalid-argument", "Quantity must be at least 1");
-  const db = (0, import_firestore12.getFirestore)();
+  if (!itemId?.trim()) throw new import_https10.HttpsError("invalid-argument", "itemId is required");
+  if (!customerName?.trim()) throw new import_https10.HttpsError("invalid-argument", "Your name is required");
+  if (!customerPhone?.trim()) throw new import_https10.HttpsError("invalid-argument", "Your phone number is required");
+  if (!quantity || quantity < 1) throw new import_https10.HttpsError("invalid-argument", "Quantity must be at least 1");
+  const db = (0, import_firestore13.getFirestore)();
   const uid = request.auth.uid;
   const itemSnap = await db.collection("items").doc(itemId.trim()).get();
-  if (!itemSnap.exists) throw new import_https9.HttpsError("not-found", "Item not found");
+  if (!itemSnap.exists) throw new import_https10.HttpsError("not-found", "Item not found");
   const itemData = itemSnap.data();
   if (itemData["policeHold"] === true) {
-    throw new import_https9.HttpsError("failed-precondition", "This item is not available");
+    throw new import_https10.HttpsError("failed-precondition", "This item is not available");
   }
   if (itemData["status"] !== "active") {
-    throw new import_https9.HttpsError("failed-precondition", "This item is not currently available for pre-order");
+    throw new import_https10.HttpsError("failed-precondition", "This item is not currently available for pre-order");
   }
   if (itemData["viewTag"] !== "fireworks") {
-    throw new import_https9.HttpsError("invalid-argument", "Pre-orders are available for fireworks items only");
+    throw new import_https10.HttpsError("invalid-argument", "Pre-orders are available for fireworks items only");
   }
-  const now = import_firestore12.FieldValue.serverTimestamp();
+  const now = import_firestore13.FieldValue.serverTimestamp();
   const preorderPayload = {
     uid,
     itemId: itemId.trim(),
@@ -305221,22 +305420,22 @@ var createPreorder = (0, import_https9.onCall)({ cors: true }, async (request) =
   });
   return { success: true, preorderId: preorderRef.id };
 });
-var confirmPreorder = (0, import_https9.onCall)({ cors: true, secrets: [import_secrets6.twilioAccountSid, import_secrets6.twilioAuthToken] }, async (request) => {
+var confirmPreorder = (0, import_https10.onCall)({ cors: true, secrets: [import_secrets7.twilioAccountSid, import_secrets7.twilioAuthToken] }, async (request) => {
   const token = request.auth?.token ?? {};
   if (!request.auth || !isStaffToken(token)) {
-    throw new import_https9.HttpsError("permission-denied", "Staff access required");
+    throw new import_https10.HttpsError("permission-denied", "Staff access required");
   }
   const { preorderId, staffNotes } = request.data;
-  if (!preorderId?.trim()) throw new import_https9.HttpsError("invalid-argument", "preorderId is required");
-  const db = (0, import_firestore12.getFirestore)();
+  if (!preorderId?.trim()) throw new import_https10.HttpsError("invalid-argument", "preorderId is required");
+  const db = (0, import_firestore13.getFirestore)();
   const preorderRef = db.collection("preorders").doc(preorderId.trim());
   const snap = await preorderRef.get();
-  if (!snap.exists) throw new import_https9.HttpsError("not-found", "Pre-order not found");
+  if (!snap.exists) throw new import_https10.HttpsError("not-found", "Pre-order not found");
   const data = snap.data();
   if (data["status"] !== "pending") {
-    throw new import_https9.HttpsError("failed-precondition", "Only pending pre-orders can be confirmed");
+    throw new import_https10.HttpsError("failed-precondition", "Only pending pre-orders can be confirmed");
   }
-  const now = import_firestore12.FieldValue.serverTimestamp();
+  const now = import_firestore13.FieldValue.serverTimestamp();
   const updatePayload = { status: "confirmed", updatedAt: now };
   if (staffNotes?.trim()) updatePayload["staffNotes"] = staffNotes.trim();
   await preorderRef.update(updatePayload);
@@ -305251,31 +305450,31 @@ var confirmPreorder = (0, import_https9.onCall)({ cors: true, secrets: [import_s
   const customerPhone = String(data["customerPhone"] ?? "");
   const body = `The Pawn Shop \xB7 Hi ${customerName}, your fireworks pre-order has been confirmed. We'll reach out once it's ready for pickup.`;
   try {
-    const sent = await (0, import_sms3.dispatchSms)(customerPhone, body);
-    if (sent) await preorderRef.update({ smsDeliveredAt: import_firestore12.Timestamp.now() });
+    const sent = await (0, import_sms4.dispatchSms)(customerPhone, body);
+    if (sent) await preorderRef.update({ smsDeliveredAt: import_firestore13.Timestamp.now() });
   } catch (err) {
     console.error("[confirmPreorder] SMS failed:", err.message);
     await preorderRef.update({ staffNotes: (staffNotes?.trim() ? staffNotes.trim() + " \u2014 " : "") + "SMS failed on confirm \u2014 resend manually" });
   }
   return { success: true };
 });
-var markPreorderReady = (0, import_https9.onCall)({ cors: true, secrets: [import_secrets6.twilioAccountSid, import_secrets6.twilioAuthToken] }, async (request) => {
+var markPreorderReady = (0, import_https10.onCall)({ cors: true, secrets: [import_secrets7.twilioAccountSid, import_secrets7.twilioAuthToken] }, async (request) => {
   const token = request.auth?.token ?? {};
   if (!request.auth || !isStaffToken(token)) {
-    throw new import_https9.HttpsError("permission-denied", "Staff access required");
+    throw new import_https10.HttpsError("permission-denied", "Staff access required");
   }
   const { preorderId, pickupWindow, staffNotes } = request.data;
-  if (!preorderId?.trim()) throw new import_https9.HttpsError("invalid-argument", "preorderId is required");
-  if (!pickupWindow?.trim()) throw new import_https9.HttpsError("invalid-argument", "pickupWindow is required");
-  const db = (0, import_firestore12.getFirestore)();
+  if (!preorderId?.trim()) throw new import_https10.HttpsError("invalid-argument", "preorderId is required");
+  if (!pickupWindow?.trim()) throw new import_https10.HttpsError("invalid-argument", "pickupWindow is required");
+  const db = (0, import_firestore13.getFirestore)();
   const preorderRef = db.collection("preorders").doc(preorderId.trim());
   const snap = await preorderRef.get();
-  if (!snap.exists) throw new import_https9.HttpsError("not-found", "Pre-order not found");
+  if (!snap.exists) throw new import_https10.HttpsError("not-found", "Pre-order not found");
   const data = snap.data();
   if (data["status"] !== "confirmed") {
-    throw new import_https9.HttpsError("failed-precondition", "Only confirmed pre-orders can be marked ready");
+    throw new import_https10.HttpsError("failed-precondition", "Only confirmed pre-orders can be marked ready");
   }
-  const now = import_firestore12.FieldValue.serverTimestamp();
+  const now = import_firestore13.FieldValue.serverTimestamp();
   const updatePayload = {
     status: "ready",
     pickupWindow: pickupWindow.trim(),
@@ -305294,30 +305493,30 @@ var markPreorderReady = (0, import_https9.onCall)({ cors: true, secrets: [import
   const customerPhone = String(data["customerPhone"] ?? "");
   const body = `The Pawn Shop \xB7 Hi ${customerName}, your fireworks order is ready for pickup. Your window: ${pickupWindow.trim()}. See you soon!`;
   try {
-    const sent = await (0, import_sms3.dispatchSms)(customerPhone, body);
-    if (sent) await preorderRef.update({ smsDeliveredAt: import_firestore12.Timestamp.now() });
+    const sent = await (0, import_sms4.dispatchSms)(customerPhone, body);
+    if (sent) await preorderRef.update({ smsDeliveredAt: import_firestore13.Timestamp.now() });
   } catch (err) {
     console.error("[markPreorderReady] SMS failed:", err.message);
     await preorderRef.update({ staffNotes: (staffNotes?.trim() ? staffNotes.trim() + " \u2014 " : "") + "SMS failed on ready \u2014 resend manually" });
   }
   return { success: true };
 });
-var collectPreorder = (0, import_https9.onCall)({ cors: true }, async (request) => {
+var collectPreorder = (0, import_https10.onCall)({ cors: true }, async (request) => {
   const token = request.auth?.token ?? {};
   if (!request.auth || !isStaffToken(token)) {
-    throw new import_https9.HttpsError("permission-denied", "Staff access required");
+    throw new import_https10.HttpsError("permission-denied", "Staff access required");
   }
   const { preorderId } = request.data;
-  if (!preorderId?.trim()) throw new import_https9.HttpsError("invalid-argument", "preorderId is required");
-  const db = (0, import_firestore12.getFirestore)();
+  if (!preorderId?.trim()) throw new import_https10.HttpsError("invalid-argument", "preorderId is required");
+  const db = (0, import_firestore13.getFirestore)();
   const preorderRef = db.collection("preorders").doc(preorderId.trim());
   const snap = await preorderRef.get();
-  if (!snap.exists) throw new import_https9.HttpsError("not-found", "Pre-order not found");
+  if (!snap.exists) throw new import_https10.HttpsError("not-found", "Pre-order not found");
   const data = snap.data();
   if (data["status"] !== "ready") {
-    throw new import_https9.HttpsError("failed-precondition", "Only ready pre-orders can be marked collected");
+    throw new import_https10.HttpsError("failed-precondition", "Only ready pre-orders can be marked collected");
   }
-  const now = import_firestore12.FieldValue.serverTimestamp();
+  const now = import_firestore13.FieldValue.serverTimestamp();
   await preorderRef.update({ status: "collected", updatedAt: now });
   await db.collection("auditLogs").add({
     eventType: "preorder_collected",
@@ -305328,26 +305527,26 @@ var collectPreorder = (0, import_https9.onCall)({ cors: true }, async (request) 
   });
   return { success: true };
 });
-var cancelPreorder = (0, import_https9.onCall)({ cors: true }, async (request) => {
-  if (!request.auth) throw new import_https9.HttpsError("unauthenticated", "Sign in to cancel");
+var cancelPreorder = (0, import_https10.onCall)({ cors: true }, async (request) => {
+  if (!request.auth) throw new import_https10.HttpsError("unauthenticated", "Sign in to cancel");
   const { preorderId } = request.data;
-  if (!preorderId?.trim()) throw new import_https9.HttpsError("invalid-argument", "preorderId is required");
-  const db = (0, import_firestore12.getFirestore)();
+  if (!preorderId?.trim()) throw new import_https10.HttpsError("invalid-argument", "preorderId is required");
+  const db = (0, import_firestore13.getFirestore)();
   const uid = request.auth.uid;
   const token = request.auth.token ?? {};
   const preorderRef = db.collection("preorders").doc(preorderId.trim());
   const snap = await preorderRef.get();
-  if (!snap.exists) throw new import_https9.HttpsError("not-found", "Pre-order not found");
+  if (!snap.exists) throw new import_https10.HttpsError("not-found", "Pre-order not found");
   const data = snap.data();
   const isOwner = data["uid"] === uid;
   if (!isOwner && !isStaffToken(token)) {
-    throw new import_https9.HttpsError("permission-denied", "You can only cancel your own pre-orders");
+    throw new import_https10.HttpsError("permission-denied", "You can only cancel your own pre-orders");
   }
   const terminalStatuses = ["collected", "cancelled"];
   if (terminalStatuses.includes(String(data["status"]))) {
-    throw new import_https9.HttpsError("failed-precondition", "This pre-order cannot be cancelled");
+    throw new import_https10.HttpsError("failed-precondition", "This pre-order cannot be cancelled");
   }
-  const now = import_firestore12.FieldValue.serverTimestamp();
+  const now = import_firestore13.FieldValue.serverTimestamp();
   await preorderRef.update({ status: "cancelled", updatedAt: now });
   await db.collection("auditLogs").add({
     eventType: "preorder_cancelled",
@@ -305360,11 +305559,11 @@ var cancelPreorder = (0, import_https9.onCall)({ cors: true }, async (request) =
 });
 
 // src/campaigns.ts
-var import_scheduler4 = require("firebase-functions/v2/scheduler");
-var import_firestore13 = require("firebase-admin/firestore");
-var activateCampaigns = (0, import_scheduler4.onSchedule)("every 5 minutes", async () => {
-  const db = (0, import_firestore13.getFirestore)();
-  const now = import_firestore13.Timestamp.now();
+var import_scheduler5 = require("firebase-functions/v2/scheduler");
+var import_firestore14 = require("firebase-admin/firestore");
+var activateCampaigns = (0, import_scheduler5.onSchedule)("every 5 minutes", async () => {
+  const db = (0, import_firestore14.getFirestore)();
+  const now = import_firestore14.Timestamp.now();
   const snap = await db.collection("campaigns").where("active", "==", false).where("endDate", ">=", now).get();
   const toActivate = snap.docs.filter((d) => {
     const startDate = d.data()["startDate"];
@@ -305373,54 +305572,54 @@ var activateCampaigns = (0, import_scheduler4.onSchedule)("every 5 minutes", asy
   if (toActivate.length === 0) return;
   const batch = db.batch();
   for (const d of toActivate) {
-    batch.update(d.ref, { active: true, updatedAt: import_firestore13.FieldValue.serverTimestamp() });
+    batch.update(d.ref, { active: true, updatedAt: import_firestore14.FieldValue.serverTimestamp() });
     const auditRef = db.collection("auditLogs").doc();
     batch.set(auditRef, {
       eventType: "campaign_activated",
       uid: "system",
       targetId: d.id,
       details: { campaignId: d.id, viewTag: String(d.data()["viewTag"] ?? "") },
-      createdAt: import_firestore13.FieldValue.serverTimestamp()
+      createdAt: import_firestore14.FieldValue.serverTimestamp()
     });
   }
   await batch.commit();
 });
-var deactivateCampaigns = (0, import_scheduler4.onSchedule)("every 5 minutes", async () => {
-  const db = (0, import_firestore13.getFirestore)();
-  const now = import_firestore13.Timestamp.now();
+var deactivateCampaigns = (0, import_scheduler5.onSchedule)("every 5 minutes", async () => {
+  const db = (0, import_firestore14.getFirestore)();
+  const now = import_firestore14.Timestamp.now();
   const snap = await db.collection("campaigns").where("active", "==", true).where("endDate", "<", now).get();
   if (snap.empty) return;
   const batch = db.batch();
   for (const d of snap.docs) {
-    batch.update(d.ref, { active: false, updatedAt: import_firestore13.FieldValue.serverTimestamp() });
+    batch.update(d.ref, { active: false, updatedAt: import_firestore14.FieldValue.serverTimestamp() });
     const auditRef = db.collection("auditLogs").doc();
     batch.set(auditRef, {
       eventType: "campaign_deactivated",
       uid: "system",
       targetId: d.id,
       details: { campaignId: d.id, viewTag: String(d.data()["viewTag"] ?? "") },
-      createdAt: import_firestore13.FieldValue.serverTimestamp()
+      createdAt: import_firestore14.FieldValue.serverTimestamp()
     });
   }
   await batch.commit();
 });
 
 // src/disputes.ts
-var import_https10 = require("firebase-functions/v2/https");
-var import_firestore14 = require("firebase-admin/firestore");
+var import_https11 = require("firebase-functions/v2/https");
+var import_firestore15 = require("firebase-admin/firestore");
 var import_authHelpers3 = __toESM(require_authHelpers());
-var resolveDispute = (0, import_https10.onCall)({ cors: true }, async (request) => {
+var resolveDispute = (0, import_https11.onCall)({ cors: true }, async (request) => {
   if (!request.auth || !(request.auth.token["admin"] || request.auth.token["manager"] || request.auth.token["inventory_staff"])) {
-    throw new import_https10.HttpsError("permission-denied", "Staff role required");
+    throw new import_https11.HttpsError("permission-denied", "Staff role required");
   }
   await (0, import_authHelpers3.assertMfaEnrolled)(request);
   const { disputeId, status, refundAmount, refundMethod, staffNotes, restockItem } = request.data;
-  if (!disputeId) throw new import_https10.HttpsError("invalid-argument", "disputeId is required");
-  const db = (0, import_firestore14.getFirestore)();
+  if (!disputeId) throw new import_https11.HttpsError("invalid-argument", "disputeId is required");
+  const db = (0, import_firestore15.getFirestore)();
   const disputeRef = db.collection("disputes").doc(disputeId);
   const disputeSnap = await disputeRef.get();
   if (!disputeSnap.exists) {
-    throw new import_https10.HttpsError("not-found", "Dispute not found");
+    throw new import_https11.HttpsError("not-found", "Dispute not found");
   }
   const dispute = disputeSnap.data();
   const itemId = dispute["itemId"];
@@ -305430,8 +305629,8 @@ var resolveDispute = (0, import_https10.onCall)({ cors: true }, async (request) 
       refundAmount: refundAmount ?? null,
       refundMethod: refundMethod ?? null,
       staffNotes: staffNotes ?? null,
-      resolvedAt: import_firestore14.FieldValue.serverTimestamp(),
-      updatedAt: import_firestore14.FieldValue.serverTimestamp()
+      resolvedAt: import_firestore15.FieldValue.serverTimestamp(),
+      updatedAt: import_firestore15.FieldValue.serverTimestamp()
     });
     if (restockItem && itemId) {
       const itemRef = db.collection("items").doc(itemId);
@@ -305441,14 +305640,14 @@ var resolveDispute = (0, import_https10.onCall)({ cors: true }, async (request) 
         if (item["policeHold"] !== true) {
           transaction.update(itemRef, {
             status: "active",
-            updatedAt: import_firestore14.FieldValue.serverTimestamp()
+            updatedAt: import_firestore15.FieldValue.serverTimestamp()
           });
           transaction.set(db.collection("auditLogs").doc(), {
             eventType: "item_restocked",
             uid: request.auth.uid,
             targetId: itemId,
             details: { disputeId, previousStatus: item["status"] },
-            createdAt: import_firestore14.FieldValue.serverTimestamp()
+            createdAt: import_firestore15.FieldValue.serverTimestamp()
           });
         }
       }
@@ -305458,23 +305657,23 @@ var resolveDispute = (0, import_https10.onCall)({ cors: true }, async (request) 
       uid: request.auth.uid,
       targetId: disputeId,
       details: { itemId, refundAmount, restockItem },
-      createdAt: import_firestore14.FieldValue.serverTimestamp()
+      createdAt: import_firestore15.FieldValue.serverTimestamp()
     });
   });
   return { success: true };
 });
-var createDispute = (0, import_https10.onCall)({ cors: true }, async (request) => {
+var createDispute = (0, import_https11.onCall)({ cors: true }, async (request) => {
   if (!request.auth) {
-    throw new import_https10.HttpsError("unauthenticated", "Sign in required");
+    throw new import_https11.HttpsError("unauthenticated", "Sign in required");
   }
   const { itemId, type, description } = request.data;
   if (!itemId || !type || !description) {
-    throw new import_https10.HttpsError("invalid-argument", "itemId, type, and description are required");
+    throw new import_https11.HttpsError("invalid-argument", "itemId, type, and description are required");
   }
-  const db = (0, import_firestore14.getFirestore)();
+  const db = (0, import_firestore15.getFirestore)();
   const itemSnap = await db.collection("items").doc(itemId).get();
   if (!itemSnap.exists) {
-    throw new import_https10.HttpsError("not-found", "Item not found");
+    throw new import_https11.HttpsError("not-found", "Item not found");
   }
   const disputeRef = db.collection("disputes").doc();
   const disputeId = disputeRef.id;
@@ -305485,36 +305684,36 @@ var createDispute = (0, import_https10.onCall)({ cors: true }, async (request) =
       type,
       status: "open",
       description,
-      createdAt: import_firestore14.FieldValue.serverTimestamp(),
-      updatedAt: import_firestore14.FieldValue.serverTimestamp()
+      createdAt: import_firestore15.FieldValue.serverTimestamp(),
+      updatedAt: import_firestore15.FieldValue.serverTimestamp()
     });
     transaction.set(db.collection("auditLogs").doc(), {
       eventType: "dispute_created",
       uid: request.auth.uid,
       targetId: disputeId,
       details: { itemId, type },
-      createdAt: import_firestore14.FieldValue.serverTimestamp()
+      createdAt: import_firestore15.FieldValue.serverTimestamp()
     });
   });
   return { disputeId, success: true };
 });
 
 // src/articles.ts
-var import_https11 = require("firebase-functions/v2/https");
-var import_firestore15 = require("firebase-admin/firestore");
+var import_https12 = require("firebase-functions/v2/https");
+var import_firestore16 = require("firebase-admin/firestore");
 var import_authHelpers4 = __toESM(require_authHelpers());
-var createArticle = (0, import_https11.onCall)({ cors: true }, async (request) => {
-  const db = (0, import_firestore15.getFirestore)();
+var createArticle = (0, import_https12.onCall)({ cors: true }, async (request) => {
+  const db = (0, import_firestore16.getFirestore)();
   const { uid } = (0, import_authHelpers4.assertStaff)(request);
   const { title, slug, viewTag } = request.data;
   if (!title || !slug || !viewTag) {
-    throw new import_https11.HttpsError("invalid-argument", "Missing required fields");
+    throw new import_https12.HttpsError("invalid-argument", "Missing required fields");
   }
   const existing = await db.collection("articles").where("slug", "==", slug).get();
   if (!existing.empty) {
-    throw new import_https11.HttpsError("already-exists", "Slug already in use");
+    throw new import_https12.HttpsError("already-exists", "Slug already in use");
   }
-  const now = import_firestore15.FieldValue.serverTimestamp();
+  const now = import_firestore16.FieldValue.serverTimestamp();
   const ref = await db.collection("articles").add({
     title,
     slug,
@@ -305532,76 +305731,76 @@ var createArticle = (0, import_https11.onCall)({ cors: true }, async (request) =
   });
   return { success: true, articleId: ref.id };
 });
-var publishArticle = (0, import_https11.onCall)({ cors: true }, async (request) => {
-  const db = (0, import_firestore15.getFirestore)();
+var publishArticle = (0, import_https12.onCall)({ cors: true }, async (request) => {
+  const db = (0, import_firestore16.getFirestore)();
   const { uid } = (0, import_authHelpers4.assertStaff)(request);
   const { articleId } = request.data;
   const articleRef = db.collection("articles").doc(articleId);
   const snap = await articleRef.get();
   if (!snap.exists) {
-    throw new import_https11.HttpsError("not-found", "Article not found");
+    throw new import_https12.HttpsError("not-found", "Article not found");
   }
   const article = snap.data();
   if (String(article["body"] ?? "").includes("[mohawk]") && !article["indigenousLanguageReviewed"]) {
-    throw new import_https11.HttpsError("failed-precondition", "Indigenous language review required before publishing content with [mohawk] tags.");
+    throw new import_https12.HttpsError("failed-precondition", "Indigenous language review required before publishing content with [mohawk] tags.");
   }
   await articleRef.update({
     status: "published",
-    publishedAt: import_firestore15.FieldValue.serverTimestamp(),
-    updatedAt: import_firestore15.FieldValue.serverTimestamp()
+    publishedAt: import_firestore16.FieldValue.serverTimestamp(),
+    updatedAt: import_firestore16.FieldValue.serverTimestamp()
   });
   await db.collection("auditLogs").add({
     eventType: "article_published",
     uid,
     targetId: articleId,
     details: { slug: article["slug"], viewTag: article["viewTag"] },
-    createdAt: import_firestore15.FieldValue.serverTimestamp()
+    createdAt: import_firestore16.FieldValue.serverTimestamp()
   });
   return { success: true };
 });
 
 // src/faqs.ts
-var import_https12 = require("firebase-functions/v2/https");
-var import_firestore16 = require("firebase-admin/firestore");
+var import_https13 = require("firebase-functions/v2/https");
+var import_firestore17 = require("firebase-admin/firestore");
 var import_authHelpers5 = __toESM(require_authHelpers());
-var logFaqAction = (0, import_https12.onCall)({ cors: true }, async (request) => {
-  const db = (0, import_firestore16.getFirestore)();
+var logFaqAction = (0, import_https13.onCall)({ cors: true }, async (request) => {
+  const db = (0, import_firestore17.getFirestore)();
   const { uid } = (0, import_authHelpers5.assertStaff)(request);
   const { action, faqId, details } = request.data;
   if (!action || !faqId) {
-    throw new import_https12.HttpsError("invalid-argument", "Missing required fields");
+    throw new import_https13.HttpsError("invalid-argument", "Missing required fields");
   }
   await db.collection("auditLogs").add({
     eventType: action,
     uid,
     targetId: faqId,
     details: details || {},
-    createdAt: import_firestore16.FieldValue.serverTimestamp()
+    createdAt: import_firestore17.FieldValue.serverTimestamp()
   });
   return { success: true };
 });
 
 // src/scheduling.ts
-var import_https13 = require("firebase-functions/v2/https");
-var import_firestore17 = require("firebase-admin/firestore");
+var import_https14 = require("firebase-functions/v2/https");
+var import_firestore18 = require("firebase-admin/firestore");
 function isManagerOrAdmin(token) {
   return token["admin"] === true || token["manager"] === true;
 }
-var createShift = (0, import_https13.onCall)({ cors: true }, async (request) => {
+var createShift = (0, import_https14.onCall)({ cors: true }, async (request) => {
   const token = request.auth?.token;
   if (!request.auth || !token || !isManagerOrAdmin(token)) {
-    throw new import_https13.HttpsError("permission-denied", "Manager or Admin role required");
+    throw new import_https14.HttpsError("permission-denied", "Manager or Admin role required");
   }
   const { staffUid, startTime, endTime, viewTag, notes } = request.data;
   if (!staffUid || !startTime || !endTime || !viewTag) {
-    throw new import_https13.HttpsError("invalid-argument", "Missing required fields");
+    throw new import_https14.HttpsError("invalid-argument", "Missing required fields");
   }
-  const db = (0, import_firestore17.getFirestore)();
-  const now = import_firestore17.FieldValue.serverTimestamp();
+  const db = (0, import_firestore18.getFirestore)();
+  const now = import_firestore18.FieldValue.serverTimestamp();
   const ref = await db.collection("shifts").add({
     staffUid,
-    startTime: import_firestore17.Timestamp.fromDate(new Date(startTime)),
-    endTime: import_firestore17.Timestamp.fromDate(new Date(endTime)),
+    startTime: import_firestore18.Timestamp.fromDate(new Date(startTime)),
+    endTime: import_firestore18.Timestamp.fromDate(new Date(endTime)),
     viewTag,
     notes: notes || "",
     createdBy: request.auth.uid,
@@ -305617,20 +305816,20 @@ var createShift = (0, import_https13.onCall)({ cors: true }, async (request) => 
   });
   return { success: true, shiftId: ref.id };
 });
-var updateShift = (0, import_https13.onCall)({ cors: true }, async (request) => {
+var updateShift = (0, import_https14.onCall)({ cors: true }, async (request) => {
   const token = request.auth?.token;
   if (!request.auth || !token || !isManagerOrAdmin(token)) {
-    throw new import_https13.HttpsError("permission-denied", "Manager or Admin role required");
+    throw new import_https14.HttpsError("permission-denied", "Manager or Admin role required");
   }
   const { shiftId, ...updates } = request.data;
-  if (!shiftId) throw new import_https13.HttpsError("invalid-argument", "shiftId is required");
-  const db = (0, import_firestore17.getFirestore)();
+  if (!shiftId) throw new import_https14.HttpsError("invalid-argument", "shiftId is required");
+  const db = (0, import_firestore18.getFirestore)();
   const shiftRef = db.collection("shifts").doc(shiftId);
   const payload = {
-    updatedAt: import_firestore17.FieldValue.serverTimestamp()
+    updatedAt: import_firestore18.FieldValue.serverTimestamp()
   };
-  if (updates.startTime) payload.startTime = import_firestore17.Timestamp.fromDate(new Date(updates.startTime));
-  if (updates.endTime) payload.endTime = import_firestore17.Timestamp.fromDate(new Date(updates.endTime));
+  if (updates.startTime) payload.startTime = import_firestore18.Timestamp.fromDate(new Date(updates.startTime));
+  if (updates.endTime) payload.endTime = import_firestore18.Timestamp.fromDate(new Date(updates.endTime));
   if (updates.viewTag) payload.viewTag = updates.viewTag;
   if (updates.notes !== void 0) payload.notes = updates.notes;
   if (updates.staffUid) payload.staffUid = updates.staffUid;
@@ -305640,35 +305839,35 @@ var updateShift = (0, import_https13.onCall)({ cors: true }, async (request) => 
     uid: request.auth.uid,
     targetId: shiftId,
     details: { updatedFields: Object.keys(updates) },
-    createdAt: import_firestore17.FieldValue.serverTimestamp()
+    createdAt: import_firestore18.FieldValue.serverTimestamp()
   });
   return { success: true };
 });
-var deleteShift = (0, import_https13.onCall)({ cors: true }, async (request) => {
+var deleteShift = (0, import_https14.onCall)({ cors: true }, async (request) => {
   const token = request.auth?.token;
   if (!request.auth || !token || !isManagerOrAdmin(token)) {
-    throw new import_https13.HttpsError("permission-denied", "Manager or Admin role required");
+    throw new import_https14.HttpsError("permission-denied", "Manager or Admin role required");
   }
   const { shiftId } = request.data;
-  if (!shiftId) throw new import_https13.HttpsError("invalid-argument", "shiftId is required");
-  const db = (0, import_firestore17.getFirestore)();
+  if (!shiftId) throw new import_https14.HttpsError("invalid-argument", "shiftId is required");
+  const db = (0, import_firestore18.getFirestore)();
   await db.collection("shifts").doc(shiftId).delete();
   await db.collection("auditLogs").add({
     eventType: "shift_deleted",
     uid: request.auth.uid,
     targetId: shiftId,
     details: {},
-    createdAt: import_firestore17.FieldValue.serverTimestamp()
+    createdAt: import_firestore18.FieldValue.serverTimestamp()
   });
   return { success: true };
 });
 
 // src/notifications.ts
-var import_scheduler5 = require("firebase-functions/v2/scheduler");
-var import_firestore18 = require("firebase-admin/firestore");
-var import_sms4 = __toESM(require_sms());
+var import_scheduler6 = require("firebase-functions/v2/scheduler");
+var import_firestore19 = require("firebase-admin/firestore");
+var import_sms5 = __toESM(require_sms());
 var import_email = __toESM(require_email());
-var import_secrets7 = __toESM(require_secrets());
+var import_secrets8 = __toESM(require_secrets());
 function pickupWindowStartsInRange(pickupWindow, from, to) {
   const match = pickupWindow.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})/);
   if (!match) return false;
@@ -305730,8 +305929,8 @@ function buildDigestHtml(items) {
 </body>
 </html>`;
 }
-var sendSeasonalReminders = (0, import_scheduler5.onSchedule)({ schedule: "0 * * * *", secrets: [import_secrets7.twilioAccountSid, import_secrets7.twilioAuthToken] }, async () => {
-  const db = (0, import_firestore18.getFirestore)();
+var sendSeasonalReminders = (0, import_scheduler6.onSchedule)({ schedule: "0 * * * *", secrets: [import_secrets8.twilioAccountSid, import_secrets8.twilioAuthToken] }, async () => {
+  const db = (0, import_firestore19.getFirestore)();
   const campaignSnap = await db.collection("campaigns").where("active", "==", true).get();
   const eligible = campaignSnap.docs.filter((d) => {
     const data = d.data();
@@ -305751,24 +305950,24 @@ var sendSeasonalReminders = (0, import_scheduler5.onSchedule)({ schedule: "0 * *
     let successCount = 0;
     for (const user of phoneRecipients) {
       try {
-        const sent = await (0, import_sms4.dispatchSms)(String(user.data()["phoneNumber"]), smsBody);
+        const sent = await (0, import_sms5.dispatchSms)(String(user.data()["phoneNumber"]), smsBody);
         if (sent) successCount++;
       } catch (err) {
         console.error(`[sendSeasonalReminders] SMS failed for user ${user.id}:`, err.message);
       }
     }
-    await campaign.ref.update({ reminderSentAt: import_firestore18.FieldValue.serverTimestamp() });
+    await campaign.ref.update({ reminderSentAt: import_firestore19.FieldValue.serverTimestamp() });
     await db.collection("auditLogs").add({
       eventType: "seasonal_reminder_sent",
       uid: "system",
       targetId: campaign.id,
       details: { campaignId: campaign.id, viewTag, recipientCount: successCount },
-      createdAt: import_firestore18.FieldValue.serverTimestamp()
+      createdAt: import_firestore19.FieldValue.serverTimestamp()
     });
   }
 });
-var sendPickupReminders = (0, import_scheduler5.onSchedule)({ schedule: "0 * * * *", secrets: [import_secrets7.twilioAccountSid, import_secrets7.twilioAuthToken] }, async () => {
-  const db = (0, import_firestore18.getFirestore)();
+var sendPickupReminders = (0, import_scheduler6.onSchedule)({ schedule: "0 * * * *", secrets: [import_secrets8.twilioAccountSid, import_secrets8.twilioAuthToken] }, async () => {
+  const db = (0, import_firestore19.getFirestore)();
   const now = /* @__PURE__ */ new Date();
   const from = new Date(now.getTime() + 20 * 60 * 60 * 1e3);
   const to = new Date(now.getTime() + 28 * 60 * 60 * 1e3);
@@ -305787,15 +305986,15 @@ var sendPickupReminders = (0, import_scheduler5.onSchedule)({ schedule: "0 * * *
     }
     const body = `The Pawn Shop \u2014 reminder: your pickup is tomorrow. Window: ${pickupWindow}. We look forward to seeing you.`;
     try {
-      const sent = await (0, import_sms4.dispatchSms)(phone, body);
+      const sent = await (0, import_sms5.dispatchSms)(phone, body);
       if (sent) {
-        await doc.ref.update({ pickupReminderSentAt: import_firestore18.Timestamp.now() });
+        await doc.ref.update({ pickupReminderSentAt: import_firestore19.Timestamp.now() });
         await db.collection("auditLogs").add({
           eventType: "pickup_reminder_sent",
           uid: "system",
           targetId: doc.id,
           details: { reservationId: doc.id, viewTag: String(data["viewTag"] ?? "") },
-          createdAt: import_firestore18.FieldValue.serverTimestamp()
+          createdAt: import_firestore19.FieldValue.serverTimestamp()
         });
       }
     } catch (err) {
@@ -305817,15 +306016,15 @@ var sendPickupReminders = (0, import_scheduler5.onSchedule)({ schedule: "0 * * *
     }
     const body = `The Pawn Shop \u2014 reminder: your pickup is tomorrow. Window: ${pickupWindow}. We look forward to seeing you.`;
     try {
-      const sent = await (0, import_sms4.dispatchSms)(phone, body);
+      const sent = await (0, import_sms5.dispatchSms)(phone, body);
       if (sent) {
-        await doc.ref.update({ pickupReminderSentAt: import_firestore18.Timestamp.now() });
+        await doc.ref.update({ pickupReminderSentAt: import_firestore19.Timestamp.now() });
         await db.collection("auditLogs").add({
           eventType: "pickup_reminder_sent",
           uid: "system",
           targetId: doc.id,
           details: { preorderId: doc.id, viewTag: String(data["viewTag"] ?? "") },
-          createdAt: import_firestore18.FieldValue.serverTimestamp()
+          createdAt: import_firestore19.FieldValue.serverTimestamp()
         });
       }
     } catch (err) {
@@ -305833,9 +306032,9 @@ var sendPickupReminders = (0, import_scheduler5.onSchedule)({ schedule: "0 * * *
     }
   }
 });
-var sendWeeklyDigest = (0, import_scheduler5.onSchedule)({ schedule: "0 14 * * 1", secrets: [import_secrets7.sendgridApiKey] }, async () => {
-  const db = (0, import_firestore18.getFirestore)();
-  const siteUrlStr = import_secrets7.siteUrl.value() || "https://thepawnshop.ca";
+var sendWeeklyDigest = (0, import_scheduler6.onSchedule)({ schedule: "0 14 * * 1", secrets: [import_secrets8.sendgridApiKey] }, async () => {
+  const db = (0, import_firestore19.getFirestore)();
+  const siteUrlStr = import_secrets8.siteUrl.value() || "https://thepawnshop.ca";
   const itemSnap = await db.collection("items").where("status", "==", "active").orderBy("trendingScore", "desc").limit(20).get();
   const digestItems = itemSnap.docs.filter((d) => {
     const data = d.data();
@@ -305873,57 +306072,57 @@ var sendWeeklyDigest = (0, import_scheduler5.onSchedule)({ schedule: "0 14 * * 1
     eventType: "weekly_digest_sent",
     uid: "system",
     details: { viewTag: "all", recipientCount: successCount },
-    createdAt: import_firestore18.FieldValue.serverTimestamp()
+    createdAt: import_firestore19.FieldValue.serverTimestamp()
   });
 });
 
 // src/social.ts
-var import_https14 = require("firebase-functions/v2/https");
-var import_firestore19 = require("firebase-admin/firestore");
+var import_https15 = require("firebase-functions/v2/https");
+var import_firestore20 = require("firebase-admin/firestore");
 var import_authHelpers6 = __toESM(require_authHelpers());
-var approveAndSchedulePost = (0, import_https14.onCall)({ cors: true }, async (request) => {
+var approveAndSchedulePost = (0, import_https15.onCall)({ cors: true }, async (request) => {
   if (!request.auth) {
-    throw new import_https14.HttpsError("unauthenticated", "Sign in required");
+    throw new import_https15.HttpsError("unauthenticated", "Sign in required");
   }
   const token = request.auth.token;
   const isAdminOrManager = token["admin"] === true || token["manager"] === true;
   if (!isAdminOrManager) {
-    throw new import_https14.HttpsError("permission-denied", "Admin or Manager role required to approve social media posts.");
+    throw new import_https15.HttpsError("permission-denied", "Admin or Manager role required to approve social media posts.");
   }
   (0, import_authHelpers6.assertMfaEnrolled)(request);
   const { postId } = request.data;
   if (!postId) {
-    throw new import_https14.HttpsError("invalid-argument", "Post ID is required");
+    throw new import_https15.HttpsError("invalid-argument", "Post ID is required");
   }
-  const db = (0, import_firestore19.getFirestore)();
+  const db = (0, import_firestore20.getFirestore)();
   const postRef = db.collection("socialPosts").doc(postId);
   try {
     const postSnap = await postRef.get();
     if (!postSnap.exists) {
-      throw new import_https14.HttpsError("not-found", "Post not found");
+      throw new import_https15.HttpsError("not-found", "Post not found");
     }
     const postData = postSnap.data();
     if (postData?.status !== "pending_review") {
-      throw new import_https14.HttpsError("failed-precondition", "Post must be in pending_review status to be approved.");
+      throw new import_https15.HttpsError("failed-precondition", "Post must be in pending_review status to be approved.");
     }
     const dummyApiResponseId = `mock_ayrshare_${Date.now()}`;
     await postRef.update({
       status: "approved",
       reviewerUid: request.auth.uid,
       apiResponseId: dummyApiResponseId,
-      updatedAt: import_firestore19.FieldValue.serverTimestamp()
+      updatedAt: import_firestore20.FieldValue.serverTimestamp()
     });
     await db.collection("auditLogs").add({
       eventType: "social_post_approved",
       uid: request.auth.uid,
       targetId: postId,
       details: { platforms: postData?.platforms },
-      createdAt: import_firestore19.FieldValue.serverTimestamp()
+      createdAt: import_firestore20.FieldValue.serverTimestamp()
     });
     return { success: true, apiResponseId: dummyApiResponseId };
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Failed to approve and schedule post";
-    throw new import_https14.HttpsError("internal", msg);
+    throw new import_https15.HttpsError("internal", msg);
   }
 });
 
@@ -305944,12 +306143,14 @@ var approveAndSchedulePost = (0, import_https14.onCall)({ cors: true }, async (r
   assignVipStatus,
   backupFirestoreDaily,
   cancelPreorder,
+  checkLoanDueDates,
   collectPreorder,
   completeReservation,
   confirmPreorder,
   confirmReservation,
   createArticle,
   createDispute,
+  createLoanTicket,
   createPreorder,
   createReservation,
   createShift,
@@ -305962,12 +306163,15 @@ var approveAndSchedulePost = (0, import_https14.onCall)({ cors: true }, async (r
   logAgeGate,
   logFaqAction,
   markPreorderReady,
+  processExtension,
   publishArticle,
   purgeExpiredData,
   recordLogin,
   recordLogout,
   recordMfaEnrolled,
+  redeemLoanTicket,
   removeSerialFromBlacklist,
+  requestExtension,
   resolveDispute,
   sendContactEmail,
   sendPickupReminders,

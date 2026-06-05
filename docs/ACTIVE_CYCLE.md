@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure `vite.config.ts` and `src/setupTests.ts`, implement initial unit tests for core utilities and compliance logic.
+E31 · Pawn Loan Management Portal — Portal allowing customers to view active pawn loan tickets, track due dates, and request extensions. (COMPLETED)
 
 ---
 

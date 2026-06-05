@@ -796,6 +796,18 @@
 - [ ] Investigate and configure Firebase v2 minimum instances to reduce Cloud Function cold starts for AI endpoints
 - [ ] Implement predictive prefetching for React Router links on hover for perceived instant loading
 
+### E78 · AI Pipeline Precision & Reliability
+
+> **Persona Gate — E78:**
+> - **Staff:** Eliminates intake parsing crashes and provides real-time, non-hallucinated eBay market pricing for accurate pawn loans.
+> - **Jordan (Operations):** Lowers cloud expenditure by downgrading lightweight tasks to `flash-8b` and utilizes strict `responseSchema` for API predictability.
+
+- [ ] Refactor `@google/generative-ai` calls to use native `responseSchema` for structured JSON.
+- [ ] Integrate `ebay.ts` Search API into `suggestAiPrice` to provide real market comps.
+- [ ] Inject Storage image buffers into `generateAIDescription` for multimodal context.
+- [ ] Implement fuzzy string matching for the Cannabis strain extraction step.
+- [ ] Optimize model selection to use `gemini-1.5-flash-8b` for simple text tasks.
+
 ### E37 · Vite SSR (Lighthouse Performance ≥0.90)
 
 > **Persona Gate — E37:**
@@ -843,16 +855,16 @@
 > - **Makoonsii (Trust Test):** Loan form and ticket viewer must be completable one-handed in portrait mode. 48 px touch targets throughout. Plain language copy — no financial jargon.
 > - **Compliance:** Audit log entry required on every loan status change (`loan_ticket_created`, `extension_requested`, `extension_approved`, `extension_declined`, `loan_forfeited`, `loan_redeemed`). All status changes via Cloud Function Admin SDK — no client writes to `loanTickets`.
 
-- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `loanTickets/{id}` collection (`uid`, `pawnRequestId`, `itemDescription`, `loanAmount`, `interestRate`, `periodDays`, `dueDate`, `status`, `extensionCount`, `staffNotes`, timestamps). Add `pawnLoanId` link to `pawnRequests/{id}`. Log all in `DECISIONS.md`. `[Comp]`
-- [ ] Update Firestore rules: customer read own tickets (`isOwner`), staff read/write all, public blocked `[Comp]`
-- [ ] Create `functions/src/loanTickets.ts`: `createLoanTicket` (staff-only), `requestExtension` (customer — `isOwner`), `processExtension` (staff-only), `checkLoanDueDates` scheduled CF (daily — 48 h forfeit alert + SMS, CASL-gated) `[Mak]` `[Dale]` `[Comp]`
-- [ ] Add `auditLogs` event types for all loan lifecycle events `[Comp]`
-- [ ] Create `src/pages/LoanTicketsPage.tsx` — customer-facing ticket list, route `/pawn/my-loans` (auth-gated) `[Mak]` `[Dale]`
-- [ ] Create `src/components/pawn/LoanTicketCard.tsx` — loan summary card (reuses `Card`, `Badge` from `src/components/ui/`) `[Mak]`
-- [ ] Create `src/components/pawn/ExtensionRequestModal.tsx` — extension request confirmation (reuses `Modal`) `[Mak]`
-- [ ] Add loan ticket list to `/admin` — staff view of all active tickets by status/due date (reuses `Table`) `[Staff]`
-- [ ] Add `/pawn/my-loans` link to `NavigationDrawer` (authenticated users only) `[All]`
-- [ ] Export new CFs from `functions/src/index.ts` `[Staff]`
+- [x] **Schema first:** Update `docs/firestore-schema.md` — add `loanTickets/{id}` collection (`uid`, `pawnRequestId`, `itemDescription`, `loanAmount`, `interestRate`, `periodDays`, `dueDate`, `status`, `extensionCount`, `staffNotes`, timestamps). Add `pawnLoanId` link to `pawnRequests/{id}`. Log all in `DECISIONS.md`. `[Comp]`
+- [x] Update Firestore rules: customer read own tickets (`isOwner`), staff read/write all, public blocked `[Comp]`
+- [x] Create `functions/src/loanTickets.ts`: `createLoanTicket` (staff-only), `requestExtension` (customer — `isOwner`), `processExtension` (staff-only), `checkLoanDueDates` scheduled CF (daily — 48 h forfeit alert + SMS, CASL-gated) `[Mak]` `[Dale]` `[Comp]`
+- [x] Add `auditLogs` event types for all loan lifecycle events `[Comp]`
+- [x] Create `src/pages/LoanTicketsPage.tsx` — customer-facing ticket list, route `/pawn/my-loans` (auth-gated) `[Mak]` `[Dale]`
+- [x] Create `src/components/pawn/LoanTicketCard.tsx` — loan summary card (reuses `Card`, `Badge` from `src/components/ui/`) `[Mak]`
+- [x] Create `src/components/pawn/ExtensionRequestModal.tsx` — extension request confirmation (reuses `Modal`) `[Mak]`
+- [x] Add loan ticket list to `/admin` — staff view of all active tickets by status/due date (reuses `Table`) `[Staff]`
+- [x] Add `/pawn/my-loans` link to `NavigationDrawer` (authenticated users only) `[All]`
+- [x] Export new CFs from `functions/src/index.ts` `[Staff]`
 
 ---
 

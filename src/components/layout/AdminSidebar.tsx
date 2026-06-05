@@ -13,6 +13,7 @@ const GROUPS = [
     label: 'Customer',
     items: [
       { to: '/admin/pawn-inbox', label: 'Pawn Inbox', icon: '📥' },
+      { to: '/admin/loans', label: 'Loans', icon: '💸' },
       { to: '/admin/reservations', label: 'Reservations', icon: '📅' },
       { to: '/admin/preorders', label: 'Preorders', icon: '📦' },
       { to: '/admin/disputes', label: 'Disputes', icon: '⚠️' },

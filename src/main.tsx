@@ -41,6 +41,7 @@ const router = createBrowserRouter([
       { index: true, lazy: () => import('./pages/HomePage.tsx').then(m => ({ Component: m.default })) },
       { path: 'pawn',      lazy: () => import('./pages/PawnPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'pawn/sell', lazy: () => import('./pages/pawn/SellPage.tsx').then(m => ({ Component: m.default })) },
+      { path: 'pawn/my-loans', lazy: () => import('./pages/LoanTicketsPage.tsx').then(m => ({ Component: m.default })) },
       {
         path: 'cannabis',
         lazy: async () => {
@@ -99,6 +100,7 @@ const router = createBrowserRouter([
         { path: 'intake/edit/:id',   lazy: () => import('./pages/admin/IntakePage.tsx').then(m => ({ Component: m.default })) },
         { path: 'inventory',         lazy: () => import('./pages/admin/InventoryPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'pawn-inbox',        lazy: () => import('./pages/admin/PawnInboxPage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'loans',             lazy: () => import('./pages/admin/LoanTicketsAdminPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'reservations',      lazy: () => import('./pages/admin/ReservationsPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'store-hours',       lazy: () => import('./pages/admin/StoreHoursPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'serial-blacklist',  lazy: () => import('./pages/admin/SerialBlacklistPage.tsx').then(m => ({ Component: m.default })) },
