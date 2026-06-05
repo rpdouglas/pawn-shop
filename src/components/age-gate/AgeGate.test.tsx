@@ -5,7 +5,7 @@ import AgeGate from './AgeGate'
 
 // Mock firebase functions and analytics
 vi.mock('firebase/functions', () => ({
-  httpsCallable: vi.fn(() => vi.fn())
+  httpsCallable: vi.fn(() => vi.fn(() => Promise.resolve({ data: { success: true } })))
 }))
 
 vi.mock('../../lib/firebase-core', () => ({
