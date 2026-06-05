@@ -57,6 +57,7 @@ Do not proceed if any of these would be violated.
 - `aiDescription` is a draft stored in `items/{id}/internal/ai` — never readable by customers.
 - `auditLogs` — no delete, ever. Create-only via Cloud Functions.
 - All AI API keys (Claude, Gemini) go through Cloud Functions. Never on the client.
+- **Strict Git Governance:** NEVER run any git commands (`git add`, `git commit`, `git push`, etc.) on ANY branch without explicit user approval. The user prefers to manage all commits and pushes manually. All subagents must also strictly adhere to this rule.
 
 **Code quality:**
 - No `any` types. Use specific interfaces or `unknown`.

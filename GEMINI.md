@@ -14,6 +14,7 @@ You are operating as an autonomous agent. Do not wait for the user to step you t
    - Age gates at router level (Logged to `auditLogs`).
    - `aiDescription` is NEVER customer-visible.
    - **Strict Firestore Data Handling:** NEVER cast Firestore data using `as any`. When reading `snap.data()`, cast it to `Record<string, unknown>` or use a dedicated type guard.
+   - **Strict Git Governance:** NEVER run any git commands (`git add`, `git commit`, `git push`, etc.) on ANY branch without explicit user approval. The user prefers to manage all commits and pushes manually. Subagents must also strictly adhere to this rule.
 5. **Artifact Output Routing:** Any report, audit, or review generated as a markdown artifact for the user MUST be saved directly into the `docs/reports/` directory.
 
 ## 2. Autonomous Operational Workflow
@@ -40,7 +41,7 @@ When execution is verified, autonomously perform close-out tasks without asking 
 3. Tick off completed tasks in `docs/EPICS.md`.
 4. **Documentation Audit:** Update the `user-guide/` markdown files so that all feature changes are accurately reflected in the customer and staff documentation.
 5. Update `docs/ACTIVE_CYCLE.md` and the epic's project file status.
-Once all docs are synced, present the user with the final, closed PR summary.
+Once all docs are synced, present the user with the final summary. Do NOT commit or push these changes.
 
 ## 3. Domain Extension Guardrails
 When extending the platform to support a new business line (e.g., pawn, cannabis, fireworks, tobacco):
