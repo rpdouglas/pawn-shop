@@ -143,8 +143,13 @@ export default function ImageUploadZone({ itemId, onRequireItemId, onProcessingC
 
         try {
           console.log(`[AI Intake] Calling processUploadedImage for ${storageRef.fullPath}...`)
-          await processUploadedImageFn({ filePath: storageRef.fullPath, extractData, viewTag })
+          const res = await processUploadedImageFn({ filePath: storageRef.fullPath, extractData, viewTag })
           console.log(`[AI Intake] processUploadedImage completed successfully.`)
+          
+          const responseData = res.data as { aiFailed?: boolean; aiError?: string };
+          if (responseData?.aiFailed) {
+            window.alert(`AI Extraction Unavailable: ${responseData.aiError}\n\nThe photo has been saved successfully. Please enter the details manually.`)
+          }
         } catch (err) {
           console.error(`[AI Intake] processUploadedImage failed:`, err)
           setUploads(prev => {

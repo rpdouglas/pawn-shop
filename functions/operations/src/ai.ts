@@ -11,8 +11,8 @@ export const geminiApiKey = defineSecret('GEMINI_API_KEY')
 function getModels() {
   const genAI = new GoogleGenerativeAI(geminiApiKey.value())
   return {
-    model: genAI.getGenerativeModel({ model: 'gemini-pro-latest' }),
-    flashModel: genAI.getGenerativeModel({ model: 'gemini-flash-latest' })
+    model: genAI.getGenerativeModel({ model: 'gemini-3.1-pro' }),
+    flashModel: genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
   }
 }
 
@@ -67,8 +67,8 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
       result = await model.generateContent([systemPrompt, userPrompt])
     } catch (error: unknown) {
       const err = error as { message?: string; status?: number };
-      if (err?.message?.includes('429') || err?.status === 429) {
-        console.warn('Gemini Pro quota exceeded, falling back to Flash model...')
+      if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
+        console.warn('Gemini Pro unavailable (Quota/503), falling back to Flash model...')
         result = await flashModel.generateContent([systemPrompt, userPrompt])
       } else {
         throw err
@@ -150,8 +150,8 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
       result = await model.generateContent([systemPrompt, userPrompt])
     } catch (error: unknown) {
       const err = error as { message?: string; status?: number };
-      if (err?.message?.includes('429') || err?.status === 429) {
-        console.warn('Gemini Pro quota exceeded, falling back to Flash model...')
+      if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
+        console.warn('Gemini Pro unavailable (Quota/503), falling back to Flash model...')
         result = await flashModel.generateContent([systemPrompt, userPrompt])
       } else {
         throw err
@@ -207,8 +207,8 @@ export const suggestAiTags = onCall({ secrets: [geminiApiKey] }, async (request)
       result = await flashModel.generateContent([systemPrompt, userPrompt])
     } catch (error: unknown) {
       const err = error as { message?: string; status?: number };
-      if (err?.message?.includes('429') || err?.status === 429) {
-        console.warn('Gemini Flash quota exceeded, falling back to Pro model...')
+      if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
+        console.warn('Gemini Flash unavailable (Quota/503), falling back to Pro model...')
         result = await model.generateContent([systemPrompt, userPrompt])
       } else {
         throw err
@@ -404,9 +404,14 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
       result = await flashModel.generateContent(promptParts)
     } catch (error: unknown) {
       const err = error as { message?: string; status?: number };
-      if (err?.message?.includes('429') || err?.status === 429) {
-        console.warn('Gemini Flash quota exceeded during intake extraction, falling back to Pro:', err.message)
-        result = await model.generateContent(promptParts)
+      if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
+        console.warn('Gemini Flash unavailable during intake extraction, falling back to Pro:', err.message)
+        try {
+          result = await model.generateContent(promptParts)
+        } catch (proError: unknown) {
+          console.warn('Gemini Pro also failed, gracefully degrading:', proError)
+          return { error: 'Graceful Degradation: AI models unavailable' }
+        }
       } else {
         throw error
       }

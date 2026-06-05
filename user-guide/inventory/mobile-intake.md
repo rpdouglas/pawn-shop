@@ -30,6 +30,8 @@ Once uploaded, your photo is sent to the **3-stage AI processing pipeline**:
    - **Crucial Policy:** To enforce our "Staff-in-the-Loop" standard, the generated description is saved as an *internal draft*. You must review and explicitly **promote** the description to apply it to the live listing.
 4. The wizard **automatically advances** you to Step 2 as soon as the baseline draft data is ready.
 
+> **Note on Reliability:** If the AI services experience high demand or go offline, the image upload will gracefully degrade. You will receive an alert pop-up, the image will still be saved successfully, and you can manually advance and enter details without being blocked.
+
 ---
 
 ## Step 2 — Details

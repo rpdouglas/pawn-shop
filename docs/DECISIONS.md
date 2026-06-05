@@ -388,3 +388,5 @@ YYYY-MM-DD — Decision. Brief reason.
 2026-06-04 — E72 Phase 3: Tested TanStack query hooks (`useItems`, `useStaffMembers`) using `renderHook` and `QueryClientProvider` to ensure proper React Query cache handling.
 
 2026-06-05 — Security: Temporarily disabled Firebase AppCheck initialization in frontend (`firebase-core.ts`) due to development environment friction with ReCaptcha tokens. Task added to E77 to re-enable prior to production launch.
+
+2026-06-05 — E73 AI Fallback: Updated Gemini models to 3.1-pro and 2.5-flash. Implemented graceful degradation during photo upload to prevent high demand errors (503/429) from blocking the intake workflow. Staff are now alerted via a popup while the image upload succeeds.

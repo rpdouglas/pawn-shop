@@ -33,6 +33,7 @@ E21 · Vitest Unit Testing — Install Vitest + React Testing Library, configure
 | Task | Epic | Completed |
 |---|---|---|
 | Installed `vitest`, `jsdom`, `@testing-library/react` and configured `vite.config.ts` | E21 | 2026-05-22 |
+| AI Fallback: Graceful degradation for 503/429 errors and updated Gemini models to 3.1-pro/2.5-flash | E73 | 2026-06-05 |
 | Implemented unit tests for `format.ts`, `Button.tsx`, and `AgeGate.tsx` | E21 | 2026-05-22 |
 | **E21 CLOSED** | E21 | 2026-05-22 |
 | Modified `deploy-dev.yml` to enforce Lint/Unit/A11y/LHCI gates | E44 | 2026-05-22 |

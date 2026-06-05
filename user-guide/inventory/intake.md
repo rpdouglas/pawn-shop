@@ -44,6 +44,8 @@ Our AI Intake utilizes a powerful **3-stage pipeline** designed to keep staff in
 3. **Stage 3: Pricing Analysis**
    - You can trigger "Suggest AI Price" to execute a deep-dive market analysis. The AI calculates recommended pricing ranges (e.g., Regular, Pawn Value) based on market data, which you can review and accept.
 
+> **Note on Reliability:** If the AI services experience high demand or go offline, the image upload will gracefully degrade. You will receive an alert pop-up, the image will still be saved successfully, and you can simply type in the details manually without being blocked.
+
 ## Step 3: Publication
 
 Before an item can go live, it must pass a validation check. The following are **mandatory**:

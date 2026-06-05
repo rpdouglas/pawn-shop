@@ -457,8 +457,16 @@ export const processUploadedImage = onCall<{ filePath: string, extractData?: boo
       const [meta] = await tempFile.getMetadata()
       const mimeType = meta.contentType || 'image/jpeg'
       const aiResult = await extractIntakeData(buffer, mimeType, viewTag)
+      
       if (aiResult && aiResult.error) {
-        throw new HttpsError('internal', `AI Extraction Failed: ${aiResult.error}`)
+        // Graceful degradation: log the error but don't fail the upload
+        await jobRef.update({
+          status: 'completed',
+          aiError: aiResult.error,
+          updatedAt: FieldValue.serverTimestamp()
+        })
+        await tempFile.delete()
+        return { success: true, url: finalUrl, aiFailed: true, aiError: aiResult.error }
       } else if (aiResult) {
         await db.collection("items").doc(itemId).collection("internal").doc("ai").set({
           intakeExtraction: {

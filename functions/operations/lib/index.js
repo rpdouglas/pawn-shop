@@ -207172,8 +207172,8 @@ var geminiApiKey = (0, import_params.defineSecret)("GEMINI_API_KEY");
 function getModels() {
   const genAI = new import_generative_ai.GoogleGenerativeAI(geminiApiKey.value());
   return {
-    model: genAI.getGenerativeModel({ model: "gemini-pro-latest" }),
-    flashModel: genAI.getGenerativeModel({ model: "gemini-flash-latest" })
+    model: genAI.getGenerativeModel({ model: "gemini-3.1-pro" }),
+    flashModel: genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
   };
 }
 var generateAIDescription = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async (request) => {
@@ -207220,8 +207220,8 @@ var generateAIDescription = (0, import_https.onCall)({ secrets: [geminiApiKey] }
       result = await model.generateContent([systemPrompt, userPrompt]);
     } catch (error) {
       const err = error;
-      if (err?.message?.includes("429") || err?.status === 429) {
-        console.warn("Gemini Pro quota exceeded, falling back to Flash model...");
+      if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
+        console.warn("Gemini Pro unavailable (Quota/503), falling back to Flash model...");
         result = await flashModel.generateContent([systemPrompt, userPrompt]);
       } else {
         throw err;
@@ -207290,8 +207290,8 @@ var suggestAiPrice = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async
       result = await model.generateContent([systemPrompt, userPrompt]);
     } catch (error) {
       const err = error;
-      if (err?.message?.includes("429") || err?.status === 429) {
-        console.warn("Gemini Pro quota exceeded, falling back to Flash model...");
+      if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
+        console.warn("Gemini Pro unavailable (Quota/503), falling back to Flash model...");
         result = await flashModel.generateContent([systemPrompt, userPrompt]);
       } else {
         throw err;
@@ -207337,8 +207337,8 @@ var suggestAiTags = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async 
       result = await flashModel.generateContent([systemPrompt, userPrompt]);
     } catch (error) {
       const err = error;
-      if (err?.message?.includes("429") || err?.status === 429) {
-        console.warn("Gemini Flash quota exceeded, falling back to Pro model...");
+      if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
+        console.warn("Gemini Flash unavailable (Quota/503), falling back to Pro model...");
         result = await model.generateContent([systemPrompt, userPrompt]);
       } else {
         throw err;
@@ -207518,9 +207518,14 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
       result = await flashModel.generateContent(promptParts);
     } catch (error) {
       const err = error;
-      if (err?.message?.includes("429") || err?.status === 429) {
-        console.warn("Gemini Flash quota exceeded during intake extraction, falling back to Pro:", err.message);
-        result = await model.generateContent(promptParts);
+      if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
+        console.warn("Gemini Flash unavailable during intake extraction, falling back to Pro:", err.message);
+        try {
+          result = await model.generateContent(promptParts);
+        } catch (proError) {
+          console.warn("Gemini Pro also failed, gracefully degrading:", proError);
+          return { error: "Graceful Degradation: AI models unavailable" };
+        }
       } else {
         throw error;
       }
@@ -207829,7 +207834,13 @@ var processUploadedImage = (0, import_https2.onCall)({ cors: true, memory: "1GiB
       const mimeType = meta.contentType || "image/jpeg";
       const aiResult = await extractIntakeData(buffer, mimeType, viewTag);
       if (aiResult && aiResult.error) {
-        throw new import_https2.HttpsError("internal", `AI Extraction Failed: ${aiResult.error}`);
+        await jobRef.update({
+          status: "completed",
+          aiError: aiResult.error,
+          updatedAt: import_firestore3.FieldValue.serverTimestamp()
+        });
+        await tempFile.delete();
+        return { success: true, url: finalUrl, aiFailed: true, aiError: aiResult.error };
       } else if (aiResult) {
         await db.collection("items").doc(itemId).collection("internal").doc("ai").set({
           intakeExtraction: {

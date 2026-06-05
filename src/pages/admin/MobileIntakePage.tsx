@@ -364,8 +364,13 @@ export default function MobileIntakePage() {
         
         try {
           console.log(`[AI Intake] Calling processUploadedImage for ${storagePath}...`)
-          await processUploadedImageFn({ filePath: storagePath, extractData: true, viewTag: form.viewTag })
+          const res = await processUploadedImageFn({ filePath: storagePath, extractData: true, viewTag: form.viewTag })
           console.log(`[AI Intake] processUploadedImage completed successfully.`)
+          
+          const responseData = res.data as { aiFailed?: boolean; aiError?: string };
+          if (responseData?.aiFailed) {
+            window.alert(`AI Extraction Unavailable: ${responseData.aiError}\n\nThe photo has been saved successfully. Please enter the details manually.`)
+          }
           
           setUploads(prev => {
             const updated = new Map(prev)
