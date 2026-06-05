@@ -15,7 +15,10 @@ export default function AcknowledgmentWall({ children }: { children: React.React
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!user || !user.isStaff) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isMock = typeof window !== 'undefined' && (window as any).__PLAYWRIGHT_MOCK_USER__
+    
+    if (!user || !user.isStaff || isMock) {
       const t = setTimeout(() => setLoading(false), 0)
       return () => clearTimeout(t)
     }

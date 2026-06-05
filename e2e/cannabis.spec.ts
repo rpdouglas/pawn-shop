@@ -31,11 +31,11 @@ test.describe('Cannabis Persona (Marie)', () => {
     await page.goto('/cannabis')
     
     // 2. Expect the AgeGate to appear
-    const ageGateHeading = page.locator('h2', { hasText: 'Are you 19 or older?' })
+    const ageGateHeading = page.locator('h1', { hasText: 'Age Verification' })
     await expect(ageGateHeading).toBeVisible()
 
     // 3. Reject age gate (redirects to safety)
-    const noBtn = page.locator('button', { hasText: 'No, I am under 19' })
+    const noBtn = page.locator('button', { hasText: 'I am under 19' })
     await noBtn.click()
 
     // Assuming we redirect somewhere safe like root or pawn, let's verify url changed to pawn or we show an error.
@@ -45,7 +45,7 @@ test.describe('Cannabis Persona (Marie)', () => {
     // 4. Try again, but accept
     await page.goto('/cannabis')
     await expect(ageGateHeading).toBeVisible()
-    const yesBtn = page.locator('button', { hasText: 'Yes, I am 19 or older' })
+    const yesBtn = page.locator('button', { hasText: 'I am 19 or older' })
     await yesBtn.click()
 
     // AgeGate should close, we should see the cannabis view.
