@@ -1,18 +1,20 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { getStorage } from 'firebase-admin/storage'
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { defineSecret } from 'firebase-functions/params'
 import { assertStaff } from '@pawn-shop/shared/lib/authHelpers'
-
-
+import { searchEbayComps } from './ebay'
 
 export const geminiApiKey = defineSecret('GEMINI_API_KEY')
 
-function getModels() {
+function getModels(schema?: any) {
   const genAI = new GoogleGenerativeAI(geminiApiKey.value())
+  const config = schema ? { generationConfig: { responseMimeType: "application/json", responseSchema: schema } } : {}
   return {
-    model: genAI.getGenerativeModel({ model: 'gemini-3.1-pro' }),
-    flashModel: genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+    model: genAI.getGenerativeModel({ model: 'gemini-3.1-pro', ...config }),
+    flashModel: genAI.getGenerativeModel({ model: 'gemini-3.5-flash', ...config }),
+    liteModel: genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite', ...config })
   }
 }
 
@@ -22,7 +24,7 @@ function getModels() {
 export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (request) => {
   const db = getFirestore()
   const { uid } = await assertStaff(request)
-  const { itemId, title, category, viewTag, condition, provenanceNotes, serialNumber, staffNotes } = request.data
+  const { itemId, title, category, viewTag, condition, provenanceNotes, serialNumber, staffNotes, images } = request.data
 
   if (!itemId || !title) {
     throw new HttpsError('invalid-argument', 'Missing itemId or title.')
@@ -60,16 +62,47 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
     }
   `
 
+  const schema = {
+    type: SchemaType.OBJECT,
+    properties: {
+      draft: { type: SchemaType.STRING, description: "150–250 word editorial description" },
+      suggestedTags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+      provenanceFlag: { type: SchemaType.BOOLEAN },
+      culturalNote: { type: SchemaType.STRING }
+    },
+    required: ["draft", "suggestedTags", "provenanceFlag", "culturalNote"]
+  };
+
   try {
-    const { model, flashModel } = getModels()
+    const { model, flashModel } = getModels(schema)
+    const promptParts: any[] = [systemPrompt, userPrompt];
+    if (images && Array.isArray(images) && images.length > 0) {
+      try {
+        const imgRes = await fetch(images[0]);
+        if (imgRes.ok) {
+          const arrayBuffer = await imgRes.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          const mimeType = imgRes.headers.get('content-type') || 'image/jpeg';
+          promptParts.push({
+            inlineData: {
+              data: buffer.toString('base64'),
+              mimeType
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to fetch image for AI description context:', err);
+      }
+    }
+
     let result
     try {
-      result = await model.generateContent([systemPrompt, userPrompt])
+      result = await model.generateContent(promptParts)
     } catch (error: unknown) {
       const err = error as { message?: string; status?: number };
       if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
         console.warn('Gemini Pro unavailable (Quota/503), falling back to Flash model...')
-        result = await flashModel.generateContent([systemPrompt, userPrompt])
+        result = await flashModel.generateContent(promptParts)
       } else {
         throw err
       }
@@ -77,7 +110,7 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
     const response = result.response
     const text = response.text()
     
-    // Clean JSON if needed (Gemini sometimes adds markdown blocks)
+    // Clean JSON if needed
     const jsonStr = text.replace(/```json|```/g, '').trim()
     const parsed = JSON.parse(jsonStr)
 
@@ -116,11 +149,22 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
     throw new HttpsError('invalid-argument', 'Missing itemId or title.')
   }
 
+  // Fetch eBay comps
+  let ebayContext = 'No recent eBay comps found.'
+  try {
+    const comps = await searchEbayComps(title)
+    if (comps && comps.length > 0) {
+      ebayContext = 'RECENT EBAY COMPS:\n' + comps.map(c => `- ${c.title}: ${c.price?.value} ${c.price?.currency}`).join('\n')
+    }
+  } catch (err) {
+    console.warn('eBay comps failed, proceeding without them', err)
+  }
+
   const systemPrompt = `
     You are a pricing analyst for a pawn shop. Analyse eBay sold listings to provide a price range recommendation. This is GUIDANCE ONLY — it is never a final price.
     RULES:
     - Always frame output as a range, never a single price.
-    - Always state the basis for your recommendation.
+    - Always state the basis for your recommendation using the provided comps.
     - Prices are in CAD cents (integer).
     - Never frame the suggestion as the "correct" or "recommended" price.
   `
@@ -133,6 +177,8 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
     - Brand/Model: ${brandModel || 'Unknown'}
     - Staff Notes: ${staffNotes || 'None'}
 
+    ${ebayContext}
+
     OUTPUT FORMAT (JSON):
     {
       "low": 0,
@@ -143,8 +189,20 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
     }
   `
 
+  const schema = {
+    type: SchemaType.OBJECT,
+    properties: {
+      low: { type: SchemaType.INTEGER },
+      high: { type: SchemaType.INTEGER },
+      source: { type: SchemaType.STRING },
+      confidenceLevel: { type: SchemaType.STRING },
+      note: { type: SchemaType.STRING }
+    },
+    required: ["low", "high", "source", "confidenceLevel", "note"]
+  };
+
   try {
-    const { model, flashModel } = getModels()
+    const { model, flashModel } = getModels(schema)
     let result
     try {
       result = await model.generateContent([systemPrompt, userPrompt])
@@ -196,19 +254,32 @@ export const suggestAiTags = onCall({ secrets: [geminiApiKey] }, async (request)
     - rare-find: genuinely uncommon.
     - limited-edition: confirmed limited run.
     Minimum 3 suggestions or explain why in note.
+    
+    OUTPUT FORMAT (JSON):
+    {
+      "suggestedTags": ["tag1", "tag2"]
+    }
   `
 
   const userPrompt = `Suggest tags for: ${title} (${category}, ${condition}). Provenance: ${provenanceNotes || 'None'}`
 
+  const schema = {
+    type: SchemaType.OBJECT,
+    properties: {
+      suggestedTags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
+    },
+    required: ["suggestedTags"]
+  };
+
   try {
-    const { model, flashModel } = getModels()
+    const { model, liteModel } = getModels(schema)
     let result
     try {
-      result = await flashModel.generateContent([systemPrompt, userPrompt])
+      result = await liteModel.generateContent([systemPrompt, userPrompt])
     } catch (error: unknown) {
       const err = error as { message?: string; status?: number };
       if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
-        console.warn('Gemini Flash unavailable (Quota/503), falling back to Pro model...')
+        console.warn('Gemini Flash Lite unavailable (Quota/503), falling back to Pro model...')
         result = await model.generateContent([systemPrompt, userPrompt])
       } else {
         throw err

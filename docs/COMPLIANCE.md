@@ -12,8 +12,8 @@
 | `/fireworks` | 18+ | Route level — before any fireworks data renders |
 
 Rules:
-- Enforced at the **router level**, not just on individual components
-- Every gate pass/fail written to `auditLogs/{id}` (`eventType: 'age_gate_pass'` or `'age_gate_fail'`)
+- Enforced at the **router level** using the `<AgeGate>` component in `main.tsx`, not just on individual components
+- Every gate pass/fail must call the `logAgeGate` Cloud Function to write to `auditLogs/{id}` (`eventType: 'age_gate_pass'` or `'age_gate_fail'`)
 - Not bypassable by direct URL navigation
 - Session-scoped only — do not persist age gate status
 
@@ -21,7 +21,7 @@ Rules:
 
 ## PIPEDA (Canada's Privacy Law)
 
-- **No PII in logs** — names, emails, phone numbers, IDs must never appear in Analytics, console, or `auditLogs.details`
+- **No PII in logs** — names, emails, phone numbers, IDs must never appear in Analytics, console, or `auditLogs.details`. Use typed interfaces for analytics that structurally exclude PII.
 - **Retain only what's needed** — pawn request data: business relationship duration + 1 year; age verification: compliance audit period only
 - **`purgeExpiredData` Cloud Function** must enforce retention on a schedule (document in `DECISIONS.md` when implemented)
 - **No third-party data sharing** without explicit consent
@@ -76,7 +76,7 @@ When a serial number is flagged by law enforcement:
 ## Audit Logs
 
 - `auditLogs/{id}` is immutable — no update, no delete, ever
-- Written via Firebase Admin SDK in Cloud Functions only
+- Client-side writes are forbidden. All writes must occur via Firebase Admin SDK in Cloud Functions only.
 - Admin-only read
 - Required events: `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override`
 

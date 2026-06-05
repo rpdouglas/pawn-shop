@@ -2,6 +2,10 @@
 
 This log tracks manual community sign-offs for Kanien'kéha language content and cultural assets.
 
+## Policy Rules
+1. **The Kanien'kéha Rule:** AI (including Antigravity and subagents) is strictly forbidden from generating Kanien'kéha language content. Every instance must be flagged for manual review. The `Linguistic_Auditor` subagent will block PRs missing a sign-off in this log.
+2. **Brand Voice:** Use the "Dapper & Debonair" voice. Avoid "Cheap", "Junk", or "Budget". This is evaluated by the `Brand_Auditor` subagent.
+
 ## Log Entry Format
 ```markdown
 - **Date:** YYYY-MM-DD

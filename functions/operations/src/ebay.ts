@@ -36,7 +36,7 @@ function getEbayBase(): string {
 }
 
 // Node 20 native fetch — no additional dependencies required
-async function ebayRequest(
+export async function ebayRequest(
   method: string,
   path: string,
   body?: unknown,
@@ -66,6 +66,19 @@ async function ebayRequest(
   }
 
   return { ok: res.ok, status: res.status, data }
+}
+
+export async function searchEbayComps(query: string): Promise<any[]> {
+  try {
+    // This uses the eBay Browse API to search for items
+    const res = await ebayRequest('GET', `/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=3`)
+    if (res.ok && res.data && (res.data as any).itemSummaries) {
+      return (res.data as any).itemSummaries
+    }
+  } catch (err) {
+    console.warn('Failed to fetch eBay comps:', err)
+  }
+  return []
 }
 
 // ── pushToEbay ────────────────────────────────────────────────────────────────

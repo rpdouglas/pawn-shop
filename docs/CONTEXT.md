@@ -32,6 +32,15 @@ Brand voice: **"Dapper. Debonair. Distinctly Akwesasne."**
 
 ---
 
+## Firebase Architecture Policy
+
+1. **Data Handling:** Zero usage of `as any` when casting Firestore data. Use explicit TypeScript interfaces or type guards when reading `snap.data()`.
+2. **Security Rules:** Every schema change must be accompanied by a corresponding update to `firestore.rules`.
+3. **Cloud Functions:** All sensitive logic belongs in a Cloud Function. Client-side `setDoc` or `addDoc` on restricted collections (e.g., `items`, `auditLogs`) is forbidden.
+4. **AI Guardrails:** All AI API calls must be routed through Cloud Functions. API keys must never be exposed to the client.
+
+---
+
 ## Design Tokens (Tailwind v4 `@theme`)
 
 ```css
