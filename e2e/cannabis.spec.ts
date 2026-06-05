@@ -68,7 +68,7 @@ test.describe('Cannabis Persona (Marie)', () => {
     // Check for wellness profile / AI generated panels
     await expect(page.getByText('Simply Bare', { exact: false })).toBeVisible()
     await expect(page.getByText('sativa', { exact: false }).first()).toBeVisible()
-    await expect(page.getByText('22', { exact: false })).toBeVisible()
+    await expect(page.getByText('22', { exact: false }).first()).toBeVisible()
     await expect(page.getByText('Myrcene', { exact: false }).first()).toBeVisible()
     await expect(page.getByText('Pinene', { exact: false }).first()).toBeVisible()
   })
