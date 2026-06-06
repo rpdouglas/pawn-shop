@@ -121,12 +121,15 @@
 | `uid` | string | Customer UID |
 | `pawnRequestId` | string | Reference to `pawnRequests/{id}` |
 | `itemDescription` | string | Description of the pawned item |
+| `itemId` | string | Reference to `items/{id}` if linked |
 | `loanAmount` | number | CAD cents |
 | `interestRate` | number | e.g. 0.05 for 5% |
 | `periodDays` | number | Standard loan period in days |
 | `dueDate` | timestamp | Current due date for the loan |
 | `status` | string | `active` \| `extension_requested` \| `forfeited` \| `redeemed` |
 | `extensionCount` | number | Number of times extended |
+| `redemptionAmount` | number | Amount paid to redeem the loan (CAD cents) |
+| `paymentIntentId` | string | Stripe PaymentIntent ID if redeemed digitally |
 | `staffNotes` | string | Internal — never shown to customer |
 | `createdAt` | timestamp | Server timestamp |
 | `updatedAt` | timestamp | Server timestamp |

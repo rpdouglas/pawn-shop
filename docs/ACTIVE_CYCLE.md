@@ -109,6 +109,10 @@ E31 · Pawn Loan Management Portal — Portal allowing customers to view active 
 | `E72 Phase 3` — Executed Strategic Extraction of `IntakeForm.tsx` (CannabisFields, FireworksFields) and built component and hook test coverage using Vitest and RTL. | E72 | 2026-06-04 |
 | `E72 Phase 4` — Persona E2E Suites. Built robust Playwright tests mapping to real UI logic and configured the emulator environment to handle CI constraints. | E72 | 2026-06-05 |
 | **E72 CLOSED** | E72 | 2026-06-05 |
+| `E81 Phase 1` — Implemented `issueLoanTicket`, `redeemLoan` (Stripe stubbed), and `forfeitLoan` CFs. | E81 | 2026-06-06 |
+| `E81 Phase 2` — Added `sendLoanReminders` CF for 3-day SMS reminders. | E81 | 2026-06-06 |
+| `E81 Phase 3` — Updated `LoanTicketsAdminPage` with manual redeem/forfeit UI and `ProfilePage` for customer visibility. | E81 | 2026-06-06 |
+| **E81 CLOSED** | E81 | 2026-06-06 |
 
 ---
 

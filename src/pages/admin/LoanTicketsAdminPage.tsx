@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAllLoanTickets, useProcessExtension } from '../../lib/useLoanTickets'
+import { useAllLoanTickets, useProcessExtension, useRedeemLoan, useForfeitLoan } from '../../lib/useLoanTickets'
 import Table from '../../components/ui/Table'
 import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
@@ -10,14 +10,19 @@ import Modal from '../../components/ui/Modal'
 export default function LoanTicketsAdminPage() {
   const { data: tickets, isLoading, error } = useAllLoanTickets()
   const { mutateAsync: processExtension } = useProcessExtension()
+  const { mutateAsync: redeemLoan } = useRedeemLoan()
+  const { mutateAsync: forfeitLoan } = useForfeitLoan()
+
   const [processingTicket, setProcessingTicket] = useState<LoanTicket | null>(null)
+  const [actionType, setActionType] = useState<'extension' | 'redeem' | 'forfeit' | null>(null)
   const [newDueDate, setNewDueDate] = useState('')
+
 
   if (isLoading) return <div className="p-8 text-stone-500">Loading loans...</div>
   if (error) return <div className="p-8 text-red-600">Error: {(error as Error).message}</div>
 
   const handleProcess = async (approved: boolean) => {
-    if (!processingTicket) return
+    if (!processingTicket || actionType !== 'extension') return
     try {
       await processExtension({
         loanTicketId: processingTicket.id,
@@ -25,11 +30,35 @@ export default function LoanTicketsAdminPage() {
         newDueDate: approved ? newDueDate : undefined
       })
       setProcessingTicket(null)
+      setActionType(null)
       setNewDueDate('')
     } catch (err) {
       alert((err as Error).message)
     }
   }
+
+  const handleRedeem = async () => {
+    if (!processingTicket || actionType !== 'redeem') return
+    try {
+      await redeemLoan({ loanTicketId: processingTicket.id })
+      setProcessingTicket(null)
+      setActionType(null)
+    } catch (err) {
+      alert((err as Error).message)
+    }
+  }
+
+  const handleForfeit = async () => {
+    if (!processingTicket || actionType !== 'forfeit') return
+    try {
+      await forfeitLoan(processingTicket.id)
+      setProcessingTicket(null)
+      setActionType(null)
+    } catch (err) {
+      alert((err as Error).message)
+    }
+  }
+
 
   const columns = [
     { key: 'itemDescription' as const, header: 'Item' },
@@ -41,11 +70,23 @@ export default function LoanTicketsAdminPage() {
       </Badge>
     )},
     { key: 'id' as const, header: 'Actions', render: (row: LoanTicket) => (
-      row.status === 'extension_requested' ? (
-        <Button size="sm" onClick={() => setProcessingTicket(row)}>
-          Review
-        </Button>
-      ) : null
+      <div className="flex gap-2">
+        {row.status === 'extension_requested' && (
+          <Button size="sm" onClick={() => { setProcessingTicket(row); setActionType('extension'); }}>
+            Review
+          </Button>
+        )}
+        {row.status === 'active' && (
+          <>
+            <Button size="sm" variant="secondary" onClick={() => { setProcessingTicket(row); setActionType('redeem'); }}>
+              Redeem
+            </Button>
+            <Button size="sm" variant="secondary" className="!border-red-600 !text-red-600 hover:!bg-red-50" onClick={() => { setProcessingTicket(row); setActionType('forfeit'); }}>
+              Forfeit
+            </Button>
+          </>
+        )}
+      </div>
     )}
   ]
 
@@ -64,8 +105,16 @@ export default function LoanTicketsAdminPage() {
         <Table columns={tableColumns} data={tableData} />
       )}
 
-      <Modal isOpen={!!processingTicket} onClose={() => setProcessingTicket(null)} title="Review Extension">
-        {processingTicket && (
+      <Modal 
+        isOpen={!!processingTicket && !!actionType} 
+        onClose={() => { setProcessingTicket(null); setActionType(null); }} 
+        title={
+          actionType === 'extension' ? "Review Extension" :
+          actionType === 'redeem' ? "Redeem Loan" :
+          "Forfeit Loan"
+        }
+      >
+        {processingTicket && actionType === 'extension' && (
           <div className="space-y-4">
             <p>Reviewing extension for: <strong>{processingTicket.itemDescription}</strong></p>
             <p>Current Due Date: <strong>{formatDate(processingTicket.dueDate)}</strong></p>
@@ -86,6 +135,31 @@ export default function LoanTicketsAdminPage() {
               </Button>
               <Button onClick={() => handleProcess(true)} className="flex-1" disabled={!newDueDate}>
                 Approve
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {processingTicket && actionType === 'redeem' && (
+          <div className="space-y-4">
+            <p>Process redemption for: <strong>{processingTicket.itemDescription}</strong></p>
+            <p>Amount to Collect: <strong>{formatPrice(processingTicket.loanAmount * (1 + processingTicket.interestRate))}</strong></p>
+            <p className="text-sm text-stone-500">Stripe integration pending (E79). This will mark the loan as redeemed manually.</p>
+            <div className="flex gap-4 pt-4">
+              <Button onClick={handleRedeem} className="w-full">
+                Confirm Redemption
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {processingTicket && actionType === 'forfeit' && (
+          <div className="space-y-4">
+            <p>Forfeit loan for: <strong>{processingTicket.itemDescription}</strong></p>
+            <p className="text-sm text-red-600">This will transition the item to active (shop-owned) and close the loan. This action cannot be undone.</p>
+            <div className="flex gap-4 pt-4">
+              <Button variant="secondary" className="w-full !border-red-600 !text-red-600 hover:!bg-red-50" onClick={handleForfeit}>
+                Confirm Forfeiture
               </Button>
             </div>
           </div>

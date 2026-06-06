@@ -1,6 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
-import { getStorage } from 'firebase-admin/storage'
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { defineSecret } from 'firebase-functions/params'
 import { assertStaff } from '@pawn-shop/shared/lib/authHelpers'
@@ -8,7 +7,7 @@ import { searchEbayComps } from './ebay'
 
 export const geminiApiKey = defineSecret('GEMINI_API_KEY')
 
-function getModels(schema?: any) {
+function getModels(schema?: Record<string, unknown>) {
   const genAI = new GoogleGenerativeAI(geminiApiKey.value())
   const config = schema ? { generationConfig: { responseMimeType: "application/json", responseSchema: schema } } : {}
   return {
@@ -75,7 +74,7 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
 
   try {
     const { model, flashModel } = getModels(schema)
-    const promptParts: any[] = [systemPrompt, userPrompt];
+    const promptParts: unknown[] = [systemPrompt, userPrompt];
     if (images && Array.isArray(images) && images.length > 0) {
       try {
         const imgRes = await fetch(images[0]);

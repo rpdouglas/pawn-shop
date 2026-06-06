@@ -1,25 +1,22 @@
 # Customer Pawn Loans
 
-As a registered customer, you can view your active and past pawn loans through your account. The platform provides a secure and easy way to track due dates and request extensions.
+As a registered customer, you can view your active and past pawn loans through your account profile. The platform provides a secure and easy way to track your active loan due dates and view your loan history.
 
 ## Viewing Your Loans
 
 1. Sign in to your account.
-2. Open the navigation menu and select **My Pawn Loans**.
-3. You will see a list of all your loans, including:
+2. Open the navigation menu and select **Profile**.
+3. Navigate to the **Activity History** tab.
+4. You will see a list of all your loans, including:
    - The item description
-   - The loan amount
+   - The loan principal amount
    - The due date
-   - The current status (e.g., Active, Pending, Redeemed)
+   - The current status (e.g., Active, Redeemed, Forfeited)
 
-## Requesting an Extension
+## Reminders and Due Dates
 
-If you need more time on a loan, you can request an extension directly from the portal:
+To help you manage your loans, the system will automatically send you an SMS reminder **3 days before** your loan due date.
 
-1. Go to **My Pawn Loans**.
-2. Locate the active loan you wish to extend.
-3. Click **Request Extension**.
-4. A confirmation window will appear. Click **Confirm Request**.
-5. Our staff will review your request. Note that you may need to visit the store to pay the interest fee before the extension is finalized.
+## Redemptions
 
-*Note: Extensions are subject to staff approval and store policies.*
+Currently, all pawn loan redemptions must be handled in-store or by contacting staff. We will be adding online payment processing soon. Please ensure you redeem your items before the due date to prevent forfeiture.

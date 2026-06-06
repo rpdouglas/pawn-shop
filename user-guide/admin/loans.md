@@ -1,6 +1,6 @@
 # Managing Pawn Loans
 
-The Pawn Shop staff dashboard provides a central interface for managing active pawn loan tickets, tracking due dates, and processing extension requests.
+The Pawn Shop staff dashboard provides a central interface for managing active pawn loan tickets, tracking due dates, processing redemptions, and handling item forfeiture.
 
 ## Accessing the Loan Dashboard
 
@@ -10,19 +10,30 @@ The Pawn Shop staff dashboard provides a central interface for managing active p
    - Item description
    - Loan amount
    - Due date
-   - Current status (e.g., Active, Extension Requested)
+   - Current status (e.g., Active, Redeemed, Forfeited)
 
-## Processing Extension Requests
+## Issuing a Loan Ticket
 
-When a customer requests an extension on their pawn loan, its status will change to **Extension Requested** and a **Review** button will appear next to it.
+When a customer accepts a pawn offer:
+1. Approve the pawn request.
+2. Enter the **Principal Amount** and **Term**.
+3. A loan ticket will be generated automatically, calculating the due date and interest based on the term.
 
-1. Click the **Review** button next to the loan.
-2. Review the loan details, including the item and current due date.
-3. If approving the extension, enter the **New Due Date**. Note: Customers are typically required to pay the interest fee in-store before an extension is finalized.
-4. Click **Approve** to update the loan's due date, or **Decline** if the extension cannot be granted.
+## Processing Loan Redemptions
 
-## Automated Forfeiture Alerts
+When a customer wants to retrieve their pawned item:
+1. Locate the active loan ticket in the dashboard.
+2. Click **Redeem**.
+3. The system will calculate the total redemption amount (principal + interest).
+4. Once payment is processed, the system will update the loan status to **Redeemed** and the item status will be set back to active so the customer can pick it up.
 
-The system runs a daily background check on all active loans. If a loan is within 48 hours of its due date, the system will automatically dispatch an SMS reminder to the customer (if they have opted in).
+## Manual Forfeiture
+
+If a loan passes its due date without payment:
+1. The system will send SMS reminders 3 days before the due date.
+2. Once the due date has passed, the loan becomes eligible for forfeiture.
+3. Click the **Forfeit** button next to the expired loan.
+4. Review any local jurisdiction compliance rules before confirming (e.g., mandatory grace periods or final notices).
+5. Confirm forfeiture. The loan status updates to **Forfeited**, and ownership of the item officially transfers to the shop for resale.
 
 All status changes and communications are logged securely in the `auditLogs` for compliance.

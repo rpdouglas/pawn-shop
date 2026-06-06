@@ -68,12 +68,12 @@ export async function ebayRequest(
   return { ok: res.ok, status: res.status, data }
 }
 
-export async function searchEbayComps(query: string): Promise<any[]> {
+export async function searchEbayComps(query: string): Promise<Record<string, unknown>[]> {
   try {
     // This uses the eBay Browse API to search for items
     const res = await ebayRequest('GET', `/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=3`)
-    if (res.ok && res.data && (res.data as any).itemSummaries) {
-      return (res.data as any).itemSummaries
+    if (res.ok && res.data && (res.data as Record<string, unknown>).itemSummaries) {
+      return (res.data as Record<string, unknown>).itemSummaries as Record<string, unknown>[]
     }
   } catch (err) {
     console.warn('Failed to fetch eBay comps:', err)

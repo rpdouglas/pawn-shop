@@ -133,7 +133,7 @@ Rely on autonomous execution via `/goal` and slash commands rather than manual p
 
 - Schema is in `docs/firestore-schema.md`. Do not invent fields.
 - Styling uses CSS tokens. Do not use inline JS conditionals for view theming.
-- Note tech choices in `docs/DECISIONS.md` when a decision is made.
+- Note tech choices in `docs/decisions/` when a decision is made.
 - Flag compliance-sensitive features for human review before deploying to prod.
 - Gemini output saves to `aiDescription` only — never auto-promote to `description`.
 - Never generate Kanien'kéha. Community review required before any Mohawk language ships.

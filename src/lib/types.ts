@@ -384,6 +384,9 @@ export interface LoanTicket {
   dueDate: Date
   status: LoanTicketStatus
   extensionCount: number
+  redemptionAmount?: number
+  paymentIntentId?: string
+  itemId?: string
   staffNotes?: string
   createdAt: Date
   updatedAt: Date

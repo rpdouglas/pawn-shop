@@ -14,7 +14,7 @@ Welcome to the governance documentation for The Pawn Shop. This repository acts 
 ## 🏗️ 3. Execution & Sprint Management
 - [ACTIVE_CYCLE.md](./ACTIVE_CYCLE.md): The sprint tracker. Shows current in-progress tasks, completed items, and open decisions.
 - [EPICS.md](./EPICS.md): The master backlog and historical log of massive feature drops.
-- [DECISIONS.md](./DECISIONS.md): Architectural Decision Records (ADR).
+- [decisions/](./decisions/): Architecture Decision Records (ADR).
 - [projects/](./projects/): Epic requirement briefs (Specs-First workflow).
 - [archive/plans/](./archive/plans/): Completed 3-strategy execution plans.
 

@@ -232,6 +232,59 @@ export const sendPickupReminders = onSchedule({ schedule: '0 * * * *', secrets: 
   }
 })
 
+// ── sendLoanReminders ─────────────────────────────────────────────────────────
+// Daily at noon. Finds active loan tickets whose due date is ~3 days away.
+// Sends a reminder SMS to the customer if opted in.
+
+export const sendLoanReminders = onSchedule({ schedule: '0 12 * * *', secrets: [twilioAccountSid, twilioAuthToken] }, async () => {
+  const db   = getFirestore()
+  const now  = new Date()
+  const from = new Date(now.getTime() + 2.5 * 24 * 60 * 60 * 1000)
+  const to   = new Date(now.getTime() + 3.5 * 24 * 60 * 60 * 1000)
+
+  const ticketSnap = await db.collection('loanTickets')
+    .where('status', '==', 'active')
+    .get()
+
+  for (const doc of ticketSnap.docs) {
+    const data = doc.data() as Record<string, unknown>
+    if (data['reminderSentAt'] != null) continue
+
+    // dueDate could be Timestamp object
+    const dueDateObj = data['dueDate'] as { toDate?: () => Date } | undefined
+    const dueDate = dueDateObj?.toDate ? dueDateObj.toDate() : null
+    if (!dueDate || dueDate < from || dueDate > to) continue
+
+    const uid = String(data['uid'] ?? '')
+    if (!uid) continue
+
+    const userSnap = await db.collection('users').doc(uid).get()
+    const userData = userSnap.data() as Record<string, unknown> | undefined
+    if (!userSnap.exists || userData?.['alertOptIn'] !== true) continue
+
+    const phone = String(userData['phoneNumber'] ?? '')
+    if (!phone) continue
+
+    const desc = String(data['itemDescription'] || 'item')
+    const body = `The Pawn Shop — reminder: your loan for ${desc} is due in 3 days. Please visit us or request an extension online.`
+    try {
+      const sent = await dispatchSms(phone, body)
+      if (sent) {
+        await doc.ref.update({ reminderSentAt: FieldValue.serverTimestamp() })
+        await db.collection('auditLogs').add({
+          eventType: 'loan_reminder_sent',
+          uid: 'system',
+          targetId: doc.id,
+          details: { loanTicketId: doc.id },
+          createdAt: FieldValue.serverTimestamp(),
+        })
+      }
+    } catch (err) {
+      console.error(`[sendLoanReminders] LoanTicket ${doc.id} SMS failed:`, (err as Error).message)
+    }
+  }
+})
+
 // ── sendWeeklyDigest ──────────────────────────────────────────────────────────
 // Every Monday at 14:00 UTC (≈ 09:00 ET / Cornwall Island local time).
 // Fetches top 5 trending active items across all views and sends an HTML email

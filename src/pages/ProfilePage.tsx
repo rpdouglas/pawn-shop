@@ -5,7 +5,7 @@ import { updateProfile } from 'firebase/auth'
 import { db } from '../lib/firebase'
 import { auth } from '../lib/firebase-core'
 import { useAuth } from '../context/AuthContext'
-import type { AuthUser, Reservation, Preorder, PawnRequest } from '../lib/types'
+import type { AuthUser, Reservation, Preorder, PawnRequest, LoanTicket } from '../lib/types'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import HRTab from '../components/profile/HRTab'
@@ -16,6 +16,8 @@ const ProfilePage: React.FC = () => {
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [preorders, setPreorders] = useState<Preorder[]>([])
   const [pawnRequests, setPawnRequests] = useState<PawnRequest[]>([])
+  const [loanTickets, setLoanTickets] = useState<LoanTicket[]>([])
+
   
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -40,11 +42,22 @@ const ProfilePage: React.FC = () => {
     Promise.all([
       getDocs(query(collection(db, 'reservations'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'))),
       getDocs(query(collection(db, 'preorders'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'))),
-      getDocs(query(collection(db, 'pawnRequests'), where('uid', '==', user.uid), orderBy('createdAt', 'desc')))
-    ]).then(([resSnap, preSnap, pawnSnap]) => {
+      getDocs(query(collection(db, 'pawnRequests'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'))),
+      getDocs(query(collection(db, 'loanTickets'), where('uid', '==', user.uid), orderBy('createdAt', 'desc')))
+    ]).then(([resSnap, preSnap, pawnSnap, loanSnap]) => {
       setReservations(resSnap.docs.map(d => ({ id: d.id, ...d.data() } as Reservation)))
       setPreorders(preSnap.docs.map(d => ({ id: d.id, ...d.data() } as Preorder)))
       setPawnRequests(pawnSnap.docs.map(d => ({ id: d.id, ...d.data() } as PawnRequest)))
+      setLoanTickets(loanSnap.docs.map(d => {
+        const data = d.data()
+        return { 
+          id: d.id, 
+          ...data,
+          dueDate: data.dueDate?.toDate ? data.dueDate.toDate() : new Date(),
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date()
+        } as LoanTicket
+      }))
       setLoading(false)
     }).catch(err => {
       console.error('Error fetching activity:', err)
@@ -166,6 +179,30 @@ const ProfilePage: React.FC = () => {
                     ))}
                   </ul>
                 )}
+              </section>
+
+              <section>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-heading)', color: 'var(--color-primary)', marginBottom: 'var(--space-4)' }}>Pawn Loans</h2>
+                {loanTickets.length === 0 ? <p style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-small)' }}>No active pawn loans.</p> : (
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {loanTickets.map(loan => (
+                      <li key={loan.id} style={{ padding: 'var(--space-4)', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div>
+                            <p style={{ fontWeight: 600, color: 'var(--color-text)', margin: '0 0 var(--space-1) 0' }}>{loan.itemDescription}</p>
+                            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: 0 }}>Due on {loan.dueDate ? loan.dueDate.toLocaleDateString() : 'N/A'}</p>
+                          </div>
+                          <span style={{ textTransform: 'uppercase', fontSize: 'var(--text-xs)', padding: 'var(--space-1) var(--space-2)', backgroundColor: 'var(--color-bg)', borderRadius: 'var(--radius-sm)', color: 'var(--color-primary)' }}>
+                            {loan.status}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div style={{ marginTop: 'var(--space-4)' }}>
+                  <Button variant="secondary" size="sm" onClick={() => window.location.href='/pawn/my-loans'}>Manage Loans</Button>
+                </div>
               </section>
 
               <section>
