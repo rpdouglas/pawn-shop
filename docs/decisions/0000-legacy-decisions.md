@@ -395,3 +395,5 @@ YYYY-MM-DD — Decision. Brief reason.
 2026-06-05 — E31 Pawn Loans: Added `loanTickets` collection and `pawnLoanId` to `pawnRequests` to track active pawn loans. All mutations to loanTickets are restricted to Cloud Functions for strict audit logging.
 
 2026-06-05 — Refactored `/docs/` structure: consolidated `policies/` into root files, merged `archives/`, cleaned `plans/`, and added a `README.md` index to harden the governance repository against drift.
+
+2026-06-06 — E28 Markdown Engine: Implemented Strategy B (Automated Dutch Auction Engine). Added a cron job in operations to execute daily markdowns and extended the Admin UI with a MarkdownConfigPanel to toggle automated price drops. Created sendMarkdownAlert to dispatch CASL-compliant notifications to opted-in users who have saved searches matching the marked down item.

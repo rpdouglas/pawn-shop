@@ -10,6 +10,7 @@ import { formatPrice } from '../../lib/format'
 import ProtectedRoute from '../../components/auth/ProtectedRoute'
 import Badge from '../../components/ui/Badge'
 import AiAssistantPanel from '../../components/admin/AiAssistantPanel'
+import MarkdownConfigPanel from '../../components/admin/MarkdownConfigPanel'
 import QuantityAdjustControl from '../../components/admin/QuantityAdjustControl'
 import type { Item, ItemStatus } from '../../lib/types'
 
@@ -436,6 +437,10 @@ export default function InventoryPage() {
                       onApplyDescription={handleApplyDescription}
                       onApplyTags={handleApplyTags}
                       onApplyPrice={handleApplyPrice}
+                    />
+                    <MarkdownConfigPanel
+                      item={selectedItem}
+                      onConfigured={() => {}}
                     />
                   </div>
                 </aside>

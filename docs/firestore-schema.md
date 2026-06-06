@@ -17,6 +17,12 @@
 | `viewTags` | array\<string\> | Multi-view items |
 | `status` | string | `draft` \| `active` \| `reserved` \| `sold` \| `archived` \| `deleted` |
 | `price` | number | CAD cents (e.g. 1999 = $19.99) |
+| `originalPrice` | number | Pre-markdown starting price |
+| `floorPrice` | number | Absolute minimum markdown price |
+| `markdownRate` | number | Percentage or fixed drop amount per cycle |
+| `markdownPeriodDays` | number | Days between price drop cycles |
+| `markdownEnabled` | boolean | Toggle for automated Dutch auction |
+| `lastMarkdownAt` | timestamp | Tracks the schedule |
 | `condition` | string | `new` \| `like-new` \| `good` \| `fair` \| `poor` |
 | `images` | array\<string\> | Firebase Storage URLs (WebP/AVIF, watermarked) |
 | `videoUrl` | string | Optional. Cannabis/Fireworks item pages |

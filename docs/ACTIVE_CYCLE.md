@@ -119,6 +119,8 @@ E31 · Pawn Loan Management Portal — Portal allowing customers to view active 
 | **E82 CLOSED** | E82 | 2026-06-06 |
 | `E78 Phase 1` — Rebuilt AI Extraction pipeline with schema validation, fuzzy matching for cannabis, eBay comps integration, and model fallback handling. | E78 | 2026-06-06 |
 | **E78 CLOSED** | E78 | 2026-06-06 |
+| `E28 Algorithmic Markdown Engine` — Built automated Dutch auction pricing with cron jobs and CASL compliant SMS alerts. Added Admin UI to configure markdown. | E28 | 2026-06-06 |
+| **E28 CLOSED** | E28 | 2026-06-06 |
 
 ---
 

@@ -62,13 +62,16 @@ function MasonryCard({ item, index, onClick, onHover }: MasonryCardProps) {
         )}
 
         {/* Merchandising tag overlay */}
-        {item.merchandisingTags && item.merchandisingTags.length > 0 && (
+        {(item.merchandisingTags?.length || (item.originalPrice !== undefined && item.price < item.originalPrice)) ? (
           <div style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', display: 'flex', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
-            {item.merchandisingTags.map((tag) => (
+            {item.originalPrice !== undefined && item.price < item.originalPrice && (
+              <MerchandisingBadge key="price-dropped" tag="price-dropped" />
+            )}
+            {item.merchandisingTags?.map((tag) => (
               <MerchandisingBadge key={tag} tag={tag} />
             ))}
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Card content */}
@@ -94,8 +97,16 @@ function MasonryCard({ item, index, onClick, onHover }: MasonryCardProps) {
           fontWeight: 700,
           color: 'var(--color-primary)',
           marginBottom: 'var(--space-2)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-2)',
         }}>
           {formatPrice(item.price)}
+          {item.originalPrice !== undefined && item.price < item.originalPrice && (
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', textDecoration: 'line-through' }}>
+              {formatPrice(item.originalPrice)}
+            </span>
+          )}
         </div>
 
         <Badge

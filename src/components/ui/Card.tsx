@@ -22,6 +22,7 @@ const STATUS_LABELS: Record<ItemStatus, string> = {
 interface CardProps {
   title: string
   price: number
+  originalPrice?: number
   condition: ConditionGrade
   status: ItemStatus
   imageUrl?: string
@@ -32,6 +33,7 @@ interface CardProps {
 export default function Card({
   title,
   price,
+  originalPrice,
   condition,
   status,
   imageUrl,
@@ -39,6 +41,11 @@ export default function Card({
   onClick,
 }: CardProps) {
   const isInteractive = onClick !== undefined
+  
+  // E28 Markdown Dutch Auction logic
+  const isPriceDropped = originalPrice !== undefined && price < originalPrice
+  const displayTags = [...merchandisingTags]
+  if (isPriceDropped) displayTags.push('price-dropped')
 
   return (
     <div
@@ -58,9 +65,9 @@ export default function Card({
           ? <img src={imageUrl} alt={title} />
           : <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>No image</span>
         }
-        {merchandisingTags.length > 0 && (
+        {displayTags.length > 0 && (
           <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-            {merchandisingTags.map((tag) => (
+            {displayTags.map((tag) => (
               <Badge key={tag} variant="tag" label={tag.replace(/-/g, ' ')} />
             ))}
           </div>
@@ -86,8 +93,16 @@ export default function Card({
           fontWeight: 700,
           color: 'var(--color-primary)',
           marginBottom: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
         }}>
           {formatPrice(price)}
+          {isPriceDropped && (
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', textDecoration: 'line-through' }}>
+              {formatPrice(originalPrice)}
+            </span>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

@@ -32,3 +32,12 @@ The system dynamically evaluates item performance to aid discovery.
 - **Enquiry Counts:** Successful Click & Collect requests or Pawn Enquiries increment the `enquiryCount`.
 - **Trending Score:** A background process calculates a score based on these engagement metrics, surfacing popular items in the "Trending" sections of the store.
 - **Sold History:** When an item transitions to `Sold`, a `soldAt` timestamp is recorded. This data feeds the "Recently Sold" strips on the storefront, providing **Dale** and **Sandra** with real-time deal validation.
+
+## Automated Markdowns (Dutch Auction)
+
+To move aging inventory automatically, the platform supports an algorithmic markdown engine (Dutch Auction).
+
+1.  **Configuration:** Managers can enable markdowns on individual items via the Admin UI. You configure a `floorPrice` (the lowest acceptable price), a `markdownRate` (e.g., 5% or 10%), and a `markdownPeriodDays` (how often the price drops).
+2.  **Execution:** A daily background job (running at 03:00 UTC) automatically drops the price by the configured rate if the period has elapsed, stopping at the floor price.
+3.  **Tags Exception:** High-value items tagged with `rare-find` or `limited-edition` are immune to the automated drops to preserve their authenticity.
+4.  **Notifications:** When an item's price drops, any customer who has saved a search matching the item and opted into alerts will receive an SMS notification.

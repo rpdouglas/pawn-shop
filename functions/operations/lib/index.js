@@ -35,10 +35,10 @@ var require_authHelpers = __commonJS({
   "../shared/lib/authHelpers.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.assertMfaEnrolled = assertMfaEnrolled2;
+    exports2.assertMfaEnrolled = assertMfaEnrolled3;
     exports2.assertStaff = assertStaff2;
     var https_1 = require("firebase-functions/v2/https");
-    function assertMfaEnrolled2(request) {
+    function assertMfaEnrolled3(request) {
       return;
       if (process.env.FUNCTIONS_EMULATOR)
         return;
@@ -57,7 +57,7 @@ var require_authHelpers = __commonJS({
       if (!isStaff) {
         throw new https_1.HttpsError("permission-denied", "Staff only.");
       }
-      assertMfaEnrolled2(request);
+      assertMfaEnrolled3(request);
       return { uid: request.auth.uid };
     }
   }
@@ -207102,10 +207102,10 @@ var require_sms = __commonJS({
       return mod && mod.__esModule ? mod : { "default": mod };
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.dispatchSms = dispatchSms2;
+    exports2.dispatchSms = dispatchSms3;
     var twilio_1 = __importDefault(require_lib3());
     var secrets_1 = require_secrets();
-    async function dispatchSms2(to, body) {
+    async function dispatchSms3(to, body) {
       const accountSid = secrets_1.twilioAccountSid.value();
       const authToken = secrets_1.twilioAuthToken.value();
       const fromNumber = secrets_1.twilioFromNumber.value();
@@ -207124,12 +207124,15 @@ var require_sms = __commonJS({
 var index_exports = {};
 __export(index_exports, {
   adjustInventory: () => adjustInventory,
+  applyMarkdownDrops: () => applyMarkdownDrops,
   calculateTrendingScore: () => calculateTrendingScore,
   clearRecycleBin: () => clearRecycleBin,
   createDraftItem: () => createDraftItem,
   deleteInventoryItem: () => deleteInventoryItem,
+  disableMarkdown: () => disableMarkdown,
   ebayRequest: () => ebayRequest,
   ebayWebhook: () => ebayWebhook,
+  enableMarkdown: () => enableMarkdown,
   extractIntakeData: () => extractIntakeData,
   geminiApiKey: () => geminiApiKey,
   generateAIDescription: () => generateAIDescription,
@@ -208438,6 +208441,134 @@ var receivePosWebhook = (0, import_https5.onRequest)({ secrets: [import_secrets3
   res.status(200).json({ received: true });
 });
 
+// src/markdownEngine.ts
+var import_scheduler3 = require("firebase-functions/v2/scheduler");
+var import_https6 = require("firebase-functions/v2/https");
+var import_firestore7 = require("firebase-admin/firestore");
+var import_authHelpers3 = __toESM(require_authHelpers());
+var import_sms2 = __toESM(require_sms());
+var import_secrets4 = __toESM(require_secrets());
+function isManagerToken(token) {
+  return token["admin"] === true || token["manager"] === true;
+}
+var applyMarkdownDrops = (0, import_scheduler3.onSchedule)({ schedule: "0 3 * * *", secrets: [import_secrets4.twilioAccountSid, import_secrets4.twilioAuthToken] }, async () => {
+  const db = (0, import_firestore7.getFirestore)();
+  const now = /* @__PURE__ */ new Date();
+  const itemsSnap = await db.collection("items").where("markdownEnabled", "==", true).where("status", "==", "active").where("policeHold", "!=", true).get();
+  for (const doc of itemsSnap.docs) {
+    const data = doc.data();
+    const merchandisingTags = data["merchandisingTags"] || [];
+    if (merchandisingTags.includes("rare-find") || merchandisingTags.includes("limited-edition")) {
+      continue;
+    }
+    const price = Number(data["price"]) || 0;
+    const floorPrice = Number(data["floorPrice"]) || 0;
+    const markdownRate = Number(data["markdownRate"]) || 0;
+    const markdownPeriodDays = Number(data["markdownPeriodDays"]) || 0;
+    if (price <= floorPrice || markdownRate <= 0 || markdownPeriodDays <= 0) continue;
+    const lastMarkdownAt = data["lastMarkdownAt"] instanceof import_firestore7.Timestamp ? data["lastMarkdownAt"].toDate() : data["createdAt"] instanceof import_firestore7.Timestamp ? data["createdAt"].toDate() : /* @__PURE__ */ new Date(0);
+    const msPerDay = 1e3 * 60 * 60 * 24;
+    const daysSinceMarkdown = (now.getTime() - lastMarkdownAt.getTime()) / msPerDay;
+    if (daysSinceMarkdown >= markdownPeriodDays) {
+      let dropAmount;
+      if (markdownRate <= 100) {
+        dropAmount = Math.floor(price * (markdownRate / 100));
+      } else {
+        dropAmount = markdownRate;
+      }
+      let newPrice = price - dropAmount;
+      if (newPrice < floorPrice) {
+        newPrice = floorPrice;
+      }
+      if (newPrice < price) {
+        const batch = db.batch();
+        batch.update(doc.ref, {
+          price: newPrice,
+          lastMarkdownAt: import_firestore7.FieldValue.serverTimestamp(),
+          updatedAt: import_firestore7.FieldValue.serverTimestamp()
+        });
+        const auditRef = db.collection("auditLogs").doc();
+        batch.set(auditRef, {
+          eventType: "price_override",
+          uid: "system",
+          details: {
+            itemId: doc.id,
+            oldPrice: price,
+            newPrice,
+            reason: "automated_markdown"
+          },
+          createdAt: import_firestore7.FieldValue.serverTimestamp()
+        });
+        await batch.commit();
+        await sendMarkdownAlert(doc.id, data, db);
+      }
+    }
+  }
+});
+var enableMarkdown = (0, import_https6.onCall)(async (request) => {
+  if (!request.auth) throw new import_https6.HttpsError("unauthenticated", "Must be logged in");
+  (0, import_authHelpers3.assertMfaEnrolled)(request.auth.token);
+  if (!isManagerToken(request.auth.token)) throw new import_https6.HttpsError("permission-denied", "Manager+ required");
+  const { itemId, floorPrice, markdownRate, markdownPeriodDays } = request.data;
+  if (!itemId || typeof floorPrice !== "number" || typeof markdownRate !== "number" || typeof markdownPeriodDays !== "number") {
+    throw new import_https6.HttpsError("invalid-argument", "Missing configuration parameters");
+  }
+  const db = (0, import_firestore7.getFirestore)();
+  const itemRef = db.collection("items").doc(itemId);
+  const itemSnap = await itemRef.get();
+  if (!itemSnap.exists) throw new import_https6.HttpsError("not-found", "Item not found");
+  const itemData = itemSnap.data();
+  const price = Number(itemData["price"]) || 0;
+  const originalPrice = itemData["originalPrice"] === void 0 ? price : Number(itemData["originalPrice"]);
+  await itemRef.update({
+    markdownEnabled: true,
+    floorPrice,
+    markdownRate,
+    markdownPeriodDays,
+    originalPrice,
+    lastMarkdownAt: itemData["lastMarkdownAt"] ?? import_firestore7.FieldValue.serverTimestamp(),
+    updatedAt: import_firestore7.FieldValue.serverTimestamp()
+  });
+  return { success: true };
+});
+var disableMarkdown = (0, import_https6.onCall)(async (request) => {
+  if (!request.auth) throw new import_https6.HttpsError("unauthenticated", "Must be logged in");
+  (0, import_authHelpers3.assertMfaEnrolled)(request.auth.token);
+  if (!isManagerToken(request.auth.token)) throw new import_https6.HttpsError("permission-denied", "Manager+ required");
+  const { itemId } = request.data;
+  if (!itemId) throw new import_https6.HttpsError("invalid-argument", "Missing itemId");
+  const db = (0, import_firestore7.getFirestore)();
+  await db.collection("items").doc(itemId).update({
+    markdownEnabled: false,
+    updatedAt: import_firestore7.FieldValue.serverTimestamp()
+  });
+  return { success: true };
+});
+async function sendMarkdownAlert(itemId, itemData, db) {
+  const viewTag = String(itemData["viewTag"]);
+  const searchTokens = new Set(itemData["searchTokens"] ?? []);
+  const searchesSnap = await db.collection("savedSearches").where("active", "==", true).where("viewTag", "==", viewTag).get();
+  if (searchesSnap.empty) return;
+  for (const doc of searchesSnap.docs) {
+    const savedSearch = doc.data();
+    const queryStr = String(savedSearch["query"] ?? "").toLowerCase().trim();
+    if (!searchTokens.has(queryStr)) continue;
+    const userSnap = await db.collection("users").doc(String(savedSearch["uid"])).get();
+    if (!userSnap.exists) continue;
+    const user = userSnap.data();
+    if (user["alertOptIn"] !== true) continue;
+    const alertMethod = user["alertMethod"];
+    if (alertMethod === "sms" && user["phoneNumber"]) {
+      const body = `[The Pawn Shop Update] An item you're watching has dropped in price. View: https://pawn.shop/item/${itemId}`;
+      try {
+        await (0, import_sms2.dispatchSms)(user["phoneNumber"], body);
+      } catch (err) {
+        console.error(`[Markdown Alert] SMS failed for uid=${userSnap.id}:`, err.message);
+      }
+    }
+  }
+}
+
 // src/index.ts
 (0, import_app.initializeApp)();
 (0, import_v2.setGlobalOptions)({
@@ -208449,12 +208580,15 @@ var receivePosWebhook = (0, import_https5.onRequest)({ secrets: [import_secrets3
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   adjustInventory,
+  applyMarkdownDrops,
   calculateTrendingScore,
   clearRecycleBin,
   createDraftItem,
   deleteInventoryItem,
+  disableMarkdown,
   ebayRequest,
   ebayWebhook,
+  enableMarkdown,
   extractIntakeData,
   geminiApiKey,
   generateAIDescription,

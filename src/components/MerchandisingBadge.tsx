@@ -5,6 +5,7 @@ const BADGE_CONFIG: Record<MerchandisingTag, { label: string; className: string 
   'just-arrived':    { label: 'Just Arrived',       className: 'merch-badge merch-badge--just-arrived' },
   'rare-find':       { label: 'Rare Find',          className: 'merch-badge merch-badge--rare-find' },
   'limited-edition': { label: 'Limited Edition',    className: 'merch-badge merch-badge--limited-edition' },
+  'price-dropped':   { label: '↓ Price Dropped',    className: 'merch-badge merch-badge--price-dropped' },
 }
 
 interface MerchandisingBadgeProps {

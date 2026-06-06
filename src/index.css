@@ -1937,6 +1937,7 @@ select:focus-visible,
 .merch-badge--just-arrived  { color: var(--color-badge-just-arrived-text); background-color: var(--color-badge-just-arrived-bg); }
 .merch-badge--rare-find     { color: var(--color-badge-rare-find-text); background-color: var(--color-badge-rare-find-bg); }
 .merch-badge--limited-edition { color: var(--color-bg); background-color: var(--color-accent); }
+.merch-badge--price-dropped { color: var(--color-badge-on-error); background-color: var(--color-error); }
 
 /* ── E13 · Staff Picks Section ──────────────────────────────────────────── */
 

@@ -5,6 +5,7 @@ const TAG_CLASS: Record<MerchandisingTag, string> = {
   'rare-find':       'merch-badge merch-badge--rare-find',
   'limited-edition': 'merch-badge merch-badge--limited-edition',
   'staff-pick':      'merch-badge merch-badge--staff-pick',
+  'price-dropped':   'merch-badge merch-badge--price-dropped',
 }
 
 const TAG_LABEL: Record<MerchandisingTag, string> = {
@@ -12,6 +13,7 @@ const TAG_LABEL: Record<MerchandisingTag, string> = {
   'rare-find':       'Rare find',
   'limited-edition': 'Limited edition',
   'staff-pick':      'Staff pick',
+  'price-dropped':   'Price dropped',
 }
 
 interface TagBadgeProps {

@@ -4,7 +4,7 @@ export type ReservationStatus = 'pending' | 'confirmed' | 'declined' | 'complete
 export type PawnRequestStatus = 'pending' | 'reviewed' | 'quoted' | 'declined' | 'completed'
 export type ConditionGrade = 'new' | 'like-new' | 'good' | 'fair' | 'poor'
 export type ItemStatus = 'draft' | 'active' | 'reserved' | 'sold' | 'archived' | 'deleted'
-export type MerchandisingTag = 'just-arrived' | 'rare-find' | 'limited-edition' | 'staff-pick'
+export type MerchandisingTag = 'just-arrived' | 'rare-find' | 'limited-edition' | 'staff-pick' | 'price-dropped'
 export type MoodCategory = 'relax' | 'focus' | 'social' | 'ceremony'
 export type CannabisCategory = 'flower' | 'vapes' | 'prerolls' | 'edibles' | 'concentrates' | 'tinctures'
 export type ResellerTier = 'bronze' | 'silver' | 'gold'
@@ -220,6 +220,12 @@ export interface Item {
   viewTags?: ViewType[]
   status: ItemStatus
   price: number          // CAD cents (integer)
+  originalPrice?: number // CAD cents (integer), populated before first markdown
+  floorPrice?: number    // CAD cents (integer), hard floor for markdowns
+  markdownRate?: number  // Percent drop (1-99) or fixed drop
+  markdownPeriodDays?: number // Cadence
+  markdownEnabled?: boolean   // Toggle for automatic Dutch auction
+  lastMarkdownAt?: Date  // Track when last drop happened
   condition: ConditionGrade
   images: string[]       // Firebase Storage URLs, watermarked WebP
   videoUrl?: string

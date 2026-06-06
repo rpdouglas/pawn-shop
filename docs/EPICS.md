@@ -839,13 +839,13 @@
 > - **Kevin (Alert Accuracy):** Price-drop notifications must respect CASL `alertOptIn` and fire within 60 s of the Cloud Function write — same SLA as item alerts.
 > - **Sandra:** "Price Dropped" badge must surface in the masonry grid via the existing `MerchandisingBadge` component. No bounce or particle animation.
 
-- [ ] **Schema first:** Update `docs/firestore-schema.md` — add `floorPrice`, `markdownRate`, `markdownPeriodDays`, `markdownEnabled`, `lastMarkdownAt`, `originalPrice` to `items/{id}`. Log in `DECISIONS.md`. `[Staff]` `[Comp]`
-- [ ] Create `functions/src/markdownEngine.ts`: `applyMarkdownDrops` scheduled CF (daily 03:00 UTC) — batch price drops, CASL-gated SMS/email alerts, `price_override` audit log entries `[Dale]` `[Kev]` `[Comp]`
-- [ ] Create `enableMarkdown` and `disableMarkdown` callable CFs (manager+ only) — staff configures cadence and floor per item `[Staff]` `[Comp]`
-- [ ] Extend `functions/src/notifications.ts` — `sendMarkdownAlert` helper: saved-search match on price drop, generic SMS body (no pricing detail in copy — Marie Discretion Test) `[Kev]` `[Marie]` `[Comp]`
-- [ ] Admin UI: markdown config panel on item detail page in `src/pages/admin/InventoryPage.tsx` (manager-only gate) `[Staff]`
-- [ ] Update `src/components/pawn/MasonryGrid.tsx` and `src/components/ui/Card.tsx`: render "Price Dropped" `MerchandisingBadge` variant when `item.originalPrice` is set `[San]` `[Dale]`
-- [ ] Export new CFs from `functions/src/index.ts` `[Staff]`
+- [x] **Schema first:** Update `docs/firestore-schema.md` — add `floorPrice`, `markdownRate`, `markdownPeriodDays`, `markdownEnabled`, `lastMarkdownAt`, `originalPrice` to `items/{id}`. Log in `DECISIONS.md`. `[Staff]` `[Comp]`
+- [x] Create `functions/src/markdownEngine.ts`: `applyMarkdownDrops` scheduled CF (daily 03:00 UTC) — batch price drops, CASL-gated SMS/email alerts, `price_override` audit log entries `[Dale]` `[Kev]` `[Comp]`
+- [x] Create `enableMarkdown` and `disableMarkdown` callable CFs (manager+ only) — staff configures cadence and floor per item `[Staff]` `[Comp]`
+- [x] Extend `functions/src/notifications.ts` — `sendMarkdownAlert` helper: saved-search match on price drop, generic SMS body (no pricing detail in copy — Marie Discretion Test) `[Kev]` `[Marie]` `[Comp]`
+- [x] Admin UI: markdown config panel on item detail page in `src/pages/admin/InventoryPage.tsx` (manager-only gate) `[Staff]`
+- [x] Update `src/components/pawn/MasonryGrid.tsx` and `src/components/ui/Card.tsx`: render "Price Dropped" `MerchandisingBadge` variant when `item.originalPrice` is set `[San]` `[Dale]`
+- [x] Export new CFs from `functions/src/index.ts` `[Staff]`
 
 ---
 
