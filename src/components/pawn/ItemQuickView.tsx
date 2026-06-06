@@ -53,7 +53,7 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
   // Fires once per item open — item_id is pseudonymous Firestore doc ID, not PII
   useEffect(() => {
     Analytics.itemView({ item_id: item.id, view: item.viewTag, category: item.category })
-    void logActivityFn({ viewTag: item.viewTag })
+    logActivityFn({ viewTag: item.viewTag }).catch(console.error)
   }, [item.id, item.viewTag, item.category])
 
   // Body scroll lock

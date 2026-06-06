@@ -965,9 +965,9 @@
 > **Persona Gate — E76:**
 > - **Compliance:** Automatic enforcement of security, accessibility, and documentation rules.
 
-- [ ] Define and implement `Security_Auditor` subagent (monitors `firestore.rules` and `storage.rules`)
-- [ ] Define and implement `Accessibility_Auditor` subagent (monitors `@axe-core/playwright` results)
-- [ ] Define and implement `Documentation_Specialist` subagent (monitors `vitepress` builds and syncs documentation)
+- [x] Define and implement `Security_Auditor` subagent (monitors `firestore.rules` and `storage.rules`)
+- [x] Define and implement `Accessibility_Auditor` subagent (monitors `@axe-core/playwright` results)
+- [x] Define and implement `Documentation_Specialist` subagent (monitors `vitepress` builds and syncs documentation)
 
 ### E77 · Deferred Design & Content Enhancements
 

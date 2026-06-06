@@ -33,6 +33,8 @@ E31 · Pawn Loan Management Portal — Portal allowing customers to view active 
 | Task | Epic | Completed |
 |---|---|---|
 | Installed `vitest`, `jsdom`, `@testing-library/react` and configured `vite.config.ts` | E21 | 2026-05-22 |
+| Implemented autonomous governance agents (Security, A11y, QA, Docs) and fixed E2E test suite flakiness | E76 | 2026-06-05 |
+| **E76 CLOSED** | E76 | 2026-06-05 |
 | AI Fallback: Graceful degradation for 503/429 errors and updated Gemini models to 3.1-pro/2.5-flash | E73 | 2026-06-05 |
 | Implemented unit tests for `format.ts`, `Button.tsx`, and `AgeGate.tsx` | E21 | 2026-05-22 |
 | **E21 CLOSED** | E21 | 2026-05-22 |

@@ -20,6 +20,9 @@ const CrmDashboardPage: React.FC = () => {
       const docs = snap.docs.map(doc => ({ uid: doc.id, ...doc.data() } as AuthUser))
       setCustomers(docs)
       setLoading(false)
+    }, (error) => {
+      console.error('Customers onSnapshot error:', error)
+      setLoading(false)
     })
 
     return () => unsubscribe()

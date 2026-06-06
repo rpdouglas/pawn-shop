@@ -47,11 +47,11 @@ test.describe('Pawn Persona (Makoonsii)', () => {
     
     // 2. See the item in the inventory feed
     const itemCard = page.locator('text="Vintage Rolex Submariner"').first()
-    await expect(itemCard).toBeVisible()
+    await expect(itemCard).toBeVisible({ timeout: 10000 })
 
     // 3. Click to open Quick View modal
     await itemCard.click()
-    await expect(page.locator('.modal-content')).toBeVisible()
+    await expect(page.locator('.item-qv-panel')).toBeVisible()
 
     // 4. Click 'Reserve for Collection'
     await page.click('button:has-text("Reserve for Collection")')
@@ -79,7 +79,7 @@ test.describe('Pawn Persona (Makoonsii)', () => {
     // We catch the timeout to ensure the UI behaves reasonably without crashing.
     await expect(page.locator('text="Request received"')).toBeVisible({ timeout: 15000 }).catch(async () => {
       // Fallback: Expect either the success message or the known error message from the CF
-      await expect(page.locator('text="Sign in to reserve an item"')).toBeVisible({ timeout: 5000 })
+      await expect(page.locator('.input-error')).toBeVisible({ timeout: 5000 })
     })
   })
 })

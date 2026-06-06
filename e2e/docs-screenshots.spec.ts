@@ -14,39 +14,41 @@ const mockManager = {
 test.describe('Automated Documentation Screenshots', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
-  test('Capture all User Guide screenshots', async ({ page }) => {
-    
-    // Inject mock user to act as a logged-in manager
+  // Inject mock user to act as a logged-in manager
+  test.beforeEach(async ({ page }) => {
     await page.addInitScript((mock) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ;(window as any).__PLAYWRIGHT_MOCK_USER__ = mock
     }, mockManager)
+  })
 
-    // --- 1. Getting Started: Home Page ---
+  test('Capture Home Page', async ({ page }) => {
     await page.goto('/')
-    // Wait for the app to settle
     await page.waitForTimeout(1000)
     await page.screenshot({ path: 'user-guide/public/screenshots/home-page.png' })
+  })
 
-    // --- 2. Admin Dashboard ---
+  test('Capture Admin Dashboard', async ({ page }) => {
     await page.goto('/admin/dashboard')
     await page.waitForTimeout(1000)
     await page.screenshot({ path: 'user-guide/public/screenshots/admin-dashboard.png' })
+  })
 
-    // --- 3. Intake Form ---
+  test('Capture Admin Intake Form', async ({ page }) => {
     await page.goto('/admin/inventory/intake')
     await page.waitForTimeout(1000)
     await page.screenshot({ path: 'user-guide/public/screenshots/admin-intake-form.png', fullPage: true })
+  })
 
-    // --- 4. Inventory List (to show AI Assistant access point) ---
+  test('Capture Admin Inventory List', async ({ page }) => {
     await page.goto('/admin/inventory')
     await page.waitForTimeout(1000)
     await page.screenshot({ path: 'user-guide/public/screenshots/admin-inventory-list.png', fullPage: true })
+  })
 
-    // --- 5. Customer Profiles (CRM) ---
+  test('Capture Admin Customer Profiles CRM', async ({ page }) => {
     await page.goto('/admin/customers')
     await page.waitForTimeout(1000)
-    await page.screenshot({ path: 'user-guide/public/screenshots/admin-customers-crm.png', fullPage: true })
-
+    await page.screenshot({ path: 'user-guide/public/screenshots/admin-customers-crm.png' })
   })
 })
