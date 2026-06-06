@@ -1,11 +1,10 @@
 import { useState, useMemo } from 'react'
 import PriceRangeSlider from './PriceRangeSlider'
-import type { Item, MoodCategory } from '../../lib/types'
+import type { Item } from '../../lib/types'
 
 export type SortMode = 'newest' | 'trending' | 'price-asc' | 'price-desc'
 
 export interface FilterState {
-  moods: MoodCategory[]
   category: string | null
   priceRange: [number, number]
   sort: SortMode
@@ -17,21 +16,12 @@ interface FilterPanelProps {
   onChange: (filters: FilterState) => void
 }
 
-const MOOD_LABELS: Record<MoodCategory, string> = {
-  relax:    'Relax',
-  focus:    'Focus',
-  social:   'Social',
-  ceremony: 'Ceremony',
-}
-
 const SORT_LABELS: Record<SortMode, string> = {
   newest:       'Newest arrivals',
   trending:     'Trending',
   'price-asc':  'Price: low to high',
   'price-desc': 'Price: high to low',
 }
-
-const ALL_MOODS: MoodCategory[] = ['relax', 'focus', 'social', 'ceremony']
 
 function chipStyle(isActive: boolean): React.CSSProperties {
   return {
@@ -61,14 +51,13 @@ export default function FilterPanel({ items, filters, onChange }: FilterPanelPro
   ), [items])
 
   const activeFilterCount = [
-    filters.moods.length > 0,
     filters.category,
     filters.priceRange[0] > priceMin || filters.priceRange[1] < priceMax,
     filters.sort !== 'newest',
   ].filter(Boolean).length
 
   function clearAll() {
-    onChange({ moods: [], category: null, priceRange: [priceMin, priceMax], sort: 'newest' })
+    onChange({ category: null, priceRange: [priceMin, priceMax], sort: 'newest' })
   }
 
   const effectivePriceRange: [number, number] = [
@@ -147,19 +136,7 @@ export default function FilterPanel({ items, filters, onChange }: FilterPanelPro
           </button>
         )}
 
-        {/* Active chips — mood and category */}
-        {filters.moods.map(mood => (
-          <span key={mood} style={{ ...chipStyle(true), display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)' }}>
-            {MOOD_LABELS[mood]}
-            <button
-              onClick={() => onChange({ ...filters, moods: filters.moods.filter(m => m !== mood) })}
-              aria-label={`Remove ${MOOD_LABELS[mood]} filter`}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', padding: 0, lineHeight: 1, fontSize: 'var(--text-body)' }}
-            >
-              ×
-            </button>
-          </span>
-        ))}
+        {/* Active chips — category */}
         {filters.category && (
           <span style={{ ...chipStyle(true), display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)' }}>
             {filters.category.replace(/-/g, ' ')}
@@ -189,41 +166,7 @@ export default function FilterPanel({ items, filters, onChange }: FilterPanelPro
             marginBottom: 'var(--space-6)',
           }}
         >
-          {/* Mood */}
-          <fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
-            <legend style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 'var(--text-small)',
-              fontWeight: 600,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase' as const,
-              color: 'var(--color-text-muted)',
-              marginBottom: 'var(--space-4)',
-              display: 'block',
-            }}>
-              Mood
-            </legend>
-            <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 'var(--space-2)' }}>
-              {ALL_MOODS.map(mood => {
-                const isActive = filters.moods.includes(mood)
-                return (
-                  <button
-                    key={mood}
-                    onClick={() => {
-                      const newMoods = isActive
-                        ? filters.moods.filter(m => m !== mood)
-                        : [...filters.moods, mood]
-                      onChange({ ...filters, moods: newMoods })
-                    }}
-                    aria-pressed={isActive}
-                    style={chipStyle(isActive)}
-                  >
-                    {MOOD_LABELS[mood]}
-                  </button>
-                )
-              })}
-            </div>
-          </fieldset>
+
 
           {/* Category */}
           {categories.length > 1 && (

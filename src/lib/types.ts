@@ -6,6 +6,7 @@ export type ConditionGrade = 'new' | 'like-new' | 'good' | 'fair' | 'poor'
 export type ItemStatus = 'draft' | 'active' | 'reserved' | 'sold' | 'archived' | 'deleted'
 export type MerchandisingTag = 'just-arrived' | 'rare-find' | 'limited-edition' | 'staff-pick'
 export type MoodCategory = 'relax' | 'focus' | 'social' | 'ceremony'
+export type CannabisCategory = 'flower' | 'vapes' | 'prerolls' | 'edibles' | 'concentrates' | 'tinctures'
 export type ResellerTier = 'bronze' | 'silver' | 'gold'
 export type AlertMethod = 'sms' | 'email' | 'none'
 

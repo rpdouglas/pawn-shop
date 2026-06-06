@@ -12,7 +12,7 @@
 |-------|------|-------|
 | `title` | string | Display title |
 | `description` | string | Staff-written, customer-visible |
-| `category` | string | e.g. `electronics`, `jewellery`, `cannabis-flower` |
+| `category` | string | e.g. `electronics`, `flower`, `vapes`, `prerolls`, `edibles`, `concentrates`, `tinctures` |
 | `viewTag` | string | Primary view: `pawn` \| `cannabis` \| `fireworks` \| `tobacco` |
 | `viewTags` | array\<string\> | Multi-view items |
 | `status` | string | `draft` \| `active` \| `reserved` \| `sold` \| `archived` \| `deleted` |

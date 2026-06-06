@@ -113,6 +113,8 @@ E31 · Pawn Loan Management Portal — Portal allowing customers to view active 
 | `E81 Phase 2` — Added `sendLoanReminders` CF for 3-day SMS reminders. | E81 | 2026-06-06 |
 | `E81 Phase 3` — Updated `LoanTicketsAdminPage` with manual redeem/forfeit UI and `ProfilePage` for customer visibility. | E81 | 2026-06-06 |
 | **E81 CLOSED** | E81 | 2026-06-06 |
+| `E82 Phase 1` — Rebuilt `CannabisPage`, added `CannabisMarqueeStrip` and `StoryStrip`, updated `LuxuryProductCard` USD/CAD logic. | E82 | 2026-06-06 |
+| **E82 CLOSED** | E82 | 2026-06-06 |
 
 ---
 

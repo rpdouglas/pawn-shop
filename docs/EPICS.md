@@ -1139,3 +1139,14 @@
 - [ ] **CF: `createLocation(locationData)`** — admin only; initialises `storeHours` config for new location
 - [ ] **Admin UI:** location selector in admin portal header; all queries scoped by `locationId` when present
 - [ ] Preserve single-location behaviour as default (`locationId: 'cornwall-island'` hardcoded) — no breaking changes to existing collections
+
+### E82 · Cannabis Storefront Hybrid Rebuild
+**Priority: HIGH · Estimated effort: 2 developer-days**
+> **Persona Gate — E82:**
+> - **Marie:** Intuitive navigation (Flower, Vapes, Edibles) replaces the abstract Mood categories.
+> - **Dale:** Product cards must clearly show USD vs CAD comparisons to validate cross-border savings.
+
+- [x] **Schema:** Update `firestore-schema.md` to map cannabis categories (flower, vapes, prerolls, edibles, concentrates, tinctures) instead of moods.
+- [x] **UI:** Build `CannabisMarqueeStrip` and `StoryStrip` components.
+- [x] **UI:** Update `LuxuryProductCard` to display THC/CBD progress bars and USD vs CAD comparison logic.
+- [x] **UI:** Rewrite `CannabisPage.tsx` to integrate the "American Craft, Canadian Prices" hero, removing `MoodCard`.

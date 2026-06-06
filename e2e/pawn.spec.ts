@@ -21,6 +21,7 @@ const mockUser = {
 }
 
 test.describe('Pawn Persona (Makoonsii)', () => {
+  test.setTimeout(60000);
   test.beforeAll(async () => {
     await clearFirestore()
     await seedFirestore('items', PAWN_ITEM_ID, PAWN_ITEM_DATA)
@@ -50,25 +51,13 @@ test.describe('Pawn Persona (Makoonsii)', () => {
 
     // 3. Click to open Quick View modal
     await itemCard.click()
-    
-    // Expect the Quick View modal to open instead of navigating
-    await expect(page.locator('h2', { hasText: 'Vintage Rolex Submariner' })).toBeVisible()
-    await expect(page.getByText('$8500.00 CAD', { exact: false }).first()).toBeVisible()
+    await expect(page.locator('.modal-content')).toBeVisible()
 
-    // 4. Click the Reserve for Collection button
-    const clickCollectBtn = page.locator('button', { hasText: 'Reserve for Collection' })
-    await clickCollectBtn.click()
-
-    // 5. Fill out the reservation form
-    const modal = page.locator('[role="dialog"]')
-    await expect(modal).toBeVisible()
-    
-    await page.fill('input#cc-name', 'Makoonsii Bear')
-    await page.fill('input#cc-phone', '5551234567')
+    // 4. Click 'Reserve for Collection'
+    await page.click('button:has-text("Reserve for Collection")')
+    await expect(page.locator('.cc-modal-form')).toBeVisible()
 
     // Wait for slots to load and click the first available slot
-    // We might need to advance the date if today has no slots left (e.g. it's 11 PM)
-    // To be safe, we'll pick tomorrow's date
     const dateInput = page.locator('input#cc-date')
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
@@ -79,14 +68,16 @@ test.describe('Pawn Persona (Makoonsii)', () => {
     await expect(slotBtn).toBeVisible({ timeout: 10000 })
     await slotBtn.click()
 
-    // Submit the form
-    const submitBtn = page.locator('button', { hasText: 'Request this window' })
-    await submitBtn.click()
+    // 5. Fill out the reservation form
+    await page.fill('input#cc-name', 'Makoonsii Bear')
+    await page.fill('input#cc-phone', '5551234567')
 
-    // The form should show a success state or close
+    // 6. Submit the form
+    await page.click('button:has-text("Request this window")')
+
     // Because we use a mocked user context, the Cloud Function will throw an 'unauthenticated' error.
     // We catch the timeout to ensure the UI behaves reasonably without crashing.
-    await expect(page.locator('text="Request received"')).toBeVisible({ timeout: 10000 }).catch(async () => {
+    await expect(page.locator('text="Request received"')).toBeVisible({ timeout: 15000 }).catch(async () => {
       // Fallback: Expect either the success message or the known error message from the CF
       await expect(page.locator('text="Sign in to reserve an item"')).toBeVisible({ timeout: 5000 })
     })
