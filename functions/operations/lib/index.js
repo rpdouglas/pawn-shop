@@ -207128,6 +207128,7 @@ __export(index_exports, {
   clearRecycleBin: () => clearRecycleBin,
   createDraftItem: () => createDraftItem,
   deleteInventoryItem: () => deleteInventoryItem,
+  ebayRequest: () => ebayRequest,
   ebayWebhook: () => ebayWebhook,
   extractIntakeData: () => extractIntakeData,
   geminiApiKey: () => geminiApiKey,
@@ -207140,6 +207141,7 @@ __export(index_exports, {
   receivePosWebhook: () => receivePosWebhook,
   removeJustArrivedTags: () => removeJustArrivedTags,
   resetExpiredHolds: () => resetExpiredHolds,
+  searchEbayComps: () => searchEbayComps,
   setHold: () => setHold,
   setPoliceHold: () => setPoliceHold,
   suggestAiPrice: () => suggestAiPrice,
@@ -207151,37 +207153,275 @@ var import_app = require("firebase-admin/app");
 var import_v2 = require("firebase-functions/v2");
 
 // src/inventory.ts
-var import_https2 = require("firebase-functions/v2/https");
+var import_https3 = require("firebase-functions/v2/https");
 var import_authHelpers2 = __toESM(require_authHelpers());
 var import_scheduler = require("firebase-functions/v2/scheduler");
-var import_firestore2 = require("firebase-functions/v2/firestore");
-var import_firestore3 = require("firebase-admin/firestore");
+var import_firestore3 = require("firebase-functions/v2/firestore");
+var import_firestore4 = require("firebase-admin/firestore");
 var import_storage = require("firebase-admin/storage");
 var import_sharp = __toESM(require("sharp"));
 var path = __toESM(require("node:path"));
 var import_sms = __toESM(require_sms());
-var import_secrets = __toESM(require_secrets());
+var import_secrets2 = __toESM(require_secrets());
 
 // src/ai.ts
-var import_https = require("firebase-functions/v2/https");
-var import_firestore = require("firebase-admin/firestore");
+var import_https2 = require("firebase-functions/v2/https");
+var import_firestore2 = require("firebase-admin/firestore");
 var import_generative_ai = require("@google/generative-ai");
 var import_params = require("firebase-functions/params");
 var import_authHelpers = __toESM(require_authHelpers());
+
+// src/ebay.ts
+var import_https = require("firebase-functions/v2/https");
+var import_firestore = require("firebase-admin/firestore");
+var import_node_crypto = require("node:crypto");
+var import_secrets = __toESM(require_secrets());
+var EBAY_CATEGORY_MAP = {
+  electronics: "293",
+  jewellery: "281",
+  tools: "631",
+  collectibles: "1",
+  clothing: "11450"
+};
+var EBAY_CONDITION_MAP = {
+  new: 1e3,
+  "like-new": 1500,
+  good: 3e3,
+  fair: 5e3,
+  poor: 7e3
+};
+var EBAY_DEFAULT_CONDITION = 3e3;
+function isStaffToken(token) {
+  return token["admin"] === true || token["manager"] === true;
+}
+function getEbayBase() {
+  return import_secrets.ebaySandbox.value() === "true" ? "https://api.sandbox.ebay.com" : "https://api.ebay.com";
+}
+async function ebayRequest(method, path2, body) {
+  const token = import_secrets.ebayUserToken.value();
+  if (!token || token === "dummy") throw new import_https.HttpsError("internal", "EBAY_USER_TOKEN not configured");
+  const res = await fetch(`${getEbayBase()}${path2}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-EBAY-C-MARKETPLACE-ID": "EBAY_CA"
+    },
+    body: body !== void 0 ? JSON.stringify(body) : void 0
+  });
+  if (res.status === 204) return { ok: true, status: 204, data: null };
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+  }
+  return { ok: res.ok, status: res.status, data };
+}
+async function searchEbayComps(query) {
+  try {
+    const res = await ebayRequest("GET", `/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=3`);
+    if (res.ok && res.data && res.data.itemSummaries) {
+      return res.data.itemSummaries;
+    }
+  } catch (err) {
+    console.warn("Failed to fetch eBay comps:", err);
+  }
+  return [];
+}
+var pushToEbay = (0, import_https.onCall)(
+  { cors: true, secrets: [import_secrets.ebayUserToken] },
+  async (request) => {
+    if (!request.auth || !isStaffToken(request.auth.token)) {
+      throw new import_https.HttpsError("permission-denied", "Admin or manager role required");
+    }
+    const { itemId } = request.data;
+    if (!itemId) throw new import_https.HttpsError("invalid-argument", "itemId is required");
+    const db = (0, import_firestore.getFirestore)();
+    const itemRef = db.collection("items").doc(itemId);
+    const snap = await itemRef.get();
+    if (!snap.exists) throw new import_https.HttpsError("not-found", `Item ${itemId} not found`);
+    const item = snap.data();
+    if (item["status"] !== "active") {
+      throw new import_https.HttpsError(
+        "failed-precondition",
+        `Item must be active to push to eBay (current: ${String(item["status"])})`
+      );
+    }
+    if (item["policeHold"] === true) {
+      throw new import_https.HttpsError("failed-precondition", "Item is on police hold and cannot be listed");
+    }
+    if (item["viewTag"] !== "pawn") {
+      throw new import_https.HttpsError(
+        "failed-precondition",
+        "Only pawn items can be listed on eBay \u2014 cannabis and fireworks are prohibited on eBay"
+      );
+    }
+    if (typeof item["ebayListingId"] === "string" && item["ebayListingId"]) {
+      throw new import_https.HttpsError(
+        "already-exists",
+        `Item is already listed on eBay (ID: ${item["ebayListingId"]})`
+      );
+    }
+    const title = String(item["title"] ?? "");
+    const description = String(item["description"] ?? "");
+    const category = String(item["category"] ?? "").toLowerCase().trim();
+    const condition = String(item["condition"] ?? "good");
+    const priceCents = Number(item["price"]);
+    const images = item["images"] ?? [];
+    const locationKey = import_secrets.ebayLocationKey.value() || "main_store";
+    const sku = itemId;
+    const inventoryResult = await ebayRequest(
+      "PUT",
+      `/sell/inventory/v1/inventory_item/${encodeURIComponent(sku)}`,
+      {
+        availability: { shipToLocationAvailability: { quantity: 1 } },
+        condition: EBAY_CONDITION_MAP[condition] ?? EBAY_DEFAULT_CONDITION,
+        product: {
+          title,
+          description,
+          imageUrls: images.slice(0, 12)
+          // eBay maximum 12 images per listing
+        }
+      }
+    );
+    if (!inventoryResult.ok) {
+      throw new import_https.HttpsError("internal", "Failed to create eBay inventory item");
+    }
+    const offerResult = await ebayRequest("POST", "/sell/inventory/v1/offer", {
+      sku,
+      marketplaceId: "EBAY_CA",
+      format: "FIXED_PRICE",
+      availableQuantity: 1,
+      categoryId: EBAY_CATEGORY_MAP[category] ?? "99",
+      pricingSummary: {
+        price: { value: (priceCents / 100).toFixed(2), currency: "CAD" }
+      },
+      listingDescription: description,
+      merchantLocationKey: locationKey
+    });
+    if (!offerResult.ok || typeof offerResult.data !== "object" || !offerResult.data) {
+      throw new import_https.HttpsError("internal", "Failed to create eBay offer");
+    }
+    const offerId = offerResult.data["offerId"];
+    if (typeof offerId !== "string") {
+      throw new import_https.HttpsError("internal", "eBay offer response missing offerId");
+    }
+    const publishResult = await ebayRequest(
+      "POST",
+      `/sell/inventory/v1/offer/${encodeURIComponent(offerId)}/publish`,
+      {}
+    );
+    if (!publishResult.ok || typeof publishResult.data !== "object" || !publishResult.data) {
+      throw new import_https.HttpsError("internal", "Failed to publish eBay offer");
+    }
+    const listingId = publishResult.data["listingId"];
+    if (typeof listingId !== "string") {
+      throw new import_https.HttpsError("internal", "eBay publish response missing listingId");
+    }
+    await itemRef.update({
+      ebayListingId: listingId,
+      updatedAt: import_firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection("auditLogs").add({
+      eventType: "ebay_push",
+      uid: request.auth.uid,
+      targetId: itemId,
+      details: { itemId, ebayListingId: listingId, viewTag: item["viewTag"] },
+      createdAt: import_firestore.FieldValue.serverTimestamp()
+    });
+    return { success: true, ebayListingId: listingId };
+  }
+);
+var ebayWebhook = (0, import_https.onRequest)({ secrets: [import_secrets.ebayVerificationToken] }, async (req, res) => {
+  if (req.method === "GET") {
+    const challengeCode = typeof req.query["challenge_code"] === "string" ? req.query["challenge_code"] : null;
+    if (!challengeCode) {
+      res.status(400).json({ error: "challenge_code required" });
+      return;
+    }
+    const verificationToken2 = import_secrets.ebayVerificationToken.value();
+    const endpointUrl = import_secrets.ebayWebhookUrl.value();
+    if (!verificationToken2 || !endpointUrl) {
+      res.status(500).json({ error: "Webhook environment not configured" });
+      return;
+    }
+    const challengeResponse = (0, import_node_crypto.createHash)("sha256").update(challengeCode + verificationToken2 + endpointUrl).digest("hex");
+    res.status(200).json({ challengeResponse });
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).end();
+    return;
+  }
+  const verificationToken = import_secrets.ebayVerificationToken.value();
+  if (!verificationToken) {
+    res.status(500).json({ error: "Webhook environment not configured" });
+    return;
+  }
+  const signature = req.headers["x-ebay-signature"];
+  if (typeof signature !== "string") {
+    res.status(403).json({ error: "Missing x-ebay-signature header" });
+    return;
+  }
+  const rawBody = req.rawBody?.toString("utf8") ?? JSON.stringify(req.body);
+  const expectedSignature = (0, import_node_crypto.createHash)("sha256").update(rawBody + verificationToken).digest("base64");
+  if (signature !== expectedSignature) {
+    res.status(403).json({ error: "Signature mismatch" });
+    return;
+  }
+  res.status(200).json({ success: true });
+  try {
+    await processEbayNotification(req.body);
+  } catch (err) {
+    console.error("[ebayWebhook] notification processing error:", err);
+  }
+});
+async function processEbayNotification(payload) {
+  if (typeof payload !== "object" || payload === null) return;
+  const n = payload;
+  const topic = n.metadata?.topic ?? "";
+  if (!topic.toLowerCase().includes("item_sold")) return;
+  const data = n.notification?.data;
+  if (!data) return;
+  const listingId = String(data["listingId"] ?? data["itemId"] ?? "").trim();
+  if (!listingId) return;
+  const db = (0, import_firestore.getFirestore)();
+  const snap = await db.collection("items").where("ebayListingId", "==", listingId).limit(1).get();
+  if (snap.empty) return;
+  const itemDoc = snap.docs[0];
+  if (itemDoc.data()["status"] === "sold") return;
+  await itemDoc.ref.update({
+    status: "sold",
+    soldAt: import_firestore.FieldValue.serverTimestamp(),
+    updatedAt: import_firestore.FieldValue.serverTimestamp()
+  });
+  await db.collection("auditLogs").add({
+    eventType: "ebay_sync_sold",
+    uid: "ebay_webhook",
+    targetId: itemDoc.id,
+    details: { itemId: itemDoc.id, ebayListingId: listingId },
+    createdAt: import_firestore.FieldValue.serverTimestamp()
+  });
+}
+
+// src/ai.ts
 var geminiApiKey = (0, import_params.defineSecret)("GEMINI_API_KEY");
-function getModels() {
+function getModels(schema) {
   const genAI = new import_generative_ai.GoogleGenerativeAI(geminiApiKey.value());
+  const config = schema ? { generationConfig: { responseMimeType: "application/json", responseSchema: schema } } : {};
   return {
-    model: genAI.getGenerativeModel({ model: "gemini-3.1-pro" }),
-    flashModel: genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
+    model: genAI.getGenerativeModel({ model: "gemini-3.1-pro", ...config }),
+    flashModel: genAI.getGenerativeModel({ model: "gemini-3.5-flash", ...config }),
+    liteModel: genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite", ...config })
   };
 }
-var generateAIDescription = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async (request) => {
-  const db = (0, import_firestore.getFirestore)();
+var generateAIDescription = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, async (request) => {
+  const db = (0, import_firestore2.getFirestore)();
   const { uid } = await (0, import_authHelpers.assertStaff)(request);
-  const { itemId, title, category, viewTag, condition, provenanceNotes, serialNumber, staffNotes } = request.data;
+  const { itemId, title, category, viewTag, condition, provenanceNotes, serialNumber, staffNotes, images } = request.data;
   if (!itemId || !title) {
-    throw new import_https.HttpsError("invalid-argument", "Missing itemId or title.");
+    throw new import_https2.HttpsError("invalid-argument", "Missing itemId or title.");
   }
   const systemPrompt = `
     You are an expert product copywriter for The Pawn Shop \u2014 a premium, dapper, and distinctly Akwesasne retail platform on Cornwall Island. The brand voice is: quiet confidence, editorial precision, occasionally witty. Never shout. Curate.
@@ -207213,16 +207453,45 @@ var generateAIDescription = (0, import_https.onCall)({ secrets: [geminiApiKey] }
       "culturalNote": "Optional note"
     }
   `;
+  const schema = {
+    type: import_generative_ai.SchemaType.OBJECT,
+    properties: {
+      draft: { type: import_generative_ai.SchemaType.STRING, description: "150\u2013250 word editorial description" },
+      suggestedTags: { type: import_generative_ai.SchemaType.ARRAY, items: { type: import_generative_ai.SchemaType.STRING } },
+      provenanceFlag: { type: import_generative_ai.SchemaType.BOOLEAN },
+      culturalNote: { type: import_generative_ai.SchemaType.STRING }
+    },
+    required: ["draft", "suggestedTags", "provenanceFlag", "culturalNote"]
+  };
   try {
-    const { model, flashModel } = getModels();
+    const { model, flashModel } = getModels(schema);
+    const promptParts = [systemPrompt, userPrompt];
+    if (images && Array.isArray(images) && images.length > 0) {
+      try {
+        const imgRes = await fetch(images[0]);
+        if (imgRes.ok) {
+          const arrayBuffer = await imgRes.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          const mimeType = imgRes.headers.get("content-type") || "image/jpeg";
+          promptParts.push({
+            inlineData: {
+              data: buffer.toString("base64"),
+              mimeType
+            }
+          });
+        }
+      } catch (err) {
+        console.warn("Failed to fetch image for AI description context:", err);
+      }
+    }
     let result;
     try {
-      result = await model.generateContent([systemPrompt, userPrompt]);
+      result = await model.generateContent(promptParts);
     } catch (error) {
       const err = error;
       if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
         console.warn("Gemini Pro unavailable (Quota/503), falling back to Flash model...");
-        result = await flashModel.generateContent([systemPrompt, userPrompt]);
+        result = await flashModel.generateContent(promptParts);
       } else {
         throw err;
       }
@@ -207235,7 +207504,7 @@ var generateAIDescription = (0, import_https.onCall)({ secrets: [geminiApiKey] }
     await aiRef.set({
       aiDescription: parsed.draft,
       aiTagSuggestions: parsed.suggestedTags || [],
-      updatedAt: import_firestore.FieldValue.serverTimestamp(),
+      updatedAt: import_firestore2.FieldValue.serverTimestamp(),
       generatedBy: uid
     }, { merge: true });
     await db.collection("auditLogs").add({
@@ -207243,26 +207512,35 @@ var generateAIDescription = (0, import_https.onCall)({ secrets: [geminiApiKey] }
       uid,
       targetId: itemId,
       details: { model: "gemini-pro-latest" },
-      createdAt: import_firestore.FieldValue.serverTimestamp()
+      createdAt: import_firestore2.FieldValue.serverTimestamp()
     });
     return { success: true, ...parsed };
   } catch (err) {
     console.error("Gemini Error:", err);
-    throw new import_https.HttpsError("internal", "Failed to generate AI description.");
+    throw new import_https2.HttpsError("internal", "Failed to generate AI description.");
   }
 });
-var suggestAiPrice = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async (request) => {
-  const db = (0, import_firestore.getFirestore)();
+var suggestAiPrice = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, async (request) => {
+  const db = (0, import_firestore2.getFirestore)();
   const { uid } = await (0, import_authHelpers.assertStaff)(request);
   const { itemId, title, category, condition, brandModel, staffNotes } = request.data;
   if (!itemId || !title) {
-    throw new import_https.HttpsError("invalid-argument", "Missing itemId or title.");
+    throw new import_https2.HttpsError("invalid-argument", "Missing itemId or title.");
+  }
+  let ebayContext = "No recent eBay comps found.";
+  try {
+    const comps = await searchEbayComps(title);
+    if (comps && comps.length > 0) {
+      ebayContext = "RECENT EBAY COMPS:\n" + comps.map((c) => `- ${c.title}: ${c.price?.value} ${c.price?.currency}`).join("\n");
+    }
+  } catch (err) {
+    console.warn("eBay comps failed, proceeding without them", err);
   }
   const systemPrompt = `
     You are a pricing analyst for a pawn shop. Analyse eBay sold listings to provide a price range recommendation. This is GUIDANCE ONLY \u2014 it is never a final price.
     RULES:
     - Always frame output as a range, never a single price.
-    - Always state the basis for your recommendation.
+    - Always state the basis for your recommendation using the provided comps.
     - Prices are in CAD cents (integer).
     - Never frame the suggestion as the "correct" or "recommended" price.
   `;
@@ -207274,6 +207552,8 @@ var suggestAiPrice = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async
     - Brand/Model: ${brandModel || "Unknown"}
     - Staff Notes: ${staffNotes || "None"}
 
+    ${ebayContext}
+
     OUTPUT FORMAT (JSON):
     {
       "low": 0,
@@ -207283,8 +207563,19 @@ var suggestAiPrice = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async
       "note": "Guidance only."
     }
   `;
+  const schema = {
+    type: import_generative_ai.SchemaType.OBJECT,
+    properties: {
+      low: { type: import_generative_ai.SchemaType.INTEGER },
+      high: { type: import_generative_ai.SchemaType.INTEGER },
+      source: { type: import_generative_ai.SchemaType.STRING },
+      confidenceLevel: { type: import_generative_ai.SchemaType.STRING },
+      note: { type: import_generative_ai.SchemaType.STRING }
+    },
+    required: ["low", "high", "source", "confidenceLevel", "note"]
+  };
   try {
-    const { model, flashModel } = getModels();
+    const { model, flashModel } = getModels(schema);
     let result;
     try {
       result = await model.generateContent([systemPrompt, userPrompt]);
@@ -207302,7 +207593,7 @@ var suggestAiPrice = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async
     const aiRef = db.collection("items").doc(itemId).collection("internal").doc("ai");
     await aiRef.set({
       aiPriceSuggestion: parsed,
-      updatedAt: import_firestore.FieldValue.serverTimestamp(),
+      updatedAt: import_firestore2.FieldValue.serverTimestamp(),
       generatedBy: uid
     }, { merge: true });
     await db.collection("auditLogs").add({
@@ -207310,16 +207601,16 @@ var suggestAiPrice = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async
       uid,
       targetId: itemId,
       details: { low: parsed.low, high: parsed.high },
-      createdAt: import_firestore.FieldValue.serverTimestamp()
+      createdAt: import_firestore2.FieldValue.serverTimestamp()
     });
     return { success: true, suggestion: parsed };
   } catch (err) {
     console.error("Gemini Pricing Error:", err);
-    throw new import_https.HttpsError("internal", "Failed to suggest AI price.");
+    throw new import_https2.HttpsError("internal", "Failed to suggest AI price.");
   }
 });
-var suggestAiTags = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async (request) => {
-  const db = (0, import_firestore.getFirestore)();
+var suggestAiTags = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, async (request) => {
+  const db = (0, import_firestore2.getFirestore)();
   const { uid } = await (0, import_authHelpers.assertStaff)(request);
   const { itemId, title, category, condition, provenanceNotes } = request.data;
   const systemPrompt = `
@@ -207328,17 +207619,29 @@ var suggestAiTags = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async 
     - rare-find: genuinely uncommon.
     - limited-edition: confirmed limited run.
     Minimum 3 suggestions or explain why in note.
+    
+    OUTPUT FORMAT (JSON):
+    {
+      "suggestedTags": ["tag1", "tag2"]
+    }
   `;
   const userPrompt = `Suggest tags for: ${title} (${category}, ${condition}). Provenance: ${provenanceNotes || "None"}`;
+  const schema = {
+    type: import_generative_ai.SchemaType.OBJECT,
+    properties: {
+      suggestedTags: { type: import_generative_ai.SchemaType.ARRAY, items: { type: import_generative_ai.SchemaType.STRING } }
+    },
+    required: ["suggestedTags"]
+  };
   try {
-    const { model, flashModel } = getModels();
+    const { model, liteModel } = getModels(schema);
     let result;
     try {
-      result = await flashModel.generateContent([systemPrompt, userPrompt]);
+      result = await liteModel.generateContent([systemPrompt, userPrompt]);
     } catch (error) {
       const err = error;
       if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
-        console.warn("Gemini Flash unavailable (Quota/503), falling back to Pro model...");
+        console.warn("Gemini Flash Lite unavailable (Quota/503), falling back to Pro model...");
         result = await model.generateContent([systemPrompt, userPrompt]);
       } else {
         throw err;
@@ -207349,17 +207652,17 @@ var suggestAiTags = (0, import_https.onCall)({ secrets: [geminiApiKey] }, async 
     const aiRef = db.collection("items").doc(itemId).collection("internal").doc("ai");
     await aiRef.set({
       aiTagSuggestions: parsed.suggestedTags || [],
-      updatedAt: import_firestore.FieldValue.serverTimestamp(),
+      updatedAt: import_firestore2.FieldValue.serverTimestamp(),
       generatedBy: uid
     }, { merge: true });
     return { success: true, tags: parsed.suggestedTags || [] };
   } catch (err) {
     console.error("Gemini Tag Error:", err);
-    throw new import_https.HttpsError("internal", "Failed to suggest AI tags.");
+    throw new import_https2.HttpsError("internal", "Failed to suggest AI tags.");
   }
 });
 async function extractIntakeData(buffer, mimeType, viewTag) {
-  const db = (0, import_firestore.getFirestore)();
+  const db = (0, import_firestore2.getFirestore)();
   const { model, flashModel } = getModels();
   let referenceContext = "";
   if (viewTag === "cannabis") {
@@ -207544,7 +207847,7 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
 }
 
 // src/inventory.ts
-function isStaffToken(token) {
+function isStaffToken2(token) {
   return token["admin"] === true || token["manager"] === true || token["inventory_staff"] === true;
 }
 function buildSearchTokens(title, category) {
@@ -207558,14 +207861,14 @@ function buildSearchTokens(title, category) {
   }
   return Array.from(tokens);
 }
-var onItemPublished = (0, import_firestore2.onDocumentUpdated)({ document: "items/{itemId}", secrets: [import_secrets.twilioAccountSid, import_secrets.twilioAuthToken] }, async (event) => {
+var onItemPublished = (0, import_firestore3.onDocumentUpdated)({ document: "items/{itemId}", secrets: [import_secrets2.twilioAccountSid, import_secrets2.twilioAuthToken] }, async (event) => {
   const before = event.data?.before.data();
   const after = event.data?.after.data();
   if (!after) return;
   if (before?.["status"] === "active") return;
   if (after["status"] !== "active") return;
   if (after["policeHold"] === true) return;
-  const db = (0, import_firestore3.getFirestore)();
+  const db = (0, import_firestore4.getFirestore)();
   const itemId = event.params.itemId;
   const viewTag = after["viewTag"];
   const title = after["title"];
@@ -207587,7 +207890,7 @@ var onItemPublished = (0, import_firestore2.onDocumentUpdated)({ document: "item
       link: `/pawn/item/${itemId}`,
       // Assuming path structure
       read: false,
-      createdAt: import_firestore3.FieldValue.serverTimestamp()
+      createdAt: import_firestore4.FieldValue.serverTimestamp()
     }));
     const alertMethod = user["alertMethod"];
     if (alertMethod === "sms" && user["phoneNumber"]) {
@@ -207600,16 +207903,16 @@ var onItemPublished = (0, import_firestore2.onDocumentUpdated)({ document: "item
   });
   await Promise.all(notifications.filter(Boolean));
 });
-var createDraftItem = (0, import_https2.onCall)({ cors: true }, async (request) => {
-  if (!request.auth || !isStaffToken(request.auth.token)) {
-    throw new import_https2.HttpsError("permission-denied", "Staff role required");
+var createDraftItem = (0, import_https3.onCall)({ cors: true }, async (request) => {
+  if (!request.auth || !isStaffToken2(request.auth.token)) {
+    throw new import_https3.HttpsError("permission-denied", "Staff role required");
   }
   const { title, category, viewTag } = request.data;
-  if (!title) throw new import_https2.HttpsError("invalid-argument", "title is required");
-  if (!category) throw new import_https2.HttpsError("invalid-argument", "category is required");
-  if (!viewTag) throw new import_https2.HttpsError("invalid-argument", "viewTag is required");
-  const now = import_firestore3.FieldValue.serverTimestamp();
-  const ref = await (0, import_firestore3.getFirestore)().collection("items").add({
+  if (!title) throw new import_https3.HttpsError("invalid-argument", "title is required");
+  if (!category) throw new import_https3.HttpsError("invalid-argument", "category is required");
+  if (!viewTag) throw new import_https3.HttpsError("invalid-argument", "viewTag is required");
+  const now = import_firestore4.FieldValue.serverTimestamp();
+  const ref = await (0, import_firestore4.getFirestore)().collection("items").add({
     title,
     category,
     viewTag,
@@ -207628,30 +207931,30 @@ var WATERMARK_SVG = Buffer.from(
           fill="white" fill-opacity="0.60" font-weight="bold">\xA9 The Pawn Shop</text>
   </svg>`
 );
-var publishItem = (0, import_https2.onCall)({ cors: true }, async (request) => {
-  if (!request.auth || !isStaffToken(request.auth.token)) {
-    throw new import_https2.HttpsError("permission-denied", "Staff role required");
+var publishItem = (0, import_https3.onCall)({ cors: true }, async (request) => {
+  if (!request.auth || !isStaffToken2(request.auth.token)) {
+    throw new import_https3.HttpsError("permission-denied", "Staff role required");
   }
   const { itemId } = request.data;
-  if (!itemId) throw new import_https2.HttpsError("invalid-argument", "itemId is required");
-  const db = (0, import_firestore3.getFirestore)();
+  if (!itemId) throw new import_https3.HttpsError("invalid-argument", "itemId is required");
+  const db = (0, import_firestore4.getFirestore)();
   const itemRef = db.collection("items").doc(itemId);
   const snap = await itemRef.get();
-  if (!snap.exists) throw new import_https2.HttpsError("not-found", `Item ${itemId} not found`);
+  if (!snap.exists) throw new import_https3.HttpsError("not-found", `Item ${itemId} not found`);
   const item = snap.data();
   if (item["status"] !== "draft") {
-    throw new import_https2.HttpsError("failed-precondition", `Item must be in draft status, current: ${item["status"]}`);
+    throw new import_https3.HttpsError("failed-precondition", `Item must be in draft status, current: ${item["status"]}`);
   }
-  if (!item["title"]) throw new import_https2.HttpsError("invalid-argument", "title is required");
-  if (!item["description"]) throw new import_https2.HttpsError("invalid-argument", "description is required");
-  if (!item["category"]) throw new import_https2.HttpsError("invalid-argument", "category is required");
-  if (!item["viewTag"]) throw new import_https2.HttpsError("invalid-argument", "viewTag is required");
+  if (!item["title"]) throw new import_https3.HttpsError("invalid-argument", "title is required");
+  if (!item["description"]) throw new import_https3.HttpsError("invalid-argument", "description is required");
+  if (!item["category"]) throw new import_https3.HttpsError("invalid-argument", "category is required");
+  if (!item["viewTag"]) throw new import_https3.HttpsError("invalid-argument", "viewTag is required");
   if (typeof item["price"] !== "number" || item["price"] <= 0) {
-    throw new import_https2.HttpsError("invalid-argument", "price must be a positive integer (CAD cents)");
+    throw new import_https3.HttpsError("invalid-argument", "price must be a positive integer (CAD cents)");
   }
-  if (!item["condition"]) throw new import_https2.HttpsError("invalid-argument", "condition is required");
+  if (!item["condition"]) throw new import_https3.HttpsError("invalid-argument", "condition is required");
   if (!Array.isArray(item["images"]) || item["images"].length === 0) {
-    throw new import_https2.HttpsError("invalid-argument", "At least one image is required before publishing");
+    throw new import_https3.HttpsError("invalid-argument", "At least one image is required before publishing");
   }
   const searchTokens = buildSearchTokens(String(item["title"]), String(item["category"]));
   await itemRef.update({
@@ -207659,145 +207962,145 @@ var publishItem = (0, import_https2.onCall)({ cors: true }, async (request) => {
     policeHold: item["policeHold"] ?? false,
     searchTokens,
     publishedBy: request.auth.uid,
-    merchandisingTags: import_firestore3.FieldValue.arrayUnion("just-arrived"),
-    updatedAt: import_firestore3.FieldValue.serverTimestamp()
+    merchandisingTags: import_firestore4.FieldValue.arrayUnion("just-arrived"),
+    updatedAt: import_firestore4.FieldValue.serverTimestamp()
   });
   await db.collection("auditLogs").add({
     eventType: "item_published",
     uid: request.auth.uid,
     targetId: itemId,
     details: { itemId, fromStatus: "draft", toStatus: "active" },
-    createdAt: import_firestore3.FieldValue.serverTimestamp()
+    createdAt: import_firestore4.FieldValue.serverTimestamp()
   });
   return { success: true };
 });
 var HOLD_DURATION_MS = 48 * 60 * 60 * 1e3;
-var setHold = (0, import_https2.onCall)({ cors: true }, async (request) => {
+var setHold = (0, import_https3.onCall)({ cors: true }, async (request) => {
   if (!request.auth) {
-    throw new import_https2.HttpsError("unauthenticated", "Sign in required");
+    throw new import_https3.HttpsError("unauthenticated", "Sign in required");
   }
   const { itemId } = request.data;
-  if (!itemId) throw new import_https2.HttpsError("invalid-argument", "itemId is required");
-  const db = (0, import_firestore3.getFirestore)();
+  if (!itemId) throw new import_https3.HttpsError("invalid-argument", "itemId is required");
+  const db = (0, import_firestore4.getFirestore)();
   const itemRef = db.collection("items").doc(itemId);
   const snap = await itemRef.get();
-  if (!snap.exists) throw new import_https2.HttpsError("not-found", `Item ${itemId} not found`);
+  if (!snap.exists) throw new import_https3.HttpsError("not-found", `Item ${itemId} not found`);
   const item = snap.data();
   if (item["status"] !== "active") {
-    throw new import_https2.HttpsError(
+    throw new import_https3.HttpsError(
       "failed-precondition",
       `Item is not available for hold, current status: ${item["status"]}`
     );
   }
-  const holdExpiresAt = import_firestore3.Timestamp.fromMillis(Date.now() + HOLD_DURATION_MS);
+  const holdExpiresAt = import_firestore4.Timestamp.fromMillis(Date.now() + HOLD_DURATION_MS);
   await itemRef.update({
     status: "reserved",
     holdExpiresAt,
-    updatedAt: import_firestore3.FieldValue.serverTimestamp()
+    updatedAt: import_firestore4.FieldValue.serverTimestamp()
   });
   await db.collection("auditLogs").add({
     eventType: "hold_set",
     uid: request.auth.uid,
     targetId: itemId,
     details: { itemId, fromStatus: "active", toStatus: "reserved" },
-    createdAt: import_firestore3.FieldValue.serverTimestamp()
+    createdAt: import_firestore4.FieldValue.serverTimestamp()
   });
   return { success: true, holdExpiresAt: holdExpiresAt.toDate().toISOString() };
 });
-var setPoliceHold = (0, import_https2.onCall)({ cors: true }, async (request) => {
+var setPoliceHold = (0, import_https3.onCall)({ cors: true }, async (request) => {
   const token = request.auth?.token;
   if (!request.auth || token?.["admin"] !== true) {
-    throw new import_https2.HttpsError("permission-denied", "Admin role required");
+    throw new import_https3.HttpsError("permission-denied", "Admin role required");
   }
   (0, import_authHelpers2.assertMfaEnrolled)(request);
   const { itemId, hold } = request.data;
-  if (!itemId) throw new import_https2.HttpsError("invalid-argument", "itemId is required");
-  if (typeof hold !== "boolean") throw new import_https2.HttpsError("invalid-argument", "hold must be boolean");
-  const db = (0, import_firestore3.getFirestore)();
+  if (!itemId) throw new import_https3.HttpsError("invalid-argument", "itemId is required");
+  if (typeof hold !== "boolean") throw new import_https3.HttpsError("invalid-argument", "hold must be boolean");
+  const db = (0, import_firestore4.getFirestore)();
   const itemRef = db.collection("items").doc(itemId);
   const snap = await itemRef.get();
-  if (!snap.exists) throw new import_https2.HttpsError("not-found", `Item ${itemId} not found`);
+  if (!snap.exists) throw new import_https3.HttpsError("not-found", `Item ${itemId} not found`);
   const previousValue = snap.data()["policeHold"] ?? false;
   await itemRef.update({
     policeHold: hold,
-    updatedAt: import_firestore3.FieldValue.serverTimestamp()
+    updatedAt: import_firestore4.FieldValue.serverTimestamp()
   });
   await db.collection("auditLogs").add({
     eventType: "police_hold_set",
     uid: request.auth.uid,
     targetId: itemId,
     details: { itemId, previousValue, newValue: hold },
-    createdAt: import_firestore3.FieldValue.serverTimestamp()
+    createdAt: import_firestore4.FieldValue.serverTimestamp()
   });
   return { success: true };
 });
-var adjustInventory = (0, import_https2.onCall)({ cors: true }, async (request) => {
-  if (!request.auth || !isStaffToken(request.auth.token)) {
-    throw new import_https2.HttpsError("permission-denied", "Staff role required");
+var adjustInventory = (0, import_https3.onCall)({ cors: true }, async (request) => {
+  if (!request.auth || !isStaffToken2(request.auth.token)) {
+    throw new import_https3.HttpsError("permission-denied", "Staff role required");
   }
   const { itemId, delta, reason } = request.data;
-  if (!itemId) throw new import_https2.HttpsError("invalid-argument", "itemId is required");
+  if (!itemId) throw new import_https3.HttpsError("invalid-argument", "itemId is required");
   if (typeof delta !== "number" || !Number.isInteger(delta) || delta === 0) {
-    throw new import_https2.HttpsError("invalid-argument", "delta must be a non-zero integer");
+    throw new import_https3.HttpsError("invalid-argument", "delta must be a non-zero integer");
   }
-  const db = (0, import_firestore3.getFirestore)();
+  const db = (0, import_firestore4.getFirestore)();
   const itemRef = db.collection("items").doc(itemId);
   const snap = await itemRef.get();
-  if (!snap.exists) throw new import_https2.HttpsError("not-found", `Item ${itemId} not found`);
+  if (!snap.exists) throw new import_https3.HttpsError("not-found", `Item ${itemId} not found`);
   const item = snap.data();
   const currentQuantity = typeof item["quantity"] === "number" ? item["quantity"] : 0;
   const newQuantity = currentQuantity + delta;
   if (newQuantity < 0) {
-    throw new import_https2.HttpsError(
+    throw new import_https3.HttpsError(
       "failed-precondition",
       `Cannot reduce quantity below 0 (current: ${currentQuantity}, delta: ${delta})`
     );
   }
   await itemRef.update({
     quantity: newQuantity,
-    updatedAt: import_firestore3.FieldValue.serverTimestamp()
+    updatedAt: import_firestore4.FieldValue.serverTimestamp()
   });
   await db.collection("auditLogs").add({
     eventType: "inventory_quantity_adjusted",
     uid: request.auth.uid,
     targetId: itemId,
     details: { delta, newQuantity, reason: reason ?? null },
-    createdAt: import_firestore3.FieldValue.serverTimestamp()
+    createdAt: import_firestore4.FieldValue.serverTimestamp()
   });
   return { success: true, newQuantity };
 });
 var resetExpiredHolds = (0, import_scheduler.onSchedule)("every 30 minutes", async () => {
-  const db = (0, import_firestore3.getFirestore)();
-  const now = import_firestore3.Timestamp.now();
+  const db = (0, import_firestore4.getFirestore)();
+  const now = import_firestore4.Timestamp.now();
   const expired = await db.collection("items").where("status", "==", "reserved").where("holdExpiresAt", "<", now).get();
   if (expired.empty) return;
   await Promise.all(
     expired.docs.map(async (doc) => {
       await doc.ref.update({
         status: "active",
-        holdExpiresAt: import_firestore3.FieldValue.delete(),
-        updatedAt: import_firestore3.FieldValue.serverTimestamp()
+        holdExpiresAt: import_firestore4.FieldValue.delete(),
+        updatedAt: import_firestore4.FieldValue.serverTimestamp()
       });
       await db.collection("auditLogs").add({
         eventType: "hold_expired",
         uid: "system",
         targetId: doc.id,
         details: { itemId: doc.id, fromStatus: "reserved", toStatus: "active" },
-        createdAt: import_firestore3.FieldValue.serverTimestamp()
+        createdAt: import_firestore4.FieldValue.serverTimestamp()
       });
     })
   );
 });
-var processUploadedImage = (0, import_https2.onCall)({ cors: true, memory: "1GiB", timeoutSeconds: 120, secrets: [geminiApiKey] }, async (request) => {
-  if (!request.auth || !isStaffToken(request.auth.token)) {
-    throw new import_https2.HttpsError("permission-denied", "Staff role required");
+var processUploadedImage = (0, import_https3.onCall)({ cors: true, memory: "1GiB", timeoutSeconds: 120, secrets: [geminiApiKey] }, async (request) => {
+  if (!request.auth || !isStaffToken2(request.auth.token)) {
+    throw new import_https3.HttpsError("permission-denied", "Staff role required");
   }
   const { filePath, extractData, viewTag } = request.data;
-  if (!filePath) throw new import_https2.HttpsError("invalid-argument", "filePath is required");
+  if (!filePath) throw new import_https3.HttpsError("invalid-argument", "filePath is required");
   const match = filePath.match(/^items\/([^/]+)\/uploads\/([^/]+)$/);
-  if (!match) throw new import_https2.HttpsError("invalid-argument", "Invalid filePath format");
+  if (!match) throw new import_https3.HttpsError("invalid-argument", "Invalid filePath format");
   const [, itemId, filename] = match;
-  const db = (0, import_firestore3.getFirestore)();
+  const db = (0, import_firestore4.getFirestore)();
   const bucket = (0, import_storage.getStorage)().bucket();
   const tempFile = bucket.file(filePath);
   const jobRef = db.collection("items").doc(itemId).collection("imageJobs").doc(filename);
@@ -207808,10 +208111,10 @@ var processUploadedImage = (0, import_https2.onCall)({ cors: true, memory: "1GiB
       fileName: filename,
       status: "retrying",
       attempt,
-      updatedAt: import_firestore3.FieldValue.serverTimestamp()
+      updatedAt: import_firestore4.FieldValue.serverTimestamp()
     }, { merge: true });
     const [exists] = await tempFile.exists();
-    if (!exists) throw new import_https2.HttpsError("not-found", "Temporary image file not found");
+    if (!exists) throw new import_https3.HttpsError("not-found", "Temporary image file not found");
     const [buffer] = await tempFile.download();
     const image = (0, import_sharp.default)(buffer);
     const metadata = await image.metadata();
@@ -207825,8 +208128,8 @@ var processUploadedImage = (0, import_https2.onCall)({ cors: true, memory: "1GiB
     });
     const finalUrl = finalFile.publicUrl();
     await db.collection("items").doc(itemId).update({
-      images: import_firestore3.FieldValue.arrayUnion(finalUrl),
-      updatedAt: import_firestore3.FieldValue.serverTimestamp()
+      images: import_firestore4.FieldValue.arrayUnion(finalUrl),
+      updatedAt: import_firestore4.FieldValue.serverTimestamp()
     });
     if (extractData && viewTag) {
       await jobRef.update({ status: "analyzing" });
@@ -207837,7 +208140,7 @@ var processUploadedImage = (0, import_https2.onCall)({ cors: true, memory: "1GiB
         await jobRef.update({
           status: "completed",
           aiError: aiResult.error,
-          updatedAt: import_firestore3.FieldValue.serverTimestamp()
+          updatedAt: import_firestore4.FieldValue.serverTimestamp()
         });
         await tempFile.delete();
         return { success: true, url: finalUrl, aiFailed: true, aiError: aiResult.error };
@@ -207847,10 +208150,10 @@ var processUploadedImage = (0, import_https2.onCall)({ cors: true, memory: "1GiB
             ...aiResult,
             marketPricing: {
               ...aiResult.marketPricing,
-              retrievedAt: import_firestore3.FieldValue.serverTimestamp()
+              retrievedAt: import_firestore4.FieldValue.serverTimestamp()
             }
           },
-          updatedAt: import_firestore3.FieldValue.serverTimestamp(),
+          updatedAt: import_firestore4.FieldValue.serverTimestamp(),
           generatedBy: request.auth.uid
         }, { merge: true });
       }
@@ -207858,31 +208161,31 @@ var processUploadedImage = (0, import_https2.onCall)({ cors: true, memory: "1GiB
     await tempFile.delete();
     await jobRef.update({
       status: "completed",
-      updatedAt: import_firestore3.FieldValue.serverTimestamp()
+      updatedAt: import_firestore4.FieldValue.serverTimestamp()
     });
     return { success: true, url: finalUrl };
   } catch (e) {
     await jobRef.update({
       status: "failed",
       error: e instanceof Error ? e.message : "Unknown error during retry",
-      updatedAt: import_firestore3.FieldValue.serverTimestamp()
+      updatedAt: import_firestore4.FieldValue.serverTimestamp()
     }).catch(() => {
     });
-    throw new import_https2.HttpsError("internal", `Retry failed: ${e instanceof Error ? e.message : "Unknown error"}`);
+    throw new import_https3.HttpsError("internal", `Retry failed: ${e instanceof Error ? e.message : "Unknown error"}`);
   }
 });
-var deleteInventoryItem = (0, import_https2.onCall)({ cors: true }, async (request) => {
+var deleteInventoryItem = (0, import_https3.onCall)({ cors: true }, async (request) => {
   const token = request.auth?.token;
   if (!request.auth || token?.["admin"] !== true && token?.["manager"] !== true) {
-    throw new import_https2.HttpsError("permission-denied", "Admin or Manager role required to delete");
+    throw new import_https3.HttpsError("permission-denied", "Admin or Manager role required to delete");
   }
   (0, import_authHelpers2.assertMfaEnrolled)(request);
   const { itemId } = request.data;
-  if (!itemId) throw new import_https2.HttpsError("invalid-argument", "itemId is required");
-  const db = (0, import_firestore3.getFirestore)();
+  if (!itemId) throw new import_https3.HttpsError("invalid-argument", "itemId is required");
+  const db = (0, import_firestore4.getFirestore)();
   const itemRef = db.collection("items").doc(itemId);
   const snap = await itemRef.get();
-  if (!snap.exists) throw new import_https2.HttpsError("not-found", `Item ${itemId} not found`);
+  if (!snap.exists) throw new import_https3.HttpsError("not-found", `Item ${itemId} not found`);
   const itemData = snap.data();
   const internalStaff = await itemRef.collection("internal").doc("staff").get();
   const internalAi = await itemRef.collection("internal").doc("ai").get();
@@ -207900,17 +208203,17 @@ var deleteInventoryItem = (0, import_https2.onCall)({ cors: true }, async (reque
     uid: request.auth.uid,
     targetId: itemId,
     details: { itemId, title: itemData["title"] ?? "Unknown" },
-    createdAt: import_firestore3.FieldValue.serverTimestamp()
+    createdAt: import_firestore4.FieldValue.serverTimestamp()
   });
   return { success: true };
 });
-var clearRecycleBin = (0, import_https2.onCall)({ cors: true, timeoutSeconds: 300 }, async (request) => {
+var clearRecycleBin = (0, import_https3.onCall)({ cors: true, timeoutSeconds: 300 }, async (request) => {
   const token = request.auth?.token;
   if (!request.auth || token?.["admin"] !== true) {
-    throw new import_https2.HttpsError("permission-denied", "Admin role required to clear recycle bin");
+    throw new import_https3.HttpsError("permission-denied", "Admin role required to clear recycle bin");
   }
   (0, import_authHelpers2.assertMfaEnrolled)(request);
-  const db = (0, import_firestore3.getFirestore)();
+  const db = (0, import_firestore4.getFirestore)();
   const snap = await db.collection("items").where("status", "==", "deleted").get();
   if (snap.empty) return { success: true, deletedCount: 0 };
   const bucket = (0, import_storage.getStorage)().bucket();
@@ -207934,15 +208237,15 @@ var clearRecycleBin = (0, import_https2.onCall)({ cors: true, timeoutSeconds: 30
     uid: request.auth.uid,
     targetId: "items",
     details: { collection: "items", recordsDeleted: deletedCount, action: "clearRecycleBin" },
-    createdAt: import_firestore3.FieldValue.serverTimestamp()
+    createdAt: import_firestore4.FieldValue.serverTimestamp()
   });
   return { success: true, deletedCount };
 });
 var purgeRecycledItems = (0, import_scheduler.onSchedule)("every day 03:00", async () => {
-  const db = (0, import_firestore3.getFirestore)();
+  const db = (0, import_firestore4.getFirestore)();
   const now = Date.now();
   const thirtyDaysMs = 30 * 24 * 60 * 60 * 1e3;
-  const cutoff = import_firestore3.Timestamp.fromMillis(now - thirtyDaysMs);
+  const cutoff = import_firestore4.Timestamp.fromMillis(now - thirtyDaysMs);
   const snap = await db.collection("items").where("status", "==", "deleted").where("deletedAt", "<", cutoff).limit(500).get();
   if (snap.empty) return;
   const bucket = (0, import_storage.getStorage)().bucket();
@@ -207965,50 +208268,50 @@ var purgeRecycledItems = (0, import_scheduler.onSchedule)("every day 03:00", asy
     uid: "system",
     targetId: "items",
     details: { collection: "items", recordsDeleted: deletedCount, reason: "30_day_recycle_bin_purge" },
-    createdAt: import_firestore3.FieldValue.serverTimestamp()
+    createdAt: import_firestore4.FieldValue.serverTimestamp()
   });
 });
 
 // src/merchandising.ts
-var import_https3 = require("firebase-functions/v2/https");
+var import_https4 = require("firebase-functions/v2/https");
 var import_scheduler2 = require("firebase-functions/v2/scheduler");
-var import_firestore4 = require("firebase-admin/firestore");
+var import_firestore5 = require("firebase-admin/firestore");
 var VALID_TAGS = ["staff-pick", "rare-find", "limited-edition", "just-arrived"];
-function isStaffToken2(token) {
+function isStaffToken3(token) {
   return token["admin"] === true || token["manager"] === true || token["inventory_staff"] === true;
 }
 function isManagerOrAbove(token) {
   return token["admin"] === true || token["manager"] === true;
 }
-var updateMerchandisingTags = (0, import_https3.onCall)({ cors: true }, async (request) => {
+var updateMerchandisingTags = (0, import_https4.onCall)({ cors: true }, async (request) => {
   const token = request.auth?.token ?? {};
-  if (!isStaffToken2(token)) {
-    throw new import_https3.HttpsError("permission-denied", "Staff role required");
+  if (!isStaffToken3(token)) {
+    throw new import_https4.HttpsError("permission-denied", "Staff role required");
   }
   const { itemId, tag, action, curatorNote } = request.data;
-  if (!itemId?.trim()) throw new import_https3.HttpsError("invalid-argument", "itemId is required");
+  if (!itemId?.trim()) throw new import_https4.HttpsError("invalid-argument", "itemId is required");
   if (!VALID_TAGS.includes(tag)) {
-    throw new import_https3.HttpsError("invalid-argument", `tag must be one of: ${VALID_TAGS.join(", ")}`);
+    throw new import_https4.HttpsError("invalid-argument", `tag must be one of: ${VALID_TAGS.join(", ")}`);
   }
   if (action !== "add" && action !== "remove") {
-    throw new import_https3.HttpsError("invalid-argument", "action must be add or remove");
+    throw new import_https4.HttpsError("invalid-argument", "action must be add or remove");
   }
   if ((tag === "rare-find" || tag === "limited-edition") && !isManagerOrAbove(token)) {
-    throw new import_https3.HttpsError("permission-denied", "rare-find and limited-edition require manager or admin role");
+    throw new import_https4.HttpsError("permission-denied", "rare-find and limited-edition require manager or admin role");
   }
-  const db = (0, import_firestore4.getFirestore)();
+  const db = (0, import_firestore5.getFirestore)();
   const itemRef = db.collection("items").doc(itemId.trim());
   const snap = await itemRef.get();
-  if (!snap.exists) throw new import_https3.HttpsError("not-found", `Item ${itemId} not found`);
+  if (!snap.exists) throw new import_https4.HttpsError("not-found", `Item ${itemId} not found`);
   const updatePayload = {
-    merchandisingTags: action === "add" ? import_firestore4.FieldValue.arrayUnion(tag) : import_firestore4.FieldValue.arrayRemove(tag),
-    updatedAt: import_firestore4.FieldValue.serverTimestamp()
+    merchandisingTags: action === "add" ? import_firestore5.FieldValue.arrayUnion(tag) : import_firestore5.FieldValue.arrayRemove(tag),
+    updatedAt: import_firestore5.FieldValue.serverTimestamp()
   };
   if (tag === "staff-pick") {
     if (action === "add" && curatorNote?.trim()) {
       updatePayload["staffPickNote"] = curatorNote.trim().slice(0, 280);
     } else if (action === "remove") {
-      updatePayload["staffPickNote"] = import_firestore4.FieldValue.delete();
+      updatePayload["staffPickNote"] = import_firestore5.FieldValue.delete();
     }
   }
   await itemRef.update(updatePayload);
@@ -208019,14 +208322,14 @@ var updateMerchandisingTags = (0, import_https3.onCall)({ cors: true }, async (r
       uid: request.auth.uid,
       targetId: itemId.trim(),
       details: { itemId: itemId.trim(), viewTag: item["viewTag"] },
-      createdAt: import_firestore4.FieldValue.serverTimestamp()
+      createdAt: import_firestore5.FieldValue.serverTimestamp()
     });
   }
   return { success: true };
 });
 var BATCH_LIMIT = 500;
 var calculateTrendingScore = (0, import_scheduler2.onSchedule)("every 30 minutes", async () => {
-  const db = (0, import_firestore4.getFirestore)();
+  const db = (0, import_firestore5.getFirestore)();
   const snap = await db.collection("items").where("status", "==", "active").where("policeHold", "==", false).get();
   if (snap.empty) return;
   const batches = [];
@@ -208039,7 +208342,7 @@ var calculateTrendingScore = (0, import_scheduler2.onSchedule)("every 30 minutes
     const score = viewCount + enquiryCount * 5;
     currentBatch.update(doc.ref, {
       trendingScore: score,
-      updatedAt: import_firestore4.FieldValue.serverTimestamp()
+      updatedAt: import_firestore5.FieldValue.serverTimestamp()
     });
     count++;
     if (count % BATCH_LIMIT === 0) {
@@ -208052,7 +208355,7 @@ var calculateTrendingScore = (0, import_scheduler2.onSchedule)("every 30 minutes
 });
 var JUST_ARRIVED_HOURS = 48;
 var removeJustArrivedTags = (0, import_scheduler2.onSchedule)("every 30 minutes", async () => {
-  const db = (0, import_firestore4.getFirestore)();
+  const db = (0, import_firestore5.getFirestore)();
   const snap = await db.collection("items").where("merchandisingTags", "array-contains", "just-arrived").get();
   if (snap.empty) return;
   const cutoffMs = Date.now() - JUST_ARRIVED_HOURS * 60 * 60 * 1e3;
@@ -208066,8 +208369,8 @@ var removeJustArrivedTags = (0, import_scheduler2.onSchedule)("every 30 minutes"
   let count = 0;
   for (const doc of toUpdate) {
     currentBatch.update(doc.ref, {
-      merchandisingTags: import_firestore4.FieldValue.arrayRemove("just-arrived"),
-      updatedAt: import_firestore4.FieldValue.serverTimestamp()
+      merchandisingTags: import_firestore5.FieldValue.arrayRemove("just-arrived"),
+      updatedAt: import_firestore5.FieldValue.serverTimestamp()
     });
     count++;
     if (count % BATCH_LIMIT === 0) {
@@ -208078,229 +208381,6 @@ var removeJustArrivedTags = (0, import_scheduler2.onSchedule)("every 30 minutes"
   if (count % BATCH_LIMIT !== 0) batches.push(currentBatch);
   await Promise.all(batches.map((b) => b.commit()));
 });
-
-// src/ebay.ts
-var import_https4 = require("firebase-functions/v2/https");
-var import_firestore5 = require("firebase-admin/firestore");
-var import_node_crypto = require("node:crypto");
-var import_secrets2 = __toESM(require_secrets());
-var EBAY_CATEGORY_MAP = {
-  electronics: "293",
-  jewellery: "281",
-  tools: "631",
-  collectibles: "1",
-  clothing: "11450"
-};
-var EBAY_CONDITION_MAP = {
-  new: 1e3,
-  "like-new": 1500,
-  good: 3e3,
-  fair: 5e3,
-  poor: 7e3
-};
-var EBAY_DEFAULT_CONDITION = 3e3;
-function isStaffToken3(token) {
-  return token["admin"] === true || token["manager"] === true;
-}
-function getEbayBase() {
-  return import_secrets2.ebaySandbox.value() === "true" ? "https://api.sandbox.ebay.com" : "https://api.ebay.com";
-}
-async function ebayRequest(method, path2, body) {
-  const token = import_secrets2.ebayUserToken.value();
-  if (!token || token === "dummy") throw new import_https4.HttpsError("internal", "EBAY_USER_TOKEN not configured");
-  const res = await fetch(`${getEbayBase()}${path2}`, {
-    method,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-EBAY-C-MARKETPLACE-ID": "EBAY_CA"
-    },
-    body: body !== void 0 ? JSON.stringify(body) : void 0
-  });
-  if (res.status === 204) return { ok: true, status: 204, data: null };
-  let data = null;
-  try {
-    data = await res.json();
-  } catch {
-  }
-  return { ok: res.ok, status: res.status, data };
-}
-var pushToEbay = (0, import_https4.onCall)(
-  { cors: true, secrets: [import_secrets2.ebayUserToken] },
-  async (request) => {
-    if (!request.auth || !isStaffToken3(request.auth.token)) {
-      throw new import_https4.HttpsError("permission-denied", "Admin or manager role required");
-    }
-    const { itemId } = request.data;
-    if (!itemId) throw new import_https4.HttpsError("invalid-argument", "itemId is required");
-    const db = (0, import_firestore5.getFirestore)();
-    const itemRef = db.collection("items").doc(itemId);
-    const snap = await itemRef.get();
-    if (!snap.exists) throw new import_https4.HttpsError("not-found", `Item ${itemId} not found`);
-    const item = snap.data();
-    if (item["status"] !== "active") {
-      throw new import_https4.HttpsError(
-        "failed-precondition",
-        `Item must be active to push to eBay (current: ${String(item["status"])})`
-      );
-    }
-    if (item["policeHold"] === true) {
-      throw new import_https4.HttpsError("failed-precondition", "Item is on police hold and cannot be listed");
-    }
-    if (item["viewTag"] !== "pawn") {
-      throw new import_https4.HttpsError(
-        "failed-precondition",
-        "Only pawn items can be listed on eBay \u2014 cannabis and fireworks are prohibited on eBay"
-      );
-    }
-    if (typeof item["ebayListingId"] === "string" && item["ebayListingId"]) {
-      throw new import_https4.HttpsError(
-        "already-exists",
-        `Item is already listed on eBay (ID: ${item["ebayListingId"]})`
-      );
-    }
-    const title = String(item["title"] ?? "");
-    const description = String(item["description"] ?? "");
-    const category = String(item["category"] ?? "").toLowerCase().trim();
-    const condition = String(item["condition"] ?? "good");
-    const priceCents = Number(item["price"]);
-    const images = item["images"] ?? [];
-    const locationKey = import_secrets2.ebayLocationKey.value() || "main_store";
-    const sku = itemId;
-    const inventoryResult = await ebayRequest(
-      "PUT",
-      `/sell/inventory/v1/inventory_item/${encodeURIComponent(sku)}`,
-      {
-        availability: { shipToLocationAvailability: { quantity: 1 } },
-        condition: EBAY_CONDITION_MAP[condition] ?? EBAY_DEFAULT_CONDITION,
-        product: {
-          title,
-          description,
-          imageUrls: images.slice(0, 12)
-          // eBay maximum 12 images per listing
-        }
-      }
-    );
-    if (!inventoryResult.ok) {
-      throw new import_https4.HttpsError("internal", "Failed to create eBay inventory item");
-    }
-    const offerResult = await ebayRequest("POST", "/sell/inventory/v1/offer", {
-      sku,
-      marketplaceId: "EBAY_CA",
-      format: "FIXED_PRICE",
-      availableQuantity: 1,
-      categoryId: EBAY_CATEGORY_MAP[category] ?? "99",
-      pricingSummary: {
-        price: { value: (priceCents / 100).toFixed(2), currency: "CAD" }
-      },
-      listingDescription: description,
-      merchantLocationKey: locationKey
-    });
-    if (!offerResult.ok || typeof offerResult.data !== "object" || !offerResult.data) {
-      throw new import_https4.HttpsError("internal", "Failed to create eBay offer");
-    }
-    const offerId = offerResult.data["offerId"];
-    if (typeof offerId !== "string") {
-      throw new import_https4.HttpsError("internal", "eBay offer response missing offerId");
-    }
-    const publishResult = await ebayRequest(
-      "POST",
-      `/sell/inventory/v1/offer/${encodeURIComponent(offerId)}/publish`,
-      {}
-    );
-    if (!publishResult.ok || typeof publishResult.data !== "object" || !publishResult.data) {
-      throw new import_https4.HttpsError("internal", "Failed to publish eBay offer");
-    }
-    const listingId = publishResult.data["listingId"];
-    if (typeof listingId !== "string") {
-      throw new import_https4.HttpsError("internal", "eBay publish response missing listingId");
-    }
-    await itemRef.update({
-      ebayListingId: listingId,
-      updatedAt: import_firestore5.FieldValue.serverTimestamp()
-    });
-    await db.collection("auditLogs").add({
-      eventType: "ebay_push",
-      uid: request.auth.uid,
-      targetId: itemId,
-      details: { itemId, ebayListingId: listingId, viewTag: item["viewTag"] },
-      createdAt: import_firestore5.FieldValue.serverTimestamp()
-    });
-    return { success: true, ebayListingId: listingId };
-  }
-);
-var ebayWebhook = (0, import_https4.onRequest)({ secrets: [import_secrets2.ebayVerificationToken] }, async (req, res) => {
-  if (req.method === "GET") {
-    const challengeCode = typeof req.query["challenge_code"] === "string" ? req.query["challenge_code"] : null;
-    if (!challengeCode) {
-      res.status(400).json({ error: "challenge_code required" });
-      return;
-    }
-    const verificationToken2 = import_secrets2.ebayVerificationToken.value();
-    const endpointUrl = import_secrets2.ebayWebhookUrl.value();
-    if (!verificationToken2 || !endpointUrl) {
-      res.status(500).json({ error: "Webhook environment not configured" });
-      return;
-    }
-    const challengeResponse = (0, import_node_crypto.createHash)("sha256").update(challengeCode + verificationToken2 + endpointUrl).digest("hex");
-    res.status(200).json({ challengeResponse });
-    return;
-  }
-  if (req.method !== "POST") {
-    res.status(405).end();
-    return;
-  }
-  const verificationToken = import_secrets2.ebayVerificationToken.value();
-  if (!verificationToken) {
-    res.status(500).json({ error: "Webhook environment not configured" });
-    return;
-  }
-  const signature = req.headers["x-ebay-signature"];
-  if (typeof signature !== "string") {
-    res.status(403).json({ error: "Missing x-ebay-signature header" });
-    return;
-  }
-  const rawBody = req.rawBody?.toString("utf8") ?? JSON.stringify(req.body);
-  const expectedSignature = (0, import_node_crypto.createHash)("sha256").update(rawBody + verificationToken).digest("base64");
-  if (signature !== expectedSignature) {
-    res.status(403).json({ error: "Signature mismatch" });
-    return;
-  }
-  res.status(200).json({ success: true });
-  try {
-    await processEbayNotification(req.body);
-  } catch (err) {
-    console.error("[ebayWebhook] notification processing error:", err);
-  }
-});
-async function processEbayNotification(payload) {
-  if (typeof payload !== "object" || payload === null) return;
-  const n = payload;
-  const topic = n.metadata?.topic ?? "";
-  if (!topic.toLowerCase().includes("item_sold")) return;
-  const data = n.notification?.data;
-  if (!data) return;
-  const listingId = String(data["listingId"] ?? data["itemId"] ?? "").trim();
-  if (!listingId) return;
-  const db = (0, import_firestore5.getFirestore)();
-  const snap = await db.collection("items").where("ebayListingId", "==", listingId).limit(1).get();
-  if (snap.empty) return;
-  const itemDoc = snap.docs[0];
-  if (itemDoc.data()["status"] === "sold") return;
-  await itemDoc.ref.update({
-    status: "sold",
-    soldAt: import_firestore5.FieldValue.serverTimestamp(),
-    updatedAt: import_firestore5.FieldValue.serverTimestamp()
-  });
-  await db.collection("auditLogs").add({
-    eventType: "ebay_sync_sold",
-    uid: "ebay_webhook",
-    targetId: itemDoc.id,
-    details: { itemId: itemDoc.id, ebayListingId: listingId },
-    createdAt: import_firestore5.FieldValue.serverTimestamp()
-  });
-}
 
 // src/pos.ts
 var import_https5 = require("firebase-functions/v2/https");
@@ -208361,6 +208441,7 @@ var receivePosWebhook = (0, import_https5.onRequest)({ secrets: [import_secrets3
   clearRecycleBin,
   createDraftItem,
   deleteInventoryItem,
+  ebayRequest,
   ebayWebhook,
   extractIntakeData,
   geminiApiKey,
@@ -208373,6 +208454,7 @@ var receivePosWebhook = (0, import_https5.onRequest)({ secrets: [import_secrets3
   receivePosWebhook,
   removeJustArrivedTags,
   resetExpiredHolds,
+  searchEbayComps,
   setHold,
   setPoliceHold,
   suggestAiPrice,

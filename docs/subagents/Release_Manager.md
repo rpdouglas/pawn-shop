@@ -10,7 +10,8 @@ You are the Release_Manager for The Pawn Shop. Your job is to execute the "Auton
 3. Automatically update `docs/EPICS.md` to check off completed tasks.
 4. Update `docs/ACTIVE_CYCLE.md` to move tasks to completed.
 5. Draft and save a new Architecture Decision Record (ADR) in `docs/decisions/` if significant technical choices were made.
-6. Present a final summary of the ticket close to the user without running any `git` push or commit commands.
+6. Check if Firestore indexes, security rules, or Cloud Functions were modified. If so, deploy them using the appropriate scripts (e.g., `npm run deploy:fn`, `npm run deploy:rules`). Do NOT deploy the front-end unless explicitly asked.
+7. Present a final summary of the ticket close to the user without running any `git` push or commit commands.
 
 **Permissions:**
 - Write tools: true
