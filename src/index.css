@@ -58,11 +58,8 @@
   /* Layout tokens */
   --container-max-width: 1200px;
   --logo-width-clamp:    clamp(200px, 50vw, 400px);
-}
 
-/* ── View-scoped design tokens ── */
-
-.view-pawn {
+  /* Unified Global Theme (formerly Pawn theme) */
   --color-primary:       #C8A14A;
   --color-primary-hover: #b8903b;
   --color-on-primary:    #080706;  /* dark on gold: 7.8:1 — WCAG AA ✓ */
@@ -77,68 +74,6 @@
   --font-body:           var(--font-lora);
   --motion-speed:        var(--motion-speed-standard);
   --motion-easing:       cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.view-cannabis {
-  --color-primary:       #7B4FA0;
-  --color-primary-hover: #6b3f90;
-  --color-on-primary:    #ffffff;  /* white on purple: 5.4:1 — WCAG AA ✓ */
-  --color-bg:            #1A0D2E;
-  --color-surface:       #221040;
-  --color-accent:        #B89FCC;
-  --color-highlight:     rgba(184, 159, 204, 0.10);
-  --color-text:          #F0EAF8;
-  --color-text-muted:    #9B8AAE;
-  --color-border:        #2D1B45;
-  --font-display:        var(--font-cormorant);
-  --font-body:           var(--font-dm-sans);
-  --motion-speed:        var(--motion-speed-slow);
-  --motion-easing:       cubic-bezier(0.6, 0, 0.4, 1);
-}
-
-.view-fireworks {
-  --color-primary:       #C0392B;
-  --color-primary-hover: #a93226;
-  --color-on-primary:    #ffffff;  /* white on red: 8.7:1 — WCAG AA ✓ */
-  --color-bg:            #1A0A0A;
-  --color-surface:       #231212;
-  --color-accent:        #E8A020;
-  --color-highlight:     rgba(232, 160, 32, 0.12);
-  --color-text:          #F5EDEC;
-  --color-text-muted:    #A87878;  /* warm rose-gray: 5.15:1 on #1A0A0A — WCAG AA ✓ */
-  --color-border:        #2D1110;
-  --font-display:        var(--font-bebas);
-  --font-body:           var(--font-oswald);
-  --motion-speed:        var(--motion-speed-base);
-  --motion-easing:       cubic-bezier(0.25, 0, 0.5, 1);
-}
-
-.view-tobacco {
-  --color-primary:       #D4AF37;
-  --color-primary-hover: #c49f27;
-  --color-on-primary:    #080706;
-  --color-bg:            #1A1108;
-  --color-surface:       #241910;
-  --color-accent:        #8B5E3C;
-  --color-highlight:     rgba(212, 175, 55, 0.10);
-  --color-text:          #F5F0E8;
-  --color-text-muted:    #A69076;
-  --color-border:        #3A2C1E;
-  --font-display:        var(--font-oswald);
-  --font-body:           var(--font-dm-sans);
-  --motion-speed:        var(--motion-speed-standard);
-  --motion-easing:       cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.view-pawn,
-.view-cannabis,
-.view-fireworks,
-.view-tobacco {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-size: var(--text-body);
-  line-height: 1.6;
 }
 
 /* ── Portal Layout (Option A) ── */
@@ -264,6 +199,11 @@
 body {
   margin: 0;
   min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {
