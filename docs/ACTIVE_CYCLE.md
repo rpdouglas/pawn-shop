@@ -117,6 +117,8 @@ E31 · Pawn Loan Management Portal — Portal allowing customers to view active 
 | **E81 CLOSED** | E81 | 2026-06-06 |
 | `E82 Phase 1` — Rebuilt `CannabisPage`, added `CannabisMarqueeStrip` and `StoryStrip`, updated `LuxuryProductCard` USD/CAD logic. | E82 | 2026-06-06 |
 | **E82 CLOSED** | E82 | 2026-06-06 |
+| `E78 Phase 1` — Rebuilt AI Extraction pipeline with schema validation, fuzzy matching for cannabis, eBay comps integration, and model fallback handling. | E78 | 2026-06-06 |
+| **E78 CLOSED** | E78 | 2026-06-06 |
 
 ---
 

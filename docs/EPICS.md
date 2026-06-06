@@ -802,11 +802,11 @@
 > - **Staff:** Eliminates intake parsing crashes and provides real-time, non-hallucinated eBay market pricing for accurate pawn loans.
 > - **Jordan (Operations):** Lowers cloud expenditure by downgrading lightweight tasks to `flash-lite` and utilizes strict `responseSchema` for API predictability.
 
-- [ ] Refactor `@google/generative-ai` calls to use native `responseSchema` for structured JSON.
-- [ ] Integrate `ebay.ts` Search API into `suggestAiPrice` to provide real market comps.
-- [ ] Inject Storage image buffers into `generateAIDescription` for multimodal context.
-- [ ] Implement fuzzy string matching for the Cannabis strain extraction step.
-- [ ] Optimize model selection to use `gemini-3.1-flash-lite` for simple text tasks.
+- [x] Refactor `@google/generative-ai` calls to use native `responseSchema` for structured JSON.
+- [x] Integrate `ebay.ts` Search API into `suggestAiPrice` to provide real market comps.
+- [x] Inject Storage image buffers into `generateAIDescription` for multimodal context.
+- [x] Implement fuzzy string matching for the Cannabis strain extraction step.
+- [x] Optimize model selection to use `gemini-3.1-flash-lite` for simple text tasks.
 
 ### E37 · Vite SSR (Lighthouse Performance ≥0.90)
 

@@ -301,13 +301,31 @@ export const suggestAiTags = onCall({ secrets: [geminiApiKey] }, async (request)
   }
 })
 
+function levenshtein(a: string, b: string): number {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      );
+    }
+  }
+  return matrix[a.length][b.length];
+}
+
 /**
  * Extract Intake Data (Image Vision)
  * Called internally by processUploadedImage CF.
  */
 export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTag: string) {
   const db = getFirestore()
-  const { model, flashModel } = getModels()
 
   let referenceContext = '';
 
@@ -315,28 +333,47 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
     // PASS 1: Extract strain name
     const initialPrompt = `
       You are an expert AI viewing a cannabis product package.
-      Return strictly JSON with NO markdown formatting, extracting only the strain name (e.g. "Blue Dream", "Sour Diesel").
-      { "strainName": "string | null" }
+      Extract only the strain name (e.g. "Blue Dream", "Sour Diesel").
     `;
+    const strainSchema = {
+      type: SchemaType.OBJECT,
+      properties: {
+        strainName: { type: SchemaType.STRING }
+      }
+    };
     try {
       const initialParts = [
         initialPrompt,
         { inlineData: { data: buffer.toString('base64'), mimeType: mimeType } }
       ];
-      const initialResult = await flashModel.generateContent(initialParts);
+      const { flashModel: initialFlashModel } = getModels(strainSchema);
+      const initialResult = await initialFlashModel.generateContent(initialParts);
       const jsonStr = initialResult.response.text().replace(/```json|```/g, '').trim();
       const parsed = JSON.parse(jsonStr);
       if (parsed.strainName) {
-        // Query database
-        const snap = await db.collection('cannabisStrains').where('strainName', '==', parsed.strainName).limit(1).get();
-        if (!snap.empty) {
-          const strainData = snap.docs[0].data();
+        // Query database for all strains to do fuzzy matching
+        const snap = await db.collection('cannabisStrains').get();
+        let bestMatch: Record<string, unknown> | null = null;
+        let bestDistance = Infinity;
+        for (const doc of snap.docs) {
+          const data = doc.data() as Record<string, unknown>;
+          if (typeof data.strainName === 'string') {
+            const dist = levenshtein(parsed.strainName.toLowerCase(), data.strainName.toLowerCase());
+            if (dist < bestDistance) {
+              bestDistance = dist;
+              bestMatch = data;
+            }
+          }
+        }
+        
+        if (bestMatch && bestDistance <= Math.max(3, parsed.strainName.length * 0.3)) {
+          const strainData = bestMatch;
           referenceContext = `
             REFERENCE CANNABIS DATA FROM DATABASE:
             Strain Name: ${strainData.strainName}
-            Terpenes: ${strainData.terpenes?.join(', ')}
+            Terpenes: ${Array.isArray(strainData.terpenes) ? strainData.terpenes.join(', ') : ''}
             Genetic Lineage: ${strainData.geneticLineage}
-            Effect Profile: ${strainData.effectProfile?.join(', ')}
+            Effect Profile: ${Array.isArray(strainData.effectProfile) ? strainData.effectProfile.join(', ') : ''}
             THC Range: ${strainData.thcMin} - ${strainData.thcMax}
             CBD Range: ${strainData.cbdMin} - ${strainData.cbdMax}
             Strain Type: ${strainData.strainType}
@@ -360,102 +397,86 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
     ${referenceContext}
   `
 
+  const suggestedFieldsProps = {
+    title: { type: SchemaType.STRING },
+    category: { type: SchemaType.STRING },
+    description: { type: SchemaType.STRING, description: "1-2 sentences" },
+    condition: { type: SchemaType.STRING, description: "new | like-new | good | fair | poor" },
+    brand: { type: SchemaType.STRING },
+    format: { type: SchemaType.STRING }
+  };
+
+  const marketPricingProps = {
+    avgRegularPriceCents: { type: SchemaType.INTEGER },
+    avgSalePriceCents: { type: SchemaType.INTEGER },
+    avgRefurbPriceCents: { type: SchemaType.INTEGER },
+    currency: { type: SchemaType.STRING, description: "Always CAD" }
+  };
+
+  const schemaProps: Record<string, unknown> = {
+    suggestedFields: { type: SchemaType.OBJECT, properties: suggestedFieldsProps, required: ["title", "category", "description", "condition", "brand", "format"] },
+    marketPricing: { type: SchemaType.OBJECT, properties: marketPricingProps, required: ["avgRegularPriceCents", "avgSalePriceCents", "avgRefurbPriceCents", "currency"] }
+  };
+  const requiredFields = ["suggestedFields", "marketPricing"];
+
   if (viewTag === 'cannabis') {
     systemPrompt += `
     CRITICAL CANNABIS INSTRUCTIONS:
     - Extract details from the package, and merge with any provided REFERENCE CANNABIS DATA.
     - If a single value is provided for THC/CBD (e.g. "20%"), set both the min and max fields to that same value.
     - Extract the cannabinoid unit (e.g., "%" or "mg/g").
+    `;
     
-    Return strictly JSON with NO markdown formatting, matching this structure:
-    {
-      "suggestedFields": {
-        "title": "string",
-        "category": "string",
-        "description": "string (1-2 sentences)",
-        "condition": "new | like-new | good | fair | poor",
-        "brand": "string",
-        "format": "string"
-      },
-      "cannabisProfile": {
-        "thcMin": "number | null",
-        "thcMax": "number | null",
-        "cbdMin": "number | null",
-        "cbdMax": "number | null",
-        "cannabinoidUnit": "string | null",
-        "terpenes": ["string"],
-        "geneticLineage": "string | null",
-        "effectProfile": ["string"],
-        "brand": "string | null",
-        "format": "string | null",
-        "weight": "number | null",
-        "lotNumber": "string | null",
-        "packagedDate": "string | null",
-        "subCategory": "string | null",
-        "servings": "number | null",
-        "weightPerServing": "number | null",
-        "strainType": "string | null"
-      },
-      "marketPricing": {
-        "avgRegularPriceCents": 0,
-        "avgSalePriceCents": 0,
-        "avgRefurbPriceCents": 0,
-        "currency": "CAD"
+    schemaProps.cannabisProfile = {
+      type: SchemaType.OBJECT,
+      properties: {
+        thcMin: { type: SchemaType.NUMBER },
+        thcMax: { type: SchemaType.NUMBER },
+        cbdMin: { type: SchemaType.NUMBER },
+        cbdMax: { type: SchemaType.NUMBER },
+        cannabinoidUnit: { type: SchemaType.STRING },
+        terpenes: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+        geneticLineage: { type: SchemaType.STRING },
+        effectProfile: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+        brand: { type: SchemaType.STRING },
+        format: { type: SchemaType.STRING },
+        weight: { type: SchemaType.NUMBER },
+        lotNumber: { type: SchemaType.STRING },
+        packagedDate: { type: SchemaType.STRING },
+        subCategory: { type: SchemaType.STRING },
+        servings: { type: SchemaType.NUMBER },
+        weightPerServing: { type: SchemaType.NUMBER },
+        strainType: { type: SchemaType.STRING }
       }
-    }
-    `
+    };
+    requiredFields.push("cannabisProfile");
   } else if (viewTag === 'fireworks') {
     systemPrompt += `
     CRITICAL FIREWORKS INSTRUCTIONS:
     - Extract fireworks specific details from the package.
+    `;
     
-    Return strictly JSON with NO markdown formatting, matching this structure:
-    {
-      "suggestedFields": {
-        "title": "string",
-        "category": "string",
-        "description": "string (1-2 sentences)",
-        "condition": "new | like-new | good | fair | poor",
-        "brand": "string",
-        "format": "string"
-      },
-      "fireworksProfile": {
-        "explosiveWeight": "string | null",
-        "classificationClass": "string | null",
-        "effectType": "string | null",
-        "shots": "number | null",
-        "duration": "number | null",
-        "noiseLevel": "low | medium | high | null"
-      },
-      "marketPricing": {
-        "avgRegularPriceCents": 0,
-        "avgSalePriceCents": 0,
-        "avgRefurbPriceCents": 0,
-        "currency": "CAD"
+    schemaProps.fireworksProfile = {
+      type: SchemaType.OBJECT,
+      properties: {
+        explosiveWeight: { type: SchemaType.STRING },
+        classificationClass: { type: SchemaType.STRING },
+        effectType: { type: SchemaType.STRING },
+        shots: { type: SchemaType.INTEGER },
+        duration: { type: SchemaType.NUMBER },
+        noiseLevel: { type: SchemaType.STRING, description: "low | medium | high" }
       }
-    }
-    `
-  } else {
-    systemPrompt += `
-    Return strictly JSON with NO markdown formatting, matching this structure:
-    {
-      "suggestedFields": {
-        "title": "string",
-        "category": "string",
-        "description": "string (1-2 sentences)",
-        "condition": "new | like-new | good | fair | poor",
-        "brand": "string",
-        "format": "string"
-      },
-      "marketPricing": {
-        "avgRegularPriceCents": 0,
-        "avgSalePriceCents": 0,
-        "avgRefurbPriceCents": 0,
-        "currency": "CAD"
-      }
-    }
-    `
+    };
+    requiredFields.push("fireworksProfile");
   }
+
+  const finalSchema = {
+    type: SchemaType.OBJECT,
+    properties: schemaProps,
+    required: requiredFields
+  };
+
+  const { model, flashModel } = getModels(finalSchema);
 
   try {
     const promptParts = [

@@ -1,4 +1,5 @@
 # Epic 78: AI Pipeline Precision & Reliability
+**Status:** Completed
 
 ## Overview
 A backend optimization epic aimed at hardening the AI extraction pipeline. This focuses on preventing JSON parsing crashes, injecting real market comp data into pricing algorithms, enabling multimodal image context for generation, and aggressively reducing latency and cloud costs by right-sizing models.

@@ -207661,34 +207661,69 @@ var suggestAiTags = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, async
     throw new import_https2.HttpsError("internal", "Failed to suggest AI tags.");
   }
 });
+function levenshtein(a, b) {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      );
+    }
+  }
+  return matrix[a.length][b.length];
+}
 async function extractIntakeData(buffer, mimeType, viewTag) {
   const db = (0, import_firestore2.getFirestore)();
-  const { model, flashModel } = getModels();
   let referenceContext = "";
   if (viewTag === "cannabis") {
     const initialPrompt = `
       You are an expert AI viewing a cannabis product package.
-      Return strictly JSON with NO markdown formatting, extracting only the strain name (e.g. "Blue Dream", "Sour Diesel").
-      { "strainName": "string | null" }
+      Extract only the strain name (e.g. "Blue Dream", "Sour Diesel").
     `;
+    const strainSchema = {
+      type: import_generative_ai.SchemaType.OBJECT,
+      properties: {
+        strainName: { type: import_generative_ai.SchemaType.STRING }
+      }
+    };
     try {
       const initialParts = [
         initialPrompt,
         { inlineData: { data: buffer.toString("base64"), mimeType } }
       ];
-      const initialResult = await flashModel.generateContent(initialParts);
+      const { flashModel: initialFlashModel } = getModels(strainSchema);
+      const initialResult = await initialFlashModel.generateContent(initialParts);
       const jsonStr = initialResult.response.text().replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(jsonStr);
       if (parsed.strainName) {
-        const snap = await db.collection("cannabisStrains").where("strainName", "==", parsed.strainName).limit(1).get();
-        if (!snap.empty) {
-          const strainData = snap.docs[0].data();
+        const snap = await db.collection("cannabisStrains").get();
+        let bestMatch = null;
+        let bestDistance = Infinity;
+        for (const doc of snap.docs) {
+          const data = doc.data();
+          if (typeof data.strainName === "string") {
+            const dist = levenshtein(parsed.strainName.toLowerCase(), data.strainName.toLowerCase());
+            if (dist < bestDistance) {
+              bestDistance = dist;
+              bestMatch = data;
+            }
+          }
+        }
+        if (bestMatch && bestDistance <= Math.max(3, parsed.strainName.length * 0.3)) {
+          const strainData = bestMatch;
           referenceContext = `
             REFERENCE CANNABIS DATA FROM DATABASE:
             Strain Name: ${strainData.strainName}
-            Terpenes: ${strainData.terpenes?.join(", ")}
+            Terpenes: ${Array.isArray(strainData.terpenes) ? strainData.terpenes.join(", ") : ""}
             Genetic Lineage: ${strainData.geneticLineage}
-            Effect Profile: ${strainData.effectProfile?.join(", ")}
+            Effect Profile: ${Array.isArray(strainData.effectProfile) ? strainData.effectProfile.join(", ") : ""}
             THC Range: ${strainData.thcMin} - ${strainData.thcMax}
             CBD Range: ${strainData.cbdMin} - ${strainData.cbdMax}
             Strain Type: ${strainData.strainType}
@@ -207710,102 +207745,79 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
     Also, provide a market pricing deep dive estimating the Average Regular Price, Average Sale Price, and Average Refurbished/Open-Box Price in CAD cents (integer).
     ${referenceContext}
   `;
+  const suggestedFieldsProps = {
+    title: { type: import_generative_ai.SchemaType.STRING },
+    category: { type: import_generative_ai.SchemaType.STRING },
+    description: { type: import_generative_ai.SchemaType.STRING, description: "1-2 sentences" },
+    condition: { type: import_generative_ai.SchemaType.STRING, description: "new | like-new | good | fair | poor" },
+    brand: { type: import_generative_ai.SchemaType.STRING },
+    format: { type: import_generative_ai.SchemaType.STRING }
+  };
+  const marketPricingProps = {
+    avgRegularPriceCents: { type: import_generative_ai.SchemaType.INTEGER },
+    avgSalePriceCents: { type: import_generative_ai.SchemaType.INTEGER },
+    avgRefurbPriceCents: { type: import_generative_ai.SchemaType.INTEGER },
+    currency: { type: import_generative_ai.SchemaType.STRING, description: "Always CAD" }
+  };
+  const schemaProps = {
+    suggestedFields: { type: import_generative_ai.SchemaType.OBJECT, properties: suggestedFieldsProps, required: ["title", "category", "description", "condition", "brand", "format"] },
+    marketPricing: { type: import_generative_ai.SchemaType.OBJECT, properties: marketPricingProps, required: ["avgRegularPriceCents", "avgSalePriceCents", "avgRefurbPriceCents", "currency"] }
+  };
+  const requiredFields = ["suggestedFields", "marketPricing"];
   if (viewTag === "cannabis") {
     systemPrompt += `
     CRITICAL CANNABIS INSTRUCTIONS:
     - Extract details from the package, and merge with any provided REFERENCE CANNABIS DATA.
     - If a single value is provided for THC/CBD (e.g. "20%"), set both the min and max fields to that same value.
     - Extract the cannabinoid unit (e.g., "%" or "mg/g").
-    
-    Return strictly JSON with NO markdown formatting, matching this structure:
-    {
-      "suggestedFields": {
-        "title": "string",
-        "category": "string",
-        "description": "string (1-2 sentences)",
-        "condition": "new | like-new | good | fair | poor",
-        "brand": "string",
-        "format": "string"
-      },
-      "cannabisProfile": {
-        "thcMin": "number | null",
-        "thcMax": "number | null",
-        "cbdMin": "number | null",
-        "cbdMax": "number | null",
-        "cannabinoidUnit": "string | null",
-        "terpenes": ["string"],
-        "geneticLineage": "string | null",
-        "effectProfile": ["string"],
-        "brand": "string | null",
-        "format": "string | null",
-        "weight": "number | null",
-        "lotNumber": "string | null",
-        "packagedDate": "string | null",
-        "subCategory": "string | null",
-        "servings": "number | null",
-        "weightPerServing": "number | null",
-        "strainType": "string | null"
-      },
-      "marketPricing": {
-        "avgRegularPriceCents": 0,
-        "avgSalePriceCents": 0,
-        "avgRefurbPriceCents": 0,
-        "currency": "CAD"
-      }
-    }
     `;
+    schemaProps.cannabisProfile = {
+      type: import_generative_ai.SchemaType.OBJECT,
+      properties: {
+        thcMin: { type: import_generative_ai.SchemaType.NUMBER },
+        thcMax: { type: import_generative_ai.SchemaType.NUMBER },
+        cbdMin: { type: import_generative_ai.SchemaType.NUMBER },
+        cbdMax: { type: import_generative_ai.SchemaType.NUMBER },
+        cannabinoidUnit: { type: import_generative_ai.SchemaType.STRING },
+        terpenes: { type: import_generative_ai.SchemaType.ARRAY, items: { type: import_generative_ai.SchemaType.STRING } },
+        geneticLineage: { type: import_generative_ai.SchemaType.STRING },
+        effectProfile: { type: import_generative_ai.SchemaType.ARRAY, items: { type: import_generative_ai.SchemaType.STRING } },
+        brand: { type: import_generative_ai.SchemaType.STRING },
+        format: { type: import_generative_ai.SchemaType.STRING },
+        weight: { type: import_generative_ai.SchemaType.NUMBER },
+        lotNumber: { type: import_generative_ai.SchemaType.STRING },
+        packagedDate: { type: import_generative_ai.SchemaType.STRING },
+        subCategory: { type: import_generative_ai.SchemaType.STRING },
+        servings: { type: import_generative_ai.SchemaType.NUMBER },
+        weightPerServing: { type: import_generative_ai.SchemaType.NUMBER },
+        strainType: { type: import_generative_ai.SchemaType.STRING }
+      }
+    };
+    requiredFields.push("cannabisProfile");
   } else if (viewTag === "fireworks") {
     systemPrompt += `
     CRITICAL FIREWORKS INSTRUCTIONS:
     - Extract fireworks specific details from the package.
-    
-    Return strictly JSON with NO markdown formatting, matching this structure:
-    {
-      "suggestedFields": {
-        "title": "string",
-        "category": "string",
-        "description": "string (1-2 sentences)",
-        "condition": "new | like-new | good | fair | poor",
-        "brand": "string",
-        "format": "string"
-      },
-      "fireworksProfile": {
-        "explosiveWeight": "string | null",
-        "classificationClass": "string | null",
-        "effectType": "string | null",
-        "shots": "number | null",
-        "duration": "number | null",
-        "noiseLevel": "low | medium | high | null"
-      },
-      "marketPricing": {
-        "avgRegularPriceCents": 0,
-        "avgSalePriceCents": 0,
-        "avgRefurbPriceCents": 0,
-        "currency": "CAD"
-      }
-    }
     `;
-  } else {
-    systemPrompt += `
-    Return strictly JSON with NO markdown formatting, matching this structure:
-    {
-      "suggestedFields": {
-        "title": "string",
-        "category": "string",
-        "description": "string (1-2 sentences)",
-        "condition": "new | like-new | good | fair | poor",
-        "brand": "string",
-        "format": "string"
-      },
-      "marketPricing": {
-        "avgRegularPriceCents": 0,
-        "avgSalePriceCents": 0,
-        "avgRefurbPriceCents": 0,
-        "currency": "CAD"
+    schemaProps.fireworksProfile = {
+      type: import_generative_ai.SchemaType.OBJECT,
+      properties: {
+        explosiveWeight: { type: import_generative_ai.SchemaType.STRING },
+        classificationClass: { type: import_generative_ai.SchemaType.STRING },
+        effectType: { type: import_generative_ai.SchemaType.STRING },
+        shots: { type: import_generative_ai.SchemaType.INTEGER },
+        duration: { type: import_generative_ai.SchemaType.NUMBER },
+        noiseLevel: { type: import_generative_ai.SchemaType.STRING, description: "low | medium | high" }
       }
-    }
-    `;
+    };
+    requiredFields.push("fireworksProfile");
   }
+  const finalSchema = {
+    type: import_generative_ai.SchemaType.OBJECT,
+    properties: schemaProps,
+    required: requiredFields
+  };
+  const { model, flashModel } = getModels(finalSchema);
   try {
     const promptParts = [
       systemPrompt,

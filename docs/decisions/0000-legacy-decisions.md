@@ -335,6 +335,7 @@ YYYY-MM-DD — Decision. Brief reason.
 2026-06-05 — E72 Phase 4: Mocked `storeHours` public reads and handled unauthenticated Cloud Function errors gracefully in E2E tests to bypass Identity Platform constraints during local UI E2E testing without breaking the CI pipeline.
 
 *Add new entries above this line.*
+2026-06-06 — E78: Refactored AI Pipeline to utilize Gemini 3.1 Pro and Flash Lite with native `responseSchema` for structured extraction. Integrated `levenshtein` fuzzy matching for cannabis strains to handle OCR drift. Verified eBay integration in `suggestAiPrice` and multimodal capabilities in `generateAIDescription`.
 
 2026-06-02 — Adopted Firestore job tracking docs over client-side timeouts for image processing to improve visibility.
 
