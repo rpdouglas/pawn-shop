@@ -207467,7 +207467,7 @@ var generateAIDescription = (0, import_https2.onCall)({ secrets: [geminiApiKey] 
     required: ["draft", "suggestedTags", "provenanceFlag", "culturalNote"]
   };
   try {
-    const { model, flashModel } = getModels(schema);
+    const { model, flashModel, liteModel } = getModels(schema);
     const promptParts = [systemPrompt, userPrompt];
     if (images && Array.isArray(images) && images.length > 0) {
       try {
@@ -207494,7 +207494,17 @@ var generateAIDescription = (0, import_https2.onCall)({ secrets: [geminiApiKey] 
       const err = error;
       if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
         console.warn("Gemini Pro unavailable (Quota/503), falling back to Flash model...");
-        result = await flashModel.generateContent(promptParts);
+        try {
+          result = await flashModel.generateContent(promptParts);
+        } catch (flashError) {
+          const fe = flashError;
+          if (fe?.message?.includes("429") || fe?.status === 429 || fe?.message?.includes("503") || fe?.status === 503) {
+            console.warn("Gemini Flash unavailable (Quota/503), falling back to Lite model...");
+            result = await liteModel.generateContent(promptParts);
+          } else {
+            throw flashError;
+          }
+        }
       } else {
         throw err;
       }
@@ -207578,7 +207588,7 @@ var suggestAiPrice = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, asyn
     required: ["low", "high", "source", "confidenceLevel", "note"]
   };
   try {
-    const { model, flashModel } = getModels(schema);
+    const { model, flashModel, liteModel } = getModels(schema);
     let result;
     try {
       result = await model.generateContent([systemPrompt, userPrompt]);
@@ -207586,7 +207596,17 @@ var suggestAiPrice = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, asyn
       const err = error;
       if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
         console.warn("Gemini Pro unavailable (Quota/503), falling back to Flash model...");
-        result = await flashModel.generateContent([systemPrompt, userPrompt]);
+        try {
+          result = await flashModel.generateContent([systemPrompt, userPrompt]);
+        } catch (flashError) {
+          const fe = flashError;
+          if (fe?.message?.includes("429") || fe?.status === 429 || fe?.message?.includes("503") || fe?.status === 503) {
+            console.warn("Gemini Flash unavailable (Quota/503), falling back to Lite model...");
+            result = await liteModel.generateContent([systemPrompt, userPrompt]);
+          } else {
+            throw flashError;
+          }
+        }
       } else {
         throw err;
       }
