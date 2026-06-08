@@ -4,10 +4,13 @@ The **Gemini AI Assistant** is a staff-only toolkit designed to enhance inventor
 
 ## The AI Toolkit
 
-When an item is selected on the [Inventory Management](/admin/inventory) page, the AI Assistant panel appears on the right.
+The assistant is accessible two ways:
+
+- **Grid view:** select an item, and the AI Assistant panel opens on the right.
+- **Table view (Inventory Table Mode):** each row has a ✨ button (description) and a $ button (price) — click either to open the assistant drawer for that item. You may also select multiple rows and use the batch action bar to run AI across several items at once.
 
 ### 1. Generating Descriptions
-Click **Generate Description & Tags** to have Gemini 1.5 Pro draft a provenance-heavy product description.
+Click **Generate Description & Tags** to have Gemini draft a provenance-heavy product description.
 - **Brand Voice:** The AI is tuned to our "Dapper & Debonair" voice — professional, precise, and sophisticated.
 - **Provenance:** For high-value finds, the AI attempts to include historical and cultural context based on your provenance notes.
 

@@ -128,6 +128,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E94 CLOSED** | E94 | 2026-06-08 |
 | `E95 CI Test Gating` — Removed Java 21, Playwright install, A11y/E2E, and LHCI steps from both deploy workflows. Push pipeline now: Lint → Unit → Build → Deploy (~3 min). Created `.github/workflows/e2e.yml` (on-demand + weekly Sunday 03:00 UTC). Created `docs/TESTING.md`. Decision logged as 0005. | E95 | 2026-06-08 |
 | **E95 CLOSED** | E95 | 2026-06-08 |
+| `FIX_AI_INVENTORY_500` — Rebuilt stale `functions/operations/lib/index.js` bundle. Root cause: source updated to `gemini-2.5-pro` in commit bd3ae16 but bundle was never rebuilt; deployed bundle still used banned `gemini-3.1-pro` model → HTTP 500. Bundle rebuilt, bundle committed. User to run `firebase deploy --only functions --project nats-rack` to push fix. E96 added to backlog for structural CI fix. | BUGFIX | 2026-06-08 |
+| **FIX_AI_INVENTORY_500 CLOSED** | BUGFIX | 2026-06-08 |
 
 ---
 
@@ -158,4 +160,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-08 (Cycle 32 — E95 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-08 (Cycle 32 — FIX_AI_INVENTORY_500 CLOSED)*

@@ -1213,3 +1213,23 @@
 - [x] 29/29 frontend unit tests pass `[Gate]`
 - [x] **E94 CLOSED** | 2026-06-08
 
+---
+
+### E96 · CI Functions Deploy — Remove Stale Bundle from Git
+**Priority: MEDIUM · Effort: 0.5 developer-days**
+
+> **Persona Gate — E96:**
+> - **Staff (Infrastructure):** Prevents future AI/CF 500s caused by stale committed bundles. Ensures every `dev` branch push automatically deploys the latest Cloud Functions alongside Hosting.
+
+**Background:** In the FIX_AI_INVENTORY_500 bug (2026-06-08), the deployed `functions/operations/lib/index.js`
+bundle was stale — it used the banned `gemini-3.1-pro` model while the source had been fixed to
+`gemini-2.5-pro`. Root cause: `functions/operations/lib/` is tracked in git but CI only deploys
+Hosting, not Functions. Strategy B fixed the immediate issue; E96 closes the structural gap.
+
+- [ ] Add `functions/operations/lib/` to root `.gitignore` (alongside `functions/lib/`) `[Infra]`
+- [ ] Remove tracked lib artifacts: `git rm --cached -r functions/operations/lib/` `[Infra]`
+- [ ] Add Firebase Functions deploy step to `.github/workflows/deploy-dev.yml` — runs after Hosting deploy on any push that changes `functions/**` `[Infra]`
+- [ ] Add Firebase Functions deploy step to `.github/workflows/deploy-prod.yml` for parity `[Infra]`
+- [ ] Verify: push a trivial change to `dev`, confirm both Hosting and Functions deploy in CI `[Infra]`
+- [ ] Log decision in `docs/decisions/` `[Comp]`
+
