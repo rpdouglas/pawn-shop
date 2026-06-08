@@ -85,6 +85,16 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
   const queryClient = useQueryClient()
   const [isCreating, setIsCreating] = useState(false)
   const [isAiProcessing, setIsAiProcessing] = useState(false)
+  // AI toggle — session-scoped preference: ON by default, persisted for batch workflows
+  const [aiEnabled, setAiEnabled] = useState<boolean>(() => {
+    const stored = sessionStorage.getItem('aiIntakeEnabled')
+    return stored === null ? true : stored === 'true'
+  })
+
+  const handleAiToggle = (enabled: boolean) => {
+    setAiEnabled(enabled)
+    sessionStorage.setItem('aiIntakeEnabled', String(enabled))
+  }
 
   const ensureItemCreated = async (): Promise<string | null> => {
     if (itemId) return itemId
@@ -475,6 +485,91 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
           )}
         </div>
 
+        {/* ── AI Auto-fill Toggle ── */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-3)',
+          padding: 'var(--space-3) var(--space-4)',
+          backgroundColor: aiEnabled ? 'var(--color-bg-subtle)' : 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-md)',
+          marginBottom: 'var(--space-6)',
+          opacity: images.length > 0 ? 0.6 : 1,
+          transition: 'opacity var(--motion-speed-fast) var(--motion-easing), background-color var(--motion-speed-fast) var(--motion-easing)',
+        }}>
+          <button
+            id="ai-toggle"
+            type="button"
+            role="switch"
+            aria-checked={aiEnabled}
+            aria-label="Use AI to auto-fill form fields and pricing from photo"
+            disabled={images.length > 0}
+            onClick={() => handleAiToggle(!aiEnabled)}
+            style={{
+              position: 'relative',
+              width: '44px',
+              height: '24px',
+              borderRadius: '12px',
+              border: 'none',
+              backgroundColor: aiEnabled ? 'var(--color-primary)' : 'var(--color-border)',
+              cursor: images.length > 0 ? 'not-allowed' : 'pointer',
+              flexShrink: 0,
+              transition: 'background-color var(--motion-speed-fast) var(--motion-easing)',
+              padding: 0,
+            }}
+          >
+            <span style={{
+              position: 'absolute',
+              top: '3px',
+              left: aiEnabled ? '23px' : '3px',
+              width: '18px',
+              height: '18px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--color-on-primary)',
+              transition: 'left var(--motion-speed-fast) var(--motion-easing)',
+              display: 'block',
+            }} />
+          </button>
+          <div>
+            <label
+              htmlFor="ai-toggle"
+              style={{
+                display: 'block',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--text-small)',
+                color: aiEnabled ? 'var(--color-text)' : 'var(--color-text-muted)',
+                cursor: images.length > 0 ? 'not-allowed' : 'pointer',
+                fontWeight: aiEnabled ? 500 : 400,
+              }}
+            >
+              {aiEnabled ? '✨ Auto-fill with AI' : 'Manual entry'}
+            </label>
+            <span style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--text-xs)',
+              color: 'var(--color-text-muted)',
+            }}>
+              {aiEnabled
+                ? 'AI will auto-fill title, description & pricing from your photo'
+                : 'Photo will be saved — fill in details manually'
+              }
+            </span>
+            {images.length > 0 && (
+              <span style={{
+                display: 'block',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--text-xs)',
+                color: 'var(--color-text-muted)',
+                fontStyle: 'italic',
+                marginTop: 'var(--space-1)',
+              }}>
+                Locked after first photo
+              </span>
+            )}
+          </div>
+        </div>
+
         {errors.images && (
           <span className="input-error" role="alert" style={{ marginBottom: 'var(--space-4)', display: 'block' }}>{errors.images}</span>
         )}
@@ -484,7 +579,7 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
           onRequireItemId={ensureItemCreated}
           onProcessingChange={setIsAiProcessing}
           images={images} 
-          extractData={images.length === 0} 
+          extractData={aiEnabled && images.length === 0}
           viewTag={formState.viewTag || undefined} 
         />
       </section>

@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-E31 · Pawn Loan Management Portal — Portal allowing customers to view active pawn loan tickets, track due dates, and request extensions. (COMPLETED)
+E93 · AI Intake Toggle — Optional AI opt-out on both desktop and mobile intake forms for batch entry workflows. (COMPLETED)
 
 ---
 
@@ -121,6 +121,8 @@ E31 · Pawn Loan Management Portal — Portal allowing customers to view active 
 | **E78 CLOSED** | E78 | 2026-06-06 |
 | `E28 Algorithmic Markdown Engine` — Built automated Dutch auction pricing with cron jobs and CASL compliant SMS alerts. Added Admin UI to configure markdown. | E28 | 2026-06-06 |
 | **E28 CLOSED** | E28 | 2026-06-06 |
+| `E93 AI Intake Toggle` — Added sessionStorage-persisted AI opt-out toggle to both `IntakeForm.tsx` and `MobileIntakePage.tsx`. Default ON, locks after first photo, skips both extraction and eBay pricing comps when off. 7 new unit tests. | E93 | 2026-06-08 |
+| **E93 CLOSED** | E93 | 2026-06-08 |
 
 ---
 

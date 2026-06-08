@@ -1150,3 +1150,22 @@
 - [x] **UI:** Build `CannabisMarqueeStrip` and `StoryStrip` components.
 - [x] **UI:** Update `LuxuryProductCard` to display THC/CBD progress bars and USD vs CAD comparison logic.
 - [x] **UI:** Rewrite `CannabisPage.tsx` to integrate the "American Craft, Canadian Prices" hero, removing `MoodCard`.
+
+---
+
+### E93 · AI Intake Toggle (Opt-Out for Batch Entry)
+**Priority: MEDIUM · Effort: 0.5 developer-days**
+
+> **Persona Gate — E93:**
+> - **Staff (Primary):** When batch-entering similar items, staff must be able to skip the AI engine on the photo upload step without losing the ability to upload photos. Skipping AI cuts Gemini API cost and removes the wait time for items where description and price are already known.
+> - **Compliance:** Toggle state is client-only (sessionStorage). No new Firestore fields introduced. `aiDescription` review gate remains fully enforced.
+
+- [x] Add `aiEnabled` state (sessionStorage-persisted, ON by default) to `IntakeForm.tsx` `[Staff]`
+- [x] Add `aiEnabled` state and `aiEnabledRef` to `MobileIntakePage.tsx` using the same `sessionStorage` key `[Staff]`
+- [x] Render accessible toggle switch (`role="switch"`, `aria-checked`) in "Capture & View" section on both forms `[Mak]` `[Comp]`
+- [x] Lock toggle to `disabled` once first photo is uploaded — prevents mid-flight state confusion `[Staff]` `[Comp]`
+- [x] Wire `extractData={aiEnabled && images.length === 0}` on desktop; `extractData: aiEnabledRef.current` on mobile `[Staff]`
+- [x] Update step subtitle on mobile to reflect AI state: "Upload Photo to start AI Extraction" vs "Upload Photo" `[Staff]`
+- [x] 7 unit tests added to `IntakeForm.test.tsx` covering: default ON, sessionStorage read on mount, click to flip, persistence write, helper text, enabled state `[Staff]` `[Comp]`
+- [x] **E93 CLOSED** | 2026-06-08
+

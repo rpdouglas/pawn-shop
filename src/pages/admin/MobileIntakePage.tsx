@@ -185,6 +185,19 @@ export default function MobileIntakePage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [publishError, setPublishError] = useState('')
   const [funStatusIndex, setFunStatusIndex] = useState(0)
+  // AI toggle — session-scoped: ON by default, persisted for batch workflows
+  // Reads the same key as the desktop IntakeForm for cross-form consistency
+  const [aiEnabled, setAiEnabled] = useState<boolean>(() => {
+    const stored = sessionStorage.getItem('aiIntakeEnabled')
+    return stored === null ? true : stored === 'true'
+  })
+  const aiEnabledRef = useRef(aiEnabled)
+
+  const handleAiToggle = (enabled: boolean) => {
+    setAiEnabled(enabled)
+    aiEnabledRef.current = enabled
+    sessionStorage.setItem('aiIntakeEnabled', String(enabled))
+  }
 
   // Refs — itemId is needed inside callbacks without stale closure issues
   const cameraRef = useRef<HTMLInputElement>(null)
@@ -364,7 +377,7 @@ export default function MobileIntakePage() {
         
         try {
           console.log(`[AI Intake] Calling processUploadedImage for ${storagePath}...`)
-          const res = await processUploadedImageFn({ filePath: storagePath, extractData: true, viewTag: form.viewTag })
+          const res = await processUploadedImageFn({ filePath: storagePath, extractData: aiEnabledRef.current, viewTag: form.viewTag })
           console.log(`[AI Intake] processUploadedImage completed successfully.`)
           
           const responseData = res.data as { aiFailed?: boolean; aiError?: string };
@@ -641,7 +654,7 @@ export default function MobileIntakePage() {
           </div>
 
           <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-8)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Step 1 of 3 — Upload Photo to start AI Extraction
+            Step 1 of 3 — {aiEnabled ? 'Upload Photo to start AI Extraction' : 'Upload Photo'}
           </p>
 
           {/* View */}
@@ -661,6 +674,91 @@ export default function MobileIntakePage() {
               <option value="fireworks">Fireworks</option>
             </select>
             {errors.viewTag && <span id="mi-view-error" style={ERROR_TEXT} role="alert">{errors.viewTag}</span>}
+          </div>
+
+          {/* AI Auto-fill Toggle */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-3)',
+            padding: 'var(--space-3) var(--space-4)',
+            backgroundColor: aiEnabled ? 'var(--color-bg-subtle)' : 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: 'var(--space-6)',
+            opacity: images.length > 0 ? 0.6 : 1,
+            transition: 'opacity var(--motion-speed-fast) var(--motion-easing), background-color var(--motion-speed-fast) var(--motion-easing)',
+          }}>
+            <button
+              id="mi-ai-toggle"
+              type="button"
+              role="switch"
+              aria-checked={aiEnabled}
+              aria-label="Use AI to auto-fill form fields and pricing from photo"
+              disabled={images.length > 0}
+              onClick={() => handleAiToggle(!aiEnabled)}
+              style={{
+                position: 'relative',
+                width: '44px',
+                height: '24px',
+                borderRadius: '12px',
+                border: 'none',
+                backgroundColor: aiEnabled ? 'var(--color-primary)' : 'var(--color-border)',
+                cursor: images.length > 0 ? 'not-allowed' : 'pointer',
+                flexShrink: 0,
+                transition: 'background-color var(--motion-speed-fast) var(--motion-easing)',
+                padding: 0,
+              }}
+            >
+              <span style={{
+                position: 'absolute',
+                top: '3px',
+                left: aiEnabled ? '23px' : '3px',
+                width: '18px',
+                height: '18px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--color-on-primary)',
+                transition: 'left var(--motion-speed-fast) var(--motion-easing)',
+                display: 'block',
+              }} />
+            </button>
+            <div>
+              <label
+                htmlFor="mi-ai-toggle"
+                style={{
+                  display: 'block',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--text-small)',
+                  color: aiEnabled ? 'var(--color-text)' : 'var(--color-text-muted)',
+                  cursor: images.length > 0 ? 'not-allowed' : 'pointer',
+                  fontWeight: aiEnabled ? 500 : 400,
+                }}
+              >
+                {aiEnabled ? '✨ Auto-fill with AI' : 'Manual entry'}
+              </label>
+              <span style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--text-xs)',
+                color: 'var(--color-text-muted)',
+              }}>
+                {aiEnabled
+                  ? 'AI will auto-fill title, description & pricing from your photo'
+                  : 'Photo will be saved — fill in details manually'
+                }
+              </span>
+              {images.length > 0 && (
+                <span style={{
+                  display: 'block',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--color-text-muted)',
+                  fontStyle: 'italic',
+                  marginTop: 'var(--space-1)',
+                }}>
+                  Locked after first photo
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Photo guidance */}
