@@ -57,6 +57,7 @@ Do not proceed if any of these would be violated.
 - `aiDescription` is a draft stored in `items/{id}/internal/ai` — never readable by customers.
 - `auditLogs` — no delete, ever. Create-only via Cloud Functions.
 - All AI API keys (Claude, Gemini) go through Cloud Functions. Never on the client.
+- **Gemini model IDs:** Never change or invent a Gemini model ID string without reading `docs/AI_MODELS.md` first. Only IDs listed in the Stable GA table may be used in deployed functions. Preview models are forbidden in production. The ID `gemini-3.1-pro` does not exist — it caused production 500s and is explicitly banned.
 - **Strict Git Governance:** NEVER run any git commands (`git add`, `git commit`, `git push`, etc.) on ANY branch without explicit user approval. The user prefers to manage all commits and pushes manually. All subagents must also strictly adhere to this rule.
 
 **Code quality:**
@@ -96,6 +97,7 @@ Eight personas govern all UX decisions. Full profiles in `docs/PERSONAS.md`.
 - `docs/ACTIVE_CYCLE.md` — current sprint priorities
 - `docs/firestore-schema.md` — the only source of truth for field names
 - `docs/design-system.md` — CSS tokens, motion rules, component specs, photography standard, spacing, breakpoints. Read before planning any UI feature.
+- `docs/AI_MODELS.md` — **the only source of truth for Gemini model IDs.** Read before touching any file in `/functions` that calls the Gemini API.
 
 ---
 
@@ -106,7 +108,7 @@ Eight personas govern all UX decisions. Full profiles in `docs/PERSONAS.md`.
 | **Claude** (this session) | Development workflow — planning, coding, review, docs | Developer |
 | **Gemini** (Cloud Functions) | Runtime E18 feature — staff-facing AI in admin | Staff in admin UI |
 
-Claude does not write `aiDescription` content. Gemini does not write code. See `docs/prompts/GEMINI_INITIALIZATION.md` for Gemini runtime prompts.
+Claude does not write `aiDescription` content. Gemini does not write code. See `docs/AI_MODELS.md` for approved model IDs and the fallback chain.
 
 ---
 

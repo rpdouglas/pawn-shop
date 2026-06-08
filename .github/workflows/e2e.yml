@@ -1,0 +1,63 @@
+name: E2E, Accessibility & Lighthouse
+
+# Runs on demand (one click in GitHub Actions UI) or weekly overnight.
+# Use this before large feature merges, pre-release checks, or when explicitly
+# validating A11y/E2E/LHCI compliance.
+# Local equivalent: npm run test:e2e | npm run test:a11y | npm run test:lhci
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 0'  # Sunday 03:00 UTC
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Java 21 for Firebase Emulators
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate version
+        run: echo "VITE_APP_VERSION=v$(date +'%y.%m.%d')-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_FIREBASE_API_KEY:             ${{ secrets.DEV_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN:         ${{ secrets.DEV_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID:          ${{ secrets.DEV_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET:      ${{ secrets.DEV_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.DEV_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID:              ${{ secrets.DEV_FIREBASE_APP_ID }}
+          VITE_APP_VERSION:                  ${{ env.VITE_APP_VERSION }}
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Accessibility & E2E Tests
+        run: npm run test:e2e
+        env:
+          VITE_FIREBASE_API_KEY:             ${{ secrets.DEV_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN:         ${{ secrets.DEV_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID:          ${{ secrets.DEV_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET:      ${{ secrets.DEV_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.DEV_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID:              ${{ secrets.DEV_FIREBASE_APP_ID }}
+          VITE_APP_VERSION:                  ${{ env.VITE_APP_VERSION }}
+
+      - name: Lighthouse CI Audit
+        run: npm run test:lhci

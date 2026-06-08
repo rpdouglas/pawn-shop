@@ -494,6 +494,20 @@
 
 ---
 
+### E95 · CI Test Gating — Remove A11y/E2E from Push Pipeline
+
+> **Persona Gate:** Infrastructure epic. No customer-facing persona directly served.
+> Improves developer velocity during active dev cycles by moving slow E2E/A11y/LHCI gates out of the push pipeline into a dedicated on-demand + scheduled workflow.
+
+- [x] Remove Java 21, Playwright install, A11y/E2E, and LHCI steps from `deploy-dev.yml` `[Staff]`
+- [x] Remove Java 21, Playwright install, and A11y/E2E steps from `deploy-prod.yml` `[Staff]`
+- [x] Create `.github/workflows/e2e.yml` — `workflow_dispatch` + weekly Sunday 03:00 UTC schedule `[Staff]`
+- [x] Create `docs/TESTING.md` — local testing guide and CI trigger instructions `[Staff]`
+- [x] Decision logged in `docs/decisions/0005-ci-test-gating-strategy-c.md` `[Staff]`
+- [x] **E95 CLOSED** | 2026-06-08
+
+---
+
 ### E25 · Header Navigation Refinement
 
 > **Persona Gate — E25:**

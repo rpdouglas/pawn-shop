@@ -126,6 +126,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | `E93 AI Overlay Bugfix` — Fixed misleading AI status indicators (fun messages on mobile, "✨ AI Extracting..." overlays on desktop) showing when AI toggle is OFF. Mobile now shows neutral "Saving photo…"; desktop overlays gated on `aiEnabled && isAiProcessing`. 2 regression tests added. | E93 | 2026-06-08 |
 | `E94 Inventory Table Mode` — TanStack Table v8 headless grid on InventoryPage with click-to-edit cells (Text, Select, Price, Tag, PoliceHold), Ctrl+C/V clipboard, row selection, floating batch action bar, per-row AI (✨/$) with AiAssistantPanel, `batchProcessItems` CF, `policeHold` admin gate, scarcity tag restriction. Zero lint errors/warnings, 29/29 tests pass. | E94 | 2026-06-08 |
 | **E94 CLOSED** | E94 | 2026-06-08 |
+| `E95 CI Test Gating` — Removed Java 21, Playwright install, A11y/E2E, and LHCI steps from both deploy workflows. Push pipeline now: Lint → Unit → Build → Deploy (~3 min). Created `.github/workflows/e2e.yml` (on-demand + weekly Sunday 03:00 UTC). Created `docs/TESTING.md`. Decision logged as 0005. | E95 | 2026-06-08 |
+| **E95 CLOSED** | E95 | 2026-06-08 |
 
 ---
 
@@ -156,4 +158,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-08 (Cycle 32 — E94 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-08 (Cycle 32 — E95 CLOSED)*

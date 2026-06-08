@@ -1,18 +1,62 @@
 # Active AI Models (As of June 2026)
 
-This document tracks the active Google Gemini models we are using in the platform.
+This document is the **single source of truth** for Gemini model IDs used in Cloud Functions.
+**Read this before touching any file in `/functions` that calls the Gemini API.**
+Never change a model ID without verifying it against this document and the official [Gemini API model list](https://ai.google.dev/gemini-api/docs/models).
 
-### Current Models in Use
+---
 
-*   **`gemini-3.1-pro`**: Flagship model used for advanced drafting, complex taxonomy mapping, and tasks requiring deep reasoning. (Currently implemented in `generateAIDescription` and `suggestAiPrice` fallbacks).
-*   **`gemini-3.5-flash`** (or `gemini-2.5-flash` for legacy fallbacks): High-performance model used for general fast reasoning and fallback from Pro.
-*   **`gemini-3.1-flash-lite`**: The most cost-efficient and lowest-latency model. This is the target model for all simple extraction, tagging, and formatting tasks where reasoning depth is not required.
-*   **`gemini-3.1-flash-image`** (GA): The current model for multimodal native visual understanding.
+## Models in Use — `functions/operations/src/ai.ts`
 
-### Deprecation Notice
-*   **`gemini-1.5-flash-8b`** was officially discontinued by Google on **September 24, 2025**. It is no longer available and must not be referenced in new code or architecture plans. Any existing 1.5 references should be migrated to the 3.1 generation.
+| Role | Model ID | Status | Used For |
+|---|---|---|---|
+| `model` (primary) | `gemini-2.5-pro` | Stable GA | `generateAIDescription`, `suggestAiPrice` primary path |
+| `flashModel` (fallback) | `gemini-3.5-flash` | Stable GA | Quota/503 fallback; `extractIntakeData` primary |
+| `liteModel` (budget) | `gemini-3.1-flash-lite` | Stable GA | `suggestAiTags`, high-volume simple tasks |
 
-### Best Practices for this Codebase
-- Do not use 1.5 models.
-- Always implement robust fallbacks (e.g., if `3.1-pro` quota limits are hit, fall back to `3.5-flash`).
-- Right-size models: Do not use `3.1-pro` for a task that `3.1-flash-lite` can handle with high accuracy.
+## Models in Use — `functions/src/ai.ts`
+
+| Role | Model ID | Status | Used For |
+|---|---|---|---|
+| `model` (primary) | `gemini-2.5-pro` | Stable GA | Description and pricing generation |
+| `flashModel` (fallback) | `gemini-2.5-flash` | Stable GA | Quota/503 fallback |
+
+---
+
+## Full 2026 Model Reference
+
+### Stable GA — safe for production
+
+| Model ID | Notes |
+|---|---|
+| `gemini-2.5-pro` | Mature, stable reasoning. No surprise deprecations. |
+| `gemini-2.5-flash` | Reliable low-latency. Proven in production. |
+| `gemini-2.5-flash-lite` | Budget/high-volume. |
+| `gemini-3.5-flash` | Latest stable Flash. Best agentic + coding performance. |
+| `gemini-3.1-flash-lite` | Current stable lite model. Low-cost extraction + tagging. |
+
+### Preview — do NOT use in production Cloud Functions
+
+| Model ID | Notes |
+|---|---|
+| `gemini-3.1-pro-preview` | Gemini 3.1 Pro — preview only, not GA as of June 2026. |
+| `gemini-3.5-pro` | Not yet released. |
+
+### Deprecated / Shut Down — never use
+
+| Model ID | Shut Down |
+|---|---|
+| `gemini-2.0-flash` | June 1, 2026 |
+| `gemini-2.0-flash-lite` | June 1, 2026 |
+| `gemini-1.5-flash-8b` | September 24, 2025 |
+| `gemini-3.1-pro` | **Never existed** — invalid ID that caused production 500s |
+
+---
+
+## Rules
+
+- Never use a model ID that does not appear in the Stable GA table above.
+- Never use a Preview model in a deployed Cloud Function.
+- When Google releases new models, update this document first, then update the code.
+- Fallback chains must only use models from the Stable GA table.
+- Right-size: do not use a Pro model for tasks `flash-lite` can handle accurately.
