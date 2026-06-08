@@ -11,7 +11,7 @@ export const geminiApiKey = defineSecret('GEMINI_API_KEY')
 function getModels() {
   const genAI = new GoogleGenerativeAI(geminiApiKey.value())
   return {
-    model: genAI.getGenerativeModel({ model: 'gemini-3.1-pro' }),
+    model: genAI.getGenerativeModel({ model: 'gemini-2.5-pro' }),
     flashModel: genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
   }
 }

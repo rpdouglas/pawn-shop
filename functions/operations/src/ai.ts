@@ -11,7 +11,7 @@ function getModels(schema?: Record<string, unknown>) {
   const genAI = new GoogleGenerativeAI(geminiApiKey.value())
   const config = schema ? { generationConfig: { responseMimeType: "application/json", responseSchema: schema } } : {}
   return {
-    model: genAI.getGenerativeModel({ model: 'gemini-3.1-pro', ...config }),
+    model: genAI.getGenerativeModel({ model: 'gemini-2.5-pro', ...config }),
     flashModel: genAI.getGenerativeModel({ model: 'gemini-3.5-flash', ...config }),
     liteModel: genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite', ...config })
   }
