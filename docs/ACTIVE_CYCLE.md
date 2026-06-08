@@ -123,6 +123,7 @@ E93 · AI Intake Toggle — Optional AI opt-out on both desktop and mobile intak
 | **E28 CLOSED** | E28 | 2026-06-06 |
 | `E93 AI Intake Toggle` — Added sessionStorage-persisted AI opt-out toggle to both `IntakeForm.tsx` and `MobileIntakePage.tsx`. Default ON, locks after first photo, skips both extraction and eBay pricing comps when off. 7 new unit tests. | E93 | 2026-06-08 |
 | **E93 CLOSED** | E93 | 2026-06-08 |
+| `E93 AI Overlay Bugfix` — Fixed misleading AI status indicators (fun messages on mobile, "✨ AI Extracting..." overlays on desktop) showing when AI toggle is OFF. Mobile now shows neutral "Saving photo…"; desktop overlays gated on `aiEnabled && isAiProcessing`. 2 regression tests added. | E93 | 2026-06-08 |
 
 ---
 

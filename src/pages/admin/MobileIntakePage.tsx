@@ -796,7 +796,9 @@ export default function MobileIntakePage() {
                   {u.error
                     ? <span style={ERROR_TEXT}>{u.error}</span>
                     : u.processing
-                      ? <span style={{ ...LABEL, display: 'block', marginTop: 'var(--space-1)', color: 'var(--color-primary)', fontWeight: 500 }}>✨ {FUN_STATUSES[funStatusIndex]}</span>
+                      ? aiEnabled
+                        ? <span style={{ ...LABEL, display: 'block', marginTop: 'var(--space-1)', color: 'var(--color-primary)', fontWeight: 500 }}>✨ {FUN_STATUSES[funStatusIndex]}</span>
+                        : <span style={{ ...LABEL, display: 'block', marginTop: 'var(--space-1)', color: 'var(--color-text-muted)' }}>Saving photo…</span>
                       : (
                         <div
                           role="progressbar"

@@ -441,7 +441,7 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
       <section className="intake-section" style={{ position: 'relative' }}>
         <h2 className="intake-section-heading">Capture & View</h2>
         
-        {isAiProcessing && (
+        {isAiProcessing && aiEnabled && (
           <div style={{
             position: 'absolute',
             top: 0, left: 0, right: 0, bottom: 0,
@@ -588,7 +588,7 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
       <section className="intake-section" style={{ position: 'relative' }}>
         <h2 className="intake-section-heading">Basic Information</h2>
 
-        {isAiProcessing && (
+        {isAiProcessing && aiEnabled && (
           <div style={{
             position: 'absolute',
             top: 0, left: 0, right: 0, bottom: 0,
