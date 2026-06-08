@@ -12,6 +12,7 @@ import Badge from '../../components/ui/Badge'
 import AiAssistantPanel from '../../components/admin/AiAssistantPanel'
 import MarkdownConfigPanel from '../../components/admin/MarkdownConfigPanel'
 import QuantityAdjustControl from '../../components/admin/QuantityAdjustControl'
+import InventoryTable from '../../components/admin/InventoryTable'
 import type { Item, ItemStatus } from '../../lib/types'
 
 const STATUS_FILTERS: Array<{ value: 'all' | ItemStatus; label: string }> = [
@@ -29,36 +30,38 @@ export default function InventoryPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
-    const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | ItemStatus>('all')
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
 
-  const handleApplyDescription = async (draft: string) => {
-    if (!selectedItem) return
+  const handleApplyDescription = async (draft: string, itemId?: string) => {
+    const id = itemId ?? selectedItem?.id
+    if (!id) return
     try {
-      await updateDoc(doc(db, 'items', selectedItem.id), { description: draft })
+      await updateDoc(doc(db, 'items', id), { description: draft })
       alert('Description promoted!')
     } catch {
       alert('Failed to promote description.')
     }
   }
 
-  const handleApplyTags = async (tags: string[]) => {
-    if (!selectedItem) return
+  const handleApplyTags = async (tags: string[], itemId?: string) => {
+    const id = itemId ?? selectedItem?.id
+    if (!id) return
     try {
-      await updateDoc(doc(db, 'items', selectedItem.id), {
-        merchandisingTags: arrayUnion(...tags)
-      })
+      await updateDoc(doc(db, 'items', id), { merchandisingTags: arrayUnion(...tags) })
       alert('Tags applied!')
     } catch {
       alert('Failed to apply tags.')
     }
   }
 
-  const handleApplyPrice = async (low: number, high: number) => {
-    if (!selectedItem) return
+  const handleApplyPrice = async (low: number, high: number, itemId?: string) => {
+    const id = itemId ?? selectedItem?.id
+    if (!id) return
     const midpoint = Math.floor((low + high) / 2)
     try {
-      await updateDoc(doc(db, 'items', selectedItem.id), { price: midpoint })
+      await updateDoc(doc(db, 'items', id), { price: midpoint })
       alert('Midpoint price applied!')
     } catch {
       alert('Failed to apply price.')
@@ -193,7 +196,7 @@ export default function InventoryPage() {
               }}
             />
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
               <div
                 role="group"
                 aria-label="Filter by status"
@@ -202,6 +205,7 @@ export default function InventoryPage() {
                   gap: 'var(--space-2)',
                   overflowX: 'auto',
                   paddingBottom: 'var(--space-2)',
+                  flex: 1,
                 }}
               >
                 {STATUS_FILTERS.map(f => (
@@ -228,31 +232,73 @@ export default function InventoryPage() {
                 ))}
               </div>
               
-              {statusFilter === 'deleted' && user?.isAdmin && (
-                <button
-                  onClick={handleEmptyRecycleBin}
-                  style={{
-                    backgroundColor: 'var(--color-error)',
-                    color: 'white',
-                    border: 'none',
-                    padding: 'var(--space-3) var(--space-4)',
-                    borderRadius: 'var(--radius-md)',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: 'var(--text-small)'
-                  }}
+              <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0 }}>
+                {/* View mode toggle */}
+                <div
+                  role="group"
+                  aria-label="View mode"
+                  style={{ display: 'flex', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}
                 >
-                  Empty Recycle Bin
-                </button>
-              )}
+                  {(['grid', 'table'] as const).map(mode => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setViewMode(mode)}
+                      aria-pressed={viewMode === mode}
+                      style={{
+                        minHeight: '36px',
+                        padding: '0 var(--space-3)',
+                        border: 'none',
+                        backgroundColor: viewMode === mode ? 'var(--color-primary)' : 'var(--color-surface)',
+                        color: viewMode === mode ? 'var(--color-on-primary)' : 'var(--color-text-muted)',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 'var(--text-xs)',
+                        cursor: 'pointer',
+                        textTransform: 'capitalize',
+                      }}
+                    >
+                      {mode === 'grid' ? '⊞ Grid' : '☰ Table'}
+                    </button>
+                  ))}
+                </div>
+
+                {statusFilter === 'deleted' && user?.isAdmin && (
+                  <button
+                    onClick={handleEmptyRecycleBin}
+                    style={{
+                      backgroundColor: 'var(--color-error)',
+                      color: 'white',
+                      border: 'none',
+                      padding: 'var(--space-2) var(--space-4)',
+                      borderRadius: 'var(--radius-md)',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      fontSize: 'var(--text-small)'
+                    }}
+                  >
+                    Empty Recycle Bin
+                  </button>
+                )}
+              </div>
             </div>
 
+            {/* Table View */}
+            {viewMode === 'table' && (
+              <InventoryTable
+                items={filteredItems}
+                isAdmin={user?.isAdmin ?? false}
+                onApplyDescription={(id, draft) => handleApplyDescription(draft, id)}
+                onApplyTags={(id, tags) => handleApplyTags(tags, id)}
+                onApplyPrice={(id, low, high) => handleApplyPrice(low, high, id)}
+              />
+            )}
+
             {/* Grouped Grid View */}
-            {filteredItems.length === 0 ? (
+            {viewMode === 'grid' && filteredItems.length === 0 ? (
               <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)', textAlign: 'center', padding: 'var(--space-12) 0' }}>
                 No items match your search.
               </p>
-            ) : (
+            ) : viewMode === 'grid' ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
                 {['pawn', 'cannabis', 'fireworks', 'other'].map(group => {
                   const groupItems = filteredItems.filter(item => {
@@ -399,7 +445,7 @@ export default function InventoryPage() {
                   )
                 })}
               </div>
-            )}
+            ) : null}
 
             {/* AI Assistant Drawer */}
             {selectedItem && (

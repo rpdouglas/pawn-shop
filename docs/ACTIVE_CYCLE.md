@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-E93 · AI Intake Toggle — Optional AI opt-out on both desktop and mobile intake forms for batch entry workflows. (COMPLETED)
+E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells, copy/paste, row selection, per-row and batch AI dispatch. (COMPLETED)
 
 ---
 
@@ -124,6 +124,8 @@ E93 · AI Intake Toggle — Optional AI opt-out on both desktop and mobile intak
 | `E93 AI Intake Toggle` — Added sessionStorage-persisted AI opt-out toggle to both `IntakeForm.tsx` and `MobileIntakePage.tsx`. Default ON, locks after first photo, skips both extraction and eBay pricing comps when off. 7 new unit tests. | E93 | 2026-06-08 |
 | **E93 CLOSED** | E93 | 2026-06-08 |
 | `E93 AI Overlay Bugfix` — Fixed misleading AI status indicators (fun messages on mobile, "✨ AI Extracting..." overlays on desktop) showing when AI toggle is OFF. Mobile now shows neutral "Saving photo…"; desktop overlays gated on `aiEnabled && isAiProcessing`. 2 regression tests added. | E93 | 2026-06-08 |
+| `E94 Inventory Table Mode` — TanStack Table v8 headless grid on InventoryPage with click-to-edit cells (Text, Select, Price, Tag, PoliceHold), Ctrl+C/V clipboard, row selection, floating batch action bar, per-row AI (✨/$) with AiAssistantPanel, `batchProcessItems` CF, `policeHold` admin gate, scarcity tag restriction. Zero lint errors/warnings, 29/29 tests pass. | E94 | 2026-06-08 |
+| **E94 CLOSED** | E94 | 2026-06-08 |
 
 ---
 
@@ -154,4 +156,4 @@ E93 · AI Intake Toggle — Optional AI opt-out on both desktop and mobile intak
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-05-22 (Cycle 31 open — E21)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-08 (Cycle 32 — E94 CLOSED)*

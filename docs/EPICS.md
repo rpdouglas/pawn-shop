@@ -1169,3 +1169,33 @@
 - [x] 7 unit tests added to `IntakeForm.test.tsx` covering: default ON, sessionStorage read on mount, click to flip, persistence write, helper text, enabled state `[Staff]` `[Comp]`
 - [x] **E93 CLOSED** | 2026-06-08
 
+---
+
+### E94 · Inventory Table Mode — Inline Spreadsheet Grid
+**Priority: HIGH · Effort: 3 developer-days (actual)**
+
+> **Persona Gate — E94:**
+> - **Staff (Primary):** Inventory staff must be able to compare attributes across items, edit multiple rows efficiently, copy values between cells, and trigger AI functions in bulk without leaving the inventory screen.
+> - **Marcus:** Image thumbnails are visible in the table; drawer opens AiAssistantPanel so AI drafts remain staff-promote-gated.
+> - **Jordan:** `aiDescription` firewall fully intact — AI column opens AiAssistantPanel, never auto-publishes.
+> - **Compliance:** `policeHold` editable by admin only. `rare-find`/`limited-edition` tags restricted to non-staff roles. All AI calls routed through Cloud Functions.
+
+- [x] Install `@tanstack/react-table` v8 (headless) `[Infra]`
+- [x] Add `viewMode: 'grid' | 'table'` toggle to `InventoryPage.tsx` with Grid/Table button group `[Staff]`
+- [x] Create `src/components/admin/InventoryTable.tsx` — main table shell, sorting, column visibility panel `[Staff]`
+- [x] Create `src/components/admin/InventoryTable/columns.tsx` — 14-column TanStack definitions with CellWrapper `[Staff]`
+- [x] Create `src/components/admin/InventoryTable/CellEditors.tsx` — `TextCellEditor`, `SelectCellEditor`, `PriceCellEditor`, `TagCellEditor`, `PoliceHoldCell` `[Staff]`
+- [x] Create `src/components/admin/InventoryTable/CellEditorOptions.ts` — exported option arrays for Status, Condition, ViewTag selects `[Staff]`
+- [x] Create `src/hooks/useGridClipboard.ts` — `copyValue`/`readClipboard` hook `[Staff]`
+- [x] Inline editing: click-to-edit per cell; Tab/Enter/Escape/blur save/cancel model; optimistic Firestore `updateDoc()` `[Staff]`
+- [x] Row selection with checkbox column; floating batch action bar (≥1 rows selected) `[Staff]`
+- [x] Per-row AI column (✨ description, $ price) → `AiAssistantPanel` drawer; per-row status indicators (loading/done/error) `[Jordan]` `[Comp]`
+- [x] Add `batchProcessItems` callable CF to `functions/src/ai.ts` — sequential processing, 400ms rate-limit delay, max 20 items `[Staff]`
+- [x] Create `functions/src/lib/audit.ts` — `writeAuditLog` helper (fixes pre-existing missing module) `[Comp]`
+- [x] `policeHold` column: admin-only toggle, read-only for inventory_staff `[Comp]`
+- [x] `rare-find`/`limited-edition` tags hidden from non-admin TagCellEditor `[Comp]`
+- [x] Zero TypeScript errors (build + `npx tsc -b` in functions) `[Gate]`
+- [x] Zero ESLint errors or warnings `[Gate]`
+- [x] 29/29 frontend unit tests pass `[Gate]`
+- [x] **E94 CLOSED** | 2026-06-08
+

@@ -394,3 +394,230 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
     return { error: err instanceof Error ? err.message : 'Unknown AI Error' }
   }
 }
+
+// ---------------------------------------------------------------------------
+// Internal helpers — shared by per-item CFs and batchProcessItems
+// ---------------------------------------------------------------------------
+
+interface DescriptionItemData {
+  title: string
+  category: string
+  viewTag: string
+  condition: string
+  provenanceNotes?: string
+  serialNumber?: string
+  staffNotes?: string
+}
+
+async function generateDescriptionForItem(uid: string, itemId: string, data: DescriptionItemData): Promise<void> {
+  const { model, flashModel } = getModels()
+  const systemPrompt = `
+    You are an expert product copywriter for The Pawn Shop — a premium, dapper, and distinctly Akwesasne retail platform on Cornwall Island. The brand voice is: quiet confidence, editorial precision, occasionally witty. Never shout. Curate.
+    Your output is a DRAFT for staff review. It will never be shown to customers until a staff member explicitly approves and promotes it.
+    HARD RULES:
+    - Never generate Kanien'kéha language. Flag cultural context for staff.
+    - Never invent condition grades or specifications. Use only the data provided.
+    - Never use scarcity language unless the item data explicitly supports it.
+    - Use Canadian English spelling.
+    - Cannabis items: boutique wellness framing only. No slang.
+  `
+  const userPrompt = `
+    Generate a product description draft for the following item. Write in the brand voice of The Pawn Shop: dapper, precise, editorial. The description should be 150–250 words.
+
+    ITEM DATA:
+    - Title: ${data.title}
+    - Category: ${data.category}
+    - View: ${data.viewTag}
+    - Condition: ${data.condition}
+    - Provenance Notes: ${data.provenanceNotes || 'None'}
+    - Serial Number: ${data.serialNumber || 'N/A'}
+    - Staff Notes: ${data.staffNotes || 'None'}
+
+    OUTPUT FORMAT (JSON):
+    {
+      "draft": "150–250 word editorial description",
+      "suggestedTags": ["tag1", "tag2"],
+      "provenanceFlag": true | false,
+      "culturalNote": "Optional note"
+    }
+  `
+
+  let result
+  try {
+    result = await model.generateContent([systemPrompt, userPrompt])
+  } catch (error: unknown) {
+    const err = error as { message?: string; status?: number }
+    if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
+      result = await flashModel.generateContent([systemPrompt, userPrompt])
+    } else {
+      throw error
+    }
+  }
+
+  const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
+  const parsed = JSON.parse(jsonStr)
+
+  const aiRef = db.collection('items').doc(itemId).collection('internal').doc('ai')
+  await aiRef.set({
+    aiDescription: parsed.draft,
+    aiTagSuggestions: parsed.suggestedTags || [],
+    updatedAt: FieldValue.serverTimestamp(),
+    generatedBy: uid,
+  }, { merge: true })
+
+  await db.collection('auditLogs').add({
+    eventType: 'ai_description_generated',
+    uid,
+    targetId: itemId,
+    details: { model: 'gemini-pro-latest', batch: true },
+    createdAt: FieldValue.serverTimestamp(),
+  })
+}
+
+interface PriceItemData {
+  title: string
+  category: string
+  condition: string
+  brand?: string
+  staffNotes?: string
+}
+
+async function suggestPriceForItem(uid: string, itemId: string, data: PriceItemData): Promise<void> {
+  const { model, flashModel } = getModels()
+  const systemPrompt = `
+    You are a pricing analyst for a pawn shop. Analyse eBay sold listings to provide a price range recommendation. This is GUIDANCE ONLY — it is never a final price.
+    RULES:
+    - Always frame output as a range, never a single price.
+    - Always state the basis for your recommendation.
+    - Prices are in CAD cents (integer).
+    - Never frame the suggestion as the "correct" or "recommended" price.
+  `
+  const userPrompt = `
+    Suggest a pricing range for the following item:
+    - Title: ${data.title}
+    - Category: ${data.category}
+    - Condition: ${data.condition}
+    - Brand/Model: ${data.brand || 'Unknown'}
+    - Staff Notes: ${data.staffNotes || 'None'}
+
+    OUTPUT FORMAT (JSON):
+    {
+      "low": 0,
+      "high": 0,
+      "source": "basis for recommendation",
+      "confidenceLevel": "high | medium | low",
+      "note": "Guidance only."
+    }
+  `
+
+  let result
+  try {
+    result = await model.generateContent([systemPrompt, userPrompt])
+  } catch (error: unknown) {
+    const err = error as { message?: string; status?: number }
+    if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
+      result = await flashModel.generateContent([systemPrompt, userPrompt])
+    } else {
+      throw error
+    }
+  }
+
+  const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
+  const parsed = JSON.parse(jsonStr)
+
+  const aiRef = db.collection('items').doc(itemId).collection('internal').doc('ai')
+  await aiRef.set({
+    aiPriceSuggestion: parsed,
+    updatedAt: FieldValue.serverTimestamp(),
+    generatedBy: uid,
+  }, { merge: true })
+
+  await db.collection('auditLogs').add({
+    eventType: 'ai_price_suggested',
+    uid,
+    targetId: itemId,
+    details: { low: parsed.low, high: parsed.high, batch: true },
+    createdAt: FieldValue.serverTimestamp(),
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Batch Process Items — staff-triggered bulk AI for selected inventory rows
+// ---------------------------------------------------------------------------
+
+interface BatchProcessPayload {
+  itemIds: string[]
+  operations: ('description' | 'price')[]
+}
+
+interface BatchProcessResult {
+  processed: string[]
+  failed: Record<string, string>
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+export const batchProcessItems = onCall({ secrets: [geminiApiKey] }, async (request): Promise<BatchProcessResult> => {
+  const { uid } = assertStaff(request)
+  const { itemIds, operations } = request.data as BatchProcessPayload
+
+  if (!Array.isArray(itemIds) || itemIds.length === 0) {
+    throw new HttpsError('invalid-argument', 'itemIds must be a non-empty array.')
+  }
+  if (itemIds.length > 20) {
+    throw new HttpsError('invalid-argument', 'Maximum 20 items per batch.')
+  }
+  if (!Array.isArray(operations) || operations.length === 0) {
+    throw new HttpsError('invalid-argument', 'operations must be a non-empty array.')
+  }
+
+  const processed: string[] = []
+  const failed: Record<string, string> = {}
+
+  for (let i = 0; i < itemIds.length; i++) {
+    const itemId = itemIds[i]
+    try {
+      const snap = await db.collection('items').doc(itemId).get()
+      if (!snap.exists) {
+        failed[itemId] = 'Item not found.'
+        continue
+      }
+      const raw = snap.data() as Record<string, unknown>
+
+      for (const op of operations) {
+        if (op === 'description') {
+          await generateDescriptionForItem(uid, itemId, {
+            title: String(raw.title ?? ''),
+            category: String(raw.category ?? ''),
+            viewTag: String(raw.viewTag ?? ''),
+            condition: String(raw.condition ?? ''),
+            provenanceNotes: raw.provenanceNotes ? String(raw.provenanceNotes) : undefined,
+            serialNumber: raw.serialNumber ? String(raw.serialNumber) : undefined,
+            staffNotes: raw.staffNotes ? String(raw.staffNotes) : undefined,
+          })
+        } else if (op === 'price') {
+          await suggestPriceForItem(uid, itemId, {
+            title: String(raw.title ?? ''),
+            category: String(raw.category ?? ''),
+            condition: String(raw.condition ?? ''),
+            brand: raw.brand ? String(raw.brand) : undefined,
+            staffNotes: raw.staffNotes ? String(raw.staffNotes) : undefined,
+          })
+        }
+      }
+
+      processed.push(itemId)
+    } catch (err: unknown) {
+      failed[itemId] = err instanceof Error ? err.message : 'Unknown error.'
+    }
+
+    // Rate-limit Gemini — 400ms between items
+    if (i < itemIds.length - 1) {
+      await delay(400)
+    }
+  }
+
+  return { processed, failed }
+})
