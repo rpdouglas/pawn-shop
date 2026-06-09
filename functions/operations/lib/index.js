@@ -207531,7 +207531,7 @@ var generateAIDescription = (0, import_https2.onCall)({ secrets: [geminiApiKey] 
       eventType: "ai_description_generated",
       uid,
       targetId: itemId,
-      details: { model: "gemini-pro-latest" },
+      details: { model: "gemini-2.5-pro" },
       createdAt: import_firestore2.FieldValue.serverTimestamp()
     });
     return { success: true, ...parsed };
@@ -207763,7 +207763,7 @@ ITEM DATA: Title: ${data.title} | Category: ${data.category} | View: ${data.view
     eventType: "ai_description_generated",
     uid,
     targetId: itemId,
-    details: { model: "gemini-pro-latest", batch: true },
+    details: { model: "gemini-2.5-pro", batch: true },
     createdAt: import_firestore2.FieldValue.serverTimestamp()
   });
 }
@@ -208051,20 +208051,16 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
       console.info("[extractIntakeData] attempting Gemini Flash");
       result = await flashModel.generateContent(promptParts);
       console.info(`[extractIntakeData] Flash succeeded rawLength=${result.response.text().length}`);
-    } catch (error) {
-      const err = error;
-      if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
-        console.warn(`[extractIntakeData] Flash failed (${err?.status ?? err?.message}), falling back to Pro`);
-        modelUsed = "pro";
-        try {
-          result = await model.generateContent(promptParts);
-          console.info(`[extractIntakeData] Pro succeeded rawLength=${result.response.text().length}`);
-        } catch (proError) {
-          console.warn("[extractIntakeData] Pro also failed, gracefully degrading:", proError);
-          return { error: "Graceful Degradation: AI models unavailable" };
-        }
-      } else {
-        throw error;
+    } catch (flashError) {
+      const fe = flashError;
+      console.warn(`[extractIntakeData] Flash failed (${fe?.status ?? fe?.message}), falling back to Pro`);
+      modelUsed = "pro";
+      try {
+        result = await model.generateContent(promptParts);
+        console.info(`[extractIntakeData] Pro succeeded rawLength=${result.response.text().length}`);
+      } catch (proError) {
+        console.warn("[extractIntakeData] Pro also failed, gracefully degrading:", proError);
+        return { error: "Graceful Degradation: AI models unavailable" };
       }
     }
     try {

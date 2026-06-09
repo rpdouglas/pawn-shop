@@ -765,20 +765,16 @@ export async function extractIntakeData(buffer: Buffer, mimeType: string, viewTa
       console.info('[extractIntakeData] attempting Gemini Flash')
       result = await flashModel.generateContent(promptParts)
       console.info(`[extractIntakeData] Flash succeeded rawLength=${result.response.text().length}`)
-    } catch (error: unknown) {
-      const err = error as { message?: string; status?: number };
-      if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
-        console.warn(`[extractIntakeData] Flash failed (${err?.status ?? err?.message}), falling back to Pro`)
-        modelUsed = 'pro'
-        try {
-          result = await model.generateContent(promptParts)
-          console.info(`[extractIntakeData] Pro succeeded rawLength=${result.response.text().length}`)
-        } catch (proError: unknown) {
-          console.warn('[extractIntakeData] Pro also failed, gracefully degrading:', proError)
-          return { error: 'Graceful Degradation: AI models unavailable' }
-        }
-      } else {
-        throw error
+    } catch (flashError: unknown) {
+      const fe = flashError as { message?: string; status?: number };
+      console.warn(`[extractIntakeData] Flash failed (${fe?.status ?? fe?.message}), falling back to Pro`)
+      modelUsed = 'pro'
+      try {
+        result = await model.generateContent(promptParts)
+        console.info(`[extractIntakeData] Pro succeeded rawLength=${result.response.text().length}`)
+      } catch (proError: unknown) {
+        console.warn('[extractIntakeData] Pro also failed, gracefully degrading:', proError)
+        return { error: 'Graceful Degradation: AI models unavailable' }
       }
     }
 
