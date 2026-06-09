@@ -416,6 +416,8 @@ export const processUploadedImage = onCall<{ filePath: string, extractData?: boo
   const tempFile = bucket.file(filePath)
   const jobRef = db.collection("items").doc(itemId).collection("imageJobs").doc(filename)
 
+  console.info(`[processUploadedImage] called itemId=${itemId} extractData=${extractData ?? false} viewTag=${viewTag ?? 'undefined'}`)
+
   try {
     const jobSnap = await jobRef.get()
     const attempt = jobSnap.exists ? ((jobSnap.data()?.attempt as number) || 1) + 1 : 2
@@ -431,6 +433,7 @@ export const processUploadedImage = onCall<{ filePath: string, extractData?: boo
     if (!exists) throw new HttpsError('not-found', 'Temporary image file not found')
 
     const [buffer] = await tempFile.download()
+    console.info(`[processUploadedImage] image downloaded bufferBytes=${buffer.length}`)
 
     const image = sharp(buffer)
     const metadata = await image.metadata()
@@ -449,17 +452,21 @@ export const processUploadedImage = onCall<{ filePath: string, extractData?: boo
     })
 
     const finalUrl = finalFile.publicUrl()
+    console.info(`[processUploadedImage] watermark+WebP complete finalPath=${finalPath}`)
 
     await db.collection("items").doc(itemId).update({
       images: FieldValue.arrayUnion(finalUrl),
       updatedAt: FieldValue.serverTimestamp(),
     })
+    console.info(`[processUploadedImage] image saved to Firestore images[] url=${finalUrl}`)
 
     if (extractData && viewTag) {
       await jobRef.update({ status: 'analyzing' })
       const [meta] = await tempFile.getMetadata()
       const mimeType = meta.contentType || 'image/jpeg'
+      console.info(`[processUploadedImage] calling extractIntakeData viewTag=${viewTag} mimeType=${mimeType}`)
       const aiResult = await extractIntakeData(buffer, mimeType, viewTag)
+      console.info(`[processUploadedImage] extractIntakeData returned keys=${Object.keys(aiResult ?? {}).join(',')}`)
       if (aiResult && aiResult.error) {
         // Graceful degradation: log the error but don't fail the upload
         await jobRef.update({
@@ -481,6 +488,7 @@ export const processUploadedImage = onCall<{ filePath: string, extractData?: boo
           updatedAt: FieldValue.serverTimestamp(),
           generatedBy: request.auth.uid
         }, { merge: true })
+        console.info(`[processUploadedImage] intakeExtraction written to Firestore items/${itemId}/internal/ai`)
       }
     }
 
@@ -491,6 +499,7 @@ export const processUploadedImage = onCall<{ filePath: string, extractData?: boo
       updatedAt: FieldValue.serverTimestamp()
     })
 
+    console.info(`[processUploadedImage] complete success url=${finalUrl}`)
     return { success: true, url: finalUrl }
   } catch (e) {
     await jobRef.update({

@@ -533,6 +533,7 @@ function levenshtein(a, b) {
  */
 async function extractIntakeData(buffer, mimeType, viewTag) {
     const db = (0, firestore_1.getFirestore)();
+    console.info(`[extractIntakeData] called viewTag=${viewTag} mimeType=${mimeType} bufferBytes=${buffer.length}`);
     let referenceContext = '';
     if (viewTag === 'cannabis') {
         // PASS 1: Extract strain name
@@ -556,6 +557,7 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
             const jsonStr = initialResult.response.text().replace(/```json|```/g, '').trim();
             const parsed = JSON.parse(jsonStr);
             if (parsed.strainName) {
+                console.info(`[extractIntakeData] cannabis pass1 strainName="${parsed.strainName}"`);
                 // Query database for all strains to do fuzzy matching
                 const snap = await db.collection('cannabisStrains').get();
                 let bestMatch = null;
@@ -571,6 +573,7 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
                     }
                 }
                 if (bestMatch && bestDistance <= Math.max(3, parsed.strainName.length * 0.3)) {
+                    console.info(`[extractIntakeData] fuzzy match bestMatch="${bestMatch.strainName}" distance=${bestDistance}`);
                     const strainData = bestMatch;
                     referenceContext = `
             REFERENCE CANNABIS DATA FROM DATABASE:
@@ -581,11 +584,14 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
             THC Range: ${strainData.thcMin} - ${strainData.thcMax}
             CBD Range: ${strainData.cbdMin} - ${strainData.cbdMax}
             Strain Type: ${strainData.strainType}
-            
-            Use this reference data to INTELLIGENTLY MERGE with what you see on the package. 
+
+            Use this reference data to INTELLIGENTLY MERGE with what you see on the package.
             If the package explicitly contradicts the reference (e.g. shows different THC %), prefer the package.
             Otherwise, use the reference data to fill in missing details like terpenes and genetic lineage.
           `;
+                }
+                else {
+                    console.info(`[extractIntakeData] fuzzy match: no close match found distance=${bestDistance === Infinity ? 'n/a' : bestDistance}`);
                 }
             }
         }
@@ -685,19 +691,24 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
             }
         ];
         let result;
+        let modelUsed = 'flash';
         try {
             // Attempt with Flash first for speed
+            console.info('[extractIntakeData] attempting Gemini Flash');
             result = await flashModel.generateContent(promptParts);
+            console.info(`[extractIntakeData] Flash succeeded rawLength=${result.response.text().length}`);
         }
         catch (error) {
             const err = error;
             if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
-                console.warn('Gemini Flash unavailable during intake extraction, falling back to Pro:', err.message);
+                console.warn(`[extractIntakeData] Flash failed (${err?.status ?? err?.message}), falling back to Pro`);
+                modelUsed = 'pro';
                 try {
                     result = await model.generateContent(promptParts);
+                    console.info(`[extractIntakeData] Pro succeeded rawLength=${result.response.text().length}`);
                 }
                 catch (proError) {
-                    console.warn('Gemini Pro also failed, gracefully degrading:', proError);
+                    console.warn('[extractIntakeData] Pro also failed, gracefully degrading:', proError);
                     return { error: 'Graceful Degradation: AI models unavailable' };
                 }
             }
@@ -706,11 +717,15 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
             }
         }
         try {
-            const jsonStr = result.response.text().replace(/```json|```/g, '').trim();
-            return JSON.parse(jsonStr);
+            const rawText = result.response.text();
+            const jsonStr = rawText.replace(/```json|```/g, '').trim();
+            const parsed = JSON.parse(jsonStr);
+            console.info(`[extractIntakeData] JSON parse succeeded model=${modelUsed} title="${parsed.suggestedFields?.title ?? ''}" category="${parsed.suggestedFields?.category ?? ''}"`);
+            return parsed;
         }
         catch {
-            console.error('Failed to parse Gemini output. Raw text:', result.response.text());
+            const rawText = result.response.text();
+            console.error(`[extractIntakeData] JSON parse failed model=${modelUsed} rawText=${rawText.slice(0, 300)}`);
             return { error: 'Failed to parse AI output into JSON.' };
         }
     }

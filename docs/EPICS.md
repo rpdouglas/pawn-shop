@@ -1297,3 +1297,14 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] **P3 — Phase 6:** Add functions deploy step to `.github/workflows/deploy-dev.yml` `[Jord]`
 - [x] **E99 CLOSED** | 2026-06-09
 
+---
+
+### E100 · AI Intake Pipeline Diagnostics
+
+> **Persona Gate — E100:**
+> - **Staff:** Add structured `console.log` breadcrumbs to the AI intake Cloud Functions so the failure mode (Gemini call, JSON parse, Firestore write) can be identified in Firebase Cloud Logging.
+
+- [x] Add diagnostic logging to `processUploadedImage` CF in `functions/operations/src/inventory.ts` `[Staff]`
+- [x] Add diagnostic logging to `extractIntakeData` in `functions/operations/src/ai.ts` `[Staff]`
+- [x] **E100 CLOSED** | 2026-06-09
+

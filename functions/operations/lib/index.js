@@ -207893,6 +207893,7 @@ function levenshtein(a, b) {
 }
 async function extractIntakeData(buffer, mimeType, viewTag) {
   const db = (0, import_firestore2.getFirestore)();
+  console.info(`[extractIntakeData] called viewTag=${viewTag} mimeType=${mimeType} bufferBytes=${buffer.length}`);
   let referenceContext = "";
   if (viewTag === "cannabis") {
     const initialPrompt = `
@@ -207915,6 +207916,7 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
       const jsonStr = initialResult.response.text().replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(jsonStr);
       if (parsed.strainName) {
+        console.info(`[extractIntakeData] cannabis pass1 strainName="${parsed.strainName}"`);
         const snap = await db.collection("cannabisStrains").get();
         let bestMatch = null;
         let bestDistance = Infinity;
@@ -207929,6 +207931,7 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
           }
         }
         if (bestMatch && bestDistance <= Math.max(3, parsed.strainName.length * 0.3)) {
+          console.info(`[extractIntakeData] fuzzy match bestMatch="${bestMatch.strainName}" distance=${bestDistance}`);
           const strainData = bestMatch;
           referenceContext = `
             REFERENCE CANNABIS DATA FROM DATABASE:
@@ -207939,11 +207942,13 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
             THC Range: ${strainData.thcMin} - ${strainData.thcMax}
             CBD Range: ${strainData.cbdMin} - ${strainData.cbdMax}
             Strain Type: ${strainData.strainType}
-            
-            Use this reference data to INTELLIGENTLY MERGE with what you see on the package. 
+
+            Use this reference data to INTELLIGENTLY MERGE with what you see on the package.
             If the package explicitly contradicts the reference (e.g. shows different THC %), prefer the package.
             Otherwise, use the reference data to fill in missing details like terpenes and genetic lineage.
           `;
+        } else {
+          console.info(`[extractIntakeData] fuzzy match: no close match found distance=${bestDistance === Infinity ? "n/a" : bestDistance}`);
         }
       }
     } catch (err) {
@@ -208041,16 +208046,21 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
       }
     ];
     let result;
+    let modelUsed = "flash";
     try {
+      console.info("[extractIntakeData] attempting Gemini Flash");
       result = await flashModel.generateContent(promptParts);
+      console.info(`[extractIntakeData] Flash succeeded rawLength=${result.response.text().length}`);
     } catch (error) {
       const err = error;
       if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
-        console.warn("Gemini Flash unavailable during intake extraction, falling back to Pro:", err.message);
+        console.warn(`[extractIntakeData] Flash failed (${err?.status ?? err?.message}), falling back to Pro`);
+        modelUsed = "pro";
         try {
           result = await model.generateContent(promptParts);
+          console.info(`[extractIntakeData] Pro succeeded rawLength=${result.response.text().length}`);
         } catch (proError) {
-          console.warn("Gemini Pro also failed, gracefully degrading:", proError);
+          console.warn("[extractIntakeData] Pro also failed, gracefully degrading:", proError);
           return { error: "Graceful Degradation: AI models unavailable" };
         }
       } else {
@@ -208058,10 +208068,14 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
       }
     }
     try {
-      const jsonStr = result.response.text().replace(/```json|```/g, "").trim();
-      return JSON.parse(jsonStr);
+      const rawText = result.response.text();
+      const jsonStr = rawText.replace(/```json|```/g, "").trim();
+      const parsed = JSON.parse(jsonStr);
+      console.info(`[extractIntakeData] JSON parse succeeded model=${modelUsed} title="${parsed.suggestedFields?.title ?? ""}" category="${parsed.suggestedFields?.category ?? ""}"`);
+      return parsed;
     } catch {
-      console.error("Failed to parse Gemini output. Raw text:", result.response.text());
+      const rawText = result.response.text();
+      console.error(`[extractIntakeData] JSON parse failed model=${modelUsed} rawText=${rawText.slice(0, 300)}`);
       return { error: "Failed to parse AI output into JSON." };
     }
   } catch (err) {
@@ -208328,6 +208342,7 @@ var processUploadedImage = (0, import_https3.onCall)({ cors: true, memory: "1GiB
   const bucket = (0, import_storage.getStorage)().bucket();
   const tempFile = bucket.file(filePath);
   const jobRef = db.collection("items").doc(itemId).collection("imageJobs").doc(filename);
+  console.info(`[processUploadedImage] called itemId=${itemId} extractData=${extractData ?? false} viewTag=${viewTag ?? "undefined"}`);
   try {
     const jobSnap = await jobRef.get();
     const attempt = jobSnap.exists ? (jobSnap.data()?.attempt || 1) + 1 : 2;
@@ -208340,6 +208355,7 @@ var processUploadedImage = (0, import_https3.onCall)({ cors: true, memory: "1GiB
     const [exists] = await tempFile.exists();
     if (!exists) throw new import_https3.HttpsError("not-found", "Temporary image file not found");
     const [buffer] = await tempFile.download();
+    console.info(`[processUploadedImage] image downloaded bufferBytes=${buffer.length}`);
     const image = (0, import_sharp.default)(buffer);
     const metadata = await image.metadata();
     const canWatermark = metadata.width && metadata.width >= 260 && (metadata.height && metadata.height >= 36);
@@ -208351,15 +208367,19 @@ var processUploadedImage = (0, import_https3.onCall)({ cors: true, memory: "1GiB
       public: true
     });
     const finalUrl = finalFile.publicUrl();
+    console.info(`[processUploadedImage] watermark+WebP complete finalPath=${finalPath}`);
     await db.collection("items").doc(itemId).update({
       images: import_firestore4.FieldValue.arrayUnion(finalUrl),
       updatedAt: import_firestore4.FieldValue.serverTimestamp()
     });
+    console.info(`[processUploadedImage] image saved to Firestore images[] url=${finalUrl}`);
     if (extractData && viewTag) {
       await jobRef.update({ status: "analyzing" });
       const [meta] = await tempFile.getMetadata();
       const mimeType = meta.contentType || "image/jpeg";
+      console.info(`[processUploadedImage] calling extractIntakeData viewTag=${viewTag} mimeType=${mimeType}`);
       const aiResult = await extractIntakeData(buffer, mimeType, viewTag);
+      console.info(`[processUploadedImage] extractIntakeData returned keys=${Object.keys(aiResult ?? {}).join(",")}`);
       if (aiResult && aiResult.error) {
         await jobRef.update({
           status: "completed",
@@ -208380,6 +208400,7 @@ var processUploadedImage = (0, import_https3.onCall)({ cors: true, memory: "1GiB
           updatedAt: import_firestore4.FieldValue.serverTimestamp(),
           generatedBy: request.auth.uid
         }, { merge: true });
+        console.info(`[processUploadedImage] intakeExtraction written to Firestore items/${itemId}/internal/ai`);
       }
     }
     await tempFile.delete();
@@ -208387,6 +208408,7 @@ var processUploadedImage = (0, import_https3.onCall)({ cors: true, memory: "1GiB
       status: "completed",
       updatedAt: import_firestore4.FieldValue.serverTimestamp()
     });
+    console.info(`[processUploadedImage] complete success url=${finalUrl}`);
     return { success: true, url: finalUrl };
   } catch (e) {
     await jobRef.update({

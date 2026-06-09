@@ -354,6 +354,7 @@ exports.processUploadedImage = (0, https_1.onCall)({ cors: true, memory: '1GiB',
     const bucket = (0, storage_1.getStorage)().bucket();
     const tempFile = bucket.file(filePath);
     const jobRef = db.collection("items").doc(itemId).collection("imageJobs").doc(filename);
+    console.info(`[processUploadedImage] called itemId=${itemId} extractData=${extractData ?? false} viewTag=${viewTag ?? 'undefined'}`);
     try {
         const jobSnap = await jobRef.get();
         const attempt = jobSnap.exists ? (jobSnap.data()?.attempt || 1) + 1 : 2;
@@ -367,6 +368,7 @@ exports.processUploadedImage = (0, https_1.onCall)({ cors: true, memory: '1GiB',
         if (!exists)
             throw new https_1.HttpsError('not-found', 'Temporary image file not found');
         const [buffer] = await tempFile.download();
+        console.info(`[processUploadedImage] image downloaded bufferBytes=${buffer.length}`);
         const image = (0, sharp_1.default)(buffer);
         const metadata = await image.metadata();
         const canWatermark = (metadata.width && metadata.width >= 260) && (metadata.height && metadata.height >= 36);
@@ -380,15 +382,19 @@ exports.processUploadedImage = (0, https_1.onCall)({ cors: true, memory: '1GiB',
             public: true,
         });
         const finalUrl = finalFile.publicUrl();
+        console.info(`[processUploadedImage] watermark+WebP complete finalPath=${finalPath}`);
         await db.collection("items").doc(itemId).update({
             images: firestore_2.FieldValue.arrayUnion(finalUrl),
             updatedAt: firestore_2.FieldValue.serverTimestamp(),
         });
+        console.info(`[processUploadedImage] image saved to Firestore images[] url=${finalUrl}`);
         if (extractData && viewTag) {
             await jobRef.update({ status: 'analyzing' });
             const [meta] = await tempFile.getMetadata();
             const mimeType = meta.contentType || 'image/jpeg';
+            console.info(`[processUploadedImage] calling extractIntakeData viewTag=${viewTag} mimeType=${mimeType}`);
             const aiResult = await (0, ai_1.extractIntakeData)(buffer, mimeType, viewTag);
+            console.info(`[processUploadedImage] extractIntakeData returned keys=${Object.keys(aiResult ?? {}).join(',')}`);
             if (aiResult && aiResult.error) {
                 // Graceful degradation: log the error but don't fail the upload
                 await jobRef.update({
@@ -411,6 +417,7 @@ exports.processUploadedImage = (0, https_1.onCall)({ cors: true, memory: '1GiB',
                     updatedAt: firestore_2.FieldValue.serverTimestamp(),
                     generatedBy: request.auth.uid
                 }, { merge: true });
+                console.info(`[processUploadedImage] intakeExtraction written to Firestore items/${itemId}/internal/ai`);
             }
         }
         await tempFile.delete();
@@ -418,6 +425,7 @@ exports.processUploadedImage = (0, https_1.onCall)({ cors: true, memory: '1GiB',
             status: 'completed',
             updatedAt: firestore_2.FieldValue.serverTimestamp()
         });
+        console.info(`[processUploadedImage] complete success url=${finalUrl}`);
         return { success: true, url: finalUrl };
     }
     catch (e) {

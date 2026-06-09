@@ -135,6 +135,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E97 CLOSED** | E97 | 2026-06-09 |
 | `E99 Cloud Functions Architecture Remediation` — Fixed 3 P0 loan function name mismatches (`issueLoanTicket`/`redeemLoan`/`forfeitLoan`); added `forfeitLoan` to core; migrated `batchProcessItems` to operations (subsumes E98); fixed Node 20→24 version mismatch; converted `functions/tsconfig.json` to project references so `tsc -b` now covers deployed codebases; deleted 4,393-line pre-E34 monolith; added `lib/` to `.gitignore`; added CI/CD functions deploy step. | E99 | 2026-06-09 |
 | **E99 CLOSED** | E99 | 2026-06-09 |
+| `E100 AI Intake Pipeline Diagnostics` — Added structured `console.info` breadcrumbs to `processUploadedImage` and `extractIntakeData` CFs. Logs capture: entry params, buffer size, Gemini model selection (Flash/Pro), raw response length, JSON parse result, and Firestore write confirmation. Enables root-cause diagnosis of AI intake failures via Firebase Cloud Logging. | E100 | 2026-06-09 |
+| **E100 CLOSED** | E100 | 2026-06-09 |
 
 ---
 
@@ -165,4 +167,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E99 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E100 CLOSED)*
