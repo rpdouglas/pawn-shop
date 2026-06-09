@@ -141,7 +141,7 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
       eventType: 'ai_description_generated',
       uid,
       targetId: itemId,
-      details: { model: 'gemini-pro-latest' },
+      details: { model: 'gemini-2.5-pro' },
       createdAt: FieldValue.serverTimestamp()
     })
 
@@ -440,7 +440,7 @@ ITEM DATA: Title: ${data.title} | Category: ${data.category} | View: ${data.view
     eventType: 'ai_description_generated',
     uid,
     targetId: itemId,
-    details: { model: 'gemini-pro-latest', batch: true },
+    details: { model: 'gemini-2.5-pro', batch: true },
     createdAt: FieldValue.serverTimestamp()
   })
 }

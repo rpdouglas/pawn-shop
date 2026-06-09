@@ -137,6 +137,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E99 CLOSED** | E99 | 2026-06-09 |
 | `E100 AI Intake Pipeline Diagnostics` — Added structured `console.info` breadcrumbs to `processUploadedImage` and `extractIntakeData` CFs. Logs capture: entry params, buffer size, Gemini model selection (Flash/Pro), raw response length, JSON parse result, and Firestore write confirmation. Enables root-cause diagnosis of AI intake failures via Firebase Cloud Logging. | E100 | 2026-06-09 |
 | **E100 CLOSED** | E100 | 2026-06-09 |
+| `E101 Gemini Model Inspector` — Created `scripts/list-gemini-models.mjs`: reads `GEMINI_API_KEY` from `functions/.env`, queries the Gemini REST API (`/v1beta/models`), and outputs an annotated console table cross-referencing `docs/AI_MODELS.md` categories (Stable GA / Preview / Deprecated / Unknown). Zero new dependencies. Setup instructions printed when key is missing. Decision 0009 logged. | E101 | 2026-06-09 |
+| **E101 CLOSED** | E101 | 2026-06-09 |
 
 ---
 
@@ -167,4 +169,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E100 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E101 CLOSED)*

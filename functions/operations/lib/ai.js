@@ -138,7 +138,7 @@ exports.generateAIDescription = (0, https_1.onCall)({ secrets: [exports.geminiAp
             eventType: 'ai_description_generated',
             uid,
             targetId: itemId,
-            details: { model: 'gemini-pro-latest' },
+            details: { model: 'gemini-2.5-pro' },
             createdAt: firestore_1.FieldValue.serverTimestamp()
         });
         return { success: true, ...parsed };
@@ -393,7 +393,7 @@ ITEM DATA: Title: ${data.title} | Category: ${data.category} | View: ${data.view
         eventType: 'ai_description_generated',
         uid,
         targetId: itemId,
-        details: { model: 'gemini-pro-latest', batch: true },
+        details: { model: 'gemini-2.5-pro', batch: true },
         createdAt: firestore_1.FieldValue.serverTimestamp()
     });
 }

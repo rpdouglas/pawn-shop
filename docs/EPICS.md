@@ -1308,3 +1308,15 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] Add diagnostic logging to `extractIntakeData` in `functions/operations/src/ai.ts` `[Staff]`
 - [x] **E100 CLOSED** | 2026-06-09
 
+---
+
+### E101 · Gemini Model Inspector (Developer Tool)
+
+> **Persona Gate — E101:**
+> - **Jordan / Developer:** A local script that reads a Gemini API key from `functions/.env` and queries the live model list so developers can confidently update `docs/AI_MODELS.md` and avoid shipping invalid model IDs.
+
+- [x] Store `GEMINI_API_KEY` in `functions/.env` (already gitignored) `[Developer]`
+- [x] Create `scripts/list-gemini-models.mjs` — reads key, calls Gemini REST API, outputs annotated model table `[Developer]`
+- [x] Update `docs/AI_MODELS.md` with findings from the script `[Developer]`
+- [x] **E101 CLOSED** | 2026-06-09
+

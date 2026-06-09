@@ -77,3 +77,30 @@ Go to **GitHub → Actions → E2E, Accessibility & Lighthouse → Run workflow*
 This triggers the full suite in CI using the same environment as the automated weekly run (every Sunday at 03:00 UTC).
 
 See `docs/TESTING.md` for the full guide on when to run each suite.
+
+---
+
+## Gemini Model Inspector
+
+Before shipping any changes that touch AI model IDs, run the model inspector to verify your API key and see every model Google currently exposes:
+
+```bash
+node scripts/list-gemini-models.mjs
+```
+
+The script reads `GEMINI_API_KEY` from `functions/.env` (already in `.gitignore`) and outputs an annotated table:
+
+| Column | Description |
+|--------|-------------|
+| Model ID | The exact string used in Cloud Functions |
+| Status | Cross-referenced against `docs/AI_MODELS.md`: `[GA]` Stable GA, `[PREV]` Preview, `[DEPR]` Deprecated, `[BAN]` Banned, `[NEW]` not yet in the doc |
+| Note | Usage context (e.g. which variable in `ai.ts`) or deprecation reason |
+| Max Input / Output Tokens | Token limits for the model |
+
+**First-time setup:**
+
+1. Open `functions/.env`
+2. Add: `GEMINI_API_KEY=your_api_key_here`
+3. Get a key at [Google AI Studio](https://aistudio.google.com/app/apikey)
+
+Any model flagged `[NEW]` is not yet in `docs/AI_MODELS.md`. Evaluate it and add it to the appropriate table (Stable GA or Preview) before using it in a Cloud Function.
