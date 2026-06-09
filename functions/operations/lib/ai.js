@@ -552,8 +552,8 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
                 initialPrompt,
                 { inlineData: { data: buffer.toString('base64'), mimeType: mimeType } }
             ];
-            const { flashModel: initialFlashModel } = getModels(strainSchema);
-            const initialResult = await initialFlashModel.generateContent(initialParts);
+            const { liteModel: initialLiteModel } = getModels(strainSchema);
+            const initialResult = await initialLiteModel.generateContent(initialParts);
             const jsonStr = initialResult.response.text().replace(/```json|```/g, '').trim();
             const parsed = JSON.parse(jsonStr);
             if (parsed.strainName) {

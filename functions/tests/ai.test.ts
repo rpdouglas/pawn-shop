@@ -10,6 +10,15 @@ vi.mock('@google/generative-ai', () => ({
     getGenerativeModel() {
       return { generateContent: mockGenerateContent }
     }
+  },
+  SchemaType: {
+    OBJECT: 'OBJECT',
+    STRING: 'STRING',
+    NUMBER: 'NUMBER',
+    INTEGER: 'INTEGER',
+    BOOLEAN: 'BOOLEAN',
+    ARRAY: 'ARRAY',
+    ENUM: 'ENUM',
   }
 }))
 
@@ -44,7 +53,7 @@ describe('extractIntakeData', () => {
   })
 
   it('should run 2-pass extraction for cannabis view', async () => {
-    // Pass 1: flash model extracts strain
+    // Pass 1: lite model extracts strain (separate quota from flash)
     mockGenerateContent.mockResolvedValueOnce({
       response: {
         text: () => JSON.stringify({ strainName: 'Blue Dream' })
