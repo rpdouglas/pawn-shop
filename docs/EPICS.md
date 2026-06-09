@@ -759,6 +759,21 @@
 - [x] Fix `auditLogs` model tracking — record the model that actually ran, not hardcoded `gemini-2.5-pro` `[Staff]`
 - [x] **E104 CLOSED** | 2026-06-09
 
+---
+
+### E105 · Admin Nav Refactor
+
+> **Persona Gate — E105:**
+> - **Staff (Primary):** Desktop admin sidebar must not overflow on a standard 1080p window. Groups must be visually labeled and scannable. Redundant "Add Item" nav entry removed.
+> - **Makoonsii:** 48px touch targets and keyboard nav preserved on all sidebar items.
+
+- [x] Remove `/admin/intake` entry from `AdminSidebar` GROUPS `[Staff]`
+- [x] Expand sidebar to 210px with labeled group headings `[Staff]`
+- [x] Add collapsible groups (Operations/Customer/People open by default; Content/Config/Support collapsed) `[Staff]`
+- [x] Fix all hardcoded hex and font-size token violations in `AdminSidebar.tsx` `[Comp]`
+- [x] Update `AdminLayout.tsx` gridTemplateColumns to match new sidebar width `[Staff]`
+- [x] **E105 CLOSED** | 2026-06-09
+
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*
 \n### Phase 15: E69 — Onboarding & SOP Management\n- [x] Write `E69_ONBOARDING_SOP_PLAN.md` Spec and Plan\n- [x] Update `firestore.rules` and `firestore-schema.md`\n- [x] Implement `inviteEmployee` Cloud Function\n- [x] Implement `DocumentsPage` Admin UI for SOPs\n- [x] Implement `AcknowledgmentWall` middleware\n- [x] Add `Invite Staff` Modal to `StaffList`\n

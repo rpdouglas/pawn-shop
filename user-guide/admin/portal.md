@@ -1,31 +1,41 @@
 # Admin Desktop Portal — Staff User Guide
 
-The Admin Desktop Portal provides a persistent, high-efficiency navigation shell for staff users on desktop viewports (≥ 1024px). This shell replaces the standard site header with specialized administrative chrome.
+The Admin Desktop Portal provides a persistent, high-efficiency navigation shell for staff users on desktop viewports (≥ 1024px). This shell replaces the standard site header with specialized administrative chrome — clean, direct, and built for the pace of the floor.
 
 ## Layout Overview
 
 The desktop portal consists of two primary areas:
 
-1.  **Icon Sidebar (Fixed Left):** A 54px navigation rail containing quick-access icons for all administrative functions.
-2.  **Slim Topbar (Fixed Top):** A 38px utility bar displaying the brand name and the current user's email and role badge.
+1. **Sidebar (Fixed Left, 210px):** A labeled navigation panel with collapsible section groups. Each section heading is clickable — tap it to expand or collapse that group of functions.
+2. **Slim Topbar (Fixed Top):** A 38px utility bar displaying the brand name and the current user's email and role badge.
 
 ## Sidebar Navigation Groups
 
-Administrative functions are organized into five logical groups:
+Administrative functions are organized into six logical groups. The three most-used sections open by default; the rest start collapsed to keep the panel clean.
 
--   **Operations:** Overview (Dashboard), Inventory, and Intake.
--   **Customer:** Pawn Inbox, Reservations, Preorders, and Disputes.
--   **People:** Staff Management, Scheduling, and Customers.
--   **Content:** Staff Picks, Campaigns, Articles, and FAQs.
--   **Config:** Store Hours and Serial Blacklist.
+| Group | Default | Functions |
+|-------|---------|-----------|
+| **Operations** | Open | Overview (Dashboard), Inventory |
+| **Customer** | Open | Pawn Inbox, Loans, Reservations, Preorders, Disputes |
+| **People** | Open | Staff Management, Scheduling, Customers, Documents |
+| **Content** | Collapsed | Staff Picks, Campaigns, Articles, FAQs, Social Media |
+| **Config** | Collapsed | Store Hours, Serial Blacklist |
+| **Support** | Collapsed | User Guide |
+
+> **Tip:** Click any section heading (e.g. **Content ›**) to expand it. Click again to collapse. Your current expanded state resets on page refresh.
+
+## Adding New Inventory
+
+To receive a new item, use the **+ Add Item** button on the Inventory page — it opens the intake workflow directly from where your stock lives. There is no separate "Intake" entry in the sidebar.
 
 ## Role-Aware Interaction
 
-The portal shell is only rendered for users with a verified staff role (`admin`, `manager`, `inventory_staff`, or `marketing_staff`). 
+The portal shell is only rendered for users with a verified staff role (`admin`, `manager`, `inventory_staff`, or `marketing_staff`).
 
--   **Desktop Efficiency:** On screens 1024px or wider, the shell remains fixed, allowing you to switch between admin pages without re-opening a menu.
--   **Mobile Continuity:** On viewports smaller than 1024px, the sidebar and topbar are replaced by a **bottom tab bar** with three quick-access tabs — Inventory, Add Item (opens the Mobile Intake Wizard), and Dashboard. The standard site header is also hidden on these viewports to maximise screen space for content.
+- **Desktop Efficiency:** On screens 1024px or wider, the sidebar stays fixed so you can move between admin sections without ever reopening a menu.
+- **Mobile Continuity:** On viewports smaller than 1024px, the sidebar and topbar are replaced by a **bottom tab bar** with four quick-access tabs — Inventory, Add Item (camera-first Mobile Intake), Customers, and Dashboard.
 
 ---
 
 *The Pawn Shop · Cornwall Island, Akwesasne*
+*Dapper. Debonair. Distinctly Akwesasne.*

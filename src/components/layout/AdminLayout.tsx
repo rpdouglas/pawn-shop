@@ -30,7 +30,7 @@ export default function AdminLayout() {
   return (
     <AdminShellProvider value={{ isAdminDesktop: true }}>
       <AcknowledgmentWall>
-        <div className="admin-shell" style={{ display: 'grid', gridTemplateColumns: '54px 1fr', minHeight: '100vh' }}>
+        <div className="admin-shell" style={{ display: 'grid', gridTemplateColumns: '210px 1fr', minHeight: '100vh' }}>
           <AdminSidebar />
           <div className="admin-main" style={{ display: 'flex', flexDirection: 'column' }}>
             <AdminTopbar />

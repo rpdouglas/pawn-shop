@@ -145,6 +145,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E103 CLOSED** | E103 | 2026-06-09 |
 | `E104 AI Function Resilience` — Extracted `callWithFallback` helper in `functions/operations/src/ai.ts`. Replaced broken 429/503-only fallback in `generateAIDescription`, `suggestAiPrice`, `generateDescriptionForItem`, and `suggestPriceForItem` with catch-all cascade. Fixed `auditLogs` model tracking to record actual model used. Decision 0012 logged. | E104 | 2026-06-09 |
 | **E104 CLOSED** | E104 | 2026-06-09 |
+| `E105 Admin Nav Refactor` — Replaced 54px icon-only sidebar with 210px labeled accordion sidebar. Removed redundant Intake nav entry. Collapsible groups: Operations/Customer/People open by default; Content/Config/Support collapsed. Default height ~720px — fits comfortably on 1080p. All 5 hardcoded hex values and 3 font/spacing violations replaced with design tokens. Decision 0013 logged. Portal user guide updated. | E105 | 2026-06-09 |
+| **E105 CLOSED** | E105 | 2026-06-09 |
 
 ---
 
@@ -175,4 +177,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E104 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E105 CLOSED)*

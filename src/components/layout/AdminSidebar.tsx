@@ -1,16 +1,21 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
-const GROUPS = [
+type NavItem = { to: string; label: string; icon: string; isExternal?: boolean }
+type NavGroup = { label: string; defaultOpen: boolean; items: NavItem[] }
+
+const GROUPS: NavGroup[] = [
   {
     label: 'Operations',
+    defaultOpen: true,
     items: [
       { to: '/admin/dashboard', label: 'Overview', icon: '📊' },
       { to: '/admin/inventory', label: 'Inventory', icon: '🏷️' },
-      { to: '/admin/intake', label: 'Intake', icon: '➕' },
     ]
   },
   {
     label: 'Customer',
+    defaultOpen: true,
     items: [
       { to: '/admin/pawn-inbox', label: 'Pawn Inbox', icon: '📥' },
       { to: '/admin/loans', label: 'Loans', icon: '💸' },
@@ -21,6 +26,7 @@ const GROUPS = [
   },
   {
     label: 'People',
+    defaultOpen: true,
     items: [
       { to: '/admin/staff', label: 'Staff', icon: '👥' },
       { to: '/admin/scheduling', label: 'Scheduling', icon: '🗓️' },
@@ -30,6 +36,7 @@ const GROUPS = [
   },
   {
     label: 'Content',
+    defaultOpen: false,
     items: [
       { to: '/admin/staff-picks', label: 'Staff Picks', icon: '⭐' },
       { to: '/admin/campaigns', label: 'Campaigns', icon: '📢' },
@@ -40,6 +47,7 @@ const GROUPS = [
   },
   {
     label: 'Config',
+    defaultOpen: false,
     items: [
       { to: '/admin/store-hours', label: 'Store Hours', icon: '🕒' },
       { to: '/admin/serial-blacklist', label: 'Blacklist', icon: '🛡️' },
@@ -47,22 +55,52 @@ const GROUPS = [
   },
   {
     label: 'Support',
+    defaultOpen: false,
     items: [
       { to: 'https://rpdouglas.github.io/pawn-shop/', label: 'User Guide', icon: '📘', isExternal: true },
     ]
   }
 ];
 
+const BASE_ITEM_STYLE = {
+  width: '100%',
+  minHeight: 'var(--space-12)',
+  display: 'flex' as const,
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  gap: 'var(--space-2)',
+  paddingLeft: 'var(--space-4)',
+  paddingRight: 'var(--space-4)',
+  textDecoration: 'none',
+  transition: `background-color var(--motion-speed-fast) var(--motion-easing)`,
+} as const;
+
 export default function AdminSidebar() {
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    () => new Set(GROUPS.filter(g => !g.defaultOpen).map(g => g.label))
+  );
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
+  function toggleGroup(label: string) {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(label)) {
+        next.delete(label);
+      } else {
+        next.add(label);
+      }
+      return next;
+    });
+  }
+
   return (
     <nav
       aria-label="Admin navigation"
       style={{
-        width: '54px',
-        backgroundColor: '#161000',
+        width: '210px',
+        backgroundColor: 'var(--color-surface)',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
         padding: 'var(--space-4) 0',
         height: 'calc(100vh - 38px)',
         position: 'sticky',
@@ -73,109 +111,138 @@ export default function AdminSidebar() {
         zIndex: 1000
       }}
     >
-      {GROUPS.map((group, gIdx) => (
-        <div key={group.label} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {gIdx > 0 && (
-            <div style={{ 
-              width: '28px', 
-              height: '0.5px', 
-              backgroundColor: '#2a1f00', 
-              margin: 'var(--space-2) 0' 
-            }} />
-          )}
-          {group.items.map(item => {
-            const content = (
-              <>
-                <span style={{ 
-                  fontSize: '18px', 
-                  color: '#7a5e0a' 
-                }}>
-                  {item.icon}
-                </span>
-                <span style={{ 
-                  fontSize: '8px', 
-                  color: '#5a4508',
-                  marginTop: '2px',
-                  textAlign: 'center'
-                }}>
-                  {item.label.split(' ')[0]}
-                </span>
-              </>
-            );
+      {GROUPS.map((group, gIdx) => {
+        const isCollapsed = collapsedGroups.has(group.label);
 
-            if ('isExternal' in item && item.isExternal) {
-              return (
-                <a
-                  key={item.to}
-                  href={item.to}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={item.label}
-                  aria-label={item.label}
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textDecoration: 'none',
-                    borderRadius: 'var(--radius-sm)',
-                    marginBottom: 'var(--space-1)',
-                    backgroundColor: 'transparent',
-                    transition: 'background-color var(--motion-speed-fast) var(--motion-easing)'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2e2200'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                >
-                  {content}
-                </a>
-              );
-            }
+        return (
+          <div key={group.label} style={{ width: '100%' }}>
+            {gIdx > 0 && (
+              <div style={{
+                height: '1px',
+                backgroundColor: 'var(--color-border)',
+                margin: `var(--space-1) var(--space-4)`,
+              }} />
+            )}
 
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                title={item.label}
-                aria-label={item.label}
-                style={({ isActive }) => ({
-                  width: '48px',
-                  height: '48px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textDecoration: 'none',
-                  borderRadius: 'var(--radius-sm)',
-                  marginBottom: 'var(--space-1)',
-                  backgroundColor: isActive ? '#2e2200' : 'transparent',
-                  transition: 'background-color var(--motion-speed-fast) var(--motion-easing)'
-                })}
+            <button
+              onClick={() => toggleGroup(group.label)}
+              aria-expanded={!isCollapsed}
+              aria-label={`${group.label} section, ${isCollapsed ? 'collapsed' : 'expanded'}`}
+              style={{
+                width: '100%',
+                minHeight: 'var(--space-12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingLeft: 'var(--space-4)',
+                paddingRight: 'var(--space-4)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--color-text-muted)',
+              }}
+            >
+              <span style={{
+                fontSize: 'var(--text-xs)',
+                fontFamily: 'var(--font-body)',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+              }}>
+                {group.label}
+              </span>
+              <span
+                aria-hidden="true"
+                style={{
+                  fontSize: 'var(--text-small)',
+                  color: 'var(--color-text-muted)',
+                  display: 'inline-block',
+                  transition: `transform var(--motion-speed-fast) var(--motion-easing)`,
+                  transform: isCollapsed ? 'rotate(0deg)' : 'rotate(90deg)',
+                  lineHeight: 1,
+                }}
               >
-                {({ isActive }) => (
-                  <>
-                    <span style={{ 
-                      fontSize: '18px', 
-                      color: isActive ? 'var(--color-primary)' : '#7a5e0a' 
-                    }}>
+                ›
+              </span>
+            </button>
+
+            {!isCollapsed && group.items.map(item => {
+              const isHovered = hoveredItem === item.to;
+
+              if (item.isExternal) {
+                return (
+                  <a
+                    key={item.to}
+                    href={item.to}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={item.label}
+                    style={{
+                      ...BASE_ITEM_STYLE,
+                      color: 'color-mix(in srgb, var(--color-primary) 50%, transparent)',
+                      backgroundColor: isHovered
+                        ? 'color-mix(in srgb, var(--color-primary) 8%, transparent)'
+                        : 'transparent',
+                    }}
+                    onMouseEnter={() => setHoveredItem(item.to)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                  >
+                    <span aria-hidden="true" style={{ fontSize: 'var(--text-body)', lineHeight: 1 }}>
                       {item.icon}
                     </span>
-                    <span style={{ 
-                      fontSize: '8px', 
-                      color: isActive ? 'var(--color-primary)' : '#5a4508',
-                      marginTop: '2px',
-                      textAlign: 'center'
-                    }}>
-                      {item.label.split(' ')[0]}
+                    <span style={{ fontSize: 'var(--text-small)', fontFamily: 'var(--font-body)' }}>
+                      {item.label}
                     </span>
-                  </>
-                )}
-              </NavLink>
-            );
-          })}
-        </div>
-      ))}
+                  </a>
+                );
+              }
+
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  aria-label={item.label}
+                  onMouseEnter={() => setHoveredItem(item.to)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  style={({ isActive }) => ({
+                    ...BASE_ITEM_STYLE,
+                    backgroundColor: isActive
+                      ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)'
+                      : isHovered
+                        ? 'color-mix(in srgb, var(--color-primary) 8%, transparent)'
+                        : 'transparent',
+                  })}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          fontSize: 'var(--text-body)',
+                          lineHeight: 1,
+                          color: isActive
+                            ? 'var(--color-primary)'
+                            : 'color-mix(in srgb, var(--color-primary) 50%, transparent)',
+                        }}
+                      >
+                        {item.icon}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 'var(--text-small)',
+                          fontFamily: 'var(--font-body)',
+                          color: isActive ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                        }}
+                      >
+                        {item.label}
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              );
+            })}
+          </div>
+        );
+      })}
     </nav>
   );
 }
