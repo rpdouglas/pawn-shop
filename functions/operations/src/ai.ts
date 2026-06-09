@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
-import { GoogleGenerativeAI, SchemaType, type Part, type Schema } from '@google/generative-ai'
+import { GoogleGenerativeAI, SchemaType, type Part, type Schema, type GenerativeModel } from '@google/generative-ai'
 import { defineSecret } from 'firebase-functions/params'
 import { assertStaff } from '@pawn-shop/shared/lib/authHelpers'
 import { searchEbayComps } from './ebay'
@@ -15,6 +15,31 @@ function getModels(schema?: Record<string, unknown>) {
     flashModel: genAI.getGenerativeModel({ model: 'gemini-3.5-flash', ...config }),
     liteModel: genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite', ...config })
   }
+}
+
+// Three-tier fallback: Pro → Flash → Lite. Catches ALL error types — not just 429/503.
+// Returns { result, modelUsed } so callers can record the actual model in auditLogs.
+async function callWithFallback(
+  models: { primary: GenerativeModel; flash: GenerativeModel; lite: GenerativeModel },
+  promptParts: (string | Part)[],
+  label: string,
+): Promise<{ result: Awaited<ReturnType<GenerativeModel['generateContent']>>; modelUsed: string }> {
+  try {
+    const result = await models.primary.generateContent(promptParts)
+    return { result, modelUsed: 'gemini-2.5-pro' }
+  } catch (err: unknown) {
+    const e = err as { message?: string; status?: number }
+    console.warn(`[${label}] Pro failed (${e?.status ?? e?.message}), falling back to Flash`)
+  }
+  try {
+    const result = await models.flash.generateContent(promptParts)
+    return { result, modelUsed: 'gemini-3.5-flash' }
+  } catch (err: unknown) {
+    const e = err as { message?: string; status?: number }
+    console.warn(`[${label}] Flash failed (${e?.status ?? e?.message}), falling back to Lite`)
+  }
+  const result = await models.lite.generateContent(promptParts)
+  return { result, modelUsed: 'gemini-3.1-flash-lite' }
 }
 
 /**
@@ -98,33 +123,12 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
       }
     }
 
-    let result
-    try {
-      result = await model.generateContent(promptParts)
-    } catch (error: unknown) {
-      const err = error as { message?: string; status?: number };
-      if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
-        console.warn('Gemini Pro unavailable (Quota/503), falling back to Flash model...')
-        try {
-          result = await flashModel.generateContent(promptParts)
-        } catch (flashError: unknown) {
-          const fe = flashError as { message?: string; status?: number };
-          if (fe?.message?.includes('429') || fe?.status === 429 || fe?.message?.includes('503') || fe?.status === 503) {
-            console.warn('Gemini Flash unavailable (Quota/503), falling back to Lite model...')
-            result = await liteModel.generateContent(promptParts)
-          } else {
-            throw flashError
-          }
-        }
-      } else {
-        throw err
-      }
-    }
-    const response = result.response
-    const text = response.text()
-    
-    // Clean JSON if needed
-    const jsonStr = text.replace(/```json|```/g, '').trim()
+    const { result, modelUsed } = await callWithFallback(
+      { primary: model, flash: flashModel, lite: liteModel },
+      promptParts,
+      'generateAIDescription'
+    )
+    const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
     const parsed = JSON.parse(jsonStr)
 
     const aiRef = db.collection('items').doc(itemId).collection('internal').doc('ai')
@@ -141,7 +145,7 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
       eventType: 'ai_description_generated',
       uid,
       targetId: itemId,
-      details: { model: 'gemini-2.5-pro' },
+      details: { model: modelUsed },
       createdAt: FieldValue.serverTimestamp()
     })
 
@@ -222,28 +226,11 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
 
   try {
     const { model, flashModel, liteModel } = getModels(schema)
-    let result
-    try {
-      result = await model.generateContent([systemPrompt, userPrompt])
-    } catch (error: unknown) {
-      const err = error as { message?: string; status?: number };
-      if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
-        console.warn('Gemini Pro unavailable (Quota/503), falling back to Flash model...')
-        try {
-          result = await flashModel.generateContent([systemPrompt, userPrompt])
-        } catch (flashError: unknown) {
-          const fe = flashError as { message?: string; status?: number };
-          if (fe?.message?.includes('429') || fe?.status === 429 || fe?.message?.includes('503') || fe?.status === 503) {
-            console.warn('Gemini Flash unavailable (Quota/503), falling back to Lite model...')
-            result = await liteModel.generateContent([systemPrompt, userPrompt])
-          } else {
-            throw flashError
-          }
-        }
-      } else {
-        throw err
-      }
-    }
+    const { result, modelUsed } = await callWithFallback(
+      { primary: model, flash: flashModel, lite: liteModel },
+      [systemPrompt, userPrompt],
+      'suggestAiPrice'
+    )
     const jsonStr = result.response.text().replace(/```json|```/g, '').trim()
     const parsed = JSON.parse(jsonStr)
 
@@ -258,7 +245,7 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
       eventType: 'ai_price_suggested',
       uid,
       targetId: itemId,
-      details: { low: parsed.low, high: parsed.high },
+      details: { low: parsed.low, high: parsed.high, model: modelUsed },
       createdAt: FieldValue.serverTimestamp()
     })
 
@@ -402,29 +389,11 @@ ITEM DATA: Title: ${data.title} | Category: ${data.category} | View: ${data.view
     }
   }
 
-  let result
-  try {
-    result = await model.generateContent(promptParts)
-  } catch (error: unknown) {
-    const err = error as { message?: string; status?: number }
-    if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
-      console.warn('[batch] Gemini Pro unavailable, falling back to Flash...')
-      try {
-        result = await flashModel.generateContent(promptParts)
-      } catch (flashError: unknown) {
-        const fe = flashError as { message?: string; status?: number }
-        if (fe?.message?.includes('429') || fe?.status === 429 || fe?.message?.includes('503') || fe?.status === 503) {
-          console.warn('[batch] Gemini Flash unavailable, falling back to Lite...')
-          result = await liteModel.generateContent(promptParts)
-        } else {
-          throw flashError
-        }
-      }
-    } else {
-      throw error
-    }
-  }
-
+  const { result, modelUsed } = await callWithFallback(
+    { primary: model, flash: flashModel, lite: liteModel },
+    promptParts,
+    'generateDescriptionForItem'
+  )
   const parsed = JSON.parse(result.response.text().replace(/```json|```/g, '').trim())
 
   await db.collection('items').doc(itemId).collection('internal').doc('ai').set({
@@ -440,7 +409,7 @@ ITEM DATA: Title: ${data.title} | Category: ${data.category} | View: ${data.view
     eventType: 'ai_description_generated',
     uid,
     targetId: itemId,
-    details: { model: 'gemini-2.5-pro', batch: true },
+    details: { model: modelUsed, batch: true },
     createdAt: FieldValue.serverTimestamp()
   })
 }
@@ -462,26 +431,11 @@ async function suggestPriceForItem(uid: string, itemId: string, data: PriceItemD
   const systemPrompt = `You are a pricing analyst for a pawn shop. Provide a price range from eBay sold comps. Guidance only. Prices in CAD cents (integer). Always give a range, never a single price.`
   const userPrompt = `Price range for: Title: ${data.title} | Category: ${data.category} | Condition: ${data.condition} | Brand: ${data.brand || 'Unknown'} | Staff Notes: ${data.staffNotes || 'None'}${data.aiDescription ? ` | Description: ${data.aiDescription}` : ''}`
 
-  let result
-  try {
-    result = await model.generateContent([systemPrompt, userPrompt])
-  } catch (error: unknown) {
-    const err = error as { message?: string; status?: number }
-    if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
-      try {
-        result = await flashModel.generateContent([systemPrompt, userPrompt])
-      } catch (flashError: unknown) {
-        const fe = flashError as { message?: string; status?: number }
-        if (fe?.message?.includes('429') || fe?.status === 429 || fe?.message?.includes('503') || fe?.status === 503) {
-          result = await liteModel.generateContent([systemPrompt, userPrompt])
-        } else {
-          throw flashError
-        }
-      }
-    } else {
-      throw error
-    }
-  }
+  const { result, modelUsed } = await callWithFallback(
+    { primary: model, flash: flashModel, lite: liteModel },
+    [systemPrompt, userPrompt],
+    'suggestPriceForItem'
+  )
 
   const parsed = JSON.parse(result.response.text().replace(/```json|```/g, '').trim())
 
@@ -495,7 +449,7 @@ async function suggestPriceForItem(uid: string, itemId: string, data: PriceItemD
     eventType: 'ai_price_suggested',
     uid,
     targetId: itemId,
-    details: { low: parsed.low, high: parsed.high, batch: true },
+    details: { low: parsed.low, high: parsed.high, model: modelUsed, batch: true },
     createdAt: FieldValue.serverTimestamp()
   })
 }

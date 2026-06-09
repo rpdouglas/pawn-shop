@@ -143,6 +143,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E102 CLOSED** | E102 | 2026-06-09 |
 | `E103 Fireworks Hero Video` — Wired default YouTube video `8rmpm3ZOn50` into `FireworksHero.tsx` with Firestore override/suppress capability. Restructured layout: video outside narrow content column, 900px max-width, 16:9 responsive. Decision 0011 logged. | E103 | 2026-06-09 |
 | **E103 CLOSED** | E103 | 2026-06-09 |
+| `E104 AI Function Resilience` — Extracted `callWithFallback` helper in `functions/operations/src/ai.ts`. Replaced broken 429/503-only fallback in `generateAIDescription`, `suggestAiPrice`, `generateDescriptionForItem`, and `suggestPriceForItem` with catch-all cascade. Fixed `auditLogs` model tracking to record actual model used. Decision 0012 logged. | E104 | 2026-06-09 |
+| **E104 CLOSED** | E104 | 2026-06-09 |
 
 ---
 
@@ -173,4 +175,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E103 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E104 CLOSED)*

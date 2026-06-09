@@ -747,6 +747,18 @@
 - [x] Restructure hero layout: video moves outside the narrow content column, 900px max-width, 16:9 responsive `[Tan]` `[Jord]` `[Mak]`
 - [x] **E103 CLOSED** | 2026-06-09
 
+---
+
+### E104 · AI Function Resilience (P0 Bug Fix)
+
+> **Persona Gate — E104:**
+> - **Staff (Primary):** `generateAIDescription` and `suggestAiPrice` must not silently fail when `gemini-2.5-pro` returns any non-429/503 error. Flash/Lite fallbacks must activate.
+
+- [x] Extract `callWithFallback` helper — single catch-all fallback chain, eliminates 5 copy-paste sites `[Staff]`
+- [x] Wire `generateAIDescription`, `suggestAiPrice`, `generateDescriptionForItem`, `suggestPriceForItem` to use helper `[Staff]`
+- [x] Fix `auditLogs` model tracking — record the model that actually ran, not hardcoded `gemini-2.5-pro` `[Staff]`
+- [x] **E104 CLOSED** | 2026-06-09
+
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*
 \n### Phase 15: E69 — Onboarding & SOP Management\n- [x] Write `E69_ONBOARDING_SOP_PLAN.md` Spec and Plan\n- [x] Update `firestore.rules` and `firestore-schema.md`\n- [x] Implement `inviteEmployee` Cloud Function\n- [x] Implement `DocumentsPage` Admin UI for SOPs\n- [x] Implement `AcknowledgmentWall` middleware\n- [x] Add `Invite Staff` Modal to `StaffList`\n
