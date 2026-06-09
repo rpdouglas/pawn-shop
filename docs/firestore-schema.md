@@ -182,17 +182,26 @@ Slot intervals are computed at runtime: `open` → `close − 30 min` in 30-minu
 
 ---
 
-## `config/shopInfo` — single document, admin-only write (E17)
+## `config/shopInfo` — single document, admin-only write (E17, E102)
 
 | Field | Type | Notes |
 |-------|------|-------|
 | `foundedYear` | number | Year the shop was founded. Used to compute years-in-business badge. |
 | `ownerName` | string | Optional. Display name used in testimonials context. |
 | `phoneNumber` | string | E.164 format (e.g. `+16135551234`). Used for WhatsApp enquiry deep link on cannabis item pages. Admin-only write. |
+| `heroData` | map | Optional. Keys: `pawn`, `cannabis`, `fireworks`. Each value is a `HeroMedia` map (see below). |
 | `updatedBy` | string | UID of admin who last modified |
 | `updatedAt` | timestamp | Server timestamp |
 
-Read access: public (no auth required — displayed on public Pawn page). Write access: `admin` custom claim only via Firebase console or a future admin UI. Create this document manually in Firestore console with `foundedYear: <year>`.
+### `heroData.{view}` — `HeroMedia` map
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `mediaType` | string | `'youtube'` \| `'carousel'` \| `'none'` |
+| `youtubeId` | string | YouTube video ID only (not full URL). Rendered via `youtube-nocookie.com`. Required when `mediaType === 'youtube'`. |
+| `carouselImages` | array\<map\> | Required when `mediaType === 'carousel'`. Each entry: `{ url: string, alt: string }`. `url` must be a Firebase Storage WebP URL. `alt` must be a descriptive string for accessibility. |
+
+Read access: public (no auth required — displayed on public pages). Write access: `admin` custom claim only via Firebase console or a future admin UI. Create this document manually in Firestore console with `foundedYear: <year>`.
 
 ---
 

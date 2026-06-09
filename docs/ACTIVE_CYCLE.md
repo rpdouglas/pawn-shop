@@ -139,6 +139,10 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E100 CLOSED** | E100 | 2026-06-09 |
 | `E101 Gemini Model Inspector` — Created `scripts/list-gemini-models.mjs`: reads `GEMINI_API_KEY` from `functions/.env`, queries the Gemini REST API (`/v1beta/models`), and outputs an annotated console table cross-referencing `docs/AI_MODELS.md` categories (Stable GA / Preview / Deprecated / Unknown). Zero new dependencies. Setup instructions printed when key is missing. Decision 0009 logged. | E101 | 2026-06-09 |
 | **E101 CLOSED** | E101 | 2026-06-09 |
+| `E102 Vertical Hero Sections` — Upgraded all three vertical heroes to design spec: PawnHero ≥80vh, CinematicHero 100vh self-contained, FireworksHero extracted from page. Added `HeroMedia` types, `useHeroMedia` hook, `ImageCarousel`, `YouTubeFacade` shared components. Schema + decision 0010 logged. | E102 | 2026-06-09 |
+| **E102 CLOSED** | E102 | 2026-06-09 |
+| `E103 Fireworks Hero Video` — Wired default YouTube video `8rmpm3ZOn50` into `FireworksHero.tsx` with Firestore override/suppress capability. Restructured layout: video outside narrow content column, 900px max-width, 16:9 responsive. Decision 0011 logged. | E103 | 2026-06-09 |
+| **E103 CLOSED** | E103 | 2026-06-09 |
 
 ---
 
@@ -169,4 +173,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E101 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E103 CLOSED)*

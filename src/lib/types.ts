@@ -269,10 +269,24 @@ export interface AdjustInventoryPayload {
   reason?: string
 }
 
+export interface HeroCarouselImage {
+  url: string
+  alt: string
+}
+
+export type HeroMediaType = 'youtube' | 'carousel' | 'none'
+
+export interface HeroMedia {
+  mediaType: HeroMediaType
+  youtubeId?: string
+  carouselImages?: HeroCarouselImage[]
+}
+
 export interface ShopInfo {
   foundedYear: number
   ownerName?: string
   phoneNumber?: string
+  heroData?: Partial<Record<'pawn' | 'cannabis' | 'fireworks', HeroMedia>>
   updatedBy?: string
   updatedAt?: Date
 }

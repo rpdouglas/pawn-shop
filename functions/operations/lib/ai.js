@@ -698,22 +698,17 @@ async function extractIntakeData(buffer, mimeType, viewTag) {
             result = await flashModel.generateContent(promptParts);
             console.info(`[extractIntakeData] Flash succeeded rawLength=${result.response.text().length}`);
         }
-        catch (error) {
-            const err = error;
-            if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
-                console.warn(`[extractIntakeData] Flash failed (${err?.status ?? err?.message}), falling back to Pro`);
-                modelUsed = 'pro';
-                try {
-                    result = await model.generateContent(promptParts);
-                    console.info(`[extractIntakeData] Pro succeeded rawLength=${result.response.text().length}`);
-                }
-                catch (proError) {
-                    console.warn('[extractIntakeData] Pro also failed, gracefully degrading:', proError);
-                    return { error: 'Graceful Degradation: AI models unavailable' };
-                }
+        catch (flashError) {
+            const fe = flashError;
+            console.warn(`[extractIntakeData] Flash failed (${fe?.status ?? fe?.message}), falling back to Pro`);
+            modelUsed = 'pro';
+            try {
+                result = await model.generateContent(promptParts);
+                console.info(`[extractIntakeData] Pro succeeded rawLength=${result.response.text().length}`);
             }
-            else {
-                throw error;
+            catch (proError) {
+                console.warn('[extractIntakeData] Pro also failed, gracefully degrading:', proError);
+                return { error: 'Graceful Degradation: AI models unavailable' };
             }
         }
         try {

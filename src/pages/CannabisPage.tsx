@@ -91,10 +91,7 @@ export default function CannabisPage() {
 
   return (
     <div>
-      <CinematicHero
-        heading="American Craft. Canadian Prices."
-        subheading="Exclusive American brands — impossible to find at any Ontario or Quebec dispensary. Priced in CAD."
-      />
+      <CinematicHero />
 
       <CannabisMarqueeStrip />
 

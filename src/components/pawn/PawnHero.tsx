@@ -1,8 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import Button from '../ui/Button'
+import { useHeroMedia } from '../../hooks/useHeroMedia'
+import { ImageCarousel } from '../ui/ImageCarousel'
+import { YouTubeFacade } from '../ui/YouTubeFacade'
 
 export default function PawnHero() {
   const navigate = useNavigate()
+  const heroMedia = useHeroMedia('pawn')
 
   const scrollToDiscovery = () => {
     document.getElementById('masonry-section')?.scrollIntoView({ behavior: 'smooth' })
@@ -13,7 +17,7 @@ export default function PawnHero() {
       aria-label="Pawn Shop — find your next discovery"
       style={{
         position: 'relative',
-        minHeight: '50vh',
+        minHeight: '80vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -21,7 +25,7 @@ export default function PawnHero() {
         padding: 'var(--space-12) var(--space-8)',
         backgroundColor: 'var(--color-bg)',
         overflow: 'hidden',
-        textAlign: 'center'
+        textAlign: 'center',
       }}
     >
       {/* Decorative gold rule — art deco motif */}
@@ -37,7 +41,7 @@ export default function PawnHero() {
         }}
       />
 
-      {/* Content — staggered text reveal (approved cinematic reveal pattern) */}
+      {/* Content — staggered text reveal (approved cinematic reveal pattern §4.2) */}
       <div
         className="pawn-hero-content"
         style={{ position: 'relative', maxWidth: '720px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
@@ -74,7 +78,7 @@ export default function PawnHero() {
           lineHeight: 1.6,
           marginBottom: 'var(--space-8)',
           maxWidth: '540px',
-          margin: '0 auto var(--space-8) auto'
+          margin: '0 auto var(--space-8) auto',
         }}>
           An uncompromising collection of timepieces, instruments, and heirlooms—presented with editorial precision.
         </p>
@@ -88,6 +92,31 @@ export default function PawnHero() {
           </Button>
         </div>
       </div>
+
+      {/* Optional media section — async, does not block LCP */}
+      {heroMedia && heroMedia.mediaType !== 'none' && (
+        <div
+          aria-label="Hero media"
+          style={{
+            width: '100%',
+            maxWidth: '900px',
+            marginTop: 'var(--space-10)',
+            borderRadius: 'var(--radius-md)',
+            overflow: 'hidden',
+            aspectRatio: heroMedia.mediaType === 'youtube' ? '16 / 9' : '16 / 7',
+          }}
+        >
+          {heroMedia.mediaType === 'carousel' && heroMedia.carouselImages && heroMedia.carouselImages.length > 0 && (
+            <ImageCarousel images={heroMedia.carouselImages} />
+          )}
+          {heroMedia.mediaType === 'youtube' && heroMedia.youtubeId && (
+            <YouTubeFacade
+              videoId={heroMedia.youtubeId}
+              title="The Pawn Shop — Cornwall Island, Akwesasne"
+            />
+          )}
+        </div>
+      )}
 
       {/* Bottom gold rule */}
       <div

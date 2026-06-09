@@ -713,6 +713,40 @@
 
 ---
 
+### E102 · Vertical Hero Sections
+
+> **Persona Gate — E102:**
+> - **Sandra (Primary):** Pawn hero must create the "I could find something here" impulse within 10 seconds. Rich above-fold visuals are the product for Sandra.
+> - **Jordan (Primary):** Editorial quality visible above fold on all three verticals. Brand coherence across views.
+> - **Marcus:** All hero images must pass the Marcus Photography Test before shipping. Dark luxury standard — no supplier images.
+> - **Marie:** Cannabis hero must pass the Marie Discretion Test. Boutique wellness tone, no hard sell.
+> - **Makoonsii:** All carousel/video controls ≥48px. All media has alt text. Carousel pauses on focus.
+
+- [x] **Schema first:** Update `docs/firestore-schema.md` — add `heroData` map to `config/shopInfo`. Log in `DECISIONS.md`. `[Jord]` `[San]` `[Comp]`
+- [x] Add `HeroMedia` interface to `src/lib/types.ts` — extend `ShopInfo` `[Staff]`
+- [x] Create `src/hooks/useHeroMedia.ts` — reads `config/shopInfo.heroData[viewTag]`, returns media config `[Jord]` `[San]`
+- [x] Create `src/components/ui/ImageCarousel.tsx` — slow-fade, 6s auto-advance, pause on hover/focus, keyboard nav, accessible `[San]` `[Mak]`
+- [x] Create `src/components/ui/YouTubeFacade.tsx` — static thumbnail + play button, loads iframe on click only, `youtube-nocookie.com` `[Jord]` `[Comp]`
+- [x] Revamp `src/components/pawn/PawnHero.tsx` — upgrade to ≥80vh spec, wire `useHeroMedia` `[San]` `[Marc]` `[Mak]`
+- [x] Revamp `src/components/cannabis/CinematicHero.tsx` — upgrade to 100vh spec, wire `useHeroMedia` `[Marie]` `[Jord]`
+- [x] Create `src/components/fireworks/FireworksHero.tsx` — extract from `FireworksPage.tsx`, full-screen, retain `CountdownTimer` `[Tan]` `[Jord]`
+- [x] Update `src/pages/FireworksPage.tsx` — use `FireworksHero` component `[Tan]`
+- [ ] **Phase 2 (blocked):** `TobaccoHero.tsx` — deferred until `.view-tobacco` CSS tokens are defined `[All]`
+- [x] **E102 CLOSED** | 2026-06-09
+
+---
+
+### E103 · Fireworks Hero Video
+
+> **Persona Gate — E103:**
+> - **Tanya (Primary):** Video `8rmpm3ZOn50` appears prominently in the Fireworks hero, above the inventory. Countdown remains visible above it.
+> - **Jordan (Primary):** 900px centered layout looks editorial and intentional on desktop.
+> - **Makoonsii:** Play button ≥48px. Video has accessible `title` attribute.
+
+- [x] Wire default video ID `8rmpm3ZOn50` into `FireworksHero.tsx` with Firestore override support `[Tan]` `[Jord]`
+- [x] Restructure hero layout: video moves outside the narrow content column, 900px max-width, 16:9 responsive `[Tan]` `[Jord]` `[Mak]`
+- [x] **E103 CLOSED** | 2026-06-09
+
 *The Pawn Shop · Cornwall Island, Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*
 \n### Phase 15: E69 — Onboarding & SOP Management\n- [x] Write `E69_ONBOARDING_SOP_PLAN.md` Spec and Plan\n- [x] Update `firestore.rules` and `firestore-schema.md`\n- [x] Implement `inviteEmployee` Cloud Function\n- [x] Implement `DocumentsPage` Admin UI for SOPs\n- [x] Implement `AcknowledgmentWall` middleware\n- [x] Add `Invite Staff` Modal to `StaffList`\n
