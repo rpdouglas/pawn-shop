@@ -207437,11 +207437,11 @@ var generateAIDescription = (0, import_https2.onCall)({ secrets: [geminiApiKey] 
     - Cannabis items: boutique wellness framing only. No slang.
   `;
   const userPrompt = `
-    Generate a product description draft for the following item. Write in the brand voice of The Pawn Shop: dapper, precise, editorial. The description should be 150\u2013250 words.
+    Analyse the item image (if provided) and the metadata below. Write in the brand voice of The Pawn Shop: dapper, precise, editorial.
 
     ITEM DATA:
-    - Title: ${title}
-    - Category: ${category}
+    - Current Title: ${title}
+    - Current Category: ${category}
     - View: ${viewTag}
     - Condition: ${condition}
     - Provenance Notes: ${provenanceNotes || "None"}
@@ -207450,21 +207450,25 @@ var generateAIDescription = (0, import_https2.onCall)({ secrets: [geminiApiKey] 
 
     OUTPUT FORMAT (JSON):
     {
-      "draft": "150\u2013250 word editorial description",
-      "suggestedTags": ["tag1", "tag2"], 
+      "title": "Concise, accurate product title based on the image/data (max 80 chars)",
+      "category": "Specific product category (e.g. Electric Guitar, Vintage Watch, Flower, Pre-Roll Pack)",
+      "draft": "150\u2013250 word editorial description in the dapper brand voice",
+      "suggestedTags": ["tag1", "tag2"],
       "provenanceFlag": true | false,
-      "culturalNote": "Optional note"
+      "culturalNote": "Optional note for staff about cultural significance"
     }
   `;
   const schema = {
     type: import_generative_ai.SchemaType.OBJECT,
     properties: {
+      title: { type: import_generative_ai.SchemaType.STRING, description: "Concise product title (max 80 chars)" },
+      category: { type: import_generative_ai.SchemaType.STRING, description: "Specific product category" },
       draft: { type: import_generative_ai.SchemaType.STRING, description: "150\u2013250 word editorial description" },
       suggestedTags: { type: import_generative_ai.SchemaType.ARRAY, items: { type: import_generative_ai.SchemaType.STRING } },
       provenanceFlag: { type: import_generative_ai.SchemaType.BOOLEAN },
       culturalNote: { type: import_generative_ai.SchemaType.STRING }
     },
-    required: ["draft", "suggestedTags", "provenanceFlag", "culturalNote"]
+    required: ["title", "category", "draft", "suggestedTags", "provenanceFlag", "culturalNote"]
   };
   try {
     const { model, flashModel, liteModel } = getModels(schema);
@@ -207515,6 +207519,8 @@ var generateAIDescription = (0, import_https2.onCall)({ secrets: [geminiApiKey] 
     const parsed = JSON.parse(jsonStr);
     const aiRef = db.collection("items").doc(itemId).collection("internal").doc("ai");
     await aiRef.set({
+      aiTitle: parsed.title || null,
+      aiCategory: parsed.category || null,
       aiDescription: parsed.draft,
       aiTagSuggestions: parsed.suggestedTags || [],
       updatedAt: import_firestore2.FieldValue.serverTimestamp(),
@@ -207536,7 +207542,7 @@ var generateAIDescription = (0, import_https2.onCall)({ secrets: [geminiApiKey] 
 var suggestAiPrice = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, async (request) => {
   const db = (0, import_firestore2.getFirestore)();
   const { uid } = await (0, import_authHelpers.assertStaff)(request);
-  const { itemId, title, category, condition, brandModel, staffNotes } = request.data;
+  const { itemId, title, category, condition, brandModel, staffNotes, aiDescription } = request.data;
   if (!itemId || !title) {
     throw new import_https2.HttpsError("invalid-argument", "Missing itemId or title.");
   }
@@ -207564,6 +207570,7 @@ var suggestAiPrice = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, asyn
     - Condition: ${condition}
     - Brand/Model: ${brandModel || "Unknown"}
     - Staff Notes: ${staffNotes || "None"}
+    ${aiDescription ? `- Item Description: ${aiDescription}` : ""}
 
     ${ebayContext}
 

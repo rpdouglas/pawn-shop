@@ -7,12 +7,16 @@ import type { Item } from '../../lib/types'
 
 interface AiAssistantPanelProps {
   item: Item
+  onApplyTitle: (title: string) => void
+  onApplyCategory: (category: string) => void
   onApplyDescription: (draft: string) => void
   onApplyTags: (tags: string[]) => void
   onApplyPrice: (low: number, high: number) => void
 }
 
 interface AiData {
+  aiTitle?: string
+  aiCategory?: string
   aiDescription?: string
   aiTagSuggestions?: string[]
   aiPriceSuggestion?: {
@@ -23,11 +27,13 @@ interface AiData {
   }
 }
 
-export default function AiAssistantPanel({ 
-  item, 
-  onApplyDescription, 
-  onApplyTags, 
-  onApplyPrice 
+export default function AiAssistantPanel({
+  item,
+  onApplyTitle,
+  onApplyCategory,
+  onApplyDescription,
+  onApplyTags,
+  onApplyPrice
 }: AiAssistantPanelProps) {
   const [aiData, setAiData] = useState<AiData | null>(null)
   const [loading, setLoading] = useState(false)
@@ -59,7 +65,8 @@ export default function AiAssistantPanel({
         condition: item.condition,
         provenanceNotes: item.provenanceNotes,
         serialNumber: item.serialNumber,
-        staffNotes: '' // Could add a field for this if needed
+        staffNotes: '',
+        images: item.images?.length ? item.images : undefined
       })
     } catch {
       setError('Failed to generate description.')
@@ -79,7 +86,8 @@ export default function AiAssistantPanel({
         category: item.category,
         condition: item.condition,
         brandModel: '',
-        staffNotes: ''
+        staffNotes: '',
+        aiDescription: aiData?.aiDescription
       })
     } catch {
       setError('Failed to suggest price.')
@@ -103,32 +111,80 @@ export default function AiAssistantPanel({
           Gemini AI Assistant
         </h3>
         <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginTop: 'var(--space-1)' }}>
-          Strategy B: Provenance-heavy drafts & eBay pricing comps.
+          Analyse image · Generate title, category & description · Price comps
         </p>
       </header>
 
       {error && <p style={{ color: 'var(--color-error)', fontSize: 'var(--text-xs)' }}>{error}</p>}
 
       <section style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
-        <Button 
-          variant="secondary" 
-          size="sm" 
-          onClick={generateDescription} 
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={generateDescription}
           disabled={loading}
           style={{ minHeight: '48px' }}
         >
-          {loading ? 'Thinking...' : 'Generate Description & Tags'}
+          {loading ? 'Thinking...' : '✨ Generate Title, Description & Tags'}
         </Button>
-        <Button 
-          variant="secondary" 
-          size="sm" 
-          onClick={suggestPrice} 
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={suggestPrice}
           disabled={loading}
           style={{ minHeight: '48px' }}
         >
-          {loading ? 'Analysing...' : 'Suggest Price'}
+          {loading ? 'Analysing...' : '$ Suggest Price'}
         </Button>
       </section>
+
+      {aiData?.aiTitle && (
+        <div style={{
+          padding: 'var(--space-4)',
+          backgroundColor: 'var(--color-surface)',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--color-border)'
+        }}>
+          <h4 style={{ fontSize: 'var(--text-xs)', textTransform: 'uppercase', color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
+            AI Suggested Title
+          </h4>
+          <p style={{ fontSize: 'var(--text-small)', color: 'var(--color-text)', fontStyle: 'italic' }}>
+            {aiData.aiTitle}
+          </p>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => onApplyTitle(aiData.aiTitle!)}
+            style={{ marginTop: 'var(--space-4)', minHeight: '48px' }}
+          >
+            Apply Title
+          </Button>
+        </div>
+      )}
+
+      {aiData?.aiCategory && (
+        <div style={{
+          padding: 'var(--space-4)',
+          backgroundColor: 'var(--color-surface)',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--color-border)'
+        }}>
+          <h4 style={{ fontSize: 'var(--text-xs)', textTransform: 'uppercase', color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
+            AI Suggested Category
+          </h4>
+          <p style={{ fontSize: 'var(--text-small)', color: 'var(--color-text)', fontStyle: 'italic' }}>
+            {aiData.aiCategory}
+          </p>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => onApplyCategory(aiData.aiCategory!)}
+            style={{ marginTop: 'var(--space-4)', minHeight: '48px' }}
+          >
+            Apply Category
+          </Button>
+        </div>
+      )}
 
       {aiData?.aiDescription && (
         <div style={{ 

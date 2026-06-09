@@ -1233,3 +1233,65 @@ Hosting, not Functions. Strategy B fixed the immediate issue; E96 closes the str
 - [ ] Verify: push a trivial change to `dev`, confirm both Hosting and Functions deploy in CI `[Infra]`
 - [ ] Log decision in `docs/decisions/` `[Comp]`
 
+---
+
+### E97 · AI Inventory Assistant — Vision-First Enrichment
+**Priority: HIGH · Effort: Medium (~1 developer-day)**
+
+> **Persona Gate — E97:**
+> - **Marcus:** AI must analyze the product image to write a provenance-rich description.
+>   Blind descriptions fail the Marcus Photography Test.
+> - **Jordan:** Title and category accuracy are editorial quality gates. AI-generated title
+>   suggestions from image analysis enable faster, higher-quality metadata at scale.
+> - **Staff:** The end-to-end workflow — analyze image → generate title/description → run pricing — must work as a coherent sequence.
+
+**Background:** Four gaps found in the inventory AI assistant workflow (2026-06-09):
+(1) Images never passed to `generateAIDescription` CF from either `AiAssistantPanel` or
+`InventoryTable.triggerAi`. (2) CF outputs no title or category suggestion. (3) `suggestAiPrice`
+has no access to the AI-generated description for richer pricing context. (4) `batchProcessItems`
+was never migrated from the pre-E34 monolith — tracked as E98.
+
+- [x] Schema: add `aiTitle` and `aiCategory` to `items/{id}/internal/ai` in `firestore-schema.md` `[Comp]`
+- [x] Decision log: `docs/decisions/0007-ai-title-category.md` `[Comp]`
+- [x] CF operations: `generateAIDescription` — update output schema to include `title`, `category`; save to `internal/ai` `[Staff]` `[Marc]`
+- [x] CF operations: `generateAIDescription` — pass `images` when present `[Marc]`
+- [x] CF operations: `suggestAiPrice` — accept optional `aiDescription` field; include in pricing prompt `[Staff]`
+- [x] UI: `AiAssistantPanel` — pass `item.images` to description CF `[Marc]`
+- [x] UI: `AiAssistantPanel` — display `aiTitle` and `aiCategory` with promote buttons `[Staff]`
+- [x] UI: `AiAssistantPanel` — pass AI description as context to price CF `[Staff]`
+- [x] UI: `InventoryTable.triggerAi` — pass images to description CF `[Staff]`
+- [x] UI: `InventoryPage` — add `handleApplyTitle`, `handleApplyCategory` callbacks `[Staff]`
+- [x] Rebuild operations bundle; all gates pass `[Comp]`
+- [x] **E97 CLOSED** | 2026-06-09
+
+### E98 · Batch AI Migration — Move `batchProcessItems` to Operations Codebase
+**Priority: MEDIUM · Effort: Small (~0.5 developer-days)**
+
+> **Persona Gate — E98:**
+> - **Staff:** Batch AI buttons in `InventoryTable` always fail silently because `batchProcessItems` was never migrated from the pre-E34 monolith.
+
+- [ ] Migrate `batchProcessItems` + helpers from `functions/src/ai.ts` to `functions/operations/src/ai.ts` `[Staff]`
+- [ ] Update `generateDescriptionForItem` helper: pass images from Firestore, generate `aiTitle`/`aiCategory` `[Staff]`
+- [ ] Export `batchProcessItems` from `functions/operations/src/index.ts` `[Staff]`
+- [ ] Verify batch AI buttons in `InventoryTable` succeed in dev environment `[Staff]`
+
+---
+
+### E99 · Cloud Functions Architecture Remediation
+**Priority: HIGH (contains P0 runtime failures) · Effort: Medium (~1 developer-day)**
+
+> **Persona Gate — E99:**
+> - **Staff (Loan Operations):** Loan issuance, redemption, and forfeiture are broken in production — client calls function names that do not match deployed exports.
+> - **Jordan:** TypeScript gate does not cover deployed codebases; stale monolith and Node version mismatch increase regression risk.
+
+- [ ] **P0 — Phase 1:** Update `src/lib/useLoanTickets.ts` — rename `issueLoanTicket` → `createLoanTicket`, `redeemLoan` → `redeemLoanTicket` `[Staff]`
+- [ ] **P0 — Phase 1:** Add `forfeitLoan` export to `functions/core/src/loanTickets.ts` `[Staff]`
+- [ ] **P0 — Phase 1:** Deploy core codebase `[Staff]`
+- [ ] **P1 — Phase 2:** Migrate `batchProcessItems` to `functions/operations/src/ai.ts` (subsumes E98) `[Staff]`
+- [ ] **P1 — Phase 2:** Deploy operations codebase `[Staff]`
+- [ ] **P2 — Phase 3:** Fix Node version to 24 in `functions/core/package.json` and `functions/operations/package.json` (engines + esbuild target) `[Jord]`
+- [ ] **P2 — Phase 3:** Fix TypeScript gate — update root typecheck script to cover core and operations, not old monolith `[Jord]`
+- [ ] **P2 — Phase 4:** Delete `functions/src/` (old monolith) `[Jord]`
+- [ ] **P3 — Phase 5:** Add `functions/core/lib/` and `functions/operations/lib/` to `.gitignore`; untrack committed lib artifacts `[Jord]`
+- [ ] **P3 — Phase 6:** Add functions deploy step to `.github/workflows/deploy-dev.yml` `[Jord]`
+

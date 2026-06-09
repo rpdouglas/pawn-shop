@@ -34,6 +34,28 @@ export default function InventoryPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | ItemStatus>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
 
+  const handleApplyTitle = async (title: string, itemId?: string) => {
+    const id = itemId ?? selectedItem?.id
+    if (!id) return
+    try {
+      await updateDoc(doc(db, 'items', id), { title })
+      alert('Title applied!')
+    } catch {
+      alert('Failed to apply title.')
+    }
+  }
+
+  const handleApplyCategory = async (category: string, itemId?: string) => {
+    const id = itemId ?? selectedItem?.id
+    if (!id) return
+    try {
+      await updateDoc(doc(db, 'items', id), { category })
+      alert('Category applied!')
+    } catch {
+      alert('Failed to apply category.')
+    }
+  }
+
   const handleApplyDescription = async (draft: string, itemId?: string) => {
     const id = itemId ?? selectedItem?.id
     if (!id) return
@@ -287,6 +309,8 @@ export default function InventoryPage() {
               <InventoryTable
                 items={filteredItems}
                 isAdmin={user?.isAdmin ?? false}
+                onApplyTitle={(id, title) => handleApplyTitle(title, id)}
+                onApplyCategory={(id, category) => handleApplyCategory(category, id)}
                 onApplyDescription={(id, draft) => handleApplyDescription(draft, id)}
                 onApplyTags={(id, tags) => handleApplyTags(tags, id)}
                 onApplyPrice={(id, low, high) => handleApplyPrice(low, high, id)}
@@ -480,6 +504,8 @@ export default function InventoryPage() {
                   <div style={{ padding: 'var(--space-4)' }}>
                     <AiAssistantPanel
                       item={selectedItem}
+                      onApplyTitle={handleApplyTitle}
+                      onApplyCategory={handleApplyCategory}
                       onApplyDescription={handleApplyDescription}
                       onApplyTags={handleApplyTags}
                       onApplyPrice={handleApplyPrice}

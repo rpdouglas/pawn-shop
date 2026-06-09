@@ -130,6 +130,9 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E95 CLOSED** | E95 | 2026-06-08 |
 | `FIX_AI_INVENTORY_500` — Rebuilt stale `functions/operations/lib/index.js` bundle. Root cause: source updated to `gemini-2.5-pro` in commit bd3ae16 but bundle was never rebuilt; deployed bundle still used banned `gemini-3.1-pro` model → HTTP 500. Bundle rebuilt, bundle committed. User to run `firebase deploy --only functions --project nats-rack` to push fix. E96 added to backlog for structural CI fix. | BUGFIX | 2026-06-08 |
 | **FIX_AI_INVENTORY_500 CLOSED** | BUGFIX | 2026-06-08 |
+| `FIX_AI_DESCRIPTION_500` — Added third fallback tier (Lite model) to `generateAIDescription` and `suggestAiPrice`. Root cause: both `gemini-2.5-pro` and `gemini-3.5-flash` returned 503 simultaneously after deploy; two-tier fallback had no third tier. Bundle rebuilt and deployed. | BUGFIX | 2026-06-09 |
+| `E97 AI Inventory Enrichment` — Images now passed to `generateAIDescription` CF; CF generates `aiTitle` + `aiCategory` alongside description; `suggestAiPrice` receives AI description context; `AiAssistantPanel` shows and promotes title/category; `InventoryTable.triggerAi` passes images. Four gaps closed. E98 (batch migration) tracked on backlog. | E97 | 2026-06-09 |
+| **E97 CLOSED** | E97 | 2026-06-09 |
 
 ---
 
@@ -160,4 +163,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-08 (Cycle 32 — FIX_AI_INVENTORY_500 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E97 CLOSED)*

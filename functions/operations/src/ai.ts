@@ -41,11 +41,11 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
   `
 
   const userPrompt = `
-    Generate a product description draft for the following item. Write in the brand voice of The Pawn Shop: dapper, precise, editorial. The description should be 150–250 words.
+    Analyse the item image (if provided) and the metadata below. Write in the brand voice of The Pawn Shop: dapper, precise, editorial.
 
     ITEM DATA:
-    - Title: ${title}
-    - Category: ${category}
+    - Current Title: ${title}
+    - Current Category: ${category}
     - View: ${viewTag}
     - Condition: ${condition}
     - Provenance Notes: ${provenanceNotes || 'None'}
@@ -54,22 +54,26 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
 
     OUTPUT FORMAT (JSON):
     {
-      "draft": "150–250 word editorial description",
-      "suggestedTags": ["tag1", "tag2"], 
+      "title": "Concise, accurate product title based on the image/data (max 80 chars)",
+      "category": "Specific product category (e.g. Electric Guitar, Vintage Watch, Flower, Pre-Roll Pack)",
+      "draft": "150–250 word editorial description in the dapper brand voice",
+      "suggestedTags": ["tag1", "tag2"],
       "provenanceFlag": true | false,
-      "culturalNote": "Optional note"
+      "culturalNote": "Optional note for staff about cultural significance"
     }
   `
 
   const schema = {
     type: SchemaType.OBJECT,
     properties: {
+      title: { type: SchemaType.STRING, description: "Concise product title (max 80 chars)" },
+      category: { type: SchemaType.STRING, description: "Specific product category" },
       draft: { type: SchemaType.STRING, description: "150–250 word editorial description" },
       suggestedTags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
       provenanceFlag: { type: SchemaType.BOOLEAN },
       culturalNote: { type: SchemaType.STRING }
     },
-    required: ["draft", "suggestedTags", "provenanceFlag", "culturalNote"]
+    required: ["title", "category", "draft", "suggestedTags", "provenanceFlag", "culturalNote"]
   };
 
   try {
@@ -125,6 +129,8 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
 
     const aiRef = db.collection('items').doc(itemId).collection('internal').doc('ai')
     await aiRef.set({
+      aiTitle: parsed.title || null,
+      aiCategory: parsed.category || null,
       aiDescription: parsed.draft,
       aiTagSuggestions: parsed.suggestedTags || [],
       updatedAt: FieldValue.serverTimestamp(),
@@ -152,7 +158,7 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
 export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request) => {
   const db = getFirestore()
   const { uid } = await assertStaff(request)
-  const { itemId, title, category, condition, brandModel, staffNotes } = request.data
+  const { itemId, title, category, condition, brandModel, staffNotes, aiDescription } = request.data
 
   if (!itemId || !title) {
     throw new HttpsError('invalid-argument', 'Missing itemId or title.')
@@ -185,6 +191,7 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
     - Condition: ${condition}
     - Brand/Model: ${brandModel || 'Unknown'}
     - Staff Notes: ${staffNotes || 'None'}
+    ${aiDescription ? `- Item Description: ${aiDescription}` : ''}
 
     ${ebayContext}
 

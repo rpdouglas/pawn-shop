@@ -71,6 +71,8 @@
 
 | Field | Type | Notes |
 |-------|------|-------|
+| `aiTitle` | string | Gemini-suggested title draft — staff must promote to `items/{id}.title` before publishing |
+| `aiCategory` | string | Gemini-suggested category draft — staff must promote to `items/{id}.category` |
 | `aiDescription` | string | Gemini draft — staff must promote to `items/{id}.description` before publishing |
 | `aiPriceSuggestion` | map | `{ low: number, high: number, source: string }` — guidance only, never a published price |
 | `aiTagSuggestions` | array\<string\> | Gemini suggested tags (e.g. `rare-find`, `just-arrived`). Staff reviewed. |

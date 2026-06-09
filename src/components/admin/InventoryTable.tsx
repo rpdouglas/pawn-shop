@@ -45,6 +45,8 @@ interface BatchProcessResult {
 interface InventoryTableProps {
   items: Item[]
   isAdmin: boolean
+  onApplyTitle: (itemId: string, title: string) => Promise<void>
+  onApplyCategory: (itemId: string, category: string) => Promise<void>
   onApplyDescription: (itemId: string, draft: string) => Promise<void>
   onApplyTags: (itemId: string, tags: string[]) => Promise<void>
   onApplyPrice: (itemId: string, low: number, high: number) => Promise<void>
@@ -57,6 +59,8 @@ interface InventoryTableProps {
 export default function InventoryTable({
   items,
   isAdmin,
+  onApplyTitle,
+  onApplyCategory,
   onApplyDescription,
   onApplyTags,
   onApplyPrice,
@@ -147,6 +151,7 @@ export default function InventoryTable({
           provenanceNotes: item.provenanceNotes,
           serialNumber: item.serialNumber,
           staffNotes: '',
+          images: item.images?.length ? item.images : undefined,
         })
       } else {
         const fn = httpsCallable(functions, 'suggestAiPrice')
@@ -579,6 +584,8 @@ export default function InventoryTable({
             <div style={{ padding: 'var(--space-4)' }}>
               <AiAssistantPanel
                 item={drawerItem}
+                onApplyTitle={title => onApplyTitle(drawerItem.id, title)}
+                onApplyCategory={category => onApplyCategory(drawerItem.id, category)}
                 onApplyDescription={draft => onApplyDescription(drawerItem.id, draft)}
                 onApplyTags={tags => onApplyTags(drawerItem.id, tags)}
                 onApplyPrice={(low, high) => onApplyPrice(drawerItem.id, low, high)}
