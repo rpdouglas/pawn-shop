@@ -104,7 +104,7 @@ export const applyMarkdownDrops = onSchedule({ schedule: '0 3 * * *', secrets: [
  */
 export const enableMarkdown = onCall(async (request) => {
   if (!request.auth) throw new HttpsError('unauthenticated', 'Must be logged in')
-  assertMfaEnrolled(request.auth.token)
+  assertMfaEnrolled(request)
   if (!isManagerToken(request.auth.token)) throw new HttpsError('permission-denied', 'Manager+ required')
 
   const { itemId, floorPrice, markdownRate, markdownPeriodDays } = request.data as {
@@ -144,7 +144,7 @@ export const enableMarkdown = onCall(async (request) => {
  */
 export const disableMarkdown = onCall(async (request) => {
   if (!request.auth) throw new HttpsError('unauthenticated', 'Must be logged in')
-  assertMfaEnrolled(request.auth.token)
+  assertMfaEnrolled(request)
   if (!isManagerToken(request.auth.token)) throw new HttpsError('permission-denied', 'Manager+ required')
 
   const { itemId } = request.data as { itemId: string }

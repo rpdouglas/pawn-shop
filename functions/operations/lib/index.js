@@ -207125,6 +207125,7 @@ var index_exports = {};
 __export(index_exports, {
   adjustInventory: () => adjustInventory,
   applyMarkdownDrops: () => applyMarkdownDrops,
+  batchProcessItems: () => batchProcessItems,
   calculateTrendingScore: () => calculateTrendingScore,
   clearRecycleBin: () => clearRecycleBin,
   createDraftItem: () => createDraftItem,
@@ -207550,7 +207551,10 @@ var suggestAiPrice = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, asyn
   try {
     const comps = await searchEbayComps(title);
     if (comps && comps.length > 0) {
-      ebayContext = "RECENT EBAY COMPS:\n" + comps.map((c) => `- ${c.title}: ${c.price?.value} ${c.price?.currency}`).join("\n");
+      ebayContext = "RECENT EBAY COMPS:\n" + comps.map((c) => {
+        const price = c["price"];
+        return `- ${String(c["title"] ?? "")}: ${price?.value ?? ""} ${price?.currency ?? ""}`;
+      }).join("\n");
     }
   } catch (err) {
     console.warn("eBay comps failed, proceeding without them", err);
@@ -207690,6 +207694,184 @@ var suggestAiTags = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, async
     console.error("Gemini Tag Error:", err);
     throw new import_https2.HttpsError("internal", "Failed to suggest AI tags.");
   }
+});
+function batchDelay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+async function generateDescriptionForItem(uid, itemId, data) {
+  const db = (0, import_firestore2.getFirestore)();
+  const schema = {
+    type: import_generative_ai.SchemaType.OBJECT,
+    properties: {
+      title: { type: import_generative_ai.SchemaType.STRING, description: "Concise product title (max 80 chars)" },
+      category: { type: import_generative_ai.SchemaType.STRING, description: "Specific product category" },
+      draft: { type: import_generative_ai.SchemaType.STRING, description: "150\u2013250 word editorial description" },
+      suggestedTags: { type: import_generative_ai.SchemaType.ARRAY, items: { type: import_generative_ai.SchemaType.STRING } },
+      provenanceFlag: { type: import_generative_ai.SchemaType.BOOLEAN },
+      culturalNote: { type: import_generative_ai.SchemaType.STRING }
+    },
+    required: ["title", "category", "draft", "suggestedTags", "provenanceFlag", "culturalNote"]
+  };
+  const { model, flashModel, liteModel } = getModels(schema);
+  const systemPrompt = `You are an expert product copywriter for The Pawn Shop \u2014 a premium, dapper, and distinctly Akwesasne retail platform on Cornwall Island. Brand voice: quiet confidence, editorial precision, occasionally witty.
+Your output is a DRAFT for staff review. HARD RULES: Never generate Kanien'k\xE9ha language. Never invent condition grades. Never use scarcity language unless data supports it. Canadian English. Cannabis: boutique wellness framing only.`;
+  const userPrompt = `Analyse the item image (if provided) and the metadata below. Write in the brand voice of The Pawn Shop.
+ITEM DATA: Title: ${data.title} | Category: ${data.category} | View: ${data.viewTag} | Condition: ${data.condition} | Provenance: ${data.provenanceNotes || "None"} | Serial: ${data.serialNumber || "N/A"} | Staff Notes: ${data.staffNotes || "None"}`;
+  const promptParts = [systemPrompt, userPrompt];
+  if (data.images && data.images.length > 0) {
+    try {
+      const imgRes = await fetch(data.images[0]);
+      if (imgRes.ok) {
+        const buffer = Buffer.from(await imgRes.arrayBuffer());
+        promptParts.push({ inlineData: { data: buffer.toString("base64"), mimeType: imgRes.headers.get("content-type") || "image/jpeg" } });
+      }
+    } catch {
+    }
+  }
+  let result;
+  try {
+    result = await model.generateContent(promptParts);
+  } catch (error) {
+    const err = error;
+    if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
+      console.warn("[batch] Gemini Pro unavailable, falling back to Flash...");
+      try {
+        result = await flashModel.generateContent(promptParts);
+      } catch (flashError) {
+        const fe = flashError;
+        if (fe?.message?.includes("429") || fe?.status === 429 || fe?.message?.includes("503") || fe?.status === 503) {
+          console.warn("[batch] Gemini Flash unavailable, falling back to Lite...");
+          result = await liteModel.generateContent(promptParts);
+        } else {
+          throw flashError;
+        }
+      }
+    } else {
+      throw error;
+    }
+  }
+  const parsed = JSON.parse(result.response.text().replace(/```json|```/g, "").trim());
+  await db.collection("items").doc(itemId).collection("internal").doc("ai").set({
+    aiTitle: parsed.title || null,
+    aiCategory: parsed.category || null,
+    aiDescription: parsed.draft,
+    aiTagSuggestions: parsed.suggestedTags || [],
+    updatedAt: import_firestore2.FieldValue.serverTimestamp(),
+    generatedBy: uid
+  }, { merge: true });
+  await db.collection("auditLogs").add({
+    eventType: "ai_description_generated",
+    uid,
+    targetId: itemId,
+    details: { model: "gemini-pro-latest", batch: true },
+    createdAt: import_firestore2.FieldValue.serverTimestamp()
+  });
+}
+async function suggestPriceForItem(uid, itemId, data) {
+  const db = (0, import_firestore2.getFirestore)();
+  const schema = {
+    type: import_generative_ai.SchemaType.OBJECT,
+    properties: {
+      low: { type: import_generative_ai.SchemaType.INTEGER },
+      high: { type: import_generative_ai.SchemaType.INTEGER },
+      source: { type: import_generative_ai.SchemaType.STRING },
+      confidenceLevel: { type: import_generative_ai.SchemaType.STRING },
+      note: { type: import_generative_ai.SchemaType.STRING }
+    },
+    required: ["low", "high", "source", "confidenceLevel", "note"]
+  };
+  const { model, flashModel, liteModel } = getModels(schema);
+  const systemPrompt = `You are a pricing analyst for a pawn shop. Provide a price range from eBay sold comps. Guidance only. Prices in CAD cents (integer). Always give a range, never a single price.`;
+  const userPrompt = `Price range for: Title: ${data.title} | Category: ${data.category} | Condition: ${data.condition} | Brand: ${data.brand || "Unknown"} | Staff Notes: ${data.staffNotes || "None"}${data.aiDescription ? ` | Description: ${data.aiDescription}` : ""}`;
+  let result;
+  try {
+    result = await model.generateContent([systemPrompt, userPrompt]);
+  } catch (error) {
+    const err = error;
+    if (err?.message?.includes("429") || err?.status === 429 || err?.message?.includes("503") || err?.status === 503) {
+      try {
+        result = await flashModel.generateContent([systemPrompt, userPrompt]);
+      } catch (flashError) {
+        const fe = flashError;
+        if (fe?.message?.includes("429") || fe?.status === 429 || fe?.message?.includes("503") || fe?.status === 503) {
+          result = await liteModel.generateContent([systemPrompt, userPrompt]);
+        } else {
+          throw flashError;
+        }
+      }
+    } else {
+      throw error;
+    }
+  }
+  const parsed = JSON.parse(result.response.text().replace(/```json|```/g, "").trim());
+  await db.collection("items").doc(itemId).collection("internal").doc("ai").set({
+    aiPriceSuggestion: parsed,
+    updatedAt: import_firestore2.FieldValue.serverTimestamp(),
+    generatedBy: uid
+  }, { merge: true });
+  await db.collection("auditLogs").add({
+    eventType: "ai_price_suggested",
+    uid,
+    targetId: itemId,
+    details: { low: parsed.low, high: parsed.high, batch: true },
+    createdAt: import_firestore2.FieldValue.serverTimestamp()
+  });
+}
+var batchProcessItems = (0, import_https2.onCall)({ secrets: [geminiApiKey] }, async (request) => {
+  const { uid } = await (0, import_authHelpers.assertStaff)(request);
+  const { itemIds, operations } = request.data;
+  if (!Array.isArray(itemIds) || itemIds.length === 0) {
+    throw new import_https2.HttpsError("invalid-argument", "itemIds must be a non-empty array.");
+  }
+  if (itemIds.length > 20) {
+    throw new import_https2.HttpsError("invalid-argument", "Maximum 20 items per batch.");
+  }
+  if (!Array.isArray(operations) || operations.length === 0) {
+    throw new import_https2.HttpsError("invalid-argument", "operations must be a non-empty array.");
+  }
+  const db = (0, import_firestore2.getFirestore)();
+  const processed = [];
+  const failed = {};
+  for (let i = 0; i < itemIds.length; i++) {
+    const itemId = itemIds[i];
+    try {
+      const snap = await db.collection("items").doc(itemId).get();
+      if (!snap.exists) {
+        failed[itemId] = "Item not found.";
+        continue;
+      }
+      const raw = snap.data();
+      for (const op of operations) {
+        if (op === "description") {
+          await generateDescriptionForItem(uid, itemId, {
+            title: String(raw["title"] ?? ""),
+            category: String(raw["category"] ?? ""),
+            viewTag: String(raw["viewTag"] ?? ""),
+            condition: String(raw["condition"] ?? ""),
+            provenanceNotes: raw["provenanceNotes"] ? String(raw["provenanceNotes"]) : void 0,
+            serialNumber: raw["serialNumber"] ? String(raw["serialNumber"]) : void 0,
+            staffNotes: raw["staffNotes"] ? String(raw["staffNotes"]) : void 0,
+            images: Array.isArray(raw["images"]) ? raw["images"] : void 0
+          });
+        } else if (op === "price") {
+          await suggestPriceForItem(uid, itemId, {
+            title: String(raw["title"] ?? ""),
+            category: String(raw["category"] ?? ""),
+            condition: String(raw["condition"] ?? ""),
+            brand: raw["brand"] ? String(raw["brand"]) : void 0,
+            staffNotes: raw["staffNotes"] ? String(raw["staffNotes"]) : void 0
+          });
+        }
+      }
+      processed.push(itemId);
+    } catch (err) {
+      failed[itemId] = err instanceof Error ? err.message : "Unknown error.";
+    }
+    if (i < itemIds.length - 1) {
+      await batchDelay(400);
+    }
+  }
+  return { processed, failed };
 });
 function levenshtein(a, b) {
   if (a.length === 0) return b.length;
@@ -208534,7 +208716,7 @@ var applyMarkdownDrops = (0, import_scheduler3.onSchedule)({ schedule: "0 3 * * 
 });
 var enableMarkdown = (0, import_https6.onCall)(async (request) => {
   if (!request.auth) throw new import_https6.HttpsError("unauthenticated", "Must be logged in");
-  (0, import_authHelpers3.assertMfaEnrolled)(request.auth.token);
+  (0, import_authHelpers3.assertMfaEnrolled)(request);
   if (!isManagerToken(request.auth.token)) throw new import_https6.HttpsError("permission-denied", "Manager+ required");
   const { itemId, floorPrice, markdownRate, markdownPeriodDays } = request.data;
   if (!itemId || typeof floorPrice !== "number" || typeof markdownRate !== "number" || typeof markdownPeriodDays !== "number") {
@@ -208560,7 +208742,7 @@ var enableMarkdown = (0, import_https6.onCall)(async (request) => {
 });
 var disableMarkdown = (0, import_https6.onCall)(async (request) => {
   if (!request.auth) throw new import_https6.HttpsError("unauthenticated", "Must be logged in");
-  (0, import_authHelpers3.assertMfaEnrolled)(request.auth.token);
+  (0, import_authHelpers3.assertMfaEnrolled)(request);
   if (!isManagerToken(request.auth.token)) throw new import_https6.HttpsError("permission-denied", "Manager+ required");
   const { itemId } = request.data;
   if (!itemId) throw new import_https6.HttpsError("invalid-argument", "Missing itemId");
@@ -208608,6 +208790,7 @@ async function sendMarkdownAlert(itemId, itemData, db) {
 0 && (module.exports = {
   adjustInventory,
   applyMarkdownDrops,
+  batchProcessItems,
   calculateTrendingScore,
   clearRecycleBin,
   createDraftItem,

@@ -8,8 +8,8 @@
     "shared"
   ],
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
+    "build": "npm run build -w core && npm run build -w operations",
+    "typecheck": "tsc -b",
     "lint": "eslint --ext .ts .",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",

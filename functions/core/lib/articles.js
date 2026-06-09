@@ -4,8 +4,8 @@ exports.publishArticle = exports.createArticle = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const firestore_1 = require("firebase-admin/firestore");
 const authHelpers_1 = require("@pawn-shop/shared/lib/authHelpers");
-const db = (0, firestore_1.getFirestore)();
 exports.createArticle = (0, https_1.onCall)({ cors: true }, async (request) => {
+    const db = (0, firestore_1.getFirestore)();
     const { uid } = (0, authHelpers_1.assertStaff)(request);
     const { title, slug, viewTag } = request.data;
     if (!title || !slug || !viewTag) {
@@ -35,6 +35,7 @@ exports.createArticle = (0, https_1.onCall)({ cors: true }, async (request) => {
     return { success: true, articleId: ref.id };
 });
 exports.publishArticle = (0, https_1.onCall)({ cors: true }, async (request) => {
+    const db = (0, firestore_1.getFirestore)();
     const { uid } = (0, authHelpers_1.assertStaff)(request);
     const { articleId } = request.data;
     const articleRef = db.collection('articles').doc(articleId);

@@ -367,8 +367,10 @@ exports.processUploadedImage = (0, https_1.onCall)({ cors: true, memory: '1GiB',
         if (!exists)
             throw new https_1.HttpsError('not-found', 'Temporary image file not found');
         const [buffer] = await tempFile.download();
-        const watermarked = await (0, sharp_1.default)(buffer)
-            .composite([{ input: WATERMARK_SVG, gravity: "southeast" }])
+        const image = (0, sharp_1.default)(buffer);
+        const metadata = await image.metadata();
+        const canWatermark = (metadata.width && metadata.width >= 260) && (metadata.height && metadata.height >= 36);
+        const watermarked = await (canWatermark ? image.composite([{ input: WATERMARK_SVG, gravity: "southeast" }]) : image)
             .webp({ quality: 85 })
             .toBuffer();
         const finalPath = `items/${itemId}/images/${path.parse(filename).name}.webp`;
@@ -388,7 +390,14 @@ exports.processUploadedImage = (0, https_1.onCall)({ cors: true, memory: '1GiB',
             const mimeType = meta.contentType || 'image/jpeg';
             const aiResult = await (0, ai_1.extractIntakeData)(buffer, mimeType, viewTag);
             if (aiResult && aiResult.error) {
-                throw new https_1.HttpsError('internal', `AI Extraction Failed: ${aiResult.error}`);
+                // Graceful degradation: log the error but don't fail the upload
+                await jobRef.update({
+                    status: 'completed',
+                    aiError: aiResult.error,
+                    updatedAt: firestore_2.FieldValue.serverTimestamp()
+                });
+                await tempFile.delete();
+                return { success: true, url: finalUrl, aiFailed: true, aiError: aiResult.error };
             }
             else if (aiResult) {
                 await db.collection("items").doc(itemId).collection("internal").doc("ai").set({
@@ -417,7 +426,7 @@ exports.processUploadedImage = (0, https_1.onCall)({ cors: true, memory: '1GiB',
             error: e instanceof Error ? e.message : 'Unknown error during retry',
             updatedAt: firestore_2.FieldValue.serverTimestamp()
         }).catch(() => { });
-        throw new https_1.HttpsError('internal', 'Retry failed');
+        throw new https_1.HttpsError('internal', `Retry failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
     }
 });
 exports.deleteInventoryItem = (0, https_1.onCall)({ cors: true }, async (request) => {

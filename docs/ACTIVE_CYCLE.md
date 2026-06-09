@@ -133,6 +133,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | `FIX_AI_DESCRIPTION_500` — Added third fallback tier (Lite model) to `generateAIDescription` and `suggestAiPrice`. Root cause: both `gemini-2.5-pro` and `gemini-3.5-flash` returned 503 simultaneously after deploy; two-tier fallback had no third tier. Bundle rebuilt and deployed. | BUGFIX | 2026-06-09 |
 | `E97 AI Inventory Enrichment` — Images now passed to `generateAIDescription` CF; CF generates `aiTitle` + `aiCategory` alongside description; `suggestAiPrice` receives AI description context; `AiAssistantPanel` shows and promotes title/category; `InventoryTable.triggerAi` passes images. Four gaps closed. E98 (batch migration) tracked on backlog. | E97 | 2026-06-09 |
 | **E97 CLOSED** | E97 | 2026-06-09 |
+| `E99 Cloud Functions Architecture Remediation` — Fixed 3 P0 loan function name mismatches (`issueLoanTicket`/`redeemLoan`/`forfeitLoan`); added `forfeitLoan` to core; migrated `batchProcessItems` to operations (subsumes E98); fixed Node 20→24 version mismatch; converted `functions/tsconfig.json` to project references so `tsc -b` now covers deployed codebases; deleted 4,393-line pre-E34 monolith; added `lib/` to `.gitignore`; added CI/CD functions deploy step. | E99 | 2026-06-09 |
+| **E99 CLOSED** | E99 | 2026-06-09 |
 
 ---
 
@@ -163,4 +165,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E97 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E99 CLOSED)*

@@ -208,6 +208,45 @@ export const redeemLoanTicket = onCall<RedeemLoanTicketData>({ cors: true }, asy
   return { success: true }
 })
 
+interface ForfeitLoanData {
+  loanTicketId: string
+}
+
+export const forfeitLoan = onCall<ForfeitLoanData>({ cors: true }, async (request) => {
+  if (!request.auth?.token.admin && !request.auth?.token.manager) {
+    throw new HttpsError('permission-denied', 'Only admins and managers can forfeit loans')
+  }
+
+  const { loanTicketId } = request.data
+  if (!loanTicketId) throw new HttpsError('invalid-argument', 'loanTicketId required')
+
+  const db = getFirestore()
+  const ref = db.collection('loanTickets').doc(loanTicketId)
+  const snap = await ref.get()
+
+  if (!snap.exists) throw new HttpsError('not-found', 'Loan ticket not found')
+
+  const data = snap.data() as Record<string, unknown>
+  const now = FieldValue.serverTimestamp()
+
+  await ref.update({ status: 'forfeited', updatedAt: now })
+
+  const itemId = typeof data['itemId'] === 'string' ? data['itemId'] : null
+  if (itemId) {
+    await db.collection('items').doc(itemId).update({ status: 'active', policeHold: false, updatedAt: now })
+  }
+
+  await db.collection('auditLogs').add({
+    eventType: 'loan_forfeited',
+    uid: request.auth.uid,
+    targetId: loanTicketId,
+    details: { loanTicketId },
+    createdAt: now,
+  })
+
+  return { success: true }
+})
+
 export const checkLoanDueDates = onSchedule({ schedule: '0 0 * * *', secrets: [twilioAccountSid, twilioAuthToken] }, async () => {
   const db = getFirestore()
   const now = new Date()

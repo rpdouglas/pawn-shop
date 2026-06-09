@@ -80,7 +80,7 @@ export function useProcessExtension() {
 
 export function useIssueLoanTicket() {
   const queryClient = useQueryClient()
-  const issueFn = httpsCallable<{ pawnRequestId: string, loanAmount: number, periodDays: number, interestRate?: number, itemId?: string }, { success: boolean, loanTicketId: string }>(functions, 'issueLoanTicket')
+  const issueFn = httpsCallable<{ pawnRequestId: string, loanAmount: number, periodDays: number, interestRate?: number, itemId?: string }, { success: boolean, loanTicketId: string }>(functions, 'createLoanTicket')
 
   return useMutation({
     mutationFn: async (args: { pawnRequestId: string, loanAmount: number, periodDays: number, interestRate?: number, itemId?: string }) => {
@@ -95,7 +95,7 @@ export function useIssueLoanTicket() {
 
 export function useRedeemLoan() {
   const queryClient = useQueryClient()
-  const redeemFn = httpsCallable<{ loanTicketId: string, paymentIntentId?: string }, { success: boolean }>(functions, 'redeemLoan')
+  const redeemFn = httpsCallable<{ loanTicketId: string, paymentIntentId?: string }, { success: boolean }>(functions, 'redeemLoanTicket')
 
   return useMutation({
     mutationFn: async (args: { loanTicketId: string, paymentIntentId?: string }) => {

@@ -44,9 +44,14 @@ Every push to `dev` or `main` automatically runs a fast pipeline:
 | Lint | `npm run lint` | Catches style, compliance, and type errors |
 | Unit Tests | `npm run test` | Vitest suite — age gates, utilities, components |
 | Build | `npm run build` | Full Vite + TypeScript compile |
-| Deploy | Firebase Hosting | Publishes to `nats-rack` (dev environment) |
+| Deploy Functions | `firebase deploy --only functions` | Deploys Core and Operations Cloud Functions to `nats-rack` |
+| Deploy Hosting | Firebase Hosting | Publishes frontend to `nats-rack` (dev environment) |
 
-This pipeline completes in approximately **3 minutes**.
+Functions deploy before hosting, ensuring the latest Cloud Functions are live before the new frontend is served.
+
+This pipeline completes in approximately **5 minutes** (functions deploy adds ~2 minutes).
+
+> **TypeScript gate:** Run `npm run typecheck` from the `/functions` directory to type-check both `core` and `operations` source trees. This uses TypeScript project references (`tsc -b`) and is the authoritative gate before deploying functions manually.
 
 ### Accessibility, E2E, and Lighthouse
 

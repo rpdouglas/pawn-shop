@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
+import { GoogleGenerativeAI, SchemaType, type Part, type Schema } from '@google/generative-ai'
 import { defineSecret } from 'firebase-functions/params'
 import { assertStaff } from '@pawn-shop/shared/lib/authHelpers'
 import { searchEbayComps } from './ebay'
@@ -9,7 +9,7 @@ export const geminiApiKey = defineSecret('GEMINI_API_KEY')
 
 function getModels(schema?: Record<string, unknown>) {
   const genAI = new GoogleGenerativeAI(geminiApiKey.value())
-  const config = schema ? { generationConfig: { responseMimeType: "application/json", responseSchema: schema } } : {}
+  const config = schema ? { generationConfig: { responseMimeType: "application/json", responseSchema: schema as unknown as Schema } } : {}
   return {
     model: genAI.getGenerativeModel({ model: 'gemini-2.5-pro', ...config }),
     flashModel: genAI.getGenerativeModel({ model: 'gemini-3.5-flash', ...config }),
@@ -78,7 +78,7 @@ export const generateAIDescription = onCall({ secrets: [geminiApiKey] }, async (
 
   try {
     const { model, flashModel, liteModel } = getModels(schema)
-    const promptParts: unknown[] = [systemPrompt, userPrompt];
+    const promptParts: (string | Part)[] = [systemPrompt, userPrompt];
     if (images && Array.isArray(images) && images.length > 0) {
       try {
         const imgRes = await fetch(images[0]);
@@ -169,7 +169,10 @@ export const suggestAiPrice = onCall({ secrets: [geminiApiKey] }, async (request
   try {
     const comps = await searchEbayComps(title)
     if (comps && comps.length > 0) {
-      ebayContext = 'RECENT EBAY COMPS:\n' + comps.map(c => `- ${c.title}: ${c.price?.value} ${c.price?.currency}`).join('\n')
+      ebayContext = 'RECENT EBAY COMPS:\n' + comps.map(c => {
+        const price = c['price'] as { value?: string; currency?: string } | undefined
+        return `- ${String(c['title'] ?? '')}: ${price?.value ?? ''} ${price?.currency ?? ''}`
+      }).join('\n')
     }
   } catch (err) {
     console.warn('eBay comps failed, proceeding without them', err)
@@ -326,6 +329,239 @@ export const suggestAiTags = onCall({ secrets: [geminiApiKey] }, async (request)
     console.error('Gemini Tag Error:', err)
     throw new HttpsError('internal', 'Failed to suggest AI tags.')
   }
+})
+
+// ---------------------------------------------------------------------------
+// Batch Process Items — staff-triggered bulk AI for selected inventory rows
+// ---------------------------------------------------------------------------
+
+interface DescriptionItemData {
+  title: string
+  category: string
+  viewTag: string
+  condition: string
+  provenanceNotes?: string
+  serialNumber?: string
+  staffNotes?: string
+  images?: string[]
+}
+
+interface PriceItemData {
+  title: string
+  category: string
+  condition: string
+  brand?: string
+  staffNotes?: string
+  aiDescription?: string
+}
+
+interface BatchProcessPayload {
+  itemIds: string[]
+  operations: ('description' | 'price')[]
+}
+
+interface BatchProcessResult {
+  processed: string[]
+  failed: Record<string, string>
+}
+
+function batchDelay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function generateDescriptionForItem(uid: string, itemId: string, data: DescriptionItemData): Promise<void> {
+  const db = getFirestore()
+  const schema = {
+    type: SchemaType.OBJECT,
+    properties: {
+      title: { type: SchemaType.STRING, description: "Concise product title (max 80 chars)" },
+      category: { type: SchemaType.STRING, description: "Specific product category" },
+      draft: { type: SchemaType.STRING, description: "150–250 word editorial description" },
+      suggestedTags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+      provenanceFlag: { type: SchemaType.BOOLEAN },
+      culturalNote: { type: SchemaType.STRING }
+    },
+    required: ["title", "category", "draft", "suggestedTags", "provenanceFlag", "culturalNote"]
+  }
+  const { model, flashModel, liteModel } = getModels(schema)
+  const systemPrompt = `You are an expert product copywriter for The Pawn Shop — a premium, dapper, and distinctly Akwesasne retail platform on Cornwall Island. Brand voice: quiet confidence, editorial precision, occasionally witty.
+Your output is a DRAFT for staff review. HARD RULES: Never generate Kanien'kéha language. Never invent condition grades. Never use scarcity language unless data supports it. Canadian English. Cannabis: boutique wellness framing only.`
+  const userPrompt = `Analyse the item image (if provided) and the metadata below. Write in the brand voice of The Pawn Shop.
+ITEM DATA: Title: ${data.title} | Category: ${data.category} | View: ${data.viewTag} | Condition: ${data.condition} | Provenance: ${data.provenanceNotes || 'None'} | Serial: ${data.serialNumber || 'N/A'} | Staff Notes: ${data.staffNotes || 'None'}`
+
+  const promptParts: (string | Part)[] = [systemPrompt, userPrompt]
+  if (data.images && data.images.length > 0) {
+    try {
+      const imgRes = await fetch(data.images[0])
+      if (imgRes.ok) {
+        const buffer = Buffer.from(await imgRes.arrayBuffer())
+        promptParts.push({ inlineData: { data: buffer.toString('base64'), mimeType: imgRes.headers.get('content-type') || 'image/jpeg' } })
+      }
+    } catch {
+      // proceed without image
+    }
+  }
+
+  let result
+  try {
+    result = await model.generateContent(promptParts)
+  } catch (error: unknown) {
+    const err = error as { message?: string; status?: number }
+    if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
+      console.warn('[batch] Gemini Pro unavailable, falling back to Flash...')
+      try {
+        result = await flashModel.generateContent(promptParts)
+      } catch (flashError: unknown) {
+        const fe = flashError as { message?: string; status?: number }
+        if (fe?.message?.includes('429') || fe?.status === 429 || fe?.message?.includes('503') || fe?.status === 503) {
+          console.warn('[batch] Gemini Flash unavailable, falling back to Lite...')
+          result = await liteModel.generateContent(promptParts)
+        } else {
+          throw flashError
+        }
+      }
+    } else {
+      throw error
+    }
+  }
+
+  const parsed = JSON.parse(result.response.text().replace(/```json|```/g, '').trim())
+
+  await db.collection('items').doc(itemId).collection('internal').doc('ai').set({
+    aiTitle: parsed.title || null,
+    aiCategory: parsed.category || null,
+    aiDescription: parsed.draft,
+    aiTagSuggestions: parsed.suggestedTags || [],
+    updatedAt: FieldValue.serverTimestamp(),
+    generatedBy: uid
+  }, { merge: true })
+
+  await db.collection('auditLogs').add({
+    eventType: 'ai_description_generated',
+    uid,
+    targetId: itemId,
+    details: { model: 'gemini-pro-latest', batch: true },
+    createdAt: FieldValue.serverTimestamp()
+  })
+}
+
+async function suggestPriceForItem(uid: string, itemId: string, data: PriceItemData): Promise<void> {
+  const db = getFirestore()
+  const schema = {
+    type: SchemaType.OBJECT,
+    properties: {
+      low: { type: SchemaType.INTEGER },
+      high: { type: SchemaType.INTEGER },
+      source: { type: SchemaType.STRING },
+      confidenceLevel: { type: SchemaType.STRING },
+      note: { type: SchemaType.STRING }
+    },
+    required: ["low", "high", "source", "confidenceLevel", "note"]
+  }
+  const { model, flashModel, liteModel } = getModels(schema)
+  const systemPrompt = `You are a pricing analyst for a pawn shop. Provide a price range from eBay sold comps. Guidance only. Prices in CAD cents (integer). Always give a range, never a single price.`
+  const userPrompt = `Price range for: Title: ${data.title} | Category: ${data.category} | Condition: ${data.condition} | Brand: ${data.brand || 'Unknown'} | Staff Notes: ${data.staffNotes || 'None'}${data.aiDescription ? ` | Description: ${data.aiDescription}` : ''}`
+
+  let result
+  try {
+    result = await model.generateContent([systemPrompt, userPrompt])
+  } catch (error: unknown) {
+    const err = error as { message?: string; status?: number }
+    if (err?.message?.includes('429') || err?.status === 429 || err?.message?.includes('503') || err?.status === 503) {
+      try {
+        result = await flashModel.generateContent([systemPrompt, userPrompt])
+      } catch (flashError: unknown) {
+        const fe = flashError as { message?: string; status?: number }
+        if (fe?.message?.includes('429') || fe?.status === 429 || fe?.message?.includes('503') || fe?.status === 503) {
+          result = await liteModel.generateContent([systemPrompt, userPrompt])
+        } else {
+          throw flashError
+        }
+      }
+    } else {
+      throw error
+    }
+  }
+
+  const parsed = JSON.parse(result.response.text().replace(/```json|```/g, '').trim())
+
+  await db.collection('items').doc(itemId).collection('internal').doc('ai').set({
+    aiPriceSuggestion: parsed,
+    updatedAt: FieldValue.serverTimestamp(),
+    generatedBy: uid
+  }, { merge: true })
+
+  await db.collection('auditLogs').add({
+    eventType: 'ai_price_suggested',
+    uid,
+    targetId: itemId,
+    details: { low: parsed.low, high: parsed.high, batch: true },
+    createdAt: FieldValue.serverTimestamp()
+  })
+}
+
+export const batchProcessItems = onCall({ secrets: [geminiApiKey] }, async (request): Promise<BatchProcessResult> => {
+  const { uid } = await assertStaff(request)
+  const { itemIds, operations } = request.data as BatchProcessPayload
+
+  if (!Array.isArray(itemIds) || itemIds.length === 0) {
+    throw new HttpsError('invalid-argument', 'itemIds must be a non-empty array.')
+  }
+  if (itemIds.length > 20) {
+    throw new HttpsError('invalid-argument', 'Maximum 20 items per batch.')
+  }
+  if (!Array.isArray(operations) || operations.length === 0) {
+    throw new HttpsError('invalid-argument', 'operations must be a non-empty array.')
+  }
+
+  const db = getFirestore()
+  const processed: string[] = []
+  const failed: Record<string, string> = {}
+
+  for (let i = 0; i < itemIds.length; i++) {
+    const itemId = itemIds[i]
+    try {
+      const snap = await db.collection('items').doc(itemId).get()
+      if (!snap.exists) {
+        failed[itemId] = 'Item not found.'
+        continue
+      }
+      const raw = snap.data() as Record<string, unknown>
+
+      for (const op of operations) {
+        if (op === 'description') {
+          await generateDescriptionForItem(uid, itemId, {
+            title: String(raw['title'] ?? ''),
+            category: String(raw['category'] ?? ''),
+            viewTag: String(raw['viewTag'] ?? ''),
+            condition: String(raw['condition'] ?? ''),
+            provenanceNotes: raw['provenanceNotes'] ? String(raw['provenanceNotes']) : undefined,
+            serialNumber: raw['serialNumber'] ? String(raw['serialNumber']) : undefined,
+            staffNotes: raw['staffNotes'] ? String(raw['staffNotes']) : undefined,
+            images: Array.isArray(raw['images']) ? (raw['images'] as string[]) : undefined
+          })
+        } else if (op === 'price') {
+          await suggestPriceForItem(uid, itemId, {
+            title: String(raw['title'] ?? ''),
+            category: String(raw['category'] ?? ''),
+            condition: String(raw['condition'] ?? ''),
+            brand: raw['brand'] ? String(raw['brand']) : undefined,
+            staffNotes: raw['staffNotes'] ? String(raw['staffNotes']) : undefined
+          })
+        }
+      }
+
+      processed.push(itemId)
+    } catch (err: unknown) {
+      failed[itemId] = err instanceof Error ? err.message : 'Unknown error.'
+    }
+
+    if (i < itemIds.length - 1) {
+      await batchDelay(400)
+    }
+  }
+
+  return { processed, failed }
 })
 
 function levenshtein(a: string, b: string): number {

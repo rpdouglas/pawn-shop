@@ -139,6 +139,7 @@
 | `redemptionAmount` | number | Amount paid to redeem the loan (CAD cents) |
 | `paymentIntentId` | string | Stripe PaymentIntent ID if redeemed digitally |
 | `staffNotes` | string | Internal — never shown to customer |
+| `forfeitAlertSentAt` | timestamp | Set by `checkLoanDueDates` when 48-hour SMS alert is dispatched. Null until sent. Prevents duplicate alerts. |
 | `createdAt` | timestamp | Server timestamp |
 | `updatedAt` | timestamp | Server timestamp |
 

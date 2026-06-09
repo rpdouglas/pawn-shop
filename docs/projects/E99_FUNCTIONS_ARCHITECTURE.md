@@ -1,5 +1,5 @@
 # E99 — Cloud Functions Architecture Remediation
-**Status:** 🔄 IN PROGRESS
+**Status:** ✅ CLOSED — 2026-06-09
 **Priority:** HIGH (contains P0 runtime failures)
 **Effort:** Medium (~1 developer-day)
 **Cycle:** 32
@@ -87,6 +87,24 @@ deployed functions match the committed source.
 - All changes are internal (CF source + CI/CD config)
 - `auditLogs` unchanged
 - No AI API key changes
+
+---
+
+## Gate Results
+
+| Gate | Result |
+|------|--------|
+| `npm run build` (Vite frontend) | ✅ PASS — `built in 2.85s` |
+| `npm run lint` (ESLint) | ✅ PASS — zero errors, zero warnings |
+| `npm run test` (Vitest) | ✅ PASS — 29/29 tests, 8 test files |
+| `npm run typecheck` (functions `tsc -b`) | ✅ PASS — zero errors; now covers core + operations |
+| `npm run build` (functions esbuild) | ✅ PASS — core 12.3mb, operations 8.0mb |
+| No `any` types introduced | ✅ PASS |
+| No unused imports/variables | ✅ PASS |
+| `forfeitAlertSentAt` added to `firestore-schema.md` (E81 drift) | ✅ PASS |
+| `forfeitLoan` CF: `auditLogs` write, no PII | ✅ PASS |
+| `batchProcessItems` CF: staff auth gate + 20-item cap | ✅ PASS |
+| `batchProcessItems` CF: all AI output to `internal/ai`, staff-promote gate | ✅ PASS |
 
 ---
 

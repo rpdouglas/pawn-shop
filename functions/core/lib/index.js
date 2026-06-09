@@ -304344,6 +304344,7 @@ __export(index_exports, {
   crmDailyReminders: () => crmDailyReminders,
   deactivateCampaigns: () => deactivateCampaigns,
   deleteShift: () => deleteShift,
+  forfeitLoan: () => forfeitLoan,
   getStaffMembers: () => getStaffMembers,
   inviteEmployee: () => inviteEmployee,
   logActivity: () => logActivity,
@@ -305069,6 +305070,32 @@ var redeemLoanTicket = (0, import_https7.onCall)({ cors: true }, async (request)
   });
   await db.collection("auditLogs").add({
     eventType: "loan_redeemed",
+    uid: request.auth.uid,
+    targetId: loanTicketId,
+    details: { loanTicketId },
+    createdAt: now
+  });
+  return { success: true };
+});
+var forfeitLoan = (0, import_https7.onCall)({ cors: true }, async (request) => {
+  if (!request.auth?.token.admin && !request.auth?.token.manager) {
+    throw new import_https7.HttpsError("permission-denied", "Only admins and managers can forfeit loans");
+  }
+  const { loanTicketId } = request.data;
+  if (!loanTicketId) throw new import_https7.HttpsError("invalid-argument", "loanTicketId required");
+  const db = (0, import_firestore10.getFirestore)();
+  const ref = db.collection("loanTickets").doc(loanTicketId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new import_https7.HttpsError("not-found", "Loan ticket not found");
+  const data = snap.data();
+  const now = import_firestore10.FieldValue.serverTimestamp();
+  await ref.update({ status: "forfeited", updatedAt: now });
+  const itemId = typeof data["itemId"] === "string" ? data["itemId"] : null;
+  if (itemId) {
+    await db.collection("items").doc(itemId).update({ status: "active", policeHold: false, updatedAt: now });
+  }
+  await db.collection("auditLogs").add({
+    eventType: "loan_forfeited",
     uid: request.auth.uid,
     targetId: loanTicketId,
     details: { loanTicketId },
@@ -306157,6 +306184,7 @@ var approveAndSchedulePost = (0, import_https15.onCall)({ cors: true }, async (r
   crmDailyReminders,
   deactivateCampaigns,
   deleteShift,
+  forfeitLoan,
   getStaffMembers,
   inviteEmployee,
   logActivity,

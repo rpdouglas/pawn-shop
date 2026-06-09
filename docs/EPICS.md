@@ -1270,10 +1270,11 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 > **Persona Gate — E98:**
 > - **Staff:** Batch AI buttons in `InventoryTable` always fail silently because `batchProcessItems` was never migrated from the pre-E34 monolith.
 
-- [ ] Migrate `batchProcessItems` + helpers from `functions/src/ai.ts` to `functions/operations/src/ai.ts` `[Staff]`
-- [ ] Update `generateDescriptionForItem` helper: pass images from Firestore, generate `aiTitle`/`aiCategory` `[Staff]`
-- [ ] Export `batchProcessItems` from `functions/operations/src/index.ts` `[Staff]`
-- [ ] Verify batch AI buttons in `InventoryTable` succeed in dev environment `[Staff]`
+- [x] Migrate `batchProcessItems` + helpers from `functions/src/ai.ts` to `functions/operations/src/ai.ts` `[Staff]`
+- [x] Update `generateDescriptionForItem` helper: pass images from Firestore, generate `aiTitle`/`aiCategory` `[Staff]`
+- [x] Export `batchProcessItems` from `functions/operations/src/index.ts` `[Staff]`
+- [x] Verify batch AI buttons in `InventoryTable` succeed in dev environment `[Staff]`
+- [x] **E98 CLOSED (subsumed by E99)** | 2026-06-09
 
 ---
 
@@ -1284,14 +1285,15 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 > - **Staff (Loan Operations):** Loan issuance, redemption, and forfeiture are broken in production — client calls function names that do not match deployed exports.
 > - **Jordan:** TypeScript gate does not cover deployed codebases; stale monolith and Node version mismatch increase regression risk.
 
-- [ ] **P0 — Phase 1:** Update `src/lib/useLoanTickets.ts` — rename `issueLoanTicket` → `createLoanTicket`, `redeemLoan` → `redeemLoanTicket` `[Staff]`
-- [ ] **P0 — Phase 1:** Add `forfeitLoan` export to `functions/core/src/loanTickets.ts` `[Staff]`
-- [ ] **P0 — Phase 1:** Deploy core codebase `[Staff]`
-- [ ] **P1 — Phase 2:** Migrate `batchProcessItems` to `functions/operations/src/ai.ts` (subsumes E98) `[Staff]`
-- [ ] **P1 — Phase 2:** Deploy operations codebase `[Staff]`
-- [ ] **P2 — Phase 3:** Fix Node version to 24 in `functions/core/package.json` and `functions/operations/package.json` (engines + esbuild target) `[Jord]`
-- [ ] **P2 — Phase 3:** Fix TypeScript gate — update root typecheck script to cover core and operations, not old monolith `[Jord]`
-- [ ] **P2 — Phase 4:** Delete `functions/src/` (old monolith) `[Jord]`
-- [ ] **P3 — Phase 5:** Add `functions/core/lib/` and `functions/operations/lib/` to `.gitignore`; untrack committed lib artifacts `[Jord]`
-- [ ] **P3 — Phase 6:** Add functions deploy step to `.github/workflows/deploy-dev.yml` `[Jord]`
+- [x] **P0 — Phase 1:** Update `src/lib/useLoanTickets.ts` — rename `issueLoanTicket` → `createLoanTicket`, `redeemLoan` → `redeemLoanTicket` `[Staff]`
+- [x] **P0 — Phase 1:** Add `forfeitLoan` export to `functions/core/src/loanTickets.ts` `[Staff]`
+- [x] **P0 — Phase 1:** Deploy core codebase `[Staff]`
+- [x] **P1 — Phase 2:** Migrate `batchProcessItems` to `functions/operations/src/ai.ts` (subsumes E98) `[Staff]`
+- [x] **P1 — Phase 2:** Deploy operations codebase `[Staff]`
+- [x] **P2 — Phase 3:** Fix Node version to 24 in `functions/core/package.json` and `functions/operations/package.json` (engines + esbuild target) `[Jord]`
+- [x] **P2 — Phase 3:** Fix TypeScript gate — convert `functions/tsconfig.json` to project references solution covering core and operations `[Jord]`
+- [x] **P2 — Phase 4:** Delete `functions/src/` (old monolith) `[Jord]`
+- [x] **P3 — Phase 5:** Add `functions/core/lib/` and `functions/operations/lib/` to `.gitignore`; untrack committed lib artifacts `[Jord]`
+- [x] **P3 — Phase 6:** Add functions deploy step to `.github/workflows/deploy-dev.yml` `[Jord]`
+- [x] **E99 CLOSED** | 2026-06-09
 

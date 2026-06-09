@@ -13,6 +13,8 @@ dist-ssr
 *.local
 emulator-data/
 functions/lib/
+functions/core/lib/
+functions/operations/lib/
 
 # Editor directories and files
 .vscode/*

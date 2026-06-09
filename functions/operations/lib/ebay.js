@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ebayWebhook = exports.pushToEbay = void 0;
+exports.ebayRequest = ebayRequest;
+exports.searchEbayComps = searchEbayComps;
 const https_1 = require("firebase-functions/v2/https");
 const firestore_1 = require("firebase-admin/firestore");
 const node_crypto_1 = require("node:crypto");
@@ -57,6 +59,19 @@ async function ebayRequest(method, path, body) {
         // empty body on unexpected non-204 response
     }
     return { ok: res.ok, status: res.status, data };
+}
+async function searchEbayComps(query) {
+    try {
+        // This uses the eBay Browse API to search for items
+        const res = await ebayRequest('GET', `/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=3`);
+        if (res.ok && res.data && res.data.itemSummaries) {
+            return res.data.itemSummaries;
+        }
+    }
+    catch (err) {
+        console.warn('Failed to fetch eBay comps:', err);
+    }
+    return [];
 }
 exports.pushToEbay = (0, https_1.onCall)({ cors: true, secrets: [secrets_1.ebayUserToken] }, async (request) => {
     if (!request.auth || !isStaffToken(request.auth.token)) {

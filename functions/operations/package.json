@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "lib/index.js",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=lib/index.js --external:firebase-admin --external:firebase-functions --external:@google/generative-ai --external:sharp"
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node24 --outfile=lib/index.js --external:firebase-admin --external:firebase-functions --external:@google/generative-ai --external:sharp"
   },
   "engines": {
-    "node": "20"
+    "node": "24"
   },
   "dependencies": {
     "firebase-admin": "^13.4.0",
