@@ -1483,6 +1483,21 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 
 ---
 
+### E109 · Walk-in Pawn Intake (POS Direct Loan Issuance)
+
+> **Persona Gate — E109:**
+> - **Staff (Primary):** Counter operator must be able to create a pawn intake and issue a loan for a walk-in customer without requiring an online form submission.
+> - **Makoonsii (Secondary):** 48px touch targets, plain language. The most common real-world transaction at the Cornwall Island counter.
+
+- [x] Schema: add `source: 'online' | 'walk_in'` to `pawnRequests/{id}` and update `docs/firestore-schema.md` `[Comp]`
+- [x] CF: `createWalkInPawnRequest` — staff-only; creates `pawnRequest` with `status: 'quoted'` and `source: 'walk_in'`; serial blacklist trigger still fires `[Staff]` `[Comp]`
+- [x] UI: `WalkInPawnModal.tsx` — name, phone (opt), email (opt), item description, serial (opt); 48px inputs `[Staff]` `[Mak]`
+- [x] UI: "New Walk-in Pawn" button at the top of `PawnInbox`; on CF success opens `IssueLoanModal` directly `[Staff]`
+- [x] Decision log `[Comp]`
+- [x] **E109 CLOSED** | 2026-06-10
+
+---
+
 ### E108 · Server-Side PDF Pawn Tickets (Backlog)
 
 > **Persona Gate — E108:**

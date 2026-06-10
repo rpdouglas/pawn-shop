@@ -7,6 +7,7 @@ import { db, functions } from '../../lib/firebase'
 import type { PawnRequest, PawnRequestStatus, PrintTicketData } from '../../lib/types'
 import IssueLoanModal from './IssueLoanModal'
 import PrintableTicket from './PrintableTicket'
+import WalkInPawnModal from './WalkInPawnModal'
 
 type FilterValue = PawnRequestStatus | 'all'
 
@@ -45,16 +46,18 @@ function toPawnRequest(id: string, data: Record<string, unknown>): PawnRequest {
   const createdAt = data['createdAt'] instanceof Timestamp
     ? data['createdAt'].toDate()
     : new Date()
+  const rawSource = data['source']
   return {
     id,
     uid: typeof data['uid'] === 'string' ? data['uid'] : null,
     name: String(data['name'] ?? ''),
-    email: String(data['email'] ?? ''),
+    email: typeof data['email'] === 'string' ? data['email'] : undefined,
     phone: typeof data['phone'] === 'string' ? data['phone'] : undefined,
     itemDescription: String(data['itemDescription'] ?? ''),
     serialNumber: typeof data['serialNumber'] === 'string' ? data['serialNumber'] : undefined,
     images: Array.isArray(data['images']) ? (data['images'] as string[]) : [],
     status: data['status'] as PawnRequestStatus,
+    source: rawSource === 'walk_in' ? 'walk_in' : rawSource === 'online' ? 'online' : undefined,
     staffNotes: typeof data['staffNotes'] === 'string' ? data['staffNotes'] : undefined,
     serialBlacklistHit: data['serialBlacklistHit'] === true,
     pawnLoanId: typeof data['pawnLoanId'] === 'string' ? data['pawnLoanId'] : undefined,
@@ -74,11 +77,23 @@ export default function PawnInbox() {
   const [saveError, setSaveError] = useState<string | null>(null)
 
   const [issueLoanFor, setIssueLoanFor] = useState<string | null>(null)
+  const [issueLoanDescription, setIssueLoanDescription] = useState('')
+  const [walkInModalOpen, setWalkInModalOpen] = useState(false)
   const [printTicket, setPrintTicket] = useState<PrintTicketData | null>(null)
 
   const handleReadyToPrint = useCallback((data: PrintTicketData) => {
     setPrintTicket(data)
     setTimeout(() => window.print(), 0)
+  }, [])
+
+  const handleWalkInSuccess = useCallback((pawnRequestId: string, itemDesc: string, serialBlacklistHit: boolean) => {
+    setWalkInModalOpen(false)
+    if (serialBlacklistHit) {
+      // Serial flagged — stay in PawnInbox so staff can review the flag before issuing a loan
+      return
+    }
+    setIssueLoanFor(pawnRequestId)
+    setIssueLoanDescription(itemDesc)
   }, [])
 
   useEffect(() => {
@@ -132,26 +147,35 @@ export default function PawnInbox() {
   }
 
   const flaggedCount = requests.filter(r => r.serialBlacklistHit).length
-  const issueLoanRequest = issueLoanFor ? requests.find(r => r.id === issueLoanFor) : null
 
   return (
     <div className="pawn-inbox">
-      <div style={{ marginBottom: 'var(--space-4)' }}>
-        <h1 style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'var(--text-heading)',
-          color: 'var(--color-text)',
-          marginBottom: 'var(--space-2)',
-        }}>
-          Pawn Enquiries
-        </h1>
-        {flaggedCount > 0 && (
-          <p style={{ margin: 0 }}>
-            <span className="badge badge-sold">
-              {flaggedCount} serial blacklist {flaggedCount === 1 ? 'hit' : 'hits'}
-            </span>
-          </p>
-        )}
+      <div style={{ marginBottom: 'var(--space-4)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+        <div>
+          <h1 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-heading)',
+            color: 'var(--color-text)',
+            marginBottom: 'var(--space-2)',
+          }}>
+            Pawn Enquiries
+          </h1>
+          {flaggedCount > 0 && (
+            <p style={{ margin: 0 }}>
+              <span className="badge badge-sold">
+                {flaggedCount} serial blacklist {flaggedCount === 1 ? 'hit' : 'hits'}
+              </span>
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          className="btn btn-primary btn-md"
+          style={{ minHeight: '48px', whiteSpace: 'nowrap' }}
+          onClick={() => setWalkInModalOpen(true)}
+        >
+          + New Walk-in Pawn
+        </button>
       </div>
 
       <div className="pawn-inbox-filters" role="group" aria-label="Filter by status">
@@ -212,10 +236,13 @@ export default function PawnInbox() {
                         : <span className="badge badge-tag">Clear</span>
                       }
                     </td>
-                    <td>
+                    <td style={{ display: 'flex', gap: 'var(--space-1)', flexWrap: 'wrap', alignItems: 'center' }}>
                       <span className={STATUS_BADGE[req.status]}>
                         {FILTER_LABELS[req.status]}
                       </span>
+                      {req.source === 'walk_in' && (
+                        <span className="badge badge-tag">Walk-in</span>
+                      )}
                     </td>
                     <td>
                       <button
@@ -316,7 +343,10 @@ export default function PawnInbox() {
                                   type="button"
                                   className="btn btn-secondary btn-md"
                                   style={{ minHeight: '48px' }}
-                                  onClick={() => setIssueLoanFor(req.id)}
+                                  onClick={() => {
+                                    setIssueLoanFor(req.id)
+                                    setIssueLoanDescription(req.itemDescription)
+                                  }}
                                   disabled={saving}
                                 >
                                   Issue Loan
@@ -344,11 +374,17 @@ export default function PawnInbox() {
         </div>
       )}
 
+      <WalkInPawnModal
+        isOpen={walkInModalOpen}
+        onClose={() => setWalkInModalOpen(false)}
+        onSuccess={handleWalkInSuccess}
+      />
+
       <IssueLoanModal
         isOpen={!!issueLoanFor}
-        onClose={() => setIssueLoanFor(null)}
+        onClose={() => { setIssueLoanFor(null); setIssueLoanDescription('') }}
         pawnRequestId={issueLoanFor}
-        itemDescription={issueLoanRequest?.itemDescription ?? ''}
+        itemDescription={issueLoanDescription}
         onReadyToPrint={handleReadyToPrint}
       />
 

@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-E107 · Pawn Ticket Digital Signature — Three-step POS loan issuance modal with canvas signature capture, Firebase Storage upload, and browser-print ticket generation. (COMPLETED)
+E107 + E109 · POS Loan Issuance — Digital signature flow and walk-in pawn intake both complete. Counter staff can now issue loans to any customer — online enquiry or walk-in — with full sign + print workflow. (COMPLETED)
 
 ---
 
@@ -161,6 +161,8 @@ E107 · Pawn Ticket Digital Signature — Three-step POS loan issuance modal wit
 | **FIX_FIREBASE_INIT_ORDER CLOSED** | BUGFIX | 2026-06-10 |
 | `E107 Pawn Ticket Generation & Digital Signature` — Three-step modal (Terms → Sign → Done+Print) in `IssueLoanModal`; `signature_pad` v5 canvas for stylus/finger capture on Android POS tablet with devicePixelRatio scaling; `signPawnAgreement` CF uploads PNG to Firebase Storage; `createLoanTicket` CF now generates `ticketNumber`; `PrintableTicket` portal-rendered with `@media print` CSS; Signed/Unsigned badge + Print button in `LoanTicketsAdminPage`; `storage.rules` updated for `tickets/` path. Decisions 0020 + 0021 logged. | E107 | 2026-06-10 |
 | **E107 CLOSED** | E107 | 2026-06-10 |
+| `E109 Walk-in Pawn Intake` — Closed the walk-in POS gap: "New Walk-in Pawn" button in PawnInbox opens `WalkInPawnModal` (name, item, serial, phone, email); new `createWalkInPawnRequest` CF creates `pawnRequest` with `status: 'quoted'` + `source: 'walk_in'`; serial blacklist check runs identically to online path; on success `IssueLoanModal` opens immediately for full sign + print flow. `source` field added to `pawnRequests` schema. Walk-in badge in PawnInbox table. Decision 0022 logged. | E109 | 2026-06-10 |
+| **E109 CLOSED** | E109 | 2026-06-10 |
 
 ---
 
@@ -191,4 +193,4 @@ E107 · Pawn Ticket Digital Signature — Three-step POS loan issuance modal wit
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 CLOSED)*

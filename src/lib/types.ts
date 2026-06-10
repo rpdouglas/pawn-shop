@@ -169,12 +169,13 @@ export interface PawnRequest {
   id: string
   uid: string | null
   name: string
-  email: string
+  email?: string
   phone?: string
   itemDescription: string
   serialNumber?: string
   images: string[]
   status: PawnRequestStatus
+  source?: 'online' | 'walk_in'
   staffNotes?: string
   serialBlacklistHit: boolean
   pawnLoanId?: string

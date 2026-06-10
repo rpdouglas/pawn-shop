@@ -15,7 +15,7 @@ The Pawn Shop staff dashboard provides a central interface for managing active p
 
 ## Issuing a Loan Ticket
 
-Loan tickets are issued from the **Pawn Inbox**, not from the Loans dashboard. This keeps the issuance tied to the original customer enquiry. See the [Pawn Inbox guide](pawn-inbox.md) for the full three-step flow: Loan Terms → Customer Signature → Print Ticket.
+Loan tickets are issued from the **Pawn Inbox**, not from the Loans dashboard. This applies whether the customer submitted an online enquiry or walked in at the counter — the [Pawn Inbox guide](pawn-inbox.md) covers both paths. The full three-step flow is identical in both cases: Loan Terms → Customer Signature → Print Ticket.
 
 ## Printing a Signed Ticket
 
