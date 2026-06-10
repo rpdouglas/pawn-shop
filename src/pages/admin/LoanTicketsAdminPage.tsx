@@ -32,7 +32,6 @@ export default function LoanTicketsAdminPage() {
       signatureUrl: ticket.signatureUrl,
       issuedAt: ticket.createdAt,
     })
-    setTimeout(() => window.print(), 0)
   }, [])
 
 

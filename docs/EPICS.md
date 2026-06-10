@@ -1498,6 +1498,27 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 
 ---
 
+### FIX · Pawn Loan Defaults — Interest Rate Cap + Blank Print Page
+
+> **Persona Gate:** Staff (admin / manager / inventory_staff) + Makoonsii (printed ticket recipient).
+
+**Root cause — Bug 1:** `IssueLoanModal` initialised `interestRatePct` with `'5'`. At 5%/30-day term this annualises to ~60% APR — the federal criminal ceiling. Correct legal caps for Akwesasne (Ontario side): 48% APR for loans under $1,000; 35% APR for loans $1,000 and over. These are now computed dynamically from the entered amount and term and auto-populated into the rate field. Submit validation blocks any rate above the cap.
+
+**Root cause — Bug 2:** `setPrintTicket(data)` followed by `setTimeout(() => window.print(), 0)`. In React 18 concurrent mode, the macrotask fires before the state commit; `PrintableTicket` renders `null` and the print dialog opens on a blank page. Fix: `window.print()` moved into `useEffect` inside `PrintableTicket` — guaranteed post-commit.
+
+- [x] Remove hardcoded `useState('5')` default; rate field starts blank `[Staff]` `[Comp]`
+- [x] Add `calcMaxRatePct(amountCents, days)` helper — APR cap × (days/365) conversion `[Comp]`
+- [x] Add APR constants (`APR_CAP_UNDER_1000 = 0.48`, `APR_CAP_OVER_1000 = 0.35`, `LOAN_THRESHOLD_CENTS = 100_000`) `[Comp]`
+- [x] Auto-populate rate to legal max in `onChange` handlers for amount + term inputs (avoids `setState-in-effect` lint violation) `[Staff]`
+- [x] Show live cap indicator label beneath rate input: "Max for this loan: X.XX% (48% APR)" `[Staff]`
+- [x] Submit-time validation: block if `ratePct > calcMaxRatePct(...)` with human-readable error `[Comp]`
+- [x] Move `window.print()` into `useEffect` in `PrintableTicket.tsx` — remove `setTimeout(fn, 0)` from `PawnInbox.tsx` and `LoanTicketsAdminPage.tsx` `[Staff]` `[Mak]`
+- [x] Decision 0023 logged `[Comp]`
+- [x] User guide updated: `admin/pawn-inbox.md` and `admin/loans.md` `[Staff]`
+- [x] **FIX_PAWN_LOAN_DEFAULTS CLOSED** | 2026-06-10
+
+---
+
 ### E108 · Server-Side PDF Pawn Tickets (Backlog)
 
 > **Persona Gate — E108:**

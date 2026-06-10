@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-E107 + E109 · POS Loan Issuance — Digital signature flow and walk-in pawn intake both complete. Counter staff can now issue loans to any customer — online enquiry or walk-in — with full sign + print workflow. (COMPLETED)
+E107 + E109 + FIX_PAWN_LOAN_DEFAULTS · POS Loan Issuance — Digital signature flow, walk-in pawn intake, and interest rate compliance all complete. Counter staff can now issue legally capped loans to any customer with full sign + print workflow. (COMPLETED)
 
 ---
 
@@ -163,6 +163,8 @@ E107 + E109 · POS Loan Issuance — Digital signature flow and walk-in pawn int
 | **E107 CLOSED** | E107 | 2026-06-10 |
 | `E109 Walk-in Pawn Intake` — Closed the walk-in POS gap: "New Walk-in Pawn" button in PawnInbox opens `WalkInPawnModal` (name, item, serial, phone, email); new `createWalkInPawnRequest` CF creates `pawnRequest` with `status: 'quoted'` + `source: 'walk_in'`; serial blacklist check runs identically to online path; on success `IssueLoanModal` opens immediately for full sign + print flow. `source` field added to `pawnRequests` schema. Walk-in badge in PawnInbox table. Decision 0022 logged. | E109 | 2026-06-10 |
 | **E109 CLOSED** | E109 | 2026-06-10 |
+| `FIX_PAWN_LOAN_DEFAULTS` — (1) Removed hardcoded 5%/period default (≈60% APR — above legal cap); replaced with dynamic `calcMaxRatePct` that converts the applicable APR cap (48% for <$1K, 35% for ≥$1K) to a per-period rate using amount and term. Rate auto-populates in onChange handlers; submit-time validation blocks overages. (2) Fixed blank-page print bug: moved `window.print()` from `setTimeout(fn, 0)` into `useEffect` in `PrintableTicket.tsx`. Decision 0023 logged. | BUGFIX | 2026-06-10 |
+| **FIX_PAWN_LOAN_DEFAULTS CLOSED** | BUGFIX | 2026-06-10 |
 
 ---
 
@@ -193,4 +195,4 @@ E107 + E109 · POS Loan Issuance — Digital signature flow and walk-in pawn int
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + FIX_PAWN_LOAN_DEFAULTS CLOSED)*

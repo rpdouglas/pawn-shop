@@ -52,8 +52,11 @@ Once an enquiry is in **Quoted** status (or immediately after a walk-in intake),
 1. Expand the enquiry row by clicking **Review**.
 2. An **Issue Loan** button appears (only visible when status is `Quoted` and no loan has been issued yet).
 3. Click **Issue Loan** to open the loan issuance form.
-4. Enter the **Loan Amount** (CAD $), **Loan Term** (days), and **Interest Rate** (%).
-5. Click **Issue Loan** to create the ticket. A human-readable ticket number (e.g. `PLT-20260610-A3F2`) is generated automatically.
+4. Enter the **Loan Amount** (CAD $) and **Loan Term** (days).
+5. The **Interest Rate** field auto-fills to the legal maximum for this loan once both amount and term are entered. The cap is shown beneath the field — for example: *"Max for this loan: 3.95% (48% APR)"*. You may enter a lower rate; you cannot go above the displayed cap.
+6. Click **Issue Loan** to create the ticket. A human-readable ticket number (e.g. `PLT-20260610-A3F2`) is generated automatically.
+
+> **Interest rate caps (Akwesasne — Ontario side):** Loans under $1,000 CAD — maximum 48% APR. Loans $1,000 CAD and over — maximum 35% APR. The system converts these annual rates to a per-period flat rate based on the loan term and blocks submission if the entered rate exceeds the cap.
 
 ### Step 2 — Customer Signature
 

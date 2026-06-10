@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import SignaturePad from 'signature_pad'
 import Modal from '../ui/Modal'
 import Button from '../ui/Button'
@@ -7,6 +7,18 @@ import { formatPrice, formatDate } from '../../lib/format'
 import type { PrintTicketData } from '../../lib/types'
 
 const AGREEMENT_VERSION = 'v1.0'
+
+// Applicable rate caps for Akwesasne (Ontario side).
+// Loans under $1,000 CAD: max 48% APR. Loans $1,000 and over: max 35% APR.
+const APR_CAP_UNDER_1000 = 0.48
+const APR_CAP_OVER_1000  = 0.35
+const LOAN_THRESHOLD_CENTS = 100_000 // $1,000.00
+
+function calcMaxRatePct(amountCents: number, days: number): number {
+  if (amountCents <= 0 || days <= 0) return 0
+  const aprCap = amountCents < LOAN_THRESHOLD_CENTS ? APR_CAP_UNDER_1000 : APR_CAP_OVER_1000
+  return parseFloat((aprCap * (days / 365) * 100).toFixed(2))
+}
 
 type Step = 'terms' | 'sign' | 'done'
 
@@ -40,7 +52,7 @@ export default function IssueLoanModal({
   const [step, setStep] = useState<Step>('terms')
   const [loanAmountDollars, setLoanAmountDollars] = useState('')
   const [periodDays, setPeriodDays] = useState('30')
-  const [interestRatePct, setInterestRatePct] = useState('5')
+  const [interestRatePct, setInterestRatePct] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -82,7 +94,7 @@ export default function IssueLoanModal({
     setIssuedData(null)
     setLoanAmountDollars('')
     setPeriodDays('30')
-    setInterestRatePct('5')
+    setInterestRatePct('')
     setLoading(false)
     setError('')
     setCustomerName('')
@@ -112,6 +124,12 @@ export default function IssueLoanModal({
     }
     if (isNaN(ratePct) || ratePct < 0) {
       setError('Enter a valid interest rate')
+      return
+    }
+    const maxRate = calcMaxRatePct(amountCents, days)
+    if (maxRate > 0 && ratePct > maxRate) {
+      const aprLabel = amountCents < LOAN_THRESHOLD_CENTS ? '48% APR — loans under $1,000' : '35% APR — loans $1,000 and over'
+      setError(`Rate exceeds the legal maximum of ${maxRate}% (${aprLabel})`)
       return
     }
 
@@ -180,6 +198,15 @@ export default function IssueLoanModal({
     })
   }, [issuedData, itemDescription, customerName, signatureUrl, onReadyToPrint])
 
+  const capLabel = useMemo(() => {
+    const amountCents = Math.round(parseFloat(loanAmountDollars) * 100)
+    const days = parseInt(periodDays, 10)
+    const max = calcMaxRatePct(amountCents, days)
+    if (max <= 0) return null
+    const aprPct = amountCents < LOAN_THRESHOLD_CENTS ? 48 : 35
+    return `Max for this loan: ${max}% (${aprPct}% APR)`
+  }, [loanAmountDollars, periodDays])
+
   if (!pawnRequestId) return null
 
   const redemptionCents = issuedData
@@ -213,7 +240,11 @@ export default function IssueLoanModal({
               className="input-field"
               style={{ minHeight: '48px' }}
               value={loanAmountDollars}
-              onChange={e => setLoanAmountDollars(e.target.value)}
+              onChange={e => {
+                setLoanAmountDollars(e.target.value)
+                const max = calcMaxRatePct(Math.round(parseFloat(e.target.value) * 100), parseInt(periodDays, 10))
+                if (max > 0) setInterestRatePct(String(max))
+              }}
               placeholder="e.g. 150.00"
               disabled={loading}
             />
@@ -228,24 +259,39 @@ export default function IssueLoanModal({
               className="input-field"
               style={{ minHeight: '48px' }}
               value={periodDays}
-              onChange={e => setPeriodDays(e.target.value)}
+              onChange={e => {
+                setPeriodDays(e.target.value)
+                const max = calcMaxRatePct(Math.round(parseFloat(loanAmountDollars) * 100), parseInt(e.target.value, 10))
+                if (max > 0) setInterestRatePct(String(max))
+              }}
               disabled={loading}
             />
           </div>
 
           <div className="input-wrapper">
-            <label className="input-label" htmlFor="issue-loan-rate">Interest Rate (%)</label>
+            <label className="input-label" htmlFor="issue-loan-rate">Interest Rate — per loan period (%)</label>
             <input
               id="issue-loan-rate"
               type="number"
               min="0"
-              step="0.1"
+              step="0.01"
               className="input-field"
               style={{ minHeight: '48px' }}
               value={interestRatePct}
               onChange={e => setInterestRatePct(e.target.value)}
               disabled={loading}
+              placeholder="Enter amount and term to calculate"
             />
+            {capLabel && (
+              <p style={{
+                marginTop: 'var(--space-1)',
+                fontSize: 'var(--text-xs)',
+                color: 'var(--color-text-muted)',
+                fontFamily: 'var(--font-body)',
+              }}>
+                {capLabel}
+              </p>
+            )}
           </div>
 
           {error && <p className="input-error" role="alert">{error}</p>}

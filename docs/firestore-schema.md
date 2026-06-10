@@ -132,7 +132,7 @@
 | `itemDescription` | string | Description of the pawned item |
 | `itemId` | string | Reference to `items/{id}` if linked |
 | `loanAmount` | number | CAD cents |
-| `interestRate` | number | e.g. 0.05 for 5% |
+| `interestRate` | number | Per-period decimal rate stored as a fraction (e.g. 0.04 = 4%). Legal caps for Akwesasne (Ontario side): 48% APR for loans < $1,000 CAD; 35% APR for loans ≥ $1,000 CAD. Per-period max = APR_cap × (periodDays / 365). Enforced at UI level in `IssueLoanModal`. See decision 0023. |
 | `periodDays` | number | Standard loan period in days |
 | `dueDate` | timestamp | Current due date for the loan |
 | `status` | string | `active` \| `extension_requested` \| `forfeited` \| `redeemed` |

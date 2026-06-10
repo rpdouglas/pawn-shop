@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { formatPrice, formatDate } from '../../lib/format'
 import type { PrintTicketData } from '../../lib/types'
@@ -7,6 +8,12 @@ interface Props {
 }
 
 export default function PrintableTicket({ data }: Props) {
+  // useEffect runs after React commits the DOM — guarantees portal is rendered before print dialog opens.
+  // setTimeout(fn, 0) fires as a macrotask before React 18 concurrent renderer commits state.
+  useEffect(() => {
+    if (data) window.print()
+  }, [data])
+
   if (!data) return null
 
   const redemptionCents = Math.round(data.loanAmountCents * (1 + data.interestRate))

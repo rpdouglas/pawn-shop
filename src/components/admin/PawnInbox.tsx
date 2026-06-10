@@ -83,7 +83,6 @@ export default function PawnInbox() {
 
   const handleReadyToPrint = useCallback((data: PrintTicketData) => {
     setPrintTicket(data)
-    setTimeout(() => window.print(), 0)
   }, [])
 
   const handleWalkInSuccess = useCallback((pawnRequestId: string, itemDesc: string, serialBlacklistHit: boolean) => {
