@@ -177,6 +177,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **E111 CLOSED** | E111 | 2026-06-10 |
 | `FIX_PRINT_TICKET_E111` — Diagnosed and fixed E111 regression: logo appeared blank in print preview because `window.print()` fired after the signature preload (cached) but before the logo fetch completed. Replaced single-image preload with `Promise.all([signature, logo]).then(() => window.print())` dual preload. Promoted `@page` rule to top-level CSS (outside `@media print`) to comply with CSS spec and ensure A4 sizing applies in all PDF engines. Decision 0028 logged. | BUGFIX | 2026-06-10 |
 | **FIX_PRINT_TICKET_E111 CLOSED** | BUGFIX | 2026-06-10 |
+| `FIX_PRINT_PAGE_BREAK` — Terms & Conditions still printed on page 1 despite E111's `break-before: page` CSS. Root cause: Blink's print fragmenter doesn't re-evaluate `break-before` on elements whose containing block transitions from `display:none` to `display:block` at print time. Fix: added explicit `<div class="print-page-break" />` sibling before `.print-ticket-agreement` with `break-after: page` in `@media print` — evaluated earlier in Blink's fragmentation pass. Decision 0029 logged. | BUGFIX | 2026-06-10 |
+| **FIX_PRINT_PAGE_BREAK CLOSED** | BUGFIX | 2026-06-10 |
 
 ---
 
@@ -207,4 +209,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + E110 + E111 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF + FIX_PRINT_TICKET_BUGS + FIX_PRINT_TICKET_E111 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + E110 + E111 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF + FIX_PRINT_TICKET_BUGS + FIX_PRINT_TICKET_E111 + FIX_PRINT_PAGE_BREAK CLOSED)*

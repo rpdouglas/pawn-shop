@@ -127,7 +127,12 @@ export default function PrintableTicket({ data }: Props) {
         Annual Percentage Rate (APR): {aprPct}%
       </div>
 
-      {/* Terms & Conditions — starts on page 2 via break-before: page in print.css */}
+      {/* Explicit page-break element — break-after on a preceding sibling is more
+          reliable than break-before on the target in Blink when the container was
+          previously display:none on screen. Both break directions are set. */}
+      <div className="print-page-break" aria-hidden="true" />
+
+      {/* Terms & Conditions — page 2 */}
       <div className="print-ticket-agreement">
         <div className="print-ticket-copy-header">— Page 2 of 2 — Terms &amp; Conditions</div>
         <span className="print-ticket-label">Terms &amp; Conditions</span>

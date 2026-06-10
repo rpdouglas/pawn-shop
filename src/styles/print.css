@@ -130,6 +130,16 @@
     margin: 0 auto 4pt;
   }
 
+  /* Explicit break-after on the preceding sibling — belt-and-suspenders with
+     break-before on the target. Blink handles break-after more reliably than
+     break-before when the container transitions from display:none at print time. */
+  .print-page-break {
+    display: block;
+    height: 0;
+    break-after: page;
+    page-break-after: always;
+  }
+
   .print-ticket-agreement {
     break-before: page;
     page-break-before: always;
