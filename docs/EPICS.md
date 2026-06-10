@@ -1519,6 +1519,17 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 
 ---
 
+### FIX · Print Ticket — Content Invisible on Printed Page
+
+> **Persona Gate:** Staff (admin / manager / inventory_staff) + Makoonsii (printed ticket recipient).
+
+**Root cause:** `index.css @media print` sets `body * { visibility: hidden }` for the QR label print flow. `print.css` restored `display: block !important` on `.print-ticket` but never restored `visibility: visible`. Result: the ticket was laid out and occupying space but invisible to the printer. The browser's native URL header and page-number footer (always printed by the browser engine regardless of CSS) were the only visible output.
+
+- [x] Add `.print-ticket, .print-ticket * { visibility: visible; }` to `@media print` in `src/styles/print.css` `[Staff]` `[Mak]`
+- [x] **FIX_PRINT_TICKET_VISIBILITY CLOSED** | 2026-06-10
+
+---
+
 ### E108 · Server-Side PDF Pawn Tickets (Backlog)
 
 > **Persona Gate — E108:**

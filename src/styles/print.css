@@ -7,6 +7,11 @@
 @media print {
   body > *:not(.print-ticket) { display: none !important; }
 
+  /* index.css sets body * { visibility: hidden } for the QR label flow.
+     Restore visibility explicitly so the ticket content is not invisible. */
+  .print-ticket,
+  .print-ticket * { visibility: visible; }
+
   .print-ticket {
     display: block !important;
     font-family: Georgia, 'Times New Roman', serif;

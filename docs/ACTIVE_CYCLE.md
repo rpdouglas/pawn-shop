@@ -165,6 +165,8 @@ E107 + E109 + FIX_PAWN_LOAN_DEFAULTS · POS Loan Issuance — Digital signature 
 | **E109 CLOSED** | E109 | 2026-06-10 |
 | `FIX_PAWN_LOAN_DEFAULTS` — (1) Removed hardcoded 5%/period default (≈60% APR — above legal cap); replaced with dynamic `calcMaxRatePct` that converts the applicable APR cap (48% for <$1K, 35% for ≥$1K) to a per-period rate using amount and term. Rate auto-populates in onChange handlers; submit-time validation blocks overages. (2) Fixed blank-page print bug: moved `window.print()` from `setTimeout(fn, 0)` into `useEffect` in `PrintableTicket.tsx`. Decision 0023 logged. | BUGFIX | 2026-06-10 |
 | **FIX_PAWN_LOAN_DEFAULTS CLOSED** | BUGFIX | 2026-06-10 |
+| `FIX_PRINT_TICKET_VISIBILITY` — Printed pawn ticket showed browser native header/footer but no ticket content. Root cause: `index.css @media print` sets `body * { visibility: hidden }` for the QR label flow; `print.css` restored `display: block` but never restored `visibility: visible` on `.print-ticket` and its children. Added `.print-ticket, .print-ticket * { visibility: visible; }` to `print.css`. One line, zero regressions. | BUGFIX | 2026-06-10 |
+| **FIX_PRINT_TICKET_VISIBILITY CLOSED** | BUGFIX | 2026-06-10 |
 
 ---
 
@@ -195,4 +197,4 @@ E107 + E109 + FIX_PAWN_LOAN_DEFAULTS · POS Loan Issuance — Digital signature 
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + FIX_PAWN_LOAN_DEFAULTS CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY CLOSED)*
