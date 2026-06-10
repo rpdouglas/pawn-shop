@@ -153,6 +153,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **FIX_SEED_ITEM_VISIBILITY CLOSED** | BUGFIX | 2026-06-10 |
 | `FIX_LOANS_PERMISSIONS` — `useAllLoanTickets` had no `enabled` guard; TanStack Query fired before Firebase confirmed staff custom claims, causing Firestore `isStaff()` to evaluate false → `PERMISSION_DENIED` on `/admin/loans/`. Added `enabled: !!user?.isStaff`. Decision 0016 logged. | BUGFIX | 2026-06-10 |
 | **FIX_LOANS_PERMISSIONS CLOSED** | BUGFIX | 2026-06-10 |
+| `FIX_INVENTORY_BULK_CRUD` — Inventory table batch action bar had no CRUD buttons despite full row-selection support. Added `onBulkDelete`/`onBulkRestore` props, `handleBulkCrud` callback, and Delete/Restore buttons. `showRestoreAction` gates which button shows based on `statusFilter`. Decision 0017 logged. | BUGFIX | 2026-06-10 |
+| **FIX_INVENTORY_BULK_CRUD CLOSED** | BUGFIX | 2026-06-10 |
 
 ---
 
@@ -183,4 +185,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — FIX_LOANS_PERMISSIONS CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — FIX_INVENTORY_BULK_CRUD CLOSED)*

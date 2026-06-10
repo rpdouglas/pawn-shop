@@ -120,6 +120,18 @@ export default function InventoryPage() {
     }
   }
 
+  const handleBulkDelete = async (itemIds: string[]) => {
+    await Promise.all(
+      itemIds.map(id => updateDoc(doc(db, 'items', id), { status: 'deleted', deletedAt: serverTimestamp() }))
+    )
+  }
+
+  const handleBulkRestore = async (itemIds: string[]) => {
+    await Promise.all(
+      itemIds.map(id => updateDoc(doc(db, 'items', id), { status: 'draft', deletedAt: deleteField() }))
+    )
+  }
+
   const handleEmptyRecycleBin = async () => {
     if (!window.confirm("Are you sure you want to permanently delete all items in the Recycle Bin? This cannot be undone.")) return
     try {
@@ -314,6 +326,9 @@ export default function InventoryPage() {
                 onApplyDescription={(id, draft) => handleApplyDescription(draft, id)}
                 onApplyTags={(id, tags) => handleApplyTags(tags, id)}
                 onApplyPrice={(id, low, high) => handleApplyPrice(low, high, id)}
+                onBulkDelete={handleBulkDelete}
+                onBulkRestore={handleBulkRestore}
+                showRestoreAction={statusFilter === 'deleted'}
               />
             )}
 

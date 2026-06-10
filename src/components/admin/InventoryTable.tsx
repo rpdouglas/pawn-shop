@@ -50,6 +50,9 @@ interface InventoryTableProps {
   onApplyDescription: (itemId: string, draft: string) => Promise<void>
   onApplyTags: (itemId: string, tags: string[]) => Promise<void>
   onApplyPrice: (itemId: string, low: number, high: number) => Promise<void>
+  onBulkDelete?: (itemIds: string[]) => Promise<void>
+  onBulkRestore?: (itemIds: string[]) => Promise<void>
+  showRestoreAction?: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -64,6 +67,9 @@ export default function InventoryTable({
   onApplyDescription,
   onApplyTags,
   onApplyPrice,
+  onBulkDelete,
+  onBulkRestore,
+  showRestoreAction = false,
 }: InventoryTableProps) {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'createdAt', desc: true }])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(DEFAULT_HIDDEN_COLUMNS)
@@ -211,6 +217,31 @@ export default function InventoryTable({
         return next
       })
       setBatchError(err instanceof Error ? err.message : 'Batch AI failed.')
+    } finally {
+      setBatchLoading(false)
+    }
+  }, [])
+
+  // ---------------------------------------------------------------------------
+  // Bulk CRUD — delete or restore selected rows
+  // ---------------------------------------------------------------------------
+
+  const handleBulkCrud = useCallback(async (
+    fn: (ids: string[]) => Promise<void>,
+    confirmMsg: string,
+  ) => {
+    const t = tableRef.current
+    if (!t) return
+    const ids = t.getSelectedRowModel().rows.map(r => r.original.id)
+    if (!ids.length) return
+    if (!window.confirm(confirmMsg)) return
+    setBatchLoading(true)
+    setBatchError(null)
+    try {
+      await fn(ids)
+      t.resetRowSelection()
+    } catch (err) {
+      setBatchError(err instanceof Error ? err.message : 'Operation failed.')
     } finally {
       setBatchLoading(false)
     }
@@ -506,6 +537,54 @@ export default function InventoryTable({
           >
             $ Suggest Prices
           </button>
+          {showRestoreAction && onBulkRestore && (
+            <button
+              type="button"
+              disabled={batchLoading}
+              onClick={() => handleBulkCrud(
+                onBulkRestore,
+                `Restore ${selectedCount} item${selectedCount !== 1 ? 's' : ''} to Draft?`,
+              )}
+              style={{
+                minHeight: '36px',
+                padding: '0 var(--space-3)',
+                border: '1px solid var(--color-primary)',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-primary)',
+                fontSize: 'var(--text-small)',
+                cursor: batchLoading ? 'not-allowed' : 'pointer',
+                opacity: batchLoading ? 0.6 : 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Restore
+            </button>
+          )}
+          {!showRestoreAction && onBulkDelete && (
+            <button
+              type="button"
+              disabled={batchLoading}
+              onClick={() => handleBulkCrud(
+                onBulkDelete,
+                `Move ${selectedCount} item${selectedCount !== 1 ? 's' : ''} to the Recycle Bin?`,
+              )}
+              style={{
+                minHeight: '36px',
+                padding: '0 var(--space-3)',
+                border: '1px solid var(--color-error)',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-error)',
+                fontSize: 'var(--text-small)',
+                cursor: batchLoading ? 'not-allowed' : 'pointer',
+                opacity: batchLoading ? 0.6 : 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Delete
+            </button>
+          )}
           <button
             type="button"
             onClick={() => table.resetRowSelection()}

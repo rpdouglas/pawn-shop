@@ -1432,3 +1432,19 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] Decision 0016 logged `[Comp]`
 - [x] **FIX_LOANS_PERMISSIONS CLOSED** | 2026-06-10
 
+---
+
+### FIX · Inventory Table — Bulk Delete / Restore
+
+> **Persona Gate:** Staff (inventory_staff / manager / admin). No customer-facing change.
+
+**Root cause:** `InventoryTable` batch action bar only had AI operations (`onBulkDelete`/`onBulkRestore` props were never defined). Staff could select multiple rows but had no way to act on them with CRUD.
+
+- [x] Add `onBulkDelete`, `onBulkRestore`, `showRestoreAction` props to `InventoryTable` `[Staff]`
+- [x] Add `handleBulkCrud` — confirmation, ID collection, selection reset on success `[Staff]`
+- [x] Add Delete button (error-coloured) and Restore button (primary-coloured) to batch action bar `[Staff]`
+- [x] Add `handleBulkDelete` and `handleBulkRestore` in `InventoryPage`, wired via props `[Staff]`
+- [x] Decision 0017 logged `[Comp]`
+- [x] User guide updated: `admin/inventory.md` — Table View section and Batch Actions `[Staff]`
+- [x] **FIX_INVENTORY_BULK_CRUD CLOSED** | 2026-06-10
+
