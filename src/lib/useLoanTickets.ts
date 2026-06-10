@@ -31,6 +31,7 @@ export function useCustomerLoanTickets() {
 }
 
 export function useAllLoanTickets() {
+  const { user } = useAuth()
   return useQuery({
     queryKey: ['loanTickets', 'all'],
     queryFn: async () => {
@@ -46,6 +47,7 @@ export function useAllLoanTickets() {
         } as LoanTicket
       })
     },
+    enabled: !!user?.isStaff,
     staleTime: 60 * 1000
   })
 }

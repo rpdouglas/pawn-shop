@@ -1420,3 +1420,15 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] User guide updated: `admin/inventory.md` `[Staff]`
 - [x] **FIX_SEED_ITEM_VISIBILITY CLOSED** | 2026-06-10
 
+---
+
+### FIX · Loans Permissions — Admin Loans Page PERMISSION_DENIED
+
+> **Persona Gate:** Staff (admin / manager / inventory_staff). No customer-facing change.
+
+**Root cause:** `useAllLoanTickets` had no `enabled` guard. TanStack Query fired `queryFn` immediately on mount, before Firebase auth confirmed staff custom claims. Firestore evaluated `isStaff()` as false → `PERMISSION_DENIED` on the unbounded collection read.
+
+- [x] Add `enabled: !!user?.isStaff` guard to `useAllLoanTickets` in `src/lib/useLoanTickets.ts` `[Staff]`
+- [x] Decision 0016 logged `[Comp]`
+- [x] **FIX_LOANS_PERMISSIONS CLOSED** | 2026-06-10
+

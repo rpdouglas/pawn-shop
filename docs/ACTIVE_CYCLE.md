@@ -151,6 +151,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E106 CLOSED** | E106 | 2026-06-09 |
 | `FIX_SEED_ITEM_VISIBILITY` — Admin inventory query had `limit(50)` hiding 36 fake seed items (added 2026-05-18) from admin view while they remained visible on public storefront pages. Raised limit to 500. Created `scripts/find-seed-items.mjs` fingerprint script — identified all 36 seed items by picsum.photos image, template description, and seed title. Decision 0015 logged. | BUGFIX | 2026-06-10 |
 | **FIX_SEED_ITEM_VISIBILITY CLOSED** | BUGFIX | 2026-06-10 |
+| `FIX_LOANS_PERMISSIONS` — `useAllLoanTickets` had no `enabled` guard; TanStack Query fired before Firebase confirmed staff custom claims, causing Firestore `isStaff()` to evaluate false → `PERMISSION_DENIED` on `/admin/loans/`. Added `enabled: !!user?.isStaff`. Decision 0016 logged. | BUGFIX | 2026-06-10 |
+| **FIX_LOANS_PERMISSIONS CLOSED** | BUGFIX | 2026-06-10 |
 
 ---
 
@@ -181,4 +183,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — FIX_SEED_ITEM_VISIBILITY CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — FIX_LOANS_PERMISSIONS CLOSED)*
