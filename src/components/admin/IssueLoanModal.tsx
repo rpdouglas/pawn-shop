@@ -189,7 +189,7 @@ export default function IssueLoanModal({
         loanAmountCents: amountCents,
         interestRate: ratePct / 100,
         periodDays: days,
-        dueDate: new Date(result.dueDate),
+        dueDate: result.dueDate ? new Date(result.dueDate) : new Date(Date.now() + days * 24 * 60 * 60 * 1000),
         agreedItemValueCents: agreedValueCents,
       })
       setStep('sign')

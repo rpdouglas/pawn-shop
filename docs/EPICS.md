@@ -1542,6 +1542,19 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 
 ---
 
+### FIX · Print Ticket — Invalid Date & Missing Signature Image
+
+> **Persona Gate:** Staff (admin / manager / inventory_staff) + Makoonsii (printed ticket recipient).
+
+**Root causes:** (1) `result.dueDate` is absent from pre-E110 CF responses; `new Date(undefined)` → `"Invalid Date"`. (2) `window.print()` fires after React's DOM commit but before the browser fetches the remote Firebase Storage signature URL — print dialog captures the img tag blank.
+
+- [x] `IssueLoanModal.tsx`: defensive fallback `result.dueDate ? new Date(result.dueDate) : client-side-computation` `[Staff]`
+- [x] `PrintableTicket.tsx`: preload signature image via hidden `Image()` before calling `window.print()`; `onerror` still triggers print `[Staff]` `[Mak]`
+- [x] Decision 0026 logged `[Comp]`
+- [x] **FIX_PRINT_TICKET_BUGS CLOSED** | 2026-06-10
+
+---
+
 ### E110 · Pawn Compliance — Intake Forms & Printed Ticket
 
 > **Persona Gate — E110:**

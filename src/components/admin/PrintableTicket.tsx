@@ -8,9 +8,15 @@ interface Props {
 }
 
 export default function PrintableTicket({ data }: Props) {
-  // useEffect runs after React commits the DOM — guarantees portal is rendered before print dialog opens.
+  // Preload the signature image before opening the print dialog.
+  // window.print() fires synchronously, so remote images not yet in cache are blank.
+  // Creating a hidden Image() forces the browser to fetch and cache it first.
   useEffect(() => {
-    if (data) window.print()
+    if (!data) return
+    const img = new window.Image()
+    img.onload = () => window.print()
+    img.onerror = () => window.print()
+    img.src = data.signatureUrl
   }, [data])
 
   if (!data) return null

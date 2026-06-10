@@ -171,6 +171,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **FIX_PRINT_TICKET_PDF CLOSED** | BUGFIX | 2026-06-10 |
 | `E110 Pawn Compliance — Intake Forms & Printed Ticket` — Closed all 10 compliance gaps from the gap analysis. APR disclosure on ticket (SOR/2024-114); agreed item value (25 CFR §141.35); sole-recourse + police hold + age/ownership declaration in ticket terms; structured item details at intake (category, make/model, colour, condition, notableMarkings) in both walk-in and online forms; ID type + verified checkboxes at issuance and walk-in intake; `createLoanTicket` CF hardened (removed `?? 0.05` default, now throws on missing rate), copies structured fields + serial to loanTickets, records `issuedByDisplayName`, returns server-side dueDate; reprint path passes all fields through. 15 files updated. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decisions 0025 logged. | E110 | 2026-06-10 |
 | **E110 CLOSED** | E110 | 2026-06-10 |
+| `FIX_PRINT_TICKET_BUGS` — (1) Invalid Date: `result.dueDate` absent on pre-E110 CF builds; `new Date(undefined)` → `"Invalid Date"`. Fixed with `result.dueDate ? new Date(result.dueDate) : client-side-fallback`. (2) Blank signature: `window.print()` fired before browser fetched remote Storage URL. Fixed by preloading via hidden `Image()` and calling `window.print()` only in `img.onload`. Decision 0026 logged. | BUGFIX | 2026-06-10 |
+| **FIX_PRINT_TICKET_BUGS CLOSED** | BUGFIX | 2026-06-10 |
 
 ---
 
@@ -201,4 +203,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + E110 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + E110 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF + FIX_PRINT_TICKET_BUGS CLOSED)*
