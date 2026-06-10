@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { collection, query, orderBy, limit, onSnapshot, serverTimestamp, deleteField } from 'firebase/firestore'
 import { updateDoc, doc, arrayUnion } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
@@ -6,14 +6,21 @@ import { Link } from 'react-router-dom'
 import { db, functions } from '../../lib/firebase'
 import { docToItem } from '../../hooks/useItems'
 import { useAuth } from '../../context/AuthContext'
-import { formatPrice } from '../../lib/format'
 import ProtectedRoute from '../../components/auth/ProtectedRoute'
-import Badge from '../../components/ui/Badge'
 import AiAssistantPanel from '../../components/admin/AiAssistantPanel'
 import MarkdownConfigPanel from '../../components/admin/MarkdownConfigPanel'
-import QuantityAdjustControl from '../../components/admin/QuantityAdjustControl'
-import InventoryTable from '../../components/admin/InventoryTable'
+import InventoryTable, { type GroupBy } from '../../components/admin/InventoryTable'
+import InventoryCard from '../../components/admin/InventoryCard'
 import type { Item, ItemStatus } from '../../lib/types'
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const LS_VIEW_MODE   = 'inventory:viewMode'
+const LS_GROUP_BY    = 'inventory:groupBy'
+const LS_STATUS      = 'inventory:statusFilter'
+const LS_COLLAPSED   = 'inventory:collapsedGroups'
 
 const STATUS_FILTERS: Array<{ value: 'all' | ItemStatus; label: string }> = [
   { value: 'all',      label: 'All' },
@@ -24,6 +31,38 @@ const STATUS_FILTERS: Array<{ value: 'all' | ItemStatus; label: string }> = [
   { value: 'deleted',  label: 'Recycle Bin' },
 ]
 
+const GROUP_BY_OPTIONS: Array<{ value: GroupBy; label: string }> = [
+  { value: 'viewTag',  label: 'View Tag' },
+  { value: 'category', label: 'Category' },
+  { value: 'status',   label: 'Status' },
+  { value: 'none',     label: 'None' },
+]
+
+const GROUP_DISPLAY_ORDER: Partial<Record<GroupBy, Record<string, number>>> = {
+  viewTag: { pawn: 0, cannabis: 1, fireworks: 2, tobacco: 3, other: 4 },
+  status:  { draft: 0, active: 1, reserved: 2, sold: 3, archived: 4, deleted: 5 },
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function getItemGroupKey(item: Item, by: GroupBy): string {
+  if (by === 'viewTag')  return item.viewTag  || 'other'
+  if (by === 'category') return item.category || 'uncategorized'
+  if (by === 'status')   return item.status
+  return '__all__'
+}
+
+function formatGroupLabel(key: string): string {
+  if (key === 'uncategorized') return 'Uncategorized'
+  return key.charAt(0).toUpperCase() + key.slice(1).replace(/-/g, ' ')
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
 export default function InventoryPage() {
   const { user } = useAuth()
   const [items, setItems] = useState<Item[]>([])
@@ -31,18 +70,49 @@ export default function InventoryPage() {
   const [error, setError] = useState<string | null>(null)
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<'all' | ItemStatus>('all')
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
+
+  // Persisted UI state
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() => {
+    const s = localStorage.getItem(LS_VIEW_MODE)
+    return s === 'table' ? 'table' : 'grid'
+  })
+  const [groupBy, setGroupBy] = useState<GroupBy>(() => {
+    const s = localStorage.getItem(LS_GROUP_BY)
+    const valid: GroupBy[] = ['none', 'viewTag', 'category', 'status']
+    return valid.includes(s as GroupBy) ? (s as GroupBy) : 'viewTag'
+  })
+  const [statusFilter, setStatusFilter] = useState<'all' | ItemStatus>(() => {
+    const s = localStorage.getItem(LS_STATUS)
+    const valid = ['all', 'active', 'draft', 'reserved', 'sold', 'deleted']
+    return valid.includes(s ?? '') ? (s as 'all' | ItemStatus) : 'all'
+  })
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => {
+    try {
+      const s = localStorage.getItem(LS_COLLAPSED)
+      return s ? new Set(JSON.parse(s) as string[]) : new Set<string>()
+    } catch {
+      return new Set<string>()
+    }
+  })
+
+  // Persist on change
+  useEffect(() => { localStorage.setItem(LS_VIEW_MODE, viewMode) }, [viewMode])
+  useEffect(() => { localStorage.setItem(LS_GROUP_BY, groupBy) }, [groupBy])
+  useEffect(() => { localStorage.setItem(LS_STATUS, statusFilter) }, [statusFilter])
+  useEffect(() => {
+    localStorage.setItem(LS_COLLAPSED, JSON.stringify([...collapsedGroups]))
+  }, [collapsedGroups])
+
+  // ---------------------------------------------------------------------------
+  // AI apply handlers (table mode)
+  // ---------------------------------------------------------------------------
 
   const handleApplyTitle = async (title: string, itemId?: string) => {
     const id = itemId ?? selectedItem?.id
     if (!id) return
     try {
       await updateDoc(doc(db, 'items', id), { title })
-      alert('Title applied!')
-    } catch {
-      alert('Failed to apply title.')
-    }
+    } catch { /* silent */ }
   }
 
   const handleApplyCategory = async (category: string, itemId?: string) => {
@@ -50,10 +120,7 @@ export default function InventoryPage() {
     if (!id) return
     try {
       await updateDoc(doc(db, 'items', id), { category })
-      alert('Category applied!')
-    } catch {
-      alert('Failed to apply category.')
-    }
+    } catch { /* silent */ }
   }
 
   const handleApplyDescription = async (draft: string, itemId?: string) => {
@@ -61,10 +128,7 @@ export default function InventoryPage() {
     if (!id) return
     try {
       await updateDoc(doc(db, 'items', id), { description: draft })
-      alert('Description promoted!')
-    } catch {
-      alert('Failed to promote description.')
-    }
+    } catch { /* silent */ }
   }
 
   const handleApplyTags = async (tags: string[], itemId?: string) => {
@@ -72,10 +136,7 @@ export default function InventoryPage() {
     if (!id) return
     try {
       await updateDoc(doc(db, 'items', id), { merchandisingTags: arrayUnion(...tags) })
-      alert('Tags applied!')
-    } catch {
-      alert('Failed to apply tags.')
-    }
+    } catch { /* silent */ }
   }
 
   const handleApplyPrice = async (low: number, high: number, itemId?: string) => {
@@ -84,98 +145,101 @@ export default function InventoryPage() {
     const midpoint = Math.floor((low + high) / 2)
     try {
       await updateDoc(doc(db, 'items', id), { price: midpoint })
-      alert('Midpoint price applied!')
-    } catch {
-      alert('Failed to apply price.')
-    }
+    } catch { /* silent */ }
   }
 
-  const handleArchive = async (item: Item, e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!window.confirm(`Archive "${item.title}"?`)) return
-    try {
-      await updateDoc(doc(db, 'items', item.id), { status: 'archived' })
-    } catch (err) {
-      alert(`Failed to archive: ${err instanceof Error ? err.message : 'Unknown error'}`)
-    }
-  }
-
-  const handleDelete = async (item: Item, e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!window.confirm(`Move "${item.title}" to the Recycle Bin?`)) return
-    try {
-      await updateDoc(doc(db, 'items', item.id), { status: 'deleted', deletedAt: serverTimestamp() })
-      if (selectedItem?.id === item.id) setSelectedItem(null)
-    } catch (err) {
-      alert(`Failed to move to recycle bin: ${err instanceof Error ? err.message : 'Unknown error'}`)
-    }
-  }
-
-  const handleRestore = async (item: Item, e: React.MouseEvent) => {
-    e.stopPropagation()
-    try {
-      await updateDoc(doc(db, 'items', item.id), { status: 'draft', deletedAt: deleteField() })
-    } catch (err) {
-      alert(`Failed to restore: ${err instanceof Error ? err.message : 'Unknown error'}`)
-    }
-  }
+  // ---------------------------------------------------------------------------
+  // Bulk operations (table mode batch action bar)
+  // ---------------------------------------------------------------------------
 
   const handleBulkDelete = async (itemIds: string[]) => {
     await Promise.all(
-      itemIds.map(id => updateDoc(doc(db, 'items', id), { status: 'deleted', deletedAt: serverTimestamp() }))
+      itemIds.map(id =>
+        updateDoc(doc(db, 'items', id), { status: 'deleted', deletedAt: serverTimestamp() }),
+      ),
     )
   }
 
   const handleBulkRestore = async (itemIds: string[]) => {
     await Promise.all(
-      itemIds.map(id => updateDoc(doc(db, 'items', id), { status: 'draft', deletedAt: deleteField() }))
+      itemIds.map(id =>
+        updateDoc(doc(db, 'items', id), { status: 'draft', deletedAt: deleteField() }),
+      ),
     )
   }
 
   const handleEmptyRecycleBin = async () => {
-    if (!window.confirm("Are you sure you want to permanently delete all items in the Recycle Bin? This cannot be undone.")) return
+    if (!window.confirm('Permanently delete all items in the Recycle Bin? This cannot be undone.')) return
     try {
       setLoading(true)
       const clearRecycleBin = httpsCallable(functions, 'clearRecycleBin')
       await clearRecycleBin()
-      alert('Recycle Bin emptied.')
-    } catch (err) {
-      alert(`Failed to empty recycle bin: ${err instanceof Error ? err.message : 'Unknown error'}`)
-    } finally {
+    } catch { /* silent */ } finally {
       setLoading(false)
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Firestore listener
+  // ---------------------------------------------------------------------------
 
   useEffect(() => {
-    const q = query(
-      collection(db, 'items'),
-      orderBy('createdAt', 'desc'),
-      limit(500)
-    )
+    const q = query(collection(db, 'items'), orderBy('createdAt', 'desc'), limit(500))
     const unsubscribe = onSnapshot(
       q,
-      (snap) => {
+      snap => {
         setItems(snap.docs.map(docToItem))
         setLoading(false)
       },
-      (err) => {
+      err => {
         setError(err.message)
         setLoading(false)
-      }
+      },
     )
     return unsubscribe
   }, [])
 
+  // ---------------------------------------------------------------------------
+  // Filtered + grouped items
+  // ---------------------------------------------------------------------------
+
   const filteredItems = items.filter(item => {
     const matchesSearch = !searchQuery || item.title.toLowerCase().includes(searchQuery.toLowerCase())
-    
     if (statusFilter !== 'deleted' && item.status === 'deleted') return false
-    
     const matchesStatus = statusFilter === 'all' || item.status === statusFilter
-    
     return matchesSearch && matchesStatus
   })
+
+  // Groups for grid mode (memoised)
+  const gridGroups = useMemo(() => {
+    if (groupBy === 'none') return null
+
+    const map = new Map<string, Item[]>()
+    for (const item of filteredItems) {
+      const key = getItemGroupKey(item, groupBy)
+      if (!map.has(key)) map.set(key, [])
+      map.get(key)!.push(item)
+    }
+
+    const order = GROUP_DISPLAY_ORDER[groupBy] ?? {}
+    const keys = [...map.keys()].sort(
+      (a, b) => (order[a] ?? 999) - (order[b] ?? 999) || a.localeCompare(b),
+    )
+    return keys.map(k => ({ key: k, items: map.get(k)! }))
+  }, [filteredItems, groupBy])
+
+  const toggleCollapsed = (key: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
 
   return (
     <ProtectedRoute staffOnly>
@@ -205,7 +269,9 @@ export default function InventoryPage() {
         )}
 
         {loading ? (
-          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)' }}>Loading inventory…</p>
+          <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)' }}>
+            Loading inventory…
+          </p>
         ) : (
           <div>
             {/* Search */}
@@ -230,7 +296,16 @@ export default function InventoryPage() {
               }}
             />
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+            {/* Toolbar row */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 'var(--space-6)',
+              gap: 'var(--space-3)',
+              flexWrap: 'wrap',
+            }}>
+              {/* Status filters */}
               <div
                 role="group"
                 aria-label="Filter by status"
@@ -253,8 +328,12 @@ export default function InventoryPage() {
                       padding: '0 var(--space-4)',
                       borderRadius: 'var(--radius-lg)',
                       border: '1px solid var(--color-border)',
-                      backgroundColor: statusFilter === f.value ? 'var(--color-primary)' : 'var(--color-surface)',
-                      color: statusFilter === f.value ? 'var(--color-on-primary)' : 'var(--color-text-muted)',
+                      backgroundColor: statusFilter === f.value
+                        ? 'var(--color-primary)'
+                        : 'var(--color-surface)',
+                      color: statusFilter === f.value
+                        ? 'var(--color-on-primary)'
+                        : 'var(--color-text-muted)',
                       fontFamily: 'var(--font-body)',
                       fontSize: 'var(--text-small)',
                       cursor: 'pointer',
@@ -265,13 +344,52 @@ export default function InventoryPage() {
                   </button>
                 ))}
               </div>
-              
-              <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0 }}>
+
+              {/* Right-side controls */}
+              <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0, alignItems: 'center' }}>
+                {/* Group by */}
+                <label style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)',
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--color-text-muted)',
+                  fontFamily: 'var(--font-body)',
+                  whiteSpace: 'nowrap',
+                }}>
+                  Group by
+                  <select
+                    value={groupBy}
+                    onChange={e => setGroupBy(e.target.value as GroupBy)}
+                    aria-label="Group inventory by"
+                    style={{
+                      minHeight: '36px',
+                      padding: '0 var(--space-3)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: 'var(--color-surface)',
+                      color: 'var(--color-text)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 'var(--text-xs)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {GROUP_BY_OPTIONS.map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </label>
+
                 {/* View mode toggle */}
                 <div
                   role="group"
                   aria-label="View mode"
-                  style={{ display: 'flex', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}
+                  style={{
+                    display: 'flex',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-sm)',
+                    overflow: 'hidden',
+                  }}
                 >
                   {(['grid', 'table'] as const).map(mode => (
                     <button
@@ -283,8 +401,12 @@ export default function InventoryPage() {
                         minHeight: '36px',
                         padding: '0 var(--space-3)',
                         border: 'none',
-                        backgroundColor: viewMode === mode ? 'var(--color-primary)' : 'var(--color-surface)',
-                        color: viewMode === mode ? 'var(--color-on-primary)' : 'var(--color-text-muted)',
+                        backgroundColor: viewMode === mode
+                          ? 'var(--color-primary)'
+                          : 'var(--color-surface)',
+                        color: viewMode === mode
+                          ? 'var(--color-on-primary)'
+                          : 'var(--color-text-muted)',
                         fontFamily: 'var(--font-body)',
                         fontSize: 'var(--text-xs)',
                         cursor: 'pointer',
@@ -307,7 +429,7 @@ export default function InventoryPage() {
                       borderRadius: 'var(--radius-md)',
                       cursor: 'pointer',
                       fontWeight: 'bold',
-                      fontSize: 'var(--text-small)'
+                      fontSize: 'var(--text-small)',
                     }}
                   >
                     Empty Recycle Bin
@@ -316,11 +438,12 @@ export default function InventoryPage() {
               </div>
             </div>
 
-            {/* Table View */}
+            {/* ---- Table View ---- */}
             {viewMode === 'table' && (
               <InventoryTable
                 items={filteredItems}
                 isAdmin={user?.isAdmin ?? false}
+                groupBy={groupBy}
                 onApplyTitle={(id, title) => handleApplyTitle(title, id)}
                 onApplyCategory={(id, category) => handleApplyCategory(category, id)}
                 onApplyDescription={(id, draft) => handleApplyDescription(draft, id)}
@@ -332,186 +455,156 @@ export default function InventoryPage() {
               />
             )}
 
-            {/* Grouped Grid View */}
-            {viewMode === 'grid' && filteredItems.length === 0 ? (
-              <p style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)', textAlign: 'center', padding: 'var(--space-12) 0' }}>
-                No items match your search.
-              </p>
-            ) : viewMode === 'grid' ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
-                {['pawn', 'cannabis', 'fireworks', 'other'].map(group => {
-                  const groupItems = filteredItems.filter(item => {
-                    if (group === 'other') return !['pawn', 'cannabis', 'fireworks'].includes(item.viewTag || '');
-                    return item.viewTag === group;
-                  })
-
-                  if (groupItems.length === 0) return null;
-
-                  return (
-                    <section key={group}>
-                      <h2 style={{
-                        fontFamily: 'var(--font-display)',
-                        fontSize: 'var(--text-lg)',
-                        color: 'var(--color-primary)',
-                        marginBottom: 'var(--space-4)',
-                        textTransform: 'capitalize',
-                        borderBottom: '1px solid var(--color-border)',
-                        paddingBottom: 'var(--space-2)'
-                      }}>
-                        {group} Inventory
-                      </h2>
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                        gap: 'var(--space-4)'
-                      }}>
-                        {groupItems.map(item => (
-                          <div
-                            key={item.id}
+            {/* ---- Grid View ---- */}
+            {viewMode === 'grid' && (
+              filteredItems.length === 0 ? (
+                <p style={{
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text-muted)',
+                  textAlign: 'center',
+                  padding: 'var(--space-12) 0',
+                }}>
+                  No items match your search.
+                </p>
+              ) : gridGroups !== null ? (
+                /* Grouped grid */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+                  {gridGroups.map(({ key, items: groupItems }) => {
+                    const isCollapsed = collapsedGroups.has(key)
+                    return (
+                      <section key={key}>
+                        <button
+                          type="button"
+                          onClick={() => toggleCollapsed(key)}
+                          aria-expanded={!isCollapsed}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 'var(--space-3)',
+                            width: '100%',
+                            textAlign: 'left',
+                            background: 'none',
+                            border: 'none',
+                            borderBottom: '1px solid var(--color-border)',
+                            paddingBottom: 'var(--space-2)',
+                            marginBottom: 'var(--space-4)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <span
                             style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              padding: 'var(--space-4)',
-                              backgroundColor: 'var(--color-surface)',
-                              borderRadius: 'var(--radius-md)',
-                              border: selectedItem?.id === item.id ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                              position: 'relative'
+                              fontSize: 'var(--text-xs)',
+                              color: 'var(--color-text-muted)',
+                              display: 'inline-block',
+                              transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+                              transition: `transform var(--motion-speed-fast) var(--motion-easing)`,
                             }}
-                            onClick={() => setSelectedItem(selectedItem?.id === item.id ? null : item)}
                           >
-                            <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-                              {item.images?.[0] ? (
-                                <img
-                                  src={item.images[0]}
-                                  alt=""
-                                  aria-hidden="true"
-                                  style={{
-                                    width: '80px',
-                                    height: '80px',
-                                    objectFit: 'cover',
-                                    borderRadius: 'var(--radius-sm)',
-                                    flexShrink: 0,
-                                  }}
-                                />
-                              ) : (
-                                <div style={{ width: '80px', height: '80px', backgroundColor: 'var(--color-bg)', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
-                              )}
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{
-                                  fontFamily: 'var(--font-body)',
-                                  fontSize: 'var(--text-small)',
-                                  fontWeight: 500,
-                                  color: 'var(--color-text)',
-                                  margin: '0 0 var(--space-2)',
-                                  whiteSpace: 'nowrap',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                }}>
-                                  {item.title}
-                                </p>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                                  <Badge variant={item.status} label={item.status} />
-                                  {item.policeHold && (
-                                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-error)', fontWeight: 'bold' }}>HOLD</span>
-                                  )}
-                                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', textTransform: 'capitalize' }}>
-                                    {item.condition || 'Unknown Condition'}
-                                  </span>
-                                </div>
-                                <div style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-md)', fontWeight: 'bold', color: 'var(--color-text)' }}>
-                                  {formatPrice(item.price)}
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div onClick={e => e.stopPropagation()} style={{ marginBottom: 'var(--space-4)' }}>
-                              {item.quantity !== undefined ? (
-                                <QuantityAdjustControl
-                                  itemId={item.id}
-                                  quantity={item.quantity}
-                                  compact
-                                />
-                              ) : (
-                                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>No stock tracking</span>
-                              )}
-                            </div>
+                            ▼
+                          </span>
+                          <h2 style={{
+                            fontFamily: 'var(--font-display)',
+                            fontSize: 'var(--text-lg)',
+                            color: 'var(--color-primary)',
+                            margin: 0,
+                            textTransform: 'capitalize',
+                            flex: 1,
+                          }}>
+                            {formatGroupLabel(key)}
+                          </h2>
+                          <span style={{
+                            fontSize: 'var(--text-xs)',
+                            color: 'var(--color-text-muted)',
+                            backgroundColor: 'var(--color-surface)',
+                            padding: `2px var(--space-2)`,
+                            borderRadius: 'var(--radius-sm)',
+                            border: '1px solid var(--color-border)',
+                          }}>
+                            {groupItems.length}
+                          </span>
+                        </button>
 
-                            <div style={{ marginTop: 'auto', display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-                              <Link
-                                to={`/admin/mobile-intake/edit/${item.id}`}
-                                className="btn btn-secondary btn-sm"
-                                onClick={(e) => e.stopPropagation()}
-                                style={{ padding: '0 var(--space-2)', minHeight: '32px', textDecoration: 'none', display: 'flex', alignItems: 'center' }}
-                              >
-                                Edit
-                              </Link>
-                              {item.status === 'deleted' ? (
-                                <button
-                                  type="button"
-                                  className="btn btn-secondary btn-sm"
-                                  onClick={(e) => handleRestore(item, e)}
-                                  style={{ padding: '0 var(--space-2)', minHeight: '32px', color: 'var(--color-primary)' }}
-                                >
-                                  Restore
-                                </button>
-                              ) : (
-                                <>
-                                  <button
-                                    type="button"
-                                    className="btn btn-secondary btn-sm"
-                                    onClick={(e) => handleArchive(item, e)}
-                                    style={{ padding: '0 var(--space-2)', minHeight: '32px' }}
-                                  >
-                                    Archive
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="btn btn-secondary btn-sm"
-                                    onClick={(e) => handleDelete(item, e)}
-                                    style={{ padding: '0 var(--space-2)', minHeight: '32px', color: 'var(--color-error)' }}
-                                  >
-                                    Delete
-                                  </button>
-                                </>
-                              )}
-                            </div>
+                        {!isCollapsed && (
+                          <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                            gap: 'var(--space-4)',
+                          }}>
+                            {groupItems.map(item => (
+                              <InventoryCard
+                                key={item.id}
+                                item={item}
+                                onOpenDrawer={setSelectedItem}
+                              />
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </section>
-                  )
-                })}
-              </div>
-            ) : null}
+                        )}
+                      </section>
+                    )
+                  })}
+                </div>
+              ) : (
+                /* Flat grid (groupBy === 'none') */
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                  gap: 'var(--space-4)',
+                }}>
+                  {filteredItems.map(item => (
+                    <InventoryCard
+                      key={item.id}
+                      item={item}
+                      onOpenDrawer={setSelectedItem}
+                    />
+                  ))}
+                </div>
+              )
+            )}
 
-            {/* AI Assistant Drawer */}
-            {selectedItem && (
+            {/* ---- AI Assistant Drawer (grid mode) ---- */}
+            {selectedItem && viewMode === 'grid' && (
               <>
-                <div 
+                <div
                   style={{
-                    position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 999
+                    position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 999,
                   }}
                   onClick={() => setSelectedItem(null)}
                 />
-                <aside style={{ 
-                  position: 'fixed', 
-                  top: 0, right: 0, bottom: 0, 
-                  width: '400px', 
+                <aside style={{
+                  position: 'fixed',
+                  top: 0, right: 0, bottom: 0,
+                  width: '400px',
                   maxWidth: '100vw',
                   backgroundColor: 'var(--color-bg)',
                   boxShadow: '-4px 0 24px rgba(0,0,0,0.2)',
                   zIndex: 1000,
                   overflowY: 'auto',
                   borderLeft: '1px solid var(--color-border)',
-                  animation: 'slideInRight 0.3s ease-out'
+                  animation: 'slideInRight 0.3s ease-out',
                 }}>
-                  <div style={{ padding: 'var(--space-4)', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, backgroundColor: 'var(--color-bg)', zIndex: 10 }}>
-                    <h2 style={{ fontSize: 'var(--text-md)', fontWeight: 'bold', color: 'var(--color-text)' }}>AI Assistant</h2>
-                    <button 
+                  <div style={{
+                    padding: 'var(--space-4)',
+                    borderBottom: '1px solid var(--color-border)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    position: 'sticky',
+                    top: 0,
+                    backgroundColor: 'var(--color-bg)',
+                    zIndex: 10,
+                  }}>
+                    <div>
+                      <h2 style={{ fontSize: 'var(--text-small)', fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
+                        AI Assistant
+                      </h2>
+                      <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: 0, marginTop: 'var(--space-1)' }}>
+                        {selectedItem.title}
+                      </p>
+                    </div>
+                    <button
                       onClick={() => setSelectedItem(null)}
                       style={{ background: 'none', border: 'none', fontSize: 'var(--text-lg)', cursor: 'pointer', color: 'var(--color-text-muted)' }}
+                      aria-label="Close AI assistant"
                     >
                       &times;
                     </button>

@@ -963,6 +963,31 @@
 
 ---
 
+### E112 · Inventory UX: Grouping, Collapsible Sections & Grid Inline Edit
+
+> **Persona Gate — E112:**
+> - **Staff (Primary):** Group by viewTag/category/status, collapse groups, edit fields inline on grid cards. localStorage persistence so view state survives navigation.
+> - **Makoonsii (Touch Standard applied to staff tools):** ≥48px action buttons on all cards. Plain-language labels ("Archive", not "Soft Delete").
+> - **Marcus (Indirect):** 80px thumbnail on each card supports rapid photography review passes.
+> - **Dale / Kevin (Indirect):** Faster staff status transitions → fresher public listings → 60s alert SLA easier to maintain.
+
+- [x] Add `GroupBy` type export to `InventoryTable.tsx` (`'none' | 'viewTag' | 'category' | 'status'`) `[Staff]`
+- [x] Manual client-side group rendering in table mode with collapsible headers + chevron animation `[Staff]`
+- [x] `GROUP_DISPLAY_ORDER` — status: draft→active→reserved→sold→archived→deleted; viewTag: pawn→cannabis→fireworks→tobacco→other `[Staff]`
+- [x] New `InventoryCard.tsx` — inline-editable grid card reusing `TextCellEditor`, `SelectCellEditor`, `PriceCellEditor` from CellEditors `[Staff]` `[Mak]`
+- [x] Card actions: Archive, Delete, Restore, Full Edit link — all `minHeight: 48px` `[Staff]` `[Mak]`
+- [x] AI Assistant drawer trigger on card thumbnail click `[Staff]`
+- [x] `QuantityAdjustControl` rendered on card when `item.quantity` is set `[Staff]`
+- [x] `InventoryPage.tsx` — `groupBy` dropdown (None / View Tag / Category / Status) `[Staff]`
+- [x] `InventoryPage.tsx` — `collapsedGroups: Set<string>` state, toggled per group key `[Staff]`
+- [x] localStorage persistence for `viewMode`, `groupBy`, `statusFilter`, `collapsedGroups` `[Staff]`
+- [x] `InventoryPage.tsx` renders `InventoryCard` in grid mode with dynamic grouped sections `[Staff]`
+- [x] `groupBy` prop wired into `InventoryTable` for table mode grouping `[Staff]`
+- [x] Decision 0030 logged `[Comp]`
+- [x] **E112 CLOSED** | 2026-06-10
+
+---
+
 ### E33 · Staff Pick-Path Optimizer
 
 > **Persona Gate — E33:**

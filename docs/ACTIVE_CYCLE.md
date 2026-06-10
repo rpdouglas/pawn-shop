@@ -179,6 +179,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **FIX_PRINT_TICKET_E111 CLOSED** | BUGFIX | 2026-06-10 |
 | `FIX_PRINT_PAGE_BREAK` — Terms & Conditions still printed on page 1 despite E111's `break-before: page` CSS. Root cause: Blink's print fragmenter doesn't re-evaluate `break-before` on elements whose containing block transitions from `display:none` to `display:block` at print time. Fix: added explicit `<div class="print-page-break" />` sibling before `.print-ticket-agreement` with `break-after: page` in `@media print` — evaluated earlier in Blink's fragmentation pass. Decision 0029 logged. | BUGFIX | 2026-06-10 |
 | **FIX_PRINT_PAGE_BREAK CLOSED** | BUGFIX | 2026-06-10 |
+| `E112 Inventory UX: Grouping, Collapsible Sections & Grid Inline Edit` — Added `GroupBy` type and manual client-side group rendering (table mode) with collapsible headers, chevron animation, and workflow-ordered status/viewTag groups. New `InventoryCard.tsx` with inline-editable title/status/condition/price via existing CellEditors; 48px action buttons; AI drawer trigger; `QuantityAdjustControl`. `InventoryPage.tsx` gained `groupBy` dropdown, `collapsedGroups` state, and localStorage persistence for all four view-state keys (`viewMode`, `groupBy`, `statusFilter`, `collapsedGroups`). No new dependencies. Decision 0030 logged. | E112 | 2026-06-10 |
+| **E112 CLOSED** | E112 | 2026-06-10 |
 
 ---
 
@@ -209,4 +211,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + E110 + E111 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF + FIX_PRINT_TICKET_BUGS + FIX_PRINT_TICKET_E111 + FIX_PRINT_PAGE_BREAK CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 33 — E112 CLOSED)*

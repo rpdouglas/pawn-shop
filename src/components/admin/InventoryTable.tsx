@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, type Dispatch, type SetStateAction, type ReactNode } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -8,7 +8,31 @@ import {
   type VisibilityState,
   type RowSelectionState,
   type Table,
+  type Row,
 } from '@tanstack/react-table'
+
+// ---------------------------------------------------------------------------
+// GroupBy — exported so InventoryPage can share the type
+// ---------------------------------------------------------------------------
+
+export type GroupBy = 'none' | 'viewTag' | 'category' | 'status'
+
+const GROUP_DISPLAY_ORDER: Partial<Record<GroupBy, Record<string, number>>> = {
+  status:  { draft: 0, active: 1, reserved: 2, sold: 3, archived: 4, deleted: 5 },
+  viewTag: { pawn: 0, cannabis: 1, fireworks: 2, tobacco: 3, other: 4 },
+}
+
+function groupKey(item: Item, by: GroupBy): string {
+  if (by === 'viewTag')  return item.viewTag  || 'other'
+  if (by === 'category') return item.category || 'uncategorized'
+  if (by === 'status')   return item.status
+  return '__all__'
+}
+
+function formatGroupLabel(key: string): string {
+  if (key === 'uncategorized') return 'Uncategorized'
+  return key.charAt(0).toUpperCase() + key.slice(1).replace(/-/g, ' ')
+}
 import { httpsCallable } from 'firebase/functions'
 import { doc, updateDoc } from 'firebase/firestore'
 import { db, functions } from '../../lib/firebase'
@@ -39,12 +63,156 @@ interface BatchProcessResult {
 }
 
 // ---------------------------------------------------------------------------
+// Table body renderer — handles flat and grouped layouts
+// ---------------------------------------------------------------------------
+
+function renderItemRow(row: Row<Item>, rowIdx: number) {
+  return (
+    <tr
+      key={row.id}
+      role="row"
+      aria-selected={row.getIsSelected()}
+      style={{
+        backgroundColor: row.getIsSelected()
+          ? 'color-mix(in srgb, var(--color-primary) 8%, transparent)'
+          : rowIdx % 2 === 0
+            ? 'var(--color-surface)'
+            : 'color-mix(in srgb, var(--color-bg) 60%, var(--color-surface) 40%)',
+        transition: `background-color var(--motion-speed-fast) var(--motion-easing)`,
+      }}
+    >
+      {row.getVisibleCells().map(cell => (
+        <td
+          key={cell.id}
+          role="gridcell"
+          style={{
+            padding: 'var(--space-2) var(--space-3)',
+            borderBottom: '1px solid var(--color-border)',
+            verticalAlign: 'middle',
+          }}
+        >
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </td>
+      ))}
+    </tr>
+  )
+}
+
+function renderTableBody(
+  rows: Row<Item>[],
+  colCount: number,
+  by: GroupBy,
+  expandedGroups: Record<string, boolean>,
+  setExpandedGroups: Dispatch<SetStateAction<Record<string, boolean>>>,
+): ReactNode {
+  if (rows.length === 0) {
+    return (
+      <tr>
+        <td
+          colSpan={colCount}
+          style={{
+            textAlign: 'center',
+            padding: 'var(--space-12) 0',
+            color: 'var(--color-text-muted)',
+            fontSize: 'var(--text-small)',
+          }}
+        >
+          No items to display.
+        </td>
+      </tr>
+    )
+  }
+
+  if (by === 'none') {
+    return rows.map((row, rowIdx) => renderItemRow(row, rowIdx))
+  }
+
+  // Build ordered groups from sorted rows
+  const groupMap = new Map<string, Row<Item>[]>()
+  for (const row of rows) {
+    const key = groupKey(row.original, by)
+    if (!groupMap.has(key)) groupMap.set(key, [])
+    groupMap.get(key)!.push(row)
+  }
+
+  const order = GROUP_DISPLAY_ORDER[by] ?? {}
+  const sortedKeys = [...groupMap.keys()].sort(
+    (a, b) => (order[a] ?? 999) - (order[b] ?? 999) || a.localeCompare(b),
+  )
+
+  return sortedKeys.flatMap(key => {
+    const groupRows = groupMap.get(key)!
+    const isExpanded = expandedGroups[key] !== false // undefined → expanded
+    const label = formatGroupLabel(key)
+
+    return [
+      <tr key={`grp-${key}`} style={{ backgroundColor: 'var(--color-bg)' }}>
+        <td
+          colSpan={colCount}
+          style={{
+            padding: 'var(--space-2) var(--space-3)',
+            borderBottom: '1px solid var(--color-border)',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() =>
+              setExpandedGroups(prev => ({ ...prev, [key]: !isExpanded }))
+            }
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--text-small)',
+              fontWeight: 600,
+              color: 'var(--color-text)',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 'var(--text-xs)',
+                color: 'var(--color-text-muted)',
+                display: 'inline-block',
+                transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+                transition: `transform var(--motion-speed-fast) var(--motion-easing)`,
+              }}
+            >
+              ▼
+            </span>
+            <span style={{ textTransform: 'capitalize' }}>{label}</span>
+            <span
+              style={{
+                fontSize: 'var(--text-xs)',
+                color: 'var(--color-text-muted)',
+                backgroundColor: 'var(--color-surface)',
+                padding: `2px var(--space-2)`,
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              {groupRows.length}
+            </span>
+          </button>
+        </td>
+      </tr>,
+      ...(isExpanded ? groupRows.map((row, rowIdx) => renderItemRow(row, rowIdx)) : []),
+    ]
+  })
+}
+
+// ---------------------------------------------------------------------------
 // Props
 // ---------------------------------------------------------------------------
 
 interface InventoryTableProps {
   items: Item[]
   isAdmin: boolean
+  groupBy?: GroupBy
   onApplyTitle: (itemId: string, title: string) => Promise<void>
   onApplyCategory: (itemId: string, category: string) => Promise<void>
   onApplyDescription: (itemId: string, draft: string) => Promise<void>
@@ -62,6 +230,7 @@ interface InventoryTableProps {
 export default function InventoryTable({
   items,
   isAdmin,
+  groupBy = 'none',
   onApplyTitle,
   onApplyCategory,
   onApplyDescription,
@@ -80,6 +249,8 @@ export default function InventoryTable({
   const [showColumnPanel, setShowColumnPanel] = useState(false)
   const [batchError, setBatchError] = useState<string | null>(null)
   const [batchLoading, setBatchLoading] = useState(false)
+  // expandedGroups: undefined key → expanded (default); false → collapsed
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
 
   const { copyValue } = useGridClipboard()
 
@@ -429,47 +600,12 @@ export default function InventoryTable({
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row, rowIdx) => (
-              <tr
-                key={row.id}
-                role="row"
-                aria-selected={row.getIsSelected()}
-                style={{
-                  backgroundColor: row.getIsSelected()
-                    ? 'color-mix(in srgb, var(--color-primary) 8%, transparent)'
-                    : rowIdx % 2 === 0 ? 'var(--color-surface)' : 'color-mix(in srgb, var(--color-bg) 60%, var(--color-surface) 40%)',
-                  transition: `background-color var(--motion-speed-fast) var(--motion-easing)`,
-                }}
-              >
-                {row.getVisibleCells().map(cell => (
-                  <td
-                    key={cell.id}
-                    role="gridcell"
-                    style={{
-                      padding: 'var(--space-2) var(--space-3)',
-                      borderBottom: '1px solid var(--color-border)',
-                      verticalAlign: 'middle',
-                    }}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-            {table.getRowModel().rows.length === 0 && (
-              <tr>
-                <td
-                  colSpan={table.getVisibleLeafColumns().length}
-                  style={{
-                    textAlign: 'center',
-                    padding: 'var(--space-12) 0',
-                    color: 'var(--color-text-muted)',
-                    fontSize: 'var(--text-small)',
-                  }}
-                >
-                  No items to display.
-                </td>
-              </tr>
+            {renderTableBody(
+              table.getRowModel().rows,
+              table.getVisibleLeafColumns().length,
+              groupBy,
+              expandedGroups,
+              setExpandedGroups,
             )}
           </tbody>
         </table>

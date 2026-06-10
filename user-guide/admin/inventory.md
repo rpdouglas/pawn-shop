@@ -1,40 +1,70 @@
 # Inventory Management
 
-The **Inventory Management** page (`/admin/inventory`) is the central hub for overseeing all items across The Pawn Shop's four storefronts. Every item in the database — across all statuses and all verticals — loads into the admin view on arrival. The layout adapts to your device — cards on mobile, a full table on desktop.
+The **Inventory Management** page (`/admin/inventory`) is the central hub for overseeing every item across The Pawn Shop's four storefronts. All items — across every status and vertical — load into a single view. Your last layout (view mode, group, filter, collapsed sections) is remembered automatically between sessions.
 
 ![Admin Inventory List](/screenshots/admin-inventory-list.png)
 
 ---
 
-## Mobile View
+## Toolbar
 
-On viewports under 768px, items appear as a scrollable card list.
+At the top of the page you'll find the core controls, all on one row:
 
-- **Search:** A full-width search field at the top filters by item title in real time.
-- **Status filter chips:** Tap Any, Active, Draft, Reserved, or Sold to narrow the list.
-- **Item cards:** Each card shows the item thumbnail, title, status badge, view tag, and listed price.
-- **Card Actions:** Every card has an **Edit**, **Archive**, and **Delete** button. Archiving hides the item from public listings without removing it; Delete moves the item to the Recycle Bin.
-- **Stock controls:** If a stock count has been set, `−` and `+` buttons appear on the card. See [Stock Management](/admin/stock-management).
-- **Add Item:** A **+** button fixed to the bottom-right corner opens the [Mobile Intake Wizard](/inventory/mobile-intake).
-
----
-
-## Desktop — Grid View
-
-On viewports 768px and wider, switch to **Grid** mode (⊞ Grid toggle, top-right) for a visual overview grouped by store section (`Pawn`, `Cannabis`, `Fireworks`).
-
-- **Grouped Categories:** Items separated into distinct sections so you can review stock by vertical at a glance.
-- **Card Actions:** Each grid card has an **Edit** link, an **Archive** button, and a **Delete** button. Deleted items move to the Recycle Bin; restore them by switching the filter to **Recycle Bin**.
-- **AI Assistant Drawer:** Click any item card to open the **AI Assistant Toolkit** in a slide-out drawer. From here you can:
-  1. **Generate Metadata:** Use Gemini to create editorial drafts and tag suggestions.
-  2. **Verify Status:** Monitor items on **Police Hold** (marked with a red label).
-  3. **Cross-Platform Sync:** Track items pushed to eBay via their listing IDs.
+- **Search** — A full-width field filters by item title in real time.
+- **Status filter chips** — All · Active · Draft · Reserved · Sold · Recycle Bin. Tap any chip to narrow the list.
+- **Group by** — Organise items into collapsible sections by **View Tag** (Pawn / Cannabis / Fireworks / Other), **Category** (alphabetical), **Status** (workflow order), or **None** (flat list).
+- **⊞ Grid / ☰ Table** — Toggle between Grid and Table view. Your choice is remembered for next time.
+- **Empty Recycle Bin** — Visible to Admins only when the Recycle Bin filter is active. Permanently and irreversibly removes every deleted item.
 
 ---
 
-## Desktop — Table View
+## Grid View
 
-Switch to **Table** mode (☰ Table toggle, top-right) for a spreadsheet-style grid built for bulk operations and fast inline edits.
+The Grid view presents items as cards — ideal for visual inventory checks and quick field edits without leaving the page.
+
+### Collapsible Group Sections
+
+When **Group by** is set to anything other than None, items are gathered into labelled sections. Each section header shows the group name, an item count badge, and a collapse chevron. Click the header to fold or unfold a section. Collapsed sections are remembered across sessions — fold the groups you don't need and they stay out of the way.
+
+### Inline Editing on Cards
+
+Every card supports editing the most common fields directly without navigating to the full intake form:
+
+| Field | How to edit |
+|-------|------------|
+| **Title** | Click the title text — a text input appears. Press **Enter** or click away to save, **Escape** to cancel. |
+| **Status** | Click the status badge — a dropdown appears. |
+| **Condition** | Click the condition badge — a dropdown appears. |
+| **Price** | Click the price — a number input appears (enter dollars; stored as CAD cents). |
+
+Changes save to Firestore the moment you confirm or blur the field.
+
+### Card Actions
+
+Each card has a row of action buttons at the bottom (all ≥48px for comfortable tapping on mobile):
+
+| Button | What it does |
+|--------|-------------|
+| **Full Edit** | Opens the full intake form (`/admin/mobile-intake/edit/:id`) for fields not available inline (images, markdown config, provenance, etc.) |
+| **Archive** | Sets `status: archived` — hides the item from public listings without moving it to the Recycle Bin |
+| **Delete** | Moves the item to the Recycle Bin (`status: deleted`) |
+| **Restore** | Visible on deleted items only — returns the item to Draft status |
+
+Click the item **thumbnail** to open the **AI Assistant Drawer** for that item without navigating away.
+
+### Stock Controls
+
+If a stock count has been set on an item, **−** and **+** buttons appear on the card. See [Stock Management](/admin/stock-management) for details.
+
+---
+
+## Table View
+
+The Table view is a spreadsheet-style grid — the best mode for bulk operations and column-by-column data sweeps.
+
+### Grouping
+
+Select a **Group by** dimension in the toolbar and the table body splits into collapsible group sections, matching the same Group Display Order used by Grid mode.
 
 ### Inline Editing
 
@@ -44,23 +74,17 @@ Click any cell to edit it in place. Press **Tab** to advance to the next editabl
 
 Click any column header to sort ascending or descending. Use the **Columns ▾** menu (top-right of the table) to show or hide columns — useful for narrowing to just the fields you need.
 
-### Selecting Rows
+### Row Selection & Batch Actions
 
-Tick the checkbox in the first column to select individual rows. Tick the header checkbox to select all visible rows at once. The count of selected rows appears in the floating **Batch Actions** bar at the bottom of the screen.
-
-### Batch Actions
-
-When one or more rows are selected, the **Batch Actions** bar floats at the bottom centre of the screen. Available actions:
+Tick the checkbox in the first column to select individual rows. Tick the header checkbox to select all visible rows. The selected row count appears in the floating **Batch Actions** bar at the bottom of the screen.
 
 | Button | What it does |
 |--------|-------------|
-| **✨ Generate Descriptions** | Dispatches the Gemini AI pipeline for all selected items — generates editorial descriptions in the background |
+| **✨ Generate Descriptions** | Dispatches the Gemini AI pipeline for all selected items |
 | **$ Suggest Prices** | Runs the AI price-suggestion model for all selected items |
 | **Delete** | Moves all selected items to the Recycle Bin (requires confirmation) |
-| **Restore** | Restores all selected Recycle Bin items to Draft status (appears only when the Recycle Bin filter is active) |
-| **Clear** | Deselects all rows without taking any action |
-
-> **Delete vs Restore:** The **Delete** button appears when you are viewing any filter other than Recycle Bin. Switch to the **Recycle Bin** filter and the button becomes **Restore** — so you can recover items in the same fluid workflow.
+| **Restore** | Restores all selected Recycle Bin items to Draft status (appears only under the Recycle Bin filter) |
+| **Clear** | Deselects all rows without any action |
 
 ### Per-Row AI
 
@@ -72,20 +96,20 @@ Every row has a **✨** (description) and **$** (price) button in the AI column 
 
 Filter by **Recycle Bin** to view soft-deleted items. From here:
 
-- **Restore** individual cards (grid) or use **Restore** in the batch bar (table) to return items to Draft.
-- **Empty Recycle Bin** (Admin only, top-right) permanently and irreversibly removes all items in the bin.
+- **Restore** individual cards (Grid mode) or use **Restore** in the batch bar (Table mode) to return items to Draft.
+- **Empty Recycle Bin** (Admin only) permanently deletes everything in the bin. This cannot be undone.
 
 ---
 
 ## Key Rules
 
-- **Sold Items:** Items marked as `Sold` automatically appear in the "Recently Sold" strip on the storefronts to build trust with customers like **Dale**.
-- **Reserved Items:** Reserved items are hidden from public search but remain visible in the admin view until the reservation expires or is completed.
-- **Out of Stock:** A zero quantity displays an **Out of Stock** label in the admin view. The item remains `Active` on the storefront — archive or mark it sold to remove it from public listings.
-- **Police Hold:** Items flagged with a police hold (`policeHold: true`) are immediately hidden from public view. Only Admins can set or clear this flag.
+- **Sold Items:** Items marked as `Sold` automatically appear in the "Recently Sold" strip on the public storefronts.
+- **Reserved Items:** Reserved items are hidden from public search but visible in the admin view until the reservation expires or is completed.
+- **Out of Stock:** A zero quantity shows an **Out of Stock** label in the admin view. The item stays `Active` on the storefront — archive or mark it sold to remove it from public listings.
+- **Police Hold:** Items flagged with a police hold (`policeHold: true`) are immediately hidden from all public views. Only Admins can set or clear this flag — available in Table view via the Police Hold cell.
 
 ---
 
-*Primary Personas: Staff (inventory_staff / manager)*
-*Cornwall Island · Cornwall Island, Akwesasne*
+*Primary Personas: Staff (inventory_staff / manager / admin)*
+*Cornwall Island · Akwesasne*
 *Dapper. Debonair. Distinctly Akwesasne.*
