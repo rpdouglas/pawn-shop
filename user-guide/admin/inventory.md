@@ -76,15 +76,27 @@ Click any column header to sort ascending or descending. Use the **Columns ▾**
 
 ### Row Selection & Batch Actions
 
-Tick the checkbox in the first column to select individual rows. Tick the header checkbox to select all visible rows. The selected row count appears in the floating **Batch Actions** bar at the bottom of the screen.
+Tick the checkbox in the first column to select individual rows. Tick the header checkbox to select all visible rows. The moment you select a row, a **Selection Banner** slides in directly below the search and filter toolbar — right where your eye already is.
 
-| Button | What it does |
-|--------|-------------|
-| **✨ Generate Descriptions** | Dispatches the Gemini AI pipeline for all selected items |
-| **$ Suggest Prices** | Runs the AI price-suggestion model for all selected items |
-| **Delete** | Moves all selected items to the Recycle Bin (requires confirmation) |
-| **Restore** | Restores all selected Recycle Bin items to Draft status (appears only under the Recycle Bin filter) |
-| **Clear** | Deselects all rows without any action |
+The banner has two zones separated by a divider:
+
+**Left zone — count & dismiss**
+
+| Element | What it does |
+|---------|-------------|
+| **Count badge** | Shows how many rows are selected (e.g. `4`) |
+| **× button** | Clears the selection without taking any action |
+
+**Right zone — grouped actions**
+
+| Button | Group | What it does |
+|--------|-------|-------------|
+| **✨ Descriptions** | AI | Dispatches the Gemini AI pipeline for all selected items |
+| **$ Prices** | AI | Runs the AI price-suggestion model for all selected items |
+| **Delete** | CRUD | Moves all selected items to the Recycle Bin (requires confirmation) |
+| **Restore** | CRUD | Restores all selected Recycle Bin items to Draft status (appears only under the Recycle Bin filter) |
+
+If a batch AI job partially fails, an error band appears below the banner with a description of what failed. Dismiss it with the × button.
 
 ### Per-Row AI
 

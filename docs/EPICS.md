@@ -564,6 +564,22 @@
 ---
 
 
+### E113 · Inventory Batch Action Bar Redesign
+
+> **Persona Gate — E113:**
+> - **Staff (Primary):** The batch action bar must not require staff to break eye contact with the table. Selection controls must be at the top of the view, grouped by action type, and not overflow on standard admin viewports.
+> - **Makoonsii (Touch Standard applied to staff tools):** All action buttons ≥44px touch targets.
+> - **Jordan (Brand Quality):** Admin UI quality reflects brand quality — overcrowded pill shapes are inconsistent with "Dapper. Debonair."
+
+- [x] Replace floating bottom pill with top-anchored sticky context banner `[Staff]`
+- [x] Two-zone layout: left (count badge + × dismiss), right (AI group | divider | CRUD group) `[Staff]`
+- [x] All buttons `minHeight: 44px`, full token compliance, zero hardcoded values `[Staff]` `[Comp]`
+- [x] `batchError` moved to dismissible `role="alert"` band below the banner `[Staff]`
+- [x] Decision 0031 logged `[Comp]`
+- [x] **E113 CLOSED** | 2026-06-10
+
+---
+
 ## Phase 10 — Inventory Intelligence
 
 > **Goal:** Data-driven merchandising. Automate stale-inventory turnover and close the cannabis product data gap vs. Dutchie/Jane. Schema updates in `docs/firestore-schema.md` and `docs/DECISIONS.md` are required before any implementation task begins.

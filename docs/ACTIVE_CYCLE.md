@@ -181,6 +181,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **FIX_PRINT_PAGE_BREAK CLOSED** | BUGFIX | 2026-06-10 |
 | `E112 Inventory UX: Grouping, Collapsible Sections & Grid Inline Edit` — Added `GroupBy` type and manual client-side group rendering (table mode) with collapsible headers, chevron animation, and workflow-ordered status/viewTag groups. New `InventoryCard.tsx` with inline-editable title/status/condition/price via existing CellEditors; 48px action buttons; AI drawer trigger; `QuantityAdjustControl`. `InventoryPage.tsx` gained `groupBy` dropdown, `collapsedGroups` state, and localStorage persistence for all four view-state keys (`viewMode`, `groupBy`, `statusFilter`, `collapsedGroups`). No new dependencies. Decision 0030 logged. | E112 | 2026-06-10 |
 | **E112 CLOSED** | E112 | 2026-06-10 |
+| `E113 Inventory Batch Action Bar Redesign` — Replaced the overcrowded centred oval pill (`position: fixed; bottom`) with a top-anchored sticky context banner (`position: sticky; top: 0`) placed between the toolbar and table. Two-zone layout: left = count badge + × dismiss; right = AI group (✨ Descriptions · $ Prices) | divider | CRUD group (Delete or Restore). `batchError` promoted from inline pill span to a full-width dismissible `role="alert"` band. All banner buttons `minHeight: 44px`. `color-mix()` primary tint on banner background. Decision 0031 logged. | E113 | 2026-06-10 |
+| **E113 CLOSED** | E113 | 2026-06-10 |
 
 ---
 
@@ -211,4 +213,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 33 — E112 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 33 — E112 + E113 CLOSED)*

@@ -541,6 +541,229 @@ export default function InventoryTable({
         </div>
       </div>
 
+      {/* ---- Selection Context Banner — sticky top-anchored, appears on row selection ---- */}
+      {selectedCount > 0 && (
+        <div
+          role="toolbar"
+          aria-label="Batch actions"
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 200,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 'var(--space-3)',
+            padding: 'var(--space-2) var(--space-4)',
+            marginBottom: 'var(--space-3)',
+            backgroundColor: 'color-mix(in srgb, var(--color-primary) 12%, var(--color-bg))',
+            border: '1px solid color-mix(in srgb, var(--color-primary) 35%, var(--color-border))',
+            borderRadius: 'var(--radius-md)',
+          }}
+        >
+          {/* Left zone: count badge + label + dismiss */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: 'var(--space-6)',
+              height: 'var(--space-6)',
+              padding: '0 var(--space-2)',
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-on-primary)',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: 'var(--text-xs)',
+              fontWeight: 700,
+              fontFamily: 'var(--font-body)',
+              lineHeight: 1,
+            }}>
+              {selectedCount}
+            </span>
+            <span style={{
+              fontSize: 'var(--text-small)',
+              color: 'var(--color-text)',
+              fontFamily: 'var(--font-body)',
+              whiteSpace: 'nowrap',
+            }}>
+              item{selectedCount !== 1 ? 's' : ''} selected
+            </span>
+            <button
+              type="button"
+              aria-label="Clear selection"
+              onClick={() => table.resetRowSelection()}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '28px',
+                minWidth: '28px',
+                background: 'none',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                color: 'var(--color-text-muted)',
+                fontSize: 'var(--text-small)',
+                lineHeight: 1,
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Right zone: grouped actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+            {/* AI enrichment group */}
+            <button
+              type="button"
+              disabled={batchLoading}
+              onClick={() => runBatchAi(['description'])}
+              style={{
+                minHeight: '44px',
+                padding: '0 var(--space-4)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text)',
+                fontSize: 'var(--text-small)',
+                fontFamily: 'var(--font-body)',
+                cursor: batchLoading ? 'not-allowed' : 'pointer',
+                opacity: batchLoading ? 0.6 : 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              ✨ Descriptions
+            </button>
+            <button
+              type="button"
+              disabled={batchLoading}
+              onClick={() => runBatchAi(['price'])}
+              style={{
+                minHeight: '44px',
+                padding: '0 var(--space-4)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text)',
+                fontSize: 'var(--text-small)',
+                fontFamily: 'var(--font-body)',
+                cursor: batchLoading ? 'not-allowed' : 'pointer',
+                opacity: batchLoading ? 0.6 : 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              $ Prices
+            </button>
+
+            {/* Divider between AI group and CRUD group */}
+            <span
+              aria-hidden="true"
+              style={{
+                width: '1px',
+                alignSelf: 'stretch',
+                minHeight: '24px',
+                backgroundColor: 'var(--color-border)',
+                flexShrink: 0,
+              }}
+            />
+
+            {/* CRUD group */}
+            {showRestoreAction && onBulkRestore && (
+              <button
+                type="button"
+                disabled={batchLoading}
+                onClick={() => handleBulkCrud(
+                  onBulkRestore,
+                  `Restore ${selectedCount} item${selectedCount !== 1 ? 's' : ''} to Draft?`,
+                )}
+                style={{
+                  minHeight: '44px',
+                  padding: '0 var(--space-4)',
+                  border: '1px solid var(--color-primary)',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: 'transparent',
+                  color: 'var(--color-primary)',
+                  fontSize: 'var(--text-small)',
+                  fontFamily: 'var(--font-body)',
+                  cursor: batchLoading ? 'not-allowed' : 'pointer',
+                  opacity: batchLoading ? 0.6 : 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Restore
+              </button>
+            )}
+            {!showRestoreAction && onBulkDelete && (
+              <button
+                type="button"
+                disabled={batchLoading}
+                onClick={() => handleBulkCrud(
+                  onBulkDelete,
+                  `Move ${selectedCount} item${selectedCount !== 1 ? 's' : ''} to the Recycle Bin?`,
+                )}
+                style={{
+                  minHeight: '44px',
+                  padding: '0 var(--space-4)',
+                  border: '1px solid var(--color-error)',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: 'transparent',
+                  color: 'var(--color-error)',
+                  fontSize: 'var(--text-small)',
+                  fontFamily: 'var(--font-body)',
+                  cursor: batchLoading ? 'not-allowed' : 'pointer',
+                  opacity: batchLoading ? 0.6 : 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Delete
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Batch error band — dismissible, below the context banner */}
+      {batchError && (
+        <div
+          role="alert"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-3)',
+            padding: 'var(--space-2) var(--space-4)',
+            marginBottom: 'var(--space-3)',
+            backgroundColor: 'color-mix(in srgb, var(--color-error) 8%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--color-error) 30%, var(--color-border))',
+            borderRadius: 'var(--radius-sm)',
+          }}
+        >
+          <span style={{ flex: 1, fontSize: 'var(--text-xs)', color: 'var(--color-error)', fontFamily: 'var(--font-body)' }}>
+            {batchError}
+          </span>
+          <button
+            type="button"
+            onClick={() => setBatchError(null)}
+            aria-label="Dismiss error"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--color-error)',
+              fontSize: 'var(--text-small)',
+              flexShrink: 0,
+              minHeight: '28px',
+              minWidth: '28px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* ---- Table ---- */}
       <div
         role="grid"
@@ -610,140 +833,6 @@ export default function InventoryTable({
           </tbody>
         </table>
       </div>
-
-      {/* ---- Batch Action Bar (fixed bottom, appears on selection) ---- */}
-      {selectedCount > 0 && (
-        <div
-          role="toolbar"
-          aria-label="Batch actions"
-          style={{
-            position: 'fixed',
-            bottom: 'var(--space-6)',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 500,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-3)',
-            padding: 'var(--space-3) var(--space-6)',
-            backgroundColor: 'var(--color-bg)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-lg)',
-            boxShadow: '0 var(--space-2) var(--space-8) rgba(0,0,0,0.5)',
-          }}
-        >
-          <span style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
-            {selectedCount} selected
-          </span>
-          <button
-            type="button"
-            disabled={batchLoading}
-            onClick={() => runBatchAi(['description'])}
-            style={{
-              minHeight: '36px',
-              padding: '0 var(--space-3)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--color-surface)',
-              color: 'var(--color-text)',
-              fontSize: 'var(--text-small)',
-              cursor: batchLoading ? 'not-allowed' : 'pointer',
-              opacity: batchLoading ? 0.6 : 1,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            ✨ Generate Descriptions
-          </button>
-          <button
-            type="button"
-            disabled={batchLoading}
-            onClick={() => runBatchAi(['price'])}
-            style={{
-              minHeight: '36px',
-              padding: '0 var(--space-3)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--color-surface)',
-              color: 'var(--color-text)',
-              fontSize: 'var(--text-small)',
-              cursor: batchLoading ? 'not-allowed' : 'pointer',
-              opacity: batchLoading ? 0.6 : 1,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            $ Suggest Prices
-          </button>
-          {showRestoreAction && onBulkRestore && (
-            <button
-              type="button"
-              disabled={batchLoading}
-              onClick={() => handleBulkCrud(
-                onBulkRestore,
-                `Restore ${selectedCount} item${selectedCount !== 1 ? 's' : ''} to Draft?`,
-              )}
-              style={{
-                minHeight: '36px',
-                padding: '0 var(--space-3)',
-                border: '1px solid var(--color-primary)',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-primary)',
-                fontSize: 'var(--text-small)',
-                cursor: batchLoading ? 'not-allowed' : 'pointer',
-                opacity: batchLoading ? 0.6 : 1,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Restore
-            </button>
-          )}
-          {!showRestoreAction && onBulkDelete && (
-            <button
-              type="button"
-              disabled={batchLoading}
-              onClick={() => handleBulkCrud(
-                onBulkDelete,
-                `Move ${selectedCount} item${selectedCount !== 1 ? 's' : ''} to the Recycle Bin?`,
-              )}
-              style={{
-                minHeight: '36px',
-                padding: '0 var(--space-3)',
-                border: '1px solid var(--color-error)',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-error)',
-                fontSize: 'var(--text-small)',
-                cursor: batchLoading ? 'not-allowed' : 'pointer',
-                opacity: batchLoading ? 0.6 : 1,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Delete
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => table.resetRowSelection()}
-            style={{
-              minHeight: '36px',
-              padding: '0 var(--space-3)',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'transparent',
-              color: 'var(--color-text-muted)',
-              fontSize: 'var(--text-small)',
-              cursor: 'pointer',
-            }}
-          >
-            Clear
-          </button>
-          {batchError && (
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-error)', maxWidth: '240px' }}>
-              {batchError}
-            </span>
-          )}
-        </div>
-      )}
 
       {/* ---- AI / Markdown Drawer ---- */}
       {drawerItem && (
