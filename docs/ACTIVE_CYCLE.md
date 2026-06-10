@@ -167,6 +167,8 @@ E107 + E109 + FIX_PAWN_LOAN_DEFAULTS · POS Loan Issuance — Digital signature 
 | **FIX_PAWN_LOAN_DEFAULTS CLOSED** | BUGFIX | 2026-06-10 |
 | `FIX_PRINT_TICKET_VISIBILITY` — Printed pawn ticket showed browser native header/footer but no ticket content. Root cause: `index.css @media print` sets `body * { visibility: hidden }` for the QR label flow; `print.css` restored `display: block` but never restored `visibility: visible` on `.print-ticket` and its children. Added `.print-ticket, .print-ticket * { visibility: visible; }` to `print.css`. One line, zero regressions. | BUGFIX | 2026-06-10 |
 | **FIX_PRINT_TICKET_VISIBILITY CLOSED** | BUGFIX | 2026-06-10 |
+| `FIX_PRINT_TICKET_PDF` — After the visibility fix, printing to PDF still produced a blank page. Root cause: `Modal.tsx` sets `document.body.style.overflow = 'hidden'` inline (scroll-lock); the PDF engine respects this overflow clip on body, hiding the `.print-ticket` portal. Added `html, body { height: auto !important; overflow: visible !important; }` to `@media print` in `print.css` — `!important` overrides the inline style. Decision 0024 logged. | BUGFIX | 2026-06-10 |
+| **FIX_PRINT_TICKET_PDF CLOSED** | BUGFIX | 2026-06-10 |
 
 ---
 
@@ -197,4 +199,4 @@ E107 + E109 + FIX_PAWN_LOAN_DEFAULTS · POS Loan Issuance — Digital signature 
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF CLOSED)*

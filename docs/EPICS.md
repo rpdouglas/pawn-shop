@@ -1530,6 +1530,18 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 
 ---
 
+### FIX · Print Ticket — PDF Renders Blank Page
+
+> **Persona Gate:** Staff (admin / manager / inventory_staff) + Makoonsii (printed ticket recipient).
+
+**Root cause:** `Modal.tsx` sets `document.body.style.overflow = 'hidden'` as an inline style (scroll-lock). In the PDF print engine, `overflow: hidden` on `body` clips the content area; combined with `body { min-height: 100vh }` from `index.css`, the `.print-ticket` portal was constrained and never captured in the PDF output. `!important` in a `@media print` stylesheet rule overrides an inline style without `!important`.
+
+- [x] Add `html, body { height: auto !important; overflow: visible !important; }` to top of `@media print` in `src/styles/print.css` `[Staff]` `[Mak]`
+- [x] Decision 0024 logged `[Comp]`
+- [x] **FIX_PRINT_TICKET_PDF CLOSED** | 2026-06-10
+
+---
+
 ### E108 · Server-Side PDF Pawn Tickets (Backlog)
 
 > **Persona Gate — E108:**

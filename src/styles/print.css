@@ -5,6 +5,14 @@
 
 /* ── Print: show only the ticket, hide the rest of the page ─────────────── */
 @media print {
+  /* Modal sets document.body.style.overflow = 'hidden' inline while open.
+     !important in a stylesheet overrides an inline style without !important,
+     so this un-clips body before the PDF engine captures the page. */
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
   body > *:not(.print-ticket) { display: none !important; }
 
   /* index.css sets body * { visibility: hidden } for the QR label flow.
