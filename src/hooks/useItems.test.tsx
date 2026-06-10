@@ -8,7 +8,7 @@ vi.mock('firebase/firestore', async (importOriginal) => {
   const actual = await importOriginal<typeof import('firebase/firestore')>()
   return {
     ...actual,
-    collection: vi.fn(),
+    collection: vi.fn().mockReturnValue({ withConverter: vi.fn().mockReturnThis() }),
     query: vi.fn(),
     where: vi.fn(),
     orderBy: vi.fn(),

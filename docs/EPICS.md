@@ -848,13 +848,14 @@
 > - **Jordan (Performance):** Reducing bundle size and eliminating ineffective dynamic imports directly improves load times, especially on mobile.
 > - **Staff (Efficiency):** Migrating to `react-hook-form` eliminates render thrashing in the Intake Form, dramatically speeding up data entry.
 
-- [ ] Fix `INEFFECTIVE_DYNAMIC_IMPORT` warnings in `firebase.ts` (Quick Win)
-- [ ] Implement explicit `manualChunks` in `vite.config.ts` (Quick Win)
-- [ ] Implement Firestore `withConverter` in `useItems.ts` (Quick Win)
+- [x] Fix `INEFFECTIVE_DYNAMIC_IMPORT` warnings — converted dynamic imports in `ConsentBanner.tsx`, `ViewContext.tsx`, `analytics.ts` to static (Quick Win)
+- [x] Implement explicit `manualChunks` in `vite.config.ts` — main bundle 1,019 kB → 43.69 kB (Quick Win)
+- [x] Implement Firestore `withConverter` in `useItems.ts` (Quick Win)
 - [ ] Refactor `IntakeForm.tsx` to compose domain-specific sub-components (Medium Term)
-- [ ] Migrate complex forms to `react-hook-form` to eliminate render thrashing (Medium Term)
+- [ ] **[BACKLOG — Strategy C]** Migrate `IntakeForm.tsx` to `react-hook-form` — eliminates render-per-keystroke; requires rewiring 3 `onSnapshot` listeners and updating 7 unit tests. Planned in `docs/plans/E73_ARCHITECTURE_MODERNIZATION_PLAN.md`. (Medium Term)
 - [ ] Architect unified TanStack Query v5 data layer to replace `onSnapshot` (Long Term)
 - [ ] Implement strict schema validation with `zod` across client and Cloud Functions (Long Term)
+- [x] **E73 Quick Wins CLOSED** | 2026-06-10
 
 ### Phase 20: E74 — Tooling & Developer Experience Improvements
 > **Persona Gate — E74:**

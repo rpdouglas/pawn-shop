@@ -155,6 +155,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **FIX_LOANS_PERMISSIONS CLOSED** | BUGFIX | 2026-06-10 |
 | `FIX_INVENTORY_BULK_CRUD` — Inventory table batch action bar had no CRUD buttons despite full row-selection support. Added `onBulkDelete`/`onBulkRestore` props, `handleBulkCrud` callback, and Delete/Restore buttons. `showRestoreAction` gates which button shows based on `statusFilter`. Decision 0017 logged. | BUGFIX | 2026-06-10 |
 | **FIX_INVENTORY_BULK_CRUD CLOSED** | BUGFIX | 2026-06-10 |
+| `E73 Architecture Modernization — Quick Wins` — Converted 3 dynamic imports to static (eliminating all `INEFFECTIVE_DYNAMIC_IMPORT` warnings); added `manualChunks` to `vite.config.ts` (main bundle 1,019 kB → 43.69 kB, 96% reduction); added Firestore `withConverter` to `useItems.ts`. Strategy C (`react-hook-form`) logged to backlog. Decision 0018 logged. | E73 | 2026-06-10 |
+| **E73 Quick Wins CLOSED** | E73 | 2026-06-10 |
 
 ---
 
@@ -185,4 +187,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — FIX_INVENTORY_BULK_CRUD CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E73 Quick Wins CLOSED)*

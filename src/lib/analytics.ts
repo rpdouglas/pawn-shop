@@ -1,7 +1,6 @@
+import { logEvent } from 'firebase/analytics'
+import { analytics } from './firebase'
 import type { ViewType } from './types'
-
-// Analytics calls are fire-and-forget — dynamic import keeps firebase/analytics
-// out of the main bundle.
 
 interface PageViewParams    { view: ViewType; page_path: string }
 interface ItemViewParams    { item_id: string; view: ViewType; category: string }
@@ -10,13 +9,10 @@ interface AgeGateParams     { view: 'cannabis' | 'fireworks' | 'tobacco'; result
 interface PawnSubmitParams  { view: 'pawn' }
 
 function fire(event: string, params: object): void {
-  Promise.all([
-    import('./firebase').then(m => m.analytics),
-    import('firebase/analytics'),
-  ]).then(([analyticsInstance, { logEvent }]) => {
-    if (!analyticsInstance) return
-    logEvent(analyticsInstance, event, params as Record<string, unknown>)
-  }).catch(() => { /* analytics failure is non-fatal */ })
+  if (!analytics) return
+  try {
+    logEvent(analytics, event, params as Record<string, unknown>)
+  } catch { /* analytics failure is non-fatal */ }
 }
 
 export const Analytics = {

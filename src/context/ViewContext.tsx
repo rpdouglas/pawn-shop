@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { doc, updateDoc } from 'firebase/firestore'
+import { db } from '../lib/firebase'
 import { useAuth } from './AuthContext'
 import type { ReactNode } from 'react'
 import type { ViewType } from '../lib/types'
@@ -34,13 +36,8 @@ export function ViewProvider({ children }: { children: ReactNode }) {
 
     if (sessionViews.size > 1 && user?.uid) {
       const uid = user.uid
-      Promise.all([
-        import('../lib/firebase').then(m => m.db),
-        import('firebase/firestore'),
-      ]).then(([db, { doc, updateDoc }]) => {
-        updateDoc(doc(db, 'users', uid), { crossViewFlag: true }).catch(err => {
-          console.debug('Failed to update crossViewFlag:', err.message)
-        })
+      updateDoc(doc(db, 'users', uid), { crossViewFlag: true }).catch(() => {
+        // Non-critical — cross-view flag is a CRM signal, not a blocking operation
       })
     }
   }, [view, user])

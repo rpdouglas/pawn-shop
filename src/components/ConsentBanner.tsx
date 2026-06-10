@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { db } from '../lib/firebase'
 import { useAuth } from '../context/AuthContext'
 
 const CONSENT_VERSION = '2026-05-01'
@@ -12,16 +14,13 @@ export default function ConsentBanner() {
   useEffect(() => {
     if (!user) return
     const uid = user.uid
-    Promise.all([
-      import('../lib/firebase').then(m => m.db),
-      import('firebase/firestore'),
-    ]).then(([db, { doc, getDoc }]) => {
-      return getDoc(doc(db, 'users', uid))
-    }).then((snap) => {
-      if (!snap.exists()) return
-      const data = snap.data() as Record<string, unknown>
-      if (!data['consentAcceptedAt']) setShowBanner(true)
-    }).catch(() => { /* non-critical — banner will appear on next session */ })
+    getDoc(doc(db, 'users', uid))
+      .then((snap) => {
+        if (!snap.exists()) return
+        const data = snap.data() as Record<string, unknown>
+        if (!data['consentAcceptedAt']) setShowBanner(true)
+      })
+      .catch(() => { /* non-critical — banner will appear on next session */ })
   }, [user])
 
   if (!showBanner) return null
@@ -30,10 +29,6 @@ export default function ConsentBanner() {
     if (!user || acknowledging) return
     setAcknowledging(true)
     try {
-      const [db, { doc, setDoc, serverTimestamp }] = await Promise.all([
-        import('../lib/firebase').then(m => m.db),
-        import('firebase/firestore'),
-      ])
       await setDoc(
         doc(db, 'users', user.uid),
         { consentAcceptedAt: serverTimestamp(), consentVersion: CONSENT_VERSION },

@@ -7,6 +7,7 @@ import {
   limit as firestoreLimit,
   onSnapshot,
   type DocumentSnapshot,
+  type QueryDocumentSnapshot,
   type Timestamp,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
@@ -54,6 +55,11 @@ export function docToItem(doc: DocumentSnapshot): Item {
   }
 }
 
+const itemConverter = {
+  toFirestore: (item: Item) => ({ ...item }),
+  fromFirestore: (snap: QueryDocumentSnapshot): Item => docToItem(snap),
+}
+
 interface UseItemsOptions {
   limit?: number
   orderByField?: 'createdAt' | 'trendingScore'
@@ -72,7 +78,7 @@ export function useItems(
 
   useEffect(() => {
     const q = query(
-      collection(db, 'items'),
+      collection(db, 'items').withConverter(itemConverter),
       where('viewTag', '==', viewTag),
       where('status', '==', 'active'),
       where('policeHold', '==', false),
@@ -83,7 +89,7 @@ export function useItems(
     const unsubscribe = onSnapshot(
       q,
       (snap) => {
-        setItems(snap.docs.map(docToItem))
+        setItems(snap.docs.map(d => d.data()))
         setLoading(false)
         setError(null)
       },
