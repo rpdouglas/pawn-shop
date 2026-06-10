@@ -147,6 +147,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E104 CLOSED** | E104 | 2026-06-09 |
 | `E105 Admin Nav Refactor` — Replaced 54px icon-only sidebar with 210px labeled accordion sidebar. Removed redundant Intake nav entry. Collapsible groups: Operations/Customer/People open by default; Content/Config/Support collapsed. Default height ~720px — fits comfortably on 1080p. All 5 hardcoded hex values and 3 font/spacing violations replaced with design tokens. Decision 0013 logged. Portal user guide updated. | E105 | 2026-06-09 |
 | **E105 CLOSED** | E105 | 2026-06-09 |
+| `E106 Pawn Loan Lifecycle Gap Remediation` — Closed 6 gaps in E31 compliance: (1) Created `IssueLoanModal` + "Issue Loan" button in `PawnInbox` to unblock loan issuance; (2) Routed all `pawnRequests` status writes through new `updatePawnRequestStatus` CF; (3) Added 7 `auditLogs.eventType` values to schema; (4) `redeemLoanTicket` now persists `redemptionAmount`; (5) Auto-forfeit scheduler transitions linked item to `active`; (6) Extension decline documented (`active` is correct post-decline state). Decision 0014 logged. | E106 | 2026-06-09 |
+| **E106 CLOSED** | E106 | 2026-06-09 |
 
 ---
 
@@ -177,4 +179,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E105 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E106 CLOSED)*

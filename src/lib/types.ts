@@ -177,6 +177,7 @@ export interface PawnRequest {
   status: PawnRequestStatus
   staffNotes?: string
   serialBlacklistHit: boolean
+  pawnLoanId?: string
   createdAt: Date
 }
 

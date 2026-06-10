@@ -1,10 +1,11 @@
 import { useEffect, useState, Fragment } from 'react'
 import {
-  collection, query, orderBy, where, onSnapshot,
-  doc, updateDoc, Timestamp,
+  collection, query, orderBy, where, onSnapshot, Timestamp,
 } from 'firebase/firestore'
-import { db } from '../../lib/firebase'
+import { httpsCallable } from 'firebase/functions'
+import { db, functions } from '../../lib/firebase'
 import type { PawnRequest, PawnRequestStatus } from '../../lib/types'
+import IssueLoanModal from './IssueLoanModal'
 
 type FilterValue = PawnRequestStatus | 'all'
 
@@ -26,6 +27,11 @@ const STATUS_BADGE: Record<PawnRequestStatus, string> = {
   declined:  'badge badge-sold',
   completed: 'badge badge-condition-new',
 }
+
+const updateStatusFn = httpsCallable<
+  { pawnRequestId: string; status: string; staffNotes?: string },
+  { success: boolean }
+>(functions, 'updatePawnRequestStatus')
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-CA', {
@@ -50,6 +56,7 @@ function toPawnRequest(id: string, data: Record<string, unknown>): PawnRequest {
     status: data['status'] as PawnRequestStatus,
     staffNotes: typeof data['staffNotes'] === 'string' ? data['staffNotes'] : undefined,
     serialBlacklistHit: data['serialBlacklistHit'] === true,
+    pawnLoanId: typeof data['pawnLoanId'] === 'string' ? data['pawnLoanId'] : undefined,
     createdAt,
   }
 }
@@ -64,6 +71,8 @@ export default function PawnInbox() {
   const [editNotes, setEditNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+
+  const [issueLoanFor, setIssueLoanFor] = useState<string | null>(null)
 
   useEffect(() => {
     const col = collection(db, 'pawnRequests')
@@ -104,10 +113,7 @@ export default function PawnInbox() {
     setSaving(true)
     setSaveError(null)
     try {
-      await updateDoc(doc(db, 'pawnRequests', expandedId), {
-        status: editStatus,
-        staffNotes: editNotes,
-      })
+      await updateStatusFn({ pawnRequestId: expandedId, status: editStatus, staffNotes: editNotes })
       setRequests(prev => prev.map(r =>
         r.id === expandedId ? { ...r, status: editStatus, staffNotes: editNotes } : r
       ))
@@ -119,6 +125,7 @@ export default function PawnInbox() {
   }
 
   const flaggedCount = requests.filter(r => r.serialBlacklistHit).length
+  const issueLoanRequest = issueLoanFor ? requests.find(r => r.id === issueLoanFor) : null
 
   return (
     <div className="pawn-inbox">
@@ -286,15 +293,38 @@ export default function PawnInbox() {
                               <p className="input-error" role="alert">{saveError}</p>
                             )}
 
-                            <button
-                              type="button"
-                              className="btn btn-primary btn-md"
-                              onClick={handleSave}
-                              disabled={saving}
-                              aria-busy={saving}
-                            >
-                              {saving ? 'Saving…' : 'Save changes'}
-                            </button>
+                            <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                              <button
+                                type="button"
+                                className="btn btn-primary btn-md"
+                                onClick={handleSave}
+                                disabled={saving}
+                                aria-busy={saving}
+                              >
+                                {saving ? 'Saving…' : 'Save changes'}
+                              </button>
+
+                              {req.status === 'quoted' && !req.pawnLoanId && (
+                                <button
+                                  type="button"
+                                  className="btn btn-secondary btn-md"
+                                  style={{ minHeight: '48px' }}
+                                  onClick={() => setIssueLoanFor(req.id)}
+                                  disabled={saving}
+                                >
+                                  Issue Loan
+                                </button>
+                              )}
+
+                              {req.pawnLoanId && (
+                                <span
+                                  className="badge badge-condition-new"
+                                  style={{ alignSelf: 'center' }}
+                                >
+                                  Loan issued
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -306,6 +336,13 @@ export default function PawnInbox() {
           </table>
         </div>
       )}
+
+      <IssueLoanModal
+        isOpen={!!issueLoanFor}
+        onClose={() => setIssueLoanFor(null)}
+        pawnRequestId={issueLoanFor}
+        itemDescription={issueLoanRequest?.itemDescription ?? ''}
+      />
     </div>
   )
 }

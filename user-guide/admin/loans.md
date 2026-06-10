@@ -6,34 +6,52 @@ The Pawn Shop staff dashboard provides a central interface for managing active p
 
 1. Sign in to your staff account.
 2. Navigate to **Admin > Loans** in the sidebar.
-3. The dashboard displays all active pawn loans with details including:
+3. The dashboard displays all pawn loans with details including:
    - Item description
    - Loan amount
    - Due date
-   - Current status (e.g., Active, Redeemed, Forfeited)
+   - Current status (Active, Extension Requested, Redeemed, Forfeited)
 
 ## Issuing a Loan Ticket
 
-When a customer accepts a pawn offer:
-1. Approve the pawn request.
-2. Enter the **Principal Amount** and **Term**.
-3. A loan ticket will be generated automatically, calculating the due date and interest based on the term.
+Loan tickets are issued from the **Pawn Inbox**, not from the Loans dashboard. This keeps the issuance tied to the original customer enquiry.
+
+1. In the Pawn Inbox, set the enquiry status to **Quoted** and save.
+2. Expand the enquiry row — an **Issue Loan** button appears.
+3. Click **Issue Loan** and enter:
+   - **Loan Amount** — the principal in CAD dollars
+   - **Loan Term** — number of days until the loan is due (default: 30)
+   - **Interest Rate** — percentage charged on the principal (default: 5%)
+4. Click **Issue Loan** to confirm. The due date is calculated automatically from the term.
+5. The Loans dashboard will reflect the new ticket immediately.
 
 ## Processing Loan Redemptions
 
 When a customer wants to retrieve their pawned item:
+
 1. Locate the active loan ticket in the dashboard.
 2. Click **Redeem**.
-3. The system will calculate the total redemption amount (principal + interest).
-4. Once payment is processed, the system will update the loan status to **Redeemed** and the item status will be set back to active so the customer can pick it up.
+3. The system displays the total redemption amount (principal + interest).
+4. Click **Confirm Redemption** to mark the loan as **Redeemed**. The redemption amount is recorded for the audit trail.
+
+> **Note:** Full Stripe payment capture is coming in E79. Until then, redemptions are confirmed manually after cash or in-store payment is collected.
+
+## Reviewing Extension Requests
+
+When a customer requests a loan extension, the ticket status changes to **Extension Requested**:
+
+1. Locate tickets with **Extension Requested** status and click **Review**.
+2. To **approve**: enter a new due date and click **Approve**. The loan returns to Active with the updated date.
+3. To **decline**: click **Decline**. The loan returns to Active with the original due date. The decline is recorded in the audit trail.
 
 ## Manual Forfeiture
 
 If a loan passes its due date without payment:
-1. The system will send SMS reminders 3 days before the due date.
-2. Once the due date has passed, the loan becomes eligible for forfeiture.
-3. Click the **Forfeit** button next to the expired loan.
+
+1. The system sends an SMS reminder 48 hours before the due date (CASL opt-in required).
+2. The daily scheduled job auto-forfeits overdue active loans overnight — the linked item transitions to **Active** (shop-owned for resale).
+3. For earlier manual forfeiture, click the **Forfeit** button next to the active loan.
 4. Review any local jurisdiction compliance rules before confirming (e.g., mandatory grace periods or final notices).
-5. Confirm forfeiture. The loan status updates to **Forfeited**, and ownership of the item officially transfers to the shop for resale.
+5. Confirm forfeiture. The loan status updates to **Forfeited** and the item is immediately available for resale.
 
 All status changes and communications are logged securely in the `auditLogs` for compliance.

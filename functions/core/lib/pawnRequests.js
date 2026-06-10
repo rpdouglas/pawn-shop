@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.submitPawnRequest = void 0;
+exports.updatePawnRequestStatus = exports.submitPawnRequest = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const firestore_1 = require("firebase-admin/firestore");
+const VALID_PAWN_REQUEST_STATUSES = ['pending', 'reviewed', 'quoted', 'declined', 'completed'];
 // Callable — any user (authenticated or guest). uid is null for guest submissions.
 // Blacklist check always runs before the document is written to Firestore, ensuring
 // serialBlacklistHit is set before staff can read the request (compliance requirement).
@@ -75,5 +76,37 @@ exports.submitPawnRequest = (0, https_1.onCall)({ cors: true }, async (request) 
         console.info(`[Admin alert] serial_blacklist_hit — requestId=${ref.id}`);
     }
     return { success: true, requestId: ref.id };
+});
+// Callable — admin/manager/inventory_staff only.
+// Replaces direct client updateDoc on pawnRequests to ensure every status
+// transition is audited via the Admin SDK.
+exports.updatePawnRequestStatus = (0, https_1.onCall)({ cors: true }, async (request) => {
+    if (!request.auth?.token.admin && !request.auth?.token.manager && !request.auth?.token.inventory_staff) {
+        throw new https_1.HttpsError('permission-denied', 'Only staff can update pawn request status');
+    }
+    const { pawnRequestId, status, staffNotes } = request.data;
+    if (!pawnRequestId)
+        throw new https_1.HttpsError('invalid-argument', 'pawnRequestId required');
+    if (!VALID_PAWN_REQUEST_STATUSES.includes(status)) {
+        throw new https_1.HttpsError('invalid-argument', `Invalid status. Must be one of: ${VALID_PAWN_REQUEST_STATUSES.join(', ')}`);
+    }
+    const db = (0, firestore_1.getFirestore)();
+    const ref = db.collection('pawnRequests').doc(pawnRequestId);
+    const snap = await ref.get();
+    if (!snap.exists)
+        throw new https_1.HttpsError('not-found', 'Pawn request not found');
+    const now = firestore_1.FieldValue.serverTimestamp();
+    const updates = { status, updatedAt: now };
+    if (staffNotes !== undefined)
+        updates['staffNotes'] = staffNotes;
+    await ref.update(updates);
+    await db.collection('auditLogs').add({
+        eventType: 'pawn_request_status_updated',
+        uid: request.auth.uid,
+        targetId: pawnRequestId,
+        details: { pawnRequestId, status },
+        createdAt: now,
+    });
+    return { success: true };
 });
 //# sourceMappingURL=pawnRequests.js.map

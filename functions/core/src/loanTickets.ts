@@ -5,27 +5,44 @@ import { dispatchSms } from '@pawn-shop/shared/lib/sms'
 import { twilioAccountSid, twilioAuthToken } from '@pawn-shop/shared/lib/secrets'
 
 interface CreateLoanTicketData {
-  uid: string
   pawnRequestId: string
-  itemDescription: string
   loanAmount: number
-  interestRate: number
+  interestRate?: number
   periodDays: number
-  dueDate: string // ISO string
+  itemId?: string
 }
 
+// Derives uid and itemDescription from the pawnRequest document so the client
+// does not need to send them (reduces trust surface; CF is the source of truth).
 export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, async (request) => {
   if (!request.auth?.token.admin && !request.auth?.token.manager && !request.auth?.token.inventory_staff) {
     throw new HttpsError('permission-denied', 'Only staff can create loan tickets')
   }
 
-  const { uid, pawnRequestId, itemDescription, loanAmount, interestRate, periodDays, dueDate } = request.data
+  const { pawnRequestId, loanAmount, periodDays, itemId } = request.data
+  const interestRate = request.data.interestRate ?? 0.05
 
-  if (!uid || !pawnRequestId || !itemDescription || loanAmount == null || interestRate == null || periodDays == null || !dueDate) {
-    throw new HttpsError('invalid-argument', 'Missing required fields')
+  if (!pawnRequestId || loanAmount == null || periodDays == null) {
+    throw new HttpsError('invalid-argument', 'pawnRequestId, loanAmount, and periodDays are required')
   }
+  if (loanAmount <= 0) throw new HttpsError('invalid-argument', 'loanAmount must be positive')
+  if (periodDays <= 0) throw new HttpsError('invalid-argument', 'periodDays must be positive')
 
   const db = getFirestore()
+
+  const pawnReqSnap = await db.collection('pawnRequests').doc(pawnRequestId).get()
+  if (!pawnReqSnap.exists) throw new HttpsError('not-found', 'Pawn request not found')
+
+  const pawnReqData = pawnReqSnap.data() as Record<string, unknown>
+  const uid = typeof pawnReqData['uid'] === 'string' ? pawnReqData['uid'] : ''
+  const itemDescription = String(pawnReqData['itemDescription'] ?? '')
+
+  // Check that a loan hasn't already been issued for this request
+  if (typeof pawnReqData['pawnLoanId'] === 'string' && pawnReqData['pawnLoanId']) {
+    throw new HttpsError('already-exists', 'A loan ticket has already been issued for this pawn request')
+  }
+
+  const dueDate = new Date(Date.now() + periodDays * 24 * 60 * 60 * 1000)
   const now = FieldValue.serverTimestamp()
 
   const docData: Record<string, unknown> = {
@@ -35,19 +52,21 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
     loanAmount,
     interestRate,
     periodDays,
-    dueDate: new Date(dueDate),
+    dueDate,
     status: 'active',
     extensionCount: 0,
     staffNotes: '',
     createdAt: now,
     updatedAt: now,
   }
+  if (itemId) docData['itemId'] = itemId
 
   const ref = await db.collection('loanTickets').add(docData)
 
   await db.collection('pawnRequests').doc(pawnRequestId).update({
     pawnLoanId: ref.id,
-    updatedAt: now
+    status: 'completed',
+    updatedAt: now,
   })
 
   await db.collection('auditLogs').add({
@@ -174,6 +193,7 @@ export const processExtension = onCall<ProcessExtensionData>({ cors: true }, asy
 
 interface RedeemLoanTicketData {
   loanTicketId: string
+  redemptionAmount?: number  // CAD cents — recorded for cash transactions; overwritten by Stripe when E79 ships
 }
 
 export const redeemLoanTicket = onCall<RedeemLoanTicketData>({ cors: true }, async (request) => {
@@ -181,7 +201,7 @@ export const redeemLoanTicket = onCall<RedeemLoanTicketData>({ cors: true }, asy
     throw new HttpsError('permission-denied', 'Only staff can redeem loan tickets')
   }
 
-  const { loanTicketId } = request.data
+  const { loanTicketId, redemptionAmount } = request.data
   if (!loanTicketId) throw new HttpsError('invalid-argument', 'loanTicketId required')
 
   const db = getFirestore()
@@ -191,11 +211,10 @@ export const redeemLoanTicket = onCall<RedeemLoanTicketData>({ cors: true }, asy
   if (!snap.exists) throw new HttpsError('not-found', 'Loan ticket not found')
 
   const now = FieldValue.serverTimestamp()
+  const updates: Record<string, unknown> = { status: 'redeemed', updatedAt: now }
+  if (redemptionAmount != null) updates['redemptionAmount'] = redemptionAmount
 
-  await ref.update({
-    status: 'redeemed',
-    updatedAt: now
-  })
+  await ref.update(updates)
 
   await db.collection('auditLogs').add({
     eventType: 'loan_redeemed',
@@ -267,11 +286,20 @@ export const checkLoanDueDates = onSchedule({ schedule: '0 0 * * *', secrets: [t
     const loanTicketId = doc.id
 
     if (dueDate < now) {
-      // Forfeited
+      // Forfeited — mirror the item-transition logic from the manual forfeitLoan CF
       await doc.ref.update({
         status: 'forfeited',
         updatedAt: FieldValue.serverTimestamp()
       })
+
+      const itemId = typeof data['itemId'] === 'string' ? data['itemId'] : null
+      if (itemId) {
+        await db.collection('items').doc(itemId).update({
+          status: 'active',
+          policeHold: false,
+          updatedAt: FieldValue.serverTimestamp(),
+        })
+      }
 
       await db.collection('auditLogs').add({
         eventType: 'loan_forfeited',

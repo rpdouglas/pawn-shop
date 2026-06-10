@@ -1381,3 +1381,28 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] Update `docs/AI_MODELS.md` with findings from the script `[Developer]`
 - [x] **E101 CLOSED** | 2026-06-09
 
+---
+
+### E106 · Pawn Loan Lifecycle Gap Remediation
+**Priority: HIGH (compliance) · Effort: Medium (8 files)**
+
+> **Persona Gate — E106:**
+> - **Staff (Primary):** Gap 1 blocked staff from creating loan tickets in the admin UI entirely.
+> - **Makoonsii:** All new loan issuance inputs meet the 48px touch target requirement.
+> - **Compliance:** Gaps 2 and 3 violated E31's requirement for CF-only status writes and full auditLog coverage.
+
+- [x] `updatePawnRequestStatus` callable CF added to `functions/core/src/pawnRequests.ts` `[Staff]` `[Comp]`
+- [x] `PawnInbox.tsx` routes all status saves through `updatePawnRequestStatus` CF (removes direct `updateDoc`) `[Comp]`
+- [x] `createLoanTicket` CF refactored — derives `uid`/`itemDescription` server-side; duplicate-issuance guard via `pawnLoanId` check `[Comp]`
+- [x] `IssueLoanModal.tsx` created — staff issues loan from pawn request (amount, term, rate); 48px inputs; success state shows ticket ID `[Staff]` `[Mak]`
+- [x] "Issue Loan" button in `PawnInbox` detail row — enabled only when `status === 'quoted'` and no `pawnLoanId` exists `[Staff]`
+- [x] `redeemLoanTicket` CF updated to accept and persist `redemptionAmount` (CAD cents) `[Comp]`
+- [x] `checkLoanDueDates` scheduler updated — auto-forfeit now transitions linked `items/{id}` to `status: 'active'` `[Comp]`
+- [x] 7 `auditLogs.eventType` values added to `docs/firestore-schema.md` `[Comp]`
+- [x] `PawnRequest` interface in `types.ts` extended with `pawnLoanId?: string` `[Staff]`
+- [x] `useIssueLoanTicket` and `useRedeemLoan` hook signatures updated to match new CF contracts `[Staff]`
+- [x] `LoanTicketsAdminPage` passes computed `redemptionAmount` on redeem `[Staff]`
+- [x] User guide updated: `admin/pawn-inbox.md` and `admin/loans.md` `[Staff]`
+- [x] Decision 0014 logged `[Comp]`
+- [x] **E106 CLOSED** | 2026-06-09
+

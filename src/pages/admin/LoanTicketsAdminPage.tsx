@@ -40,7 +40,8 @@ export default function LoanTicketsAdminPage() {
   const handleRedeem = async () => {
     if (!processingTicket || actionType !== 'redeem') return
     try {
-      await redeemLoan({ loanTicketId: processingTicket.id })
+      const redemptionAmount = Math.round(processingTicket.loanAmount * (1 + processingTicket.interestRate))
+      await redeemLoan({ loanTicketId: processingTicket.id, redemptionAmount })
       setProcessingTicket(null)
       setActionType(null)
     } catch (err) {

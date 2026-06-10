@@ -1,6 +1,8 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 
+const VALID_PAWN_REQUEST_STATUSES = ['pending', 'reviewed', 'quoted', 'declined', 'completed']
+
 interface SubmitPawnRequestData {
   name: string
   email: string
@@ -90,4 +92,48 @@ export const submitPawnRequest = onCall<SubmitPawnRequestData>({ cors: true }, a
   }
 
   return { success: true, requestId: ref.id }
+})
+
+interface UpdatePawnRequestStatusData {
+  pawnRequestId: string
+  status: string
+  staffNotes?: string
+}
+
+// Callable — admin/manager/inventory_staff only.
+// Replaces direct client updateDoc on pawnRequests to ensure every status
+// transition is audited via the Admin SDK.
+export const updatePawnRequestStatus = onCall<UpdatePawnRequestStatusData>({ cors: true }, async (request) => {
+  if (!request.auth?.token.admin && !request.auth?.token.manager && !request.auth?.token.inventory_staff) {
+    throw new HttpsError('permission-denied', 'Only staff can update pawn request status')
+  }
+
+  const { pawnRequestId, status, staffNotes } = request.data
+
+  if (!pawnRequestId) throw new HttpsError('invalid-argument', 'pawnRequestId required')
+  if (!VALID_PAWN_REQUEST_STATUSES.includes(status)) {
+    throw new HttpsError('invalid-argument', `Invalid status. Must be one of: ${VALID_PAWN_REQUEST_STATUSES.join(', ')}`)
+  }
+
+  const db = getFirestore()
+  const ref = db.collection('pawnRequests').doc(pawnRequestId)
+  const snap = await ref.get()
+
+  if (!snap.exists) throw new HttpsError('not-found', 'Pawn request not found')
+
+  const now = FieldValue.serverTimestamp()
+  const updates: Record<string, unknown> = { status, updatedAt: now }
+  if (staffNotes !== undefined) updates['staffNotes'] = staffNotes
+
+  await ref.update(updates)
+
+  await db.collection('auditLogs').add({
+    eventType: 'pawn_request_status_updated',
+    uid: request.auth.uid,
+    targetId: pawnRequestId,
+    details: { pawnRequestId, status },
+    createdAt: now,
+  })
+
+  return { success: true }
 })

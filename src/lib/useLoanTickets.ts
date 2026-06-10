@@ -80,30 +80,36 @@ export function useProcessExtension() {
 
 export function useIssueLoanTicket() {
   const queryClient = useQueryClient()
-  const issueFn = httpsCallable<{ pawnRequestId: string, loanAmount: number, periodDays: number, interestRate?: number, itemId?: string }, { success: boolean, loanTicketId: string }>(functions, 'createLoanTicket')
+  const issueFn = httpsCallable<
+    { pawnRequestId: string; loanAmount: number; periodDays: number; interestRate?: number; itemId?: string },
+    { success: boolean; loanTicketId: string }
+  >(functions, 'createLoanTicket')
 
   return useMutation({
-    mutationFn: async (args: { pawnRequestId: string, loanAmount: number, periodDays: number, interestRate?: number, itemId?: string }) => {
+    mutationFn: async (args: { pawnRequestId: string; loanAmount: number; periodDays: number; interestRate?: number; itemId?: string }) => {
       return (await issueFn(args)).data
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['loanTickets'] })
       queryClient.invalidateQueries({ queryKey: ['pawnRequests'] })
-    }
+    },
   })
 }
 
 export function useRedeemLoan() {
   const queryClient = useQueryClient()
-  const redeemFn = httpsCallable<{ loanTicketId: string, paymentIntentId?: string }, { success: boolean }>(functions, 'redeemLoanTicket')
+  const redeemFn = httpsCallable<
+    { loanTicketId: string; paymentIntentId?: string; redemptionAmount?: number },
+    { success: boolean }
+  >(functions, 'redeemLoanTicket')
 
   return useMutation({
-    mutationFn: async (args: { loanTicketId: string, paymentIntentId?: string }) => {
+    mutationFn: async (args: { loanTicketId: string; paymentIntentId?: string; redemptionAmount?: number }) => {
       await redeemFn(args)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['loanTickets'] })
-    }
+    },
   })
 }
 
