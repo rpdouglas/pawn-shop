@@ -175,6 +175,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **FIX_PRINT_TICKET_BUGS CLOSED** | BUGFIX | 2026-06-10 |
 | `E111 Pawn Ticket Two-Page Layout + Logo` — Printed ticket is now a two-page branded document: shop logo in page 1 header; `break-before: page` forces Terms & Conditions onto page 2; "Page 2 of 2" copy-header labels the second page. 2 files, ~8 lines CSS + JSX. Decision 0027 logged. | E111 | 2026-06-10 |
 | **E111 CLOSED** | E111 | 2026-06-10 |
+| `FIX_PRINT_TICKET_E111` — Diagnosed and fixed E111 regression: logo appeared blank in print preview because `window.print()` fired after the signature preload (cached) but before the logo fetch completed. Replaced single-image preload with `Promise.all([signature, logo]).then(() => window.print())` dual preload. Promoted `@page` rule to top-level CSS (outside `@media print`) to comply with CSS spec and ensure A4 sizing applies in all PDF engines. Decision 0028 logged. | BUGFIX | 2026-06-10 |
+| **FIX_PRINT_TICKET_E111 CLOSED** | BUGFIX | 2026-06-10 |
 
 ---
 
@@ -205,4 +207,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + E110 + E111 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF + FIX_PRINT_TICKET_BUGS CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + E110 + E111 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF + FIX_PRINT_TICKET_BUGS + FIX_PRINT_TICKET_E111 CLOSED)*

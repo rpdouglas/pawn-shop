@@ -1,3 +1,9 @@
+/* ── Page layout — top-level so all print engines apply it ──────────────── */
+@page {
+  margin: 10mm;
+  size: A4 portrait;
+}
+
 /* ── Screen: hide the print-only ticket ─────────────────────────────────── */
 @media screen {
   .print-ticket { display: none !important; }
@@ -199,10 +205,5 @@
     color: #333;
     line-height: 1.4;
     margin-bottom: 4pt;
-  }
-
-  @page {
-    margin: 10mm;
-    size: A4 portrait;
   }
 }

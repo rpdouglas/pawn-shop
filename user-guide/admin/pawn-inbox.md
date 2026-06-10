@@ -95,14 +95,9 @@ After the loan is created, the agreement signing step opens automatically.
 After signing, a confirmation screen shows the ticket number and a **Print Ticket** button.
 
 1. Click **Print Ticket** to open the browser print dialog.
-2. Select the connected printer and print. The ticket includes:
-   - Shop name and address
-   - Ticket number, date, and the issuing staff member's name
-   - Full item block: description, category, make/model, colour, serial number, condition, notable markings, and agreed item value
-   - Loan amount, interest rate (per period), term, due date, redemption total, and **Annual Percentage Rate (APR)**
-   - Legal terms: sole-recourse clause, police hold clause, extension terms, and customer rights
-   - Age and ownership declaration above the customer's signature
-   - Record retention notice
+2. Select the connected printer and print. The ticket is a **two-page document**:
+   - **Page 1** — Shop logo, ticket number, date, issuing staff member's name; full item block (description, category, make/model, colour, serial number, condition, notable markings, agreed item value); loan amount, interest rate (per period), term, due date, redemption total, and **Annual Percentage Rate (APR)**
+   - **Page 2** — Legal terms (sole-recourse clause, police hold clause, extension terms), age and ownership declaration above the customer's signature, and record retention notice
 3. Hand the printed ticket to the customer. They must keep it — photo ID plus this ticket is required to redeem their item.
 
 A loan can only be issued once per enquiry — the button is hidden if `pawnLoanId` is already set on the record.

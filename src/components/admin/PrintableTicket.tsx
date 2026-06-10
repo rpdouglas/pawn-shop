@@ -8,15 +8,22 @@ interface Props {
 }
 
 export default function PrintableTicket({ data }: Props) {
-  // Preload the signature image before opening the print dialog.
-  // window.print() fires synchronously, so remote images not yet in cache are blank.
-  // Creating a hidden Image() forces the browser to fetch and cache it first.
+  // Preload both the signature and the logo before opening the print dialog.
+  // window.print() can fire before async fetches complete; images inside display:none
+  // containers may not be cached yet. Promise.all waits for both, onerror resolves so
+  // print always fires even if one asset fails to load.
   useEffect(() => {
     if (!data) return
-    const img = new window.Image()
-    img.onload = () => window.print()
-    img.onerror = () => window.print()
-    img.src = data.signatureUrl
+    const preload = (src: string) => new Promise<void>(resolve => {
+      const img = new window.Image()
+      img.onload = () => resolve()
+      img.onerror = () => resolve()
+      img.src = src
+    })
+    Promise.all([
+      preload(data.signatureUrl),
+      preload('/branding/logo_pc.png'),
+    ]).then(() => window.print())
   }, [data])
 
   if (!data) return null
