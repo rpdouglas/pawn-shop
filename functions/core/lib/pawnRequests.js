@@ -8,7 +8,7 @@ const VALID_PAWN_REQUEST_STATUSES = ['pending', 'reviewed', 'quoted', 'declined'
 // Blacklist check always runs before the document is written to Firestore, ensuring
 // serialBlacklistHit is set before staff can read the request (compliance requirement).
 exports.submitPawnRequest = (0, https_1.onCall)({ cors: true }, async (request) => {
-    const { name, email, phone, itemDescription, serialNumber, imageUrls } = request.data;
+    const { name, email, phone, itemDescription, serialNumber, imageUrls, itemCategory, condition, notableMarkings, requestedAmount } = request.data;
     if (!name?.trim())
         throw new https_1.HttpsError('invalid-argument', 'Your name is required');
     if (!email?.trim())
@@ -46,6 +46,14 @@ exports.submitPawnRequest = (0, https_1.onCall)({ cors: true }, async (request) 
         docData['phone'] = phone.trim();
     if (trimmedSerial)
         docData['serialNumber'] = trimmedSerial;
+    if (itemCategory?.trim())
+        docData['itemCategory'] = itemCategory.trim();
+    if (condition?.trim())
+        docData['condition'] = condition.trim();
+    if (notableMarkings?.trim())
+        docData['notableMarkings'] = notableMarkings.trim();
+    if (typeof requestedAmount === 'number' && requestedAmount > 0)
+        docData['requestedAmount'] = requestedAmount;
     // Admin SDK write bypasses Firestore rules — serialBlacklistHit is always set
     // before any staff read, satisfying the E07 compliance requirement.
     const ref = await db.collection('pawnRequests').add(docData);

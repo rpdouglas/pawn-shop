@@ -61,6 +61,12 @@ function toPawnRequest(id: string, data: Record<string, unknown>): PawnRequest {
     staffNotes: typeof data['staffNotes'] === 'string' ? data['staffNotes'] : undefined,
     serialBlacklistHit: data['serialBlacklistHit'] === true,
     pawnLoanId: typeof data['pawnLoanId'] === 'string' ? data['pawnLoanId'] : undefined,
+    itemCategory: typeof data['itemCategory'] === 'string' ? data['itemCategory'] : undefined,
+    itemMake: typeof data['itemMake'] === 'string' ? data['itemMake'] : undefined,
+    itemModel: typeof data['itemModel'] === 'string' ? data['itemModel'] : undefined,
+    itemColour: typeof data['itemColour'] === 'string' ? data['itemColour'] : undefined,
+    condition: typeof data['condition'] === 'string' ? data['condition'] : undefined,
+    notableMarkings: typeof data['notableMarkings'] === 'string' ? data['notableMarkings'] : undefined,
     createdAt,
   }
 }
@@ -76,8 +82,19 @@ export default function PawnInbox() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
-  const [issueLoanFor, setIssueLoanFor] = useState<string | null>(null)
-  const [issueLoanDescription, setIssueLoanDescription] = useState('')
+  interface IssueLoanCtx {
+    pawnRequestId: string
+    itemDescription: string
+    serialNumber?: string
+    itemCategory?: string
+    itemMake?: string
+    itemModel?: string
+    itemColour?: string
+    condition?: string
+    notableMarkings?: string
+  }
+
+  const [issueLoanCtx, setIssueLoanCtx] = useState<IssueLoanCtx | null>(null)
   const [walkInModalOpen, setWalkInModalOpen] = useState(false)
   const [printTicket, setPrintTicket] = useState<PrintTicketData | null>(null)
 
@@ -85,14 +102,18 @@ export default function PawnInbox() {
     setPrintTicket(data)
   }, [])
 
-  const handleWalkInSuccess = useCallback((pawnRequestId: string, itemDesc: string, serialBlacklistHit: boolean) => {
+  const handleWalkInSuccess = useCallback((
+    pawnRequestId: string,
+    itemDesc: string,
+    serialBlacklistHit: boolean,
+    itemData?: { serialNumber?: string; itemCategory?: string; itemMake?: string; itemModel?: string; itemColour?: string; condition?: string; notableMarkings?: string },
+  ) => {
     setWalkInModalOpen(false)
     if (serialBlacklistHit) {
       // Serial flagged — stay in PawnInbox so staff can review the flag before issuing a loan
       return
     }
-    setIssueLoanFor(pawnRequestId)
-    setIssueLoanDescription(itemDesc)
+    setIssueLoanCtx({ pawnRequestId, itemDescription: itemDesc, ...itemData })
   }, [])
 
   useEffect(() => {
@@ -343,8 +364,17 @@ export default function PawnInbox() {
                                   className="btn btn-secondary btn-md"
                                   style={{ minHeight: '48px' }}
                                   onClick={() => {
-                                    setIssueLoanFor(req.id)
-                                    setIssueLoanDescription(req.itemDescription)
+                                    setIssueLoanCtx({
+                                      pawnRequestId: req.id,
+                                      itemDescription: req.itemDescription,
+                                      serialNumber: req.serialNumber,
+                                      itemCategory: req.itemCategory,
+                                      itemMake: req.itemMake,
+                                      itemModel: req.itemModel,
+                                      itemColour: req.itemColour,
+                                      condition: req.condition,
+                                      notableMarkings: req.notableMarkings,
+                                    })
                                   }}
                                   disabled={saving}
                                 >
@@ -380,10 +410,17 @@ export default function PawnInbox() {
       />
 
       <IssueLoanModal
-        isOpen={!!issueLoanFor}
-        onClose={() => { setIssueLoanFor(null); setIssueLoanDescription('') }}
-        pawnRequestId={issueLoanFor}
-        itemDescription={issueLoanDescription}
+        isOpen={!!issueLoanCtx}
+        onClose={() => setIssueLoanCtx(null)}
+        pawnRequestId={issueLoanCtx?.pawnRequestId ?? null}
+        itemDescription={issueLoanCtx?.itemDescription ?? ''}
+        serialNumber={issueLoanCtx?.serialNumber}
+        itemCategory={issueLoanCtx?.itemCategory}
+        itemMake={issueLoanCtx?.itemMake}
+        itemModel={issueLoanCtx?.itemModel}
+        itemColour={issueLoanCtx?.itemColour}
+        condition={issueLoanCtx?.condition}
+        notableMarkings={issueLoanCtx?.notableMarkings}
         onReadyToPrint={handleReadyToPrint}
       />
 

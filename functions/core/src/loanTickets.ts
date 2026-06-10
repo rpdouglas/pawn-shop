@@ -7,9 +7,12 @@ import { twilioAccountSid, twilioAuthToken } from '@pawn-shop/shared/lib/secrets
 interface CreateLoanTicketData {
   pawnRequestId: string
   loanAmount: number
-  interestRate?: number
+  interestRate: number
   periodDays: number
   itemId?: string
+  agreedItemValue?: number
+  idType?: string
+  idVerified?: boolean
 }
 
 // Derives uid and itemDescription from the pawnRequest document so the client
@@ -19,11 +22,14 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
     throw new HttpsError('permission-denied', 'Only staff can create loan tickets')
   }
 
-  const { pawnRequestId, loanAmount, periodDays, itemId } = request.data
-  const interestRate = request.data.interestRate ?? 0.05
+  const { pawnRequestId, loanAmount, periodDays, itemId, agreedItemValue, idType, idVerified } = request.data
+  const interestRate = request.data.interestRate
 
   if (!pawnRequestId || loanAmount == null || periodDays == null) {
     throw new HttpsError('invalid-argument', 'pawnRequestId, loanAmount, and periodDays are required')
+  }
+  if (interestRate == null) {
+    throw new HttpsError('invalid-argument', 'interestRate is required')
   }
   if (loanAmount <= 0) throw new HttpsError('invalid-argument', 'loanAmount must be positive')
   if (periodDays <= 0) throw new HttpsError('invalid-argument', 'periodDays must be positive')
@@ -36,11 +42,22 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
   const pawnReqData = pawnReqSnap.data() as Record<string, unknown>
   const uid = typeof pawnReqData['uid'] === 'string' ? pawnReqData['uid'] : ''
   const itemDescription = String(pawnReqData['itemDescription'] ?? '')
+  const serialNumber = typeof pawnReqData['serialNumber'] === 'string' ? pawnReqData['serialNumber'] : undefined
+  const itemCategory = typeof pawnReqData['itemCategory'] === 'string' ? pawnReqData['itemCategory'] : undefined
+  const itemMake = typeof pawnReqData['itemMake'] === 'string' ? pawnReqData['itemMake'] : undefined
+  const itemModel = typeof pawnReqData['itemModel'] === 'string' ? pawnReqData['itemModel'] : undefined
+  const itemColour = typeof pawnReqData['itemColour'] === 'string' ? pawnReqData['itemColour'] : undefined
+  const condition = typeof pawnReqData['condition'] === 'string' ? pawnReqData['condition'] : undefined
+  const notableMarkings = typeof pawnReqData['notableMarkings'] === 'string' ? pawnReqData['notableMarkings'] : undefined
 
   // Check that a loan hasn't already been issued for this request
   if (typeof pawnReqData['pawnLoanId'] === 'string' && pawnReqData['pawnLoanId']) {
     throw new HttpsError('already-exists', 'A loan ticket has already been issued for this pawn request')
   }
+
+  const issuedByDisplayName = typeof request.auth.token['name'] === 'string'
+    ? request.auth.token['name']
+    : (request.auth.token.email ?? '')
 
   const dueDate = new Date(Date.now() + periodDays * 24 * 60 * 60 * 1000)
   const now = FieldValue.serverTimestamp()
@@ -60,6 +77,15 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
     updatedAt: now,
   }
   if (itemId) docData['itemId'] = itemId
+  if (serialNumber) docData['serialNumber'] = serialNumber
+  if (issuedByDisplayName) docData['issuedByDisplayName'] = issuedByDisplayName
+  if (typeof agreedItemValue === 'number' && agreedItemValue > 0) docData['agreedItemValue'] = agreedItemValue
+  if (itemCategory) docData['itemCategory'] = itemCategory
+  if (itemMake) docData['itemMake'] = itemMake
+  if (itemModel) docData['itemModel'] = itemModel
+  if (itemColour) docData['itemColour'] = itemColour
+  if (condition) docData['condition'] = condition
+  if (notableMarkings) docData['notableMarkings'] = notableMarkings
 
   const ref = await db.collection('loanTickets').add(docData)
 
@@ -67,21 +93,24 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
   const ticketNumber = `PLT-${dateStr}-${ref.id.slice(0, 4).toUpperCase()}`
   await ref.update({ ticketNumber })
 
-  await db.collection('pawnRequests').doc(pawnRequestId).update({
+  const pawnRequestUpdates: Record<string, unknown> = {
     pawnLoanId: ref.id,
     status: 'completed',
     updatedAt: now,
-  })
+  }
+  if (idType) pawnRequestUpdates['idType'] = idType
+  if (idVerified) pawnRequestUpdates['idVerified'] = true
+  await db.collection('pawnRequests').doc(pawnRequestId).update(pawnRequestUpdates)
 
   await db.collection('auditLogs').add({
     eventType: 'loan_ticket_created',
     uid: request.auth.uid,
     targetId: ref.id,
-    details: { loanTicketId: ref.id, pawnRequestId, loanAmount },
+    details: { loanTicketId: ref.id, pawnRequestId, loanAmount, idVerified: idVerified ?? false },
     createdAt: now,
   })
 
-  return { success: true, loanTicketId: ref.id, ticketNumber }
+  return { success: true, loanTicketId: ref.id, ticketNumber, dueDate: dueDate.toISOString() }
 })
 
 interface RequestExtensionData {

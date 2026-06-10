@@ -304946,10 +304946,13 @@ var createLoanTicket = (0, import_https7.onCall)({ cors: true }, async (request)
   if (!request.auth?.token.admin && !request.auth?.token.manager && !request.auth?.token.inventory_staff) {
     throw new import_https7.HttpsError("permission-denied", "Only staff can create loan tickets");
   }
-  const { pawnRequestId, loanAmount, periodDays, itemId } = request.data;
-  const interestRate = request.data.interestRate ?? 0.05;
+  const { pawnRequestId, loanAmount, periodDays, itemId, agreedItemValue, idType, idVerified } = request.data;
+  const interestRate = request.data.interestRate;
   if (!pawnRequestId || loanAmount == null || periodDays == null) {
     throw new import_https7.HttpsError("invalid-argument", "pawnRequestId, loanAmount, and periodDays are required");
+  }
+  if (interestRate == null) {
+    throw new import_https7.HttpsError("invalid-argument", "interestRate is required");
   }
   if (loanAmount <= 0) throw new import_https7.HttpsError("invalid-argument", "loanAmount must be positive");
   if (periodDays <= 0) throw new import_https7.HttpsError("invalid-argument", "periodDays must be positive");
@@ -304959,9 +304962,17 @@ var createLoanTicket = (0, import_https7.onCall)({ cors: true }, async (request)
   const pawnReqData = pawnReqSnap.data();
   const uid = typeof pawnReqData["uid"] === "string" ? pawnReqData["uid"] : "";
   const itemDescription = String(pawnReqData["itemDescription"] ?? "");
+  const serialNumber = typeof pawnReqData["serialNumber"] === "string" ? pawnReqData["serialNumber"] : void 0;
+  const itemCategory = typeof pawnReqData["itemCategory"] === "string" ? pawnReqData["itemCategory"] : void 0;
+  const itemMake = typeof pawnReqData["itemMake"] === "string" ? pawnReqData["itemMake"] : void 0;
+  const itemModel = typeof pawnReqData["itemModel"] === "string" ? pawnReqData["itemModel"] : void 0;
+  const itemColour = typeof pawnReqData["itemColour"] === "string" ? pawnReqData["itemColour"] : void 0;
+  const condition = typeof pawnReqData["condition"] === "string" ? pawnReqData["condition"] : void 0;
+  const notableMarkings = typeof pawnReqData["notableMarkings"] === "string" ? pawnReqData["notableMarkings"] : void 0;
   if (typeof pawnReqData["pawnLoanId"] === "string" && pawnReqData["pawnLoanId"]) {
     throw new import_https7.HttpsError("already-exists", "A loan ticket has already been issued for this pawn request");
   }
+  const issuedByDisplayName = typeof request.auth.token["name"] === "string" ? request.auth.token["name"] : request.auth.token.email ?? "";
   const dueDate = new Date(Date.now() + periodDays * 24 * 60 * 60 * 1e3);
   const now = import_firestore10.FieldValue.serverTimestamp();
   const docData = {
@@ -304979,23 +304990,35 @@ var createLoanTicket = (0, import_https7.onCall)({ cors: true }, async (request)
     updatedAt: now
   };
   if (itemId) docData["itemId"] = itemId;
+  if (serialNumber) docData["serialNumber"] = serialNumber;
+  if (issuedByDisplayName) docData["issuedByDisplayName"] = issuedByDisplayName;
+  if (typeof agreedItemValue === "number" && agreedItemValue > 0) docData["agreedItemValue"] = agreedItemValue;
+  if (itemCategory) docData["itemCategory"] = itemCategory;
+  if (itemMake) docData["itemMake"] = itemMake;
+  if (itemModel) docData["itemModel"] = itemModel;
+  if (itemColour) docData["itemColour"] = itemColour;
+  if (condition) docData["condition"] = condition;
+  if (notableMarkings) docData["notableMarkings"] = notableMarkings;
   const ref = await db.collection("loanTickets").add(docData);
   const dateStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10).replace(/-/g, "");
   const ticketNumber = `PLT-${dateStr}-${ref.id.slice(0, 4).toUpperCase()}`;
   await ref.update({ ticketNumber });
-  await db.collection("pawnRequests").doc(pawnRequestId).update({
+  const pawnRequestUpdates = {
     pawnLoanId: ref.id,
     status: "completed",
     updatedAt: now
-  });
+  };
+  if (idType) pawnRequestUpdates["idType"] = idType;
+  if (idVerified) pawnRequestUpdates["idVerified"] = true;
+  await db.collection("pawnRequests").doc(pawnRequestId).update(pawnRequestUpdates);
   await db.collection("auditLogs").add({
     eventType: "loan_ticket_created",
     uid: request.auth.uid,
     targetId: ref.id,
-    details: { loanTicketId: ref.id, pawnRequestId, loanAmount },
+    details: { loanTicketId: ref.id, pawnRequestId, loanAmount, idVerified: idVerified ?? false },
     createdAt: now
   });
-  return { success: true, loanTicketId: ref.id, ticketNumber };
+  return { success: true, loanTicketId: ref.id, ticketNumber, dueDate: dueDate.toISOString() };
 });
 var requestExtension = (0, import_https7.onCall)({ cors: true }, async (request) => {
   const { loanTicketId } = request.data;
@@ -305229,7 +305252,7 @@ var import_https9 = require("firebase-functions/v2/https");
 var import_firestore12 = require("firebase-admin/firestore");
 var VALID_PAWN_REQUEST_STATUSES = ["pending", "reviewed", "quoted", "declined", "completed"];
 var submitPawnRequest = (0, import_https9.onCall)({ cors: true }, async (request) => {
-  const { name, email, phone, itemDescription, serialNumber, imageUrls } = request.data;
+  const { name, email, phone, itemDescription, serialNumber, imageUrls, itemCategory, condition, notableMarkings, requestedAmount } = request.data;
   if (!name?.trim())
     throw new import_https9.HttpsError("invalid-argument", "Your name is required");
   if (!email?.trim())
@@ -305259,6 +305282,10 @@ var submitPawnRequest = (0, import_https9.onCall)({ cors: true }, async (request
   };
   if (phone?.trim()) docData["phone"] = phone.trim();
   if (trimmedSerial) docData["serialNumber"] = trimmedSerial;
+  if (itemCategory?.trim()) docData["itemCategory"] = itemCategory.trim();
+  if (condition?.trim()) docData["condition"] = condition.trim();
+  if (notableMarkings?.trim()) docData["notableMarkings"] = notableMarkings.trim();
+  if (typeof requestedAmount === "number" && requestedAmount > 0) docData["requestedAmount"] = requestedAmount;
   const ref = await db.collection("pawnRequests").add(docData);
   if (uid) {
     await db.collection("users").doc(uid).update({
@@ -305319,7 +305346,22 @@ var createWalkInPawnRequest = (0, import_https10.onCall)({ cors: true }, async (
   if (!request.auth?.token.admin && !request.auth?.token.manager && !request.auth?.token.inventory_staff) {
     throw new import_https10.HttpsError("permission-denied", "Only staff can create walk-in pawn requests");
   }
-  const { name, itemDescription, phone, email, serialNumber } = request.data;
+  const {
+    name,
+    itemDescription,
+    phone,
+    email,
+    serialNumber,
+    itemCategory,
+    itemMake,
+    itemModel,
+    itemColour,
+    condition,
+    notableMarkings,
+    requestedAmount,
+    idType,
+    idVerified
+  } = request.data;
   if (!name?.trim()) throw new import_https10.HttpsError("invalid-argument", "Customer name is required");
   if (!itemDescription?.trim()) throw new import_https10.HttpsError("invalid-argument", "Item description is required");
   const db = (0, import_firestore13.getFirestore)();
@@ -305343,6 +305385,15 @@ var createWalkInPawnRequest = (0, import_https10.onCall)({ cors: true }, async (
   if (phone?.trim()) docData["phone"] = phone.trim();
   if (email?.trim()) docData["email"] = email.trim();
   if (trimmedSerial) docData["serialNumber"] = trimmedSerial;
+  if (itemCategory?.trim()) docData["itemCategory"] = itemCategory.trim();
+  if (itemMake?.trim()) docData["itemMake"] = itemMake.trim();
+  if (itemModel?.trim()) docData["itemModel"] = itemModel.trim();
+  if (itemColour?.trim()) docData["itemColour"] = itemColour.trim();
+  if (condition?.trim()) docData["condition"] = condition.trim();
+  if (notableMarkings?.trim()) docData["notableMarkings"] = notableMarkings.trim();
+  if (typeof requestedAmount === "number" && requestedAmount > 0) docData["requestedAmount"] = requestedAmount;
+  if (idType?.trim()) docData["idType"] = idType.trim();
+  if (idVerified) docData["idVerified"] = true;
   const ref = await db.collection("pawnRequests").add(docData);
   await db.collection("auditLogs").add({
     eventType: "walk_in_pawn_created",

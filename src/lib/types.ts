@@ -179,6 +179,15 @@ export interface PawnRequest {
   staffNotes?: string
   serialBlacklistHit: boolean
   pawnLoanId?: string
+  itemCategory?: string
+  itemMake?: string
+  itemModel?: string
+  itemColour?: string
+  condition?: string
+  notableMarkings?: string
+  requestedAmount?: number
+  idType?: string
+  idVerified?: boolean
   createdAt: Date
 }
 
@@ -416,6 +425,15 @@ export interface LoanTicket {
   signedAt?: Date
   agreementVersion?: string
   customerName?: string
+  serialNumber?: string
+  issuedByDisplayName?: string
+  agreedItemValue?: number
+  itemCategory?: string
+  itemMake?: string
+  itemModel?: string
+  itemColour?: string
+  condition?: string
+  notableMarkings?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -430,4 +448,13 @@ export interface PrintTicketData {
   customerName: string
   signatureUrl: string
   issuedAt: Date
+  staffName?: string
+  serialNumber?: string
+  agreedItemValueCents?: number
+  itemCategory?: string
+  itemMake?: string
+  itemModel?: string
+  itemColour?: string
+  condition?: string
+  notableMarkings?: string
 }

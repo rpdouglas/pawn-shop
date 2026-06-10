@@ -79,15 +79,30 @@ export function useProcessExtension() {
   })
 }
 
+export interface IssueLoanArgs {
+  pawnRequestId: string
+  loanAmount: number
+  periodDays: number
+  interestRate: number
+  itemId?: string
+  agreedItemValue?: number
+  idType?: string
+  idVerified?: boolean
+}
+
+export interface IssueLoanResult {
+  success: boolean
+  loanTicketId: string
+  ticketNumber: string
+  dueDate: string
+}
+
 export function useIssueLoanTicket() {
   const queryClient = useQueryClient()
-  const issueFn = httpsCallable<
-    { pawnRequestId: string; loanAmount: number; periodDays: number; interestRate?: number; itemId?: string },
-    { success: boolean; loanTicketId: string; ticketNumber: string }
-  >(functions, 'createLoanTicket')
+  const issueFn = httpsCallable<IssueLoanArgs, IssueLoanResult>(functions, 'createLoanTicket')
 
   return useMutation({
-    mutationFn: async (args: { pawnRequestId: string; loanAmount: number; periodDays: number; interestRate?: number; itemId?: string }) => {
+    mutationFn: async (args: IssueLoanArgs) => {
       return (await issueFn(args)).data
     },
     onSuccess: () => {

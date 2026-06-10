@@ -1542,6 +1542,31 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 
 ---
 
+### E110 · Pawn Compliance — Intake Forms & Printed Ticket
+
+> **Persona Gate — E110:**
+> - **Staff / POS Operator (Primary):** Complete, compliant intake form captures structured item details and ID verification. Printed ticket is a legally valid document with APR, agreed value, serial number, and proper terms.
+> - **Makoonsii (Secondary):** Ticket is readable, complete, and protects their rights — shows what was pawned, the total cost in plain language, and how to get it back.
+
+**Status:** ✅ CLOSED — 2026-06-10 · **Priority:** HIGH — Legal/Compliance · **Cycle:** 33
+
+- [x] Update `firestore-schema.md` with new fields (`pawnRequests`: `itemCategory`, `itemMake`, `itemModel`, `itemColour`, `condition`, `notableMarkings`, `requestedAmount`, `idType`, `idVerified`; `loanTickets`: `serialNumber`, `issuedByDisplayName`, `agreedItemValue`, `itemCategory`, `itemMake`, `itemModel`, `itemColour`, `condition`, `notableMarkings`) — Decision 0025 `[Comp]`
+- [x] `types.ts`: add new fields to `PrintTicketData`, `LoanTicket`, `PawnRequest` interfaces `[Comp]`
+- [x] `PrintableTicket.tsx`: APR row (computed from rate + term), agreed item value, serial number, staff issuer name, structured item block; improved terms (sole-recourse language, police hold clause, age/ownership declaration, retention note) `[Staff]` `[Mak]`
+- [x] `IssueLoanModal.tsx`: add agreedItemValue input, idType dropdown, idVerified + item-received checkboxes; pass staffName from `useAuth`; fix client-side due-date drift `[Staff]`
+- [x] `WalkInPawnModal.tsx`: add category, make/model, colour, condition, notableMarkings, requestedAmount fields `[Staff]`
+- [x] `PawnEnquiryForm.tsx`: add category, condition, notableMarkings, requestedAmount fields `[Mak]`
+- [x] `PawnInbox.tsx`: thread serialNumber through to IssueLoanModal props and PrintTicketData `[Staff]`
+- [x] `LoanTicketsAdminPage.tsx`: serialNumber + staffName available on reprint path `[Staff]`
+- [x] `createLoanTicket` CF: copy serialNumber + structured fields from pawnRequest, persist issuedByDisplayName, accept agreedItemValue, remove `?? 0.05` fallback `[Comp]`
+- [x] `createWalkInPawnRequest` CF (`pawnIntake.ts`): accept new optional intake fields `[Comp]`
+- [x] `submitPawnRequest` CF (`pawnRequests.ts`): accept new optional intake fields `[Comp]`
+- [x] Decision 0025 logged `[Comp]`
+- [x] User guide updated: `admin/pawn-inbox.md` and `admin/loans.md` `[Staff]`
+- [x] **E110 CLOSED** | 2026-06-10
+
+---
+
 ### E108 · Server-Side PDF Pawn Tickets (Backlog)
 
 > **Persona Gate — E108:**

@@ -31,6 +31,15 @@ export default function LoanTicketsAdminPage() {
       customerName: ticket.customerName,
       signatureUrl: ticket.signatureUrl,
       issuedAt: ticket.createdAt,
+      staffName: ticket.issuedByDisplayName,
+      serialNumber: ticket.serialNumber,
+      agreedItemValueCents: ticket.agreedItemValue,
+      itemCategory: ticket.itemCategory,
+      itemMake: ticket.itemMake,
+      itemModel: ticket.itemModel,
+      itemColour: ticket.itemColour,
+      condition: ticket.condition,
+      notableMarkings: ticket.notableMarkings,
     })
   }, [])
 

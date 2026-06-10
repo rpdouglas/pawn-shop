@@ -3,10 +3,11 @@ import SignaturePad from 'signature_pad'
 import Modal from '../ui/Modal'
 import Button from '../ui/Button'
 import { useIssueLoanTicket, useSignPawnAgreement } from '../../lib/useLoanTickets'
+import { useAuth } from '../../context/AuthContext'
 import { formatPrice, formatDate } from '../../lib/format'
 import type { PrintTicketData } from '../../lib/types'
 
-const AGREEMENT_VERSION = 'v1.0'
+const AGREEMENT_VERSION = 'v2.0'
 
 // Applicable rate caps for Akwesasne (Ontario side).
 // Loans under $1,000 CAD: max 48% APR. Loans $1,000 and over: max 35% APR.
@@ -29,6 +30,7 @@ interface IssuedLoanData {
   interestRate: number
   periodDays: number
   dueDate: Date
+  agreedItemValueCents: number
 }
 
 interface IssueLoanModalProps {
@@ -36,6 +38,13 @@ interface IssueLoanModalProps {
   onClose: () => void
   pawnRequestId: string | null
   itemDescription: string
+  serialNumber?: string
+  itemCategory?: string
+  itemMake?: string
+  itemModel?: string
+  itemColour?: string
+  condition?: string
+  notableMarkings?: string
   onReadyToPrint?: (data: PrintTicketData) => void
 }
 
@@ -44,15 +53,27 @@ export default function IssueLoanModal({
   onClose,
   pawnRequestId,
   itemDescription,
+  serialNumber,
+  itemCategory,
+  itemMake,
+  itemModel,
+  itemColour,
+  condition,
+  notableMarkings,
   onReadyToPrint,
 }: IssueLoanModalProps) {
   const { mutateAsync: issueLoan } = useIssueLoanTicket()
   const { mutateAsync: signAgreement } = useSignPawnAgreement()
+  const { user } = useAuth()
 
   const [step, setStep] = useState<Step>('terms')
   const [loanAmountDollars, setLoanAmountDollars] = useState('')
   const [periodDays, setPeriodDays] = useState('30')
   const [interestRatePct, setInterestRatePct] = useState('')
+  const [agreedItemValueDollars, setAgreedItemValueDollars] = useState('')
+  const [idType, setIdType] = useState('')
+  const [idVerified, setIdVerified] = useState(false)
+  const [itemReceived, setItemReceived] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -95,6 +116,10 @@ export default function IssueLoanModal({
     setLoanAmountDollars('')
     setPeriodDays('30')
     setInterestRatePct('')
+    setAgreedItemValueDollars('')
+    setIdType('')
+    setIdVerified(false)
+    setItemReceived(false)
     setLoading(false)
     setError('')
     setCustomerName('')
@@ -113,6 +138,7 @@ export default function IssueLoanModal({
     const amountCents = Math.round(parseFloat(loanAmountDollars) * 100)
     const days = parseInt(periodDays, 10)
     const ratePct = parseFloat(interestRatePct)
+    const agreedValueCents = Math.round(parseFloat(agreedItemValueDollars) * 100)
 
     if (!loanAmountDollars || isNaN(amountCents) || amountCents <= 0) {
       setError('Enter a valid loan amount')
@@ -132,18 +158,39 @@ export default function IssueLoanModal({
       setError(`Rate exceeds the legal maximum of ${maxRate}% (${aprLabel})`)
       return
     }
+    if (!agreedItemValueDollars || isNaN(agreedValueCents) || agreedValueCents <= 0) {
+      setError('Enter the agreed item value')
+      return
+    }
+    if (!idVerified) {
+      setError("Confirm you have verified the customer's government-issued photo ID")
+      return
+    }
+    if (!itemReceived) {
+      setError('Confirm the item has been physically received and is in the shop\'s possession')
+      return
+    }
 
     setLoading(true)
     setError('')
     try {
-      const result = await issueLoan({ pawnRequestId, loanAmount: amountCents, periodDays: days, interestRate: ratePct / 100 })
+      const result = await issueLoan({
+        pawnRequestId,
+        loanAmount: amountCents,
+        periodDays: days,
+        interestRate: ratePct / 100,
+        agreedItemValue: agreedValueCents,
+        idType: idType || undefined,
+        idVerified: true,
+      })
       setIssuedData({
         loanTicketId: result.loanTicketId,
         ticketNumber: result.ticketNumber,
         loanAmountCents: amountCents,
         interestRate: ratePct / 100,
         periodDays: days,
-        dueDate: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+        dueDate: new Date(result.dueDate),
+        agreedItemValueCents: agreedValueCents,
       })
       setStep('sign')
     } catch (err) {
@@ -195,8 +242,17 @@ export default function IssueLoanModal({
       customerName,
       signatureUrl,
       issuedAt: new Date(),
+      staffName: user?.displayName ?? undefined,
+      serialNumber,
+      agreedItemValueCents: issuedData.agreedItemValueCents,
+      itemCategory,
+      itemMake,
+      itemModel,
+      itemColour,
+      condition,
+      notableMarkings,
     })
-  }, [issuedData, itemDescription, customerName, signatureUrl, onReadyToPrint])
+  }, [issuedData, itemDescription, customerName, signatureUrl, onReadyToPrint, user, serialNumber, itemCategory, itemMake, itemModel, itemColour, condition, notableMarkings])
 
   const capLabel = useMemo(() => {
     const amountCents = Math.round(parseFloat(loanAmountDollars) * 100)
@@ -294,6 +350,63 @@ export default function IssueLoanModal({
             )}
           </div>
 
+          <div className="input-wrapper">
+            <label className="input-label" htmlFor="issue-loan-agreed-value">Agreed Item Value (CAD $) *</label>
+            <input
+              id="issue-loan-agreed-value"
+              type="number"
+              min="0"
+              step="0.01"
+              className="input-field"
+              style={{ minHeight: '48px' }}
+              value={agreedItemValueDollars}
+              onChange={e => setAgreedItemValueDollars(e.target.value)}
+              placeholder="Appraised / agreed value"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="input-wrapper">
+            <label className="input-label" htmlFor="issue-loan-id-type">ID Type Verified</label>
+            <select
+              id="issue-loan-id-type"
+              className="input-field input-field-select"
+              style={{ minHeight: '48px' }}
+              value={idType}
+              onChange={e => setIdType(e.target.value)}
+              disabled={loading}
+            >
+              <option value="">Select ID type…</option>
+              <option value="drivers_licence">Driver&apos;s Licence</option>
+              <option value="status_card">Status Card</option>
+              <option value="passport">Passport</option>
+              <option value="other">Other Government ID</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', minHeight: '48px', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
+              <input
+                type="checkbox"
+                checked={idVerified}
+                onChange={e => setIdVerified(e.target.checked)}
+                disabled={loading}
+                style={{ width: '20px', height: '20px', flexShrink: 0 }}
+              />
+              I have verified the customer&apos;s government-issued photo ID *
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', minHeight: '48px', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
+              <input
+                type="checkbox"
+                checked={itemReceived}
+                onChange={e => setItemReceived(e.target.checked)}
+                disabled={loading}
+                style={{ width: '20px', height: '20px', flexShrink: 0 }}
+              />
+              The item is physically in the shop&apos;s possession *
+            </label>
+          </div>
+
           {error && <p className="input-error" role="alert">{error}</p>}
 
           <div style={{ display: 'flex', gap: 'var(--space-4)', paddingTop: 'var(--space-2)' }}>
@@ -321,8 +434,9 @@ export default function IssueLoanModal({
           }}>
             <div style={{ fontWeight: 600, marginBottom: 'var(--space-1)' }}>Loan Summary</div>
             <div>Item: {itemDescription}</div>
-            <div>Amount: {formatPrice(issuedData.loanAmountCents)} · Rate: {(issuedData.interestRate * 100).toFixed(1)}% · Term: {issuedData.periodDays} days</div>
+            <div>Amount: {formatPrice(issuedData.loanAmountCents)} · Rate: {(issuedData.interestRate * 100).toFixed(2)}% · Term: {issuedData.periodDays} days</div>
             <div>Due: {formatDate(issuedData.dueDate)} · Redemption: {formatPrice(redemptionCents)}</div>
+            <div>Agreed Value: {formatPrice(issuedData.agreedItemValueCents)}</div>
           </div>
 
           <div style={{
@@ -332,10 +446,10 @@ export default function IssueLoanModal({
             lineHeight: 1.5,
           }}>
             <p style={{ margin: 0, marginBottom: 'var(--space-2)' }}>
-              By signing, the customer agrees to leave the above item as security for this loan. The item will be returned upon full repayment of the redemption amount by the due date. Failure to redeem by the due date will result in the item becoming the property of The Pawn Shop.
+              By signing, the customer confirms they are 18 or older, the lawful owner of the item, and not under the influence of alcohol or drugs. The item is left as security for this loan and will be returned on full repayment. In the event of default, the lender&apos;s only remedy is seizure of the pledged item — no further legal action will be pursued.
             </p>
             <p style={{ margin: 0 }}>
-              Ticket No. {issuedData.ticketNumber} is proof of this agreement and must be presented for redemption.
+              Ticket No. {issuedData.ticketNumber} is proof of this agreement and must be presented with valid photo ID for redemption.
             </p>
           </div>
 

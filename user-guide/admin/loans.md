@@ -19,6 +19,23 @@ Loan tickets are issued from the **Pawn Inbox**, not from the Loans dashboard. T
 
 > **Interest rate caps:** The system enforces the applicable legal maximums for Akwesasne (Ontario side) — 48% APR for loans under $1,000 CAD; 35% APR for loans $1,000 and over. The interest rate field auto-fills to the legal maximum and the system blocks submission if the entered rate exceeds it. See the [Pawn Inbox guide](pawn-inbox.md#step-1--loan-terms) for full details.
 
+## What Appears on the Printed Ticket
+
+Every pawn loan agreement ticket includes the following for legal validity:
+
+| Section | Contents |
+|---------|---------|
+| **Header** | Ticket number, issuance date, and issuing staff member's name |
+| **Pledged Item** | Description, category, make/model, colour, serial number, condition, notable markings, and agreed item value |
+| **Loan Terms** | Loan amount, per-period interest rate, term length, due date, and redemption total |
+| **APR Disclosure** | Annual Percentage Rate — required under Criminal Interest Rate Regulations SOR/2024-114 |
+| **Legal Terms** | Sole-recourse clause (lender's only remedy on default is item seizure), police hold clause, extension terms, customer rights |
+| **Declaration** | Customer confirms: 18+, lawful owner, not impaired |
+| **Signature** | Customer's on-screen signature and printed name |
+| **Footer** | Record retention notice and redemption instructions |
+
+> The APR and sole-recourse language together satisfy the requirements for the 48% pawn loan exemption under s.347 of the Criminal Code of Canada (SOR/2024-114).
+
 ## Printing a Signed Ticket
 
 If a loan ticket has been signed (green **Signed** badge), you can reprint the ticket at any time from the Loans dashboard:
@@ -28,6 +45,8 @@ If a loan ticket has been signed (green **Signed** badge), you can reprint the t
 3. The browser print dialog opens. Select your printer and print.
 
 Unsigned tickets do not have a Print button — the signature must be captured first.
+
+Reprinted tickets include all structured item details (make, model, serial, agreed value) and the name of the staff member who originally issued the ticket.
 
 ## Processing Loan Redemptions
 

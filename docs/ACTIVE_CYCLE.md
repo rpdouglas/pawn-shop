@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-E107 + E109 + FIX_PAWN_LOAN_DEFAULTS · POS Loan Issuance — Digital signature flow, walk-in pawn intake, and interest rate compliance all complete. Counter staff can now issue legally capped loans to any customer with full sign + print workflow. (COMPLETED)
+E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow, walk-in intake, interest rate compliance, and full pawn ticket legal compliance all complete. APR disclosure, agreed item value, sole-recourse terms, police hold clause, age declaration, and structured intake fields in place. (COMPLETED)
 
 ---
 
@@ -169,6 +169,8 @@ E107 + E109 + FIX_PAWN_LOAN_DEFAULTS · POS Loan Issuance — Digital signature 
 | **FIX_PRINT_TICKET_VISIBILITY CLOSED** | BUGFIX | 2026-06-10 |
 | `FIX_PRINT_TICKET_PDF` — After the visibility fix, printing to PDF still produced a blank page. Root cause: `Modal.tsx` sets `document.body.style.overflow = 'hidden'` inline (scroll-lock); the PDF engine respects this overflow clip on body, hiding the `.print-ticket` portal. Added `html, body { height: auto !important; overflow: visible !important; }` to `@media print` in `print.css` — `!important` overrides the inline style. Decision 0024 logged. | BUGFIX | 2026-06-10 |
 | **FIX_PRINT_TICKET_PDF CLOSED** | BUGFIX | 2026-06-10 |
+| `E110 Pawn Compliance — Intake Forms & Printed Ticket` — Closed all 10 compliance gaps from the gap analysis. APR disclosure on ticket (SOR/2024-114); agreed item value (25 CFR §141.35); sole-recourse + police hold + age/ownership declaration in ticket terms; structured item details at intake (category, make/model, colour, condition, notableMarkings) in both walk-in and online forms; ID type + verified checkboxes at issuance and walk-in intake; `createLoanTicket` CF hardened (removed `?? 0.05` default, now throws on missing rate), copies structured fields + serial to loanTickets, records `issuedByDisplayName`, returns server-side dueDate; reprint path passes all fields through. 15 files updated. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decisions 0025 logged. | E110 | 2026-06-10 |
+| **E110 CLOSED** | E110 | 2026-06-10 |
 
 ---
 
@@ -199,4 +201,4 @@ E107 + E109 + FIX_PAWN_LOAN_DEFAULTS · POS Loan Issuance — Digital signature 
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + E110 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF CLOSED)*

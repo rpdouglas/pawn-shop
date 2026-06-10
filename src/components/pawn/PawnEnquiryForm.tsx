@@ -39,6 +39,10 @@ export default function PawnEnquiryForm() {
   const [phone, setPhone] = useState('')
   const [itemDescription, setItemDescription] = useState('')
   const [serialNumber, setSerialNumber] = useState('')
+  const [itemCategory, setItemCategory] = useState('')
+  const [condition, setCondition] = useState('')
+  const [notableMarkings, setNotableMarkings] = useState('')
+  const [requestedAmountDollars, setRequestedAmountDollars] = useState('')
 
   const [errors, setErrors] = useState<{
     name?: string
@@ -139,9 +143,28 @@ export default function PawnEnquiryForm() {
         itemDescription: string
         serialNumber: string
         imageUrls: string[]
+        itemCategory?: string
+        condition?: string
+        notableMarkings?: string
+        requestedAmount?: number
       }, SubmitResponse>(functions, 'submitPawnRequest')
 
-      await submit({ name, email, phone, itemDescription, serialNumber, imageUrls })
+      const requestedAmountCents = requestedAmountDollars.trim()
+        ? Math.round(parseFloat(requestedAmountDollars) * 100)
+        : undefined
+
+      await submit({
+        name,
+        email,
+        phone,
+        itemDescription,
+        serialNumber,
+        imageUrls,
+        itemCategory: itemCategory || undefined,
+        condition: condition || undefined,
+        notableMarkings: notableMarkings.trim() || undefined,
+        requestedAmount: requestedAmountCents && requestedAmountCents > 0 ? requestedAmountCents : undefined,
+      })
       Analytics.pawnFormSubmit({ view: 'pawn' })
       setSubmitted(true)
     } catch {
@@ -261,6 +284,74 @@ export default function PawnEnquiryForm() {
             value={serialNumber}
             onChange={setSerialNumber}
             placeholder="e.g. SN-1234567 or Model XZ-800"
+            disabled={submitting}
+          />
+        </div>
+
+        <div className="pawn-form-row">
+          <div className="input-wrapper">
+            <label className="input-label" htmlFor="pawn-category">Category (optional)</label>
+            <select
+              id="pawn-category"
+              className="input-field input-field-select"
+              style={{ minHeight: '48px' }}
+              value={itemCategory}
+              onChange={e => setItemCategory(e.target.value)}
+              disabled={submitting}
+            >
+              <option value="">Select…</option>
+              <option value="electronics">Electronics</option>
+              <option value="jewellery">Jewellery</option>
+              <option value="power_tools">Power Tools</option>
+              <option value="musical_instruments">Musical Instruments</option>
+              <option value="sporting_goods">Sporting Goods</option>
+              <option value="collectibles">Collectibles</option>
+              <option value="clothing">Clothing</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div className="input-wrapper">
+            <label className="input-label" htmlFor="pawn-condition">Condition (optional)</label>
+            <select
+              id="pawn-condition"
+              className="input-field input-field-select"
+              style={{ minHeight: '48px' }}
+              value={condition}
+              onChange={e => setCondition(e.target.value)}
+              disabled={submitting}
+            >
+              <option value="">Select…</option>
+              <option value="excellent">Excellent</option>
+              <option value="good">Good</option>
+              <option value="fair">Fair</option>
+              <option value="poor">Poor</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="pawn-form-field">
+          <div className="input-wrapper">
+            <label className="input-label" htmlFor="pawn-markings">Notable markings or damage (optional)</label>
+            <textarea
+              id="pawn-markings"
+              className="input-field intake-textarea"
+              value={notableMarkings}
+              onChange={e => setNotableMarkings(e.target.value)}
+              placeholder="Engravings, scratches, or any distinctive features"
+              rows={2}
+              disabled={submitting}
+            />
+          </div>
+        </div>
+
+        <div className="pawn-form-field">
+          <Input
+            id="pawn-requested"
+            label="How much are you looking for? (optional)"
+            value={requestedAmountDollars}
+            onChange={setRequestedAmountDollars}
+            type="number"
+            placeholder="e.g. 200.00"
             disabled={submitting}
           />
         </div>

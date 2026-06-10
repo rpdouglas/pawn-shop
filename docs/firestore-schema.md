@@ -117,6 +117,15 @@
 | `staffNotes` | string | Internal — never show to customer |
 | `serialBlacklistHit` | boolean | Set by Cloud Function on create |
 | `pawnLoanId` | string | Link to `loanTickets/{id}` if a loan is issued |
+| `itemCategory` | string | Optional. Staff/customer classification at intake: `'electronics'` \| `'jewellery'` \| `'power_tools'` \| `'musical_instruments'` \| `'sporting_goods'` \| `'collectibles'` \| `'clothing'` \| `'other'`. |
+| `itemMake` | string | Optional. Manufacturer or brand name (e.g., `'DeWalt'`, `'Apple'`). Populated at intake by staff or customer. |
+| `itemModel` | string | Optional. Model name or number (e.g., `'DCD777C2'`, `'iPhone 14 Pro'`). |
+| `itemColour` | string | Optional. Primary colour or finish (e.g., `'black'`, `'stainless steel'`). |
+| `condition` | string | Optional. Staff/customer assessed condition at intake: `'excellent'` \| `'good'` \| `'fair'` \| `'poor'`. Distinct from `items.condition` which uses `'new'` — pawn intake uses `'excellent'` as the top grade since items are pre-owned. |
+| `notableMarkings` | string | Optional. Engravings, scratches, damage, or distinctive features used to confirm item identity on redemption. |
+| `requestedAmount` | number | Optional. CAD cents. Amount the customer is asking to borrow. Recorded at intake for staff reference during valuation. |
+| `idType` | string | Optional. Type of government ID checked at intake (walk-in) or at issuance: `'drivers_licence'` \| `'status_card'` \| `'passport'` \| `'other'`. Full ID number recorded in paper ledger only — not stored digitally. |
+| `idVerified` | boolean | Optional. Set to `true` by staff when government photo ID has been physically checked. Set by `createWalkInPawnRequest` CF (walk-in) or by `createLoanTicket` CF (online → in-person). |
 | `createdAt` | timestamp | |
 
 ---
@@ -146,6 +155,15 @@
 | `signedAt` | timestamp | Server timestamp when agreement was signed. Null until signed. |
 | `agreementVersion` | string | Version slug of the agreement template shown (e.g. `'v1.0'`). Tracks which terms the customer consented to. |
 | `customerName` | string | Customer's full name at time of signing, recorded for agreement validity. Never in `auditLogs`. |
+| `serialNumber` | string | Optional. Item serial number copied from `pawnRequests/{id}.serialNumber` at `createLoanTicket` CF execution. Stored here so reprinting from `LoanTicketsAdminPage` can show it without a second Firestore read. |
+| `issuedByDisplayName` | string | Optional. Display name of the staff member who called `createLoanTicket`. Source: `request.auth.token.name`. Printed on ticket as the issuing authority line. |
+| `agreedItemValue` | number | Optional. CAD cents. Agreed valuation of the pledged item at time of loan issuance, as per 25 CFR §141.35(e) and best-practice pawnbroker agreements. Staff-set in `IssueLoanModal`. Printed on ticket. |
+| `itemCategory` | string | Optional. Copied from `pawnRequests/{id}.itemCategory` at `createLoanTicket` CF execution. Stored here so reprinting works without a second Firestore read. |
+| `itemMake` | string | Optional. Copied from `pawnRequests/{id}.itemMake` at loan creation. |
+| `itemModel` | string | Optional. Copied from `pawnRequests/{id}.itemModel` at loan creation. |
+| `itemColour` | string | Optional. Copied from `pawnRequests/{id}.itemColour` at loan creation. |
+| `condition` | string | Optional. Copied from `pawnRequests/{id}.condition` at loan creation. |
+| `notableMarkings` | string | Optional. Copied from `pawnRequests/{id}.notableMarkings` at loan creation. |
 | `createdAt` | timestamp | Server timestamp |
 | `updatedAt` | timestamp | Server timestamp |
 
