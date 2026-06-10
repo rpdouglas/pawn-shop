@@ -173,6 +173,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **E110 CLOSED** | E110 | 2026-06-10 |
 | `FIX_PRINT_TICKET_BUGS` — (1) Invalid Date: `result.dueDate` absent on pre-E110 CF builds; `new Date(undefined)` → `"Invalid Date"`. Fixed with `result.dueDate ? new Date(result.dueDate) : client-side-fallback`. (2) Blank signature: `window.print()` fired before browser fetched remote Storage URL. Fixed by preloading via hidden `Image()` and calling `window.print()` only in `img.onload`. Decision 0026 logged. | BUGFIX | 2026-06-10 |
 | **FIX_PRINT_TICKET_BUGS CLOSED** | BUGFIX | 2026-06-10 |
+| `E111 Pawn Ticket Two-Page Layout + Logo` — Printed ticket is now a two-page branded document: shop logo in page 1 header; `break-before: page` forces Terms & Conditions onto page 2; "Page 2 of 2" copy-header labels the second page. 2 files, ~8 lines CSS + JSX. Decision 0027 logged. | E111 | 2026-06-10 |
+| **E111 CLOSED** | E111 | 2026-06-10 |
 
 ---
 
@@ -203,4 +205,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + E110 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF + FIX_PRINT_TICKET_BUGS CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 + E109 + E110 + E111 + FIX_PAWN_LOAN_DEFAULTS + FIX_PRINT_TICKET_VISIBILITY + FIX_PRINT_TICKET_PDF + FIX_PRINT_TICKET_BUGS CLOSED)*

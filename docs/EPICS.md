@@ -1580,6 +1580,23 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 
 ---
 
+### E111 · Pawn Ticket Two-Page Print Layout + Logo
+
+> **Persona Gate — E111:**
+> - **Jordan (Primary):** Printed document is a polished, branded two-page agreement — not a single wall of text.
+> - **Staff / POS Operator (Primary):** Page 1 = loan summary; page 2 = legal terms. Logo confirms document provenance at the counter.
+> - **Makoonsii / Dale (Secondary):** Cleaner page 1 makes loan terms easier to read and retain.
+
+**Status:** ✅ CLOSED — 2026-06-10 · **Priority:** LOW · **Cycle:** 33
+
+- [x] `print.css`: add `.print-ticket-logo` rule; add `break-before: page` to `.print-ticket-agreement` `[Jord]`
+- [x] `PrintableTicket.tsx`: replace shop-name text with `<img src="/branding/logo_pc.png">` in page 1 header `[Jord]`
+- [x] `PrintableTicket.tsx`: add "— Page 2 of 2 — Terms & Conditions" copy-header inside `.print-ticket-agreement` `[Staff]`
+- [x] Decision 0027 logged `[Jord]`
+- [x] **E111 CLOSED** | 2026-06-10
+
+---
+
 ### E108 · Server-Side PDF Pawn Tickets (Backlog)
 
 > **Persona Gate — E108:**

@@ -117,7 +117,16 @@
     font-weight: bold;
   }
 
+  .print-ticket-logo {
+    display: block;
+    max-height: 18mm;
+    max-width: 50mm;
+    margin: 0 auto 4pt;
+  }
+
   .print-ticket-agreement {
+    break-before: page;
+    page-break-before: always;
     margin-bottom: 8pt;
   }
 

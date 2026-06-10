@@ -23,16 +23,21 @@ Loan tickets are issued from the **Pawn Inbox**, not from the Loans dashboard. T
 
 Every pawn loan agreement ticket includes the following for legal validity:
 
-| Section | Contents |
-|---------|---------|
-| **Header** | Ticket number, issuance date, and issuing staff member's name |
-| **Pledged Item** | Description, category, make/model, colour, serial number, condition, notable markings, and agreed item value |
-| **Loan Terms** | Loan amount, per-period interest rate, term length, due date, and redemption total |
-| **APR Disclosure** | Annual Percentage Rate — required under Criminal Interest Rate Regulations SOR/2024-114 |
-| **Legal Terms** | Sole-recourse clause (lender's only remedy on default is item seizure), police hold clause, extension terms, customer rights |
-| **Declaration** | Customer confirms: 18+, lawful owner, not impaired |
-| **Signature** | Customer's on-screen signature and printed name |
-| **Footer** | Record retention notice and redemption instructions |
+The ticket prints as a **two-page document**:
+
+- **Page 1** — Loan summary (shop logo, ticket number, pledged item details, loan terms, APR disclosure)
+- **Page 2** — Legal terms, customer declaration, and signature
+
+| Section | Page | Contents |
+|---------|------|---------|
+| **Header** | 1 | Shop logo, ticket number, issuance date, and issuing staff member's name |
+| **Pledged Item** | 1 | Description, category, make/model, colour, serial number, condition, notable markings, and agreed item value |
+| **Loan Terms** | 1 | Loan amount, per-period interest rate, term length, due date, and redemption total |
+| **APR Disclosure** | 1 | Annual Percentage Rate — required under Criminal Interest Rate Regulations SOR/2024-114 |
+| **Legal Terms** | 2 | Sole-recourse clause (lender's only remedy on default is item seizure), police hold clause, extension terms, customer rights |
+| **Declaration** | 2 | Customer confirms: 18+, lawful owner, not impaired |
+| **Signature** | 2 | Customer's on-screen signature and printed name |
+| **Footer** | 2 | Record retention notice and redemption instructions |
 
 > The APR and sole-recourse language together satisfy the requirements for the 48% pawn loan exemption under s.347 of the Criminal Code of Canada (SOR/2024-114).
 

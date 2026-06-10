@@ -30,7 +30,7 @@ export default function PrintableTicket({ data }: Props) {
       <div className="print-ticket-copy-header">Customer Copy — Keep for Redemption</div>
 
       <div>
-        <div className="print-ticket-shop-name">The Pawn Shop</div>
+        <img src="/branding/logo_pc.png" alt="The Pawn Shop" className="print-ticket-logo" />
         <div className="print-ticket-shop-address">Cornwall Island · Akwesasne</div>
         <div className="print-ticket-divider" />
         <div className="print-ticket-title">Pawn Loan Agreement</div>
@@ -120,8 +120,9 @@ export default function PrintableTicket({ data }: Props) {
         Annual Percentage Rate (APR): {aprPct}%
       </div>
 
-      {/* Terms & Conditions */}
+      {/* Terms & Conditions — starts on page 2 via break-before: page in print.css */}
       <div className="print-ticket-agreement">
+        <div className="print-ticket-copy-header">— Page 2 of 2 — Terms &amp; Conditions</div>
         <span className="print-ticket-label">Terms &amp; Conditions</span>
         <div className="print-ticket-agreement-text">
           <p>The customer leaves the above item as security for this loan. To reclaim the item, the full redemption amount must be paid by the due date shown above.</p>
