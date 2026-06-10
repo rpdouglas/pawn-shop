@@ -1406,3 +1406,17 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] Decision 0014 logged `[Comp]`
 - [x] **E106 CLOSED** | 2026-06-09
 
+---
+
+### FIX · Seed Item Visibility — Admin Inventory Hidden Items
+
+> **Persona Gate:** Staff (inventory_staff / manager / admin). No customer-facing change.
+
+**Root cause:** Admin `InventoryPage` query had `limit(50)` ordered by `createdAt desc`. Seed items (batch-written 2026-05-18) held the oldest timestamps and fell past position 50 as real items accumulated. Public storefronts were unaffected — per-viewTag `limit(20)` buckets are independent of the global admin query.
+
+- [x] Raise admin inventory query from `limit(50)` to `limit(500)` in `InventoryPage.tsx` `[Staff]`
+- [x] Create `scripts/find-seed-items.mjs` — read-only fingerprint query to identify 36 fake seed items `[Staff]`
+- [x] Decision 0015 logged `[Comp]`
+- [x] User guide updated: `admin/inventory.md` `[Staff]`
+- [x] **FIX_SEED_ITEM_VISIBILITY CLOSED** | 2026-06-10
+

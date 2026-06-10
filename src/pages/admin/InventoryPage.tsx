@@ -139,7 +139,7 @@ export default function InventoryPage() {
     const q = query(
       collection(db, 'items'),
       orderBy('createdAt', 'desc'),
-      limit(50)
+      limit(500)
     )
     const unsubscribe = onSnapshot(
       q,

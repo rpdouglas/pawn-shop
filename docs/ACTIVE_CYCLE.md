@@ -149,6 +149,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E105 CLOSED** | E105 | 2026-06-09 |
 | `E106 Pawn Loan Lifecycle Gap Remediation` — Closed 6 gaps in E31 compliance: (1) Created `IssueLoanModal` + "Issue Loan" button in `PawnInbox` to unblock loan issuance; (2) Routed all `pawnRequests` status writes through new `updatePawnRequestStatus` CF; (3) Added 7 `auditLogs.eventType` values to schema; (4) `redeemLoanTicket` now persists `redemptionAmount`; (5) Auto-forfeit scheduler transitions linked item to `active`; (6) Extension decline documented (`active` is correct post-decline state). Decision 0014 logged. | E106 | 2026-06-09 |
 | **E106 CLOSED** | E106 | 2026-06-09 |
+| `FIX_SEED_ITEM_VISIBILITY` — Admin inventory query had `limit(50)` hiding 36 fake seed items (added 2026-05-18) from admin view while they remained visible on public storefront pages. Raised limit to 500. Created `scripts/find-seed-items.mjs` fingerprint script — identified all 36 seed items by picsum.photos image, template description, and seed title. Decision 0015 logged. | BUGFIX | 2026-06-10 |
+| **FIX_SEED_ITEM_VISIBILITY CLOSED** | BUGFIX | 2026-06-10 |
 
 ---
 
@@ -179,4 +181,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-09 (Cycle 32 — E106 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — FIX_SEED_ITEM_VISIBILITY CLOSED)*
