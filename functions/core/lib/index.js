@@ -32,6 +32,7 @@ __exportStar(require("./purgeExpiredData"), exports);
 __exportStar(require("./activity"), exports);
 __exportStar(require("./backup"), exports);
 __exportStar(require("./loanTickets"), exports);
+__exportStar(require("./pawnAgreement"), exports);
 __exportStar(require("./pawnRequests"), exports);
 __exportStar(require("./reservations"), exports);
 __exportStar(require("./preorders"), exports);

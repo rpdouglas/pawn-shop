@@ -11,19 +11,21 @@ The Pawn Shop staff dashboard provides a central interface for managing active p
    - Loan amount
    - Due date
    - Current status (Active, Extension Requested, Redeemed, Forfeited)
+   - Signed / Unsigned badge — whether the customer has signed the agreement
 
 ## Issuing a Loan Ticket
 
-Loan tickets are issued from the **Pawn Inbox**, not from the Loans dashboard. This keeps the issuance tied to the original customer enquiry.
+Loan tickets are issued from the **Pawn Inbox**, not from the Loans dashboard. This keeps the issuance tied to the original customer enquiry. See the [Pawn Inbox guide](pawn-inbox.md) for the full three-step flow: Loan Terms → Customer Signature → Print Ticket.
 
-1. In the Pawn Inbox, set the enquiry status to **Quoted** and save.
-2. Expand the enquiry row — an **Issue Loan** button appears.
-3. Click **Issue Loan** and enter:
-   - **Loan Amount** — the principal in CAD dollars
-   - **Loan Term** — number of days until the loan is due (default: 30)
-   - **Interest Rate** — percentage charged on the principal (default: 5%)
-4. Click **Issue Loan** to confirm. The due date is calculated automatically from the term.
-5. The Loans dashboard will reflect the new ticket immediately.
+## Printing a Signed Ticket
+
+If a loan ticket has been signed (green **Signed** badge), you can reprint the ticket at any time from the Loans dashboard:
+
+1. Locate the loan ticket in the list.
+2. Click the **Print** button in the row actions.
+3. The browser print dialog opens. Select your printer and print.
+
+Unsigned tickets do not have a Print button — the signature must be captured first.
 
 ## Processing Loan Redemptions
 

@@ -16,7 +16,7 @@
 
 ## Cycle Goal
 
-E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells, copy/paste, row selection, per-row and batch AI dispatch. (COMPLETED)
+E107 · Pawn Ticket Digital Signature — Three-step POS loan issuance modal with canvas signature capture, Firebase Storage upload, and browser-print ticket generation. (COMPLETED)
 
 ---
 
@@ -159,6 +159,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **E73 Quick Wins CLOSED** | E73 | 2026-06-10 |
 | `FIX_FIREBASE_INIT_ORDER` — E73's static import conversion broke ES module evaluation order: `firebase.ts` called `getApp()` before `firebase-core.ts` ran `initializeApp()`, crashing the entire app on load. Fix: replaced `getApp()` with `import { app } from './firebase-core'` to encode the dependency in the module graph. Decision 0019 logged. | BUGFIX | 2026-06-10 |
 | **FIX_FIREBASE_INIT_ORDER CLOSED** | BUGFIX | 2026-06-10 |
+| `E107 Pawn Ticket Generation & Digital Signature` — Three-step modal (Terms → Sign → Done+Print) in `IssueLoanModal`; `signature_pad` v5 canvas for stylus/finger capture on Android POS tablet with devicePixelRatio scaling; `signPawnAgreement` CF uploads PNG to Firebase Storage; `createLoanTicket` CF now generates `ticketNumber`; `PrintableTicket` portal-rendered with `@media print` CSS; Signed/Unsigned badge + Print button in `LoanTicketsAdminPage`; `storage.rules` updated for `tickets/` path. Decisions 0020 + 0021 logged. | E107 | 2026-06-10 |
+| **E107 CLOSED** | E107 | 2026-06-10 |
 
 ---
 
@@ -189,4 +191,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — FIX_FIREBASE_INIT_ORDER CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E107 CLOSED)*

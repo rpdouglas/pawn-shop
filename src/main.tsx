@@ -18,6 +18,7 @@ import '@fontsource/oswald/400.css'
 import '@fontsource/oswald/500.css'
 
 import './index.css'
+import './styles/print.css'
 import App from './App.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
 import AgeGate from './components/age-gate/AgeGate.tsx'

@@ -16,14 +16,41 @@ The **Pawn Inbox** is the central dashboard for staff to review and manage custo
 
 ## Issuing a Loan Ticket
 
-Once an enquiry is in **Quoted** status and the customer has accepted the offer:
+Once an enquiry is in **Quoted** status and the customer has accepted the offer, the full issuance flow runs in three steps — all within the admin dashboard.
+
+### Step 1 — Loan Terms
 
 1. Expand the enquiry row by clicking **Review**.
 2. An **Issue Loan** button appears (only visible when status is `Quoted` and no loan has been issued yet).
 3. Click **Issue Loan** to open the loan issuance form.
 4. Enter the **Loan Amount** (CAD $), **Loan Term** (days), and **Interest Rate** (%).
-5. Click **Issue Loan** to create the ticket. The loan ID is displayed on success.
-6. The pawn request status automatically advances to **Completed** and a "Loan issued" badge replaces the button.
+5. Click **Issue Loan** to create the ticket. A human-readable ticket number (e.g. `PLT-20260610-A3F2`) is generated automatically.
+
+### Step 2 — Customer Signature
+
+After the loan is created, the agreement signing step opens automatically.
+
+1. Review the **Loan Summary** with the customer — amount, rate, term, due date, and redemption total.
+2. Ask the customer to enter their **full name** in the field provided.
+3. Hand the tablet to the customer. They sign directly on screen using their finger or stylus.
+4. If they make a mistake, tap **Clear signature** to start again.
+5. Click **Submit Signature** — the signature is saved securely to Firebase Storage and linked to the loan ticket.
+
+> The Submit Signature button remains disabled until both the signature canvas and the customer name field are filled in.
+
+### Step 3 — Print the Ticket
+
+After signing, a confirmation screen shows the ticket number and a **Print Ticket** button.
+
+1. Click **Print Ticket** to open the browser print dialog.
+2. Select the connected printer and print. The layout includes:
+   - Shop name and address
+   - Ticket number and date
+   - Item description
+   - Loan amount, interest rate, term, due date, and redemption total
+   - Agreement terms
+   - Customer signature image and name
+3. Hand the printed ticket to the customer. They must keep it to redeem their item.
 
 A loan can only be issued once per enquiry — the button is hidden if `pawnLoanId` is already set on the record.
 

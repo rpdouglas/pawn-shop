@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useAllLoanTickets, useProcessExtension, useRedeemLoan, useForfeitLoan } from '../../lib/useLoanTickets'
 import Table from '../../components/ui/Table'
 import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
 import { formatPrice, formatDate } from '../../lib/format'
-import type { LoanTicket } from '../../lib/types'
+import type { LoanTicket, PrintTicketData } from '../../lib/types'
 import Modal from '../../components/ui/Modal'
+import PrintableTicket from '../../components/admin/PrintableTicket'
 
 export default function LoanTicketsAdminPage() {
   const { data: tickets, isLoading, error } = useAllLoanTickets()
@@ -16,6 +17,23 @@ export default function LoanTicketsAdminPage() {
   const [processingTicket, setProcessingTicket] = useState<LoanTicket | null>(null)
   const [actionType, setActionType] = useState<'extension' | 'redeem' | 'forfeit' | null>(null)
   const [newDueDate, setNewDueDate] = useState('')
+  const [printTicket, setPrintTicket] = useState<PrintTicketData | null>(null)
+
+  const handlePrint = useCallback((ticket: LoanTicket) => {
+    if (!ticket.signatureUrl || !ticket.ticketNumber || !ticket.customerName) return
+    setPrintTicket({
+      ticketNumber: ticket.ticketNumber,
+      itemDescription: ticket.itemDescription,
+      loanAmountCents: ticket.loanAmount,
+      interestRate: ticket.interestRate,
+      periodDays: ticket.periodDays,
+      dueDate: ticket.dueDate,
+      customerName: ticket.customerName,
+      signatureUrl: ticket.signatureUrl,
+      issuedAt: ticket.createdAt,
+    })
+    setTimeout(() => window.print(), 0)
+  }, [])
 
 
   if (isLoading) return <div className="p-8 text-stone-500">Loading loans...</div>
@@ -66,9 +84,15 @@ export default function LoanTicketsAdminPage() {
     { key: 'loanAmount' as const, header: 'Amount', render: (row: LoanTicket) => formatPrice(row.loanAmount) },
     { key: 'dueDate' as const, header: 'Due Date', render: (row: LoanTicket) => formatDate(row.dueDate) },
     { key: 'status' as const, header: 'Status', render: (row: LoanTicket) => (
-      <Badge variant={row.status}>
-        {row.status}
-      </Badge>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', alignItems: 'center' }}>
+        <Badge variant={row.status}>
+          {row.status}
+        </Badge>
+        {row.signatureUrl
+          ? <span className="badge badge-condition-new">Signed</span>
+          : <span className="badge badge-tag">Unsigned</span>
+        }
+      </div>
     )},
     { key: 'id' as const, header: 'Actions', render: (row: LoanTicket) => (
       <div className="flex gap-2">
@@ -86,6 +110,11 @@ export default function LoanTicketsAdminPage() {
               Forfeit
             </Button>
           </>
+        )}
+        {row.signatureUrl && row.ticketNumber && (
+          <Button size="sm" variant="secondary" onClick={() => handlePrint(row)}>
+            Print
+          </Button>
         )}
       </div>
     )}
@@ -106,9 +135,11 @@ export default function LoanTicketsAdminPage() {
         <Table columns={tableColumns} data={tableData} />
       )}
 
-      <Modal 
-        isOpen={!!processingTicket && !!actionType} 
-        onClose={() => { setProcessingTicket(null); setActionType(null); }} 
+      <PrintableTicket data={printTicket} />
+
+      <Modal
+        isOpen={!!processingTicket && !!actionType}
+        onClose={() => { setProcessingTicket(null); setActionType(null); }}
         title={
           actionType === 'extension' ? "Review Extension" :
           actionType === 'redeem' ? "Redeem Loan" :

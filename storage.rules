@@ -21,6 +21,15 @@ service firebase.storage {
       allow write: if request.auth != null;
     }
 
+    // Pawn loan agreement signatures — public read (URL embedded in printed ticket), staff write
+    match /tickets/{loanTicketId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && (request.auth.token.admin == true
+                    || request.auth.token.manager == true
+                    || request.auth.token.inventory_staff == true);
+    }
+
     // Deny everything else
     match /{allPaths=**} {
       allow read, write: if false;

@@ -410,6 +410,23 @@ export interface LoanTicket {
   paymentIntentId?: string
   itemId?: string
   staffNotes?: string
+  ticketNumber?: string
+  signatureUrl?: string
+  signedAt?: Date
+  agreementVersion?: string
+  customerName?: string
   createdAt: Date
   updatedAt: Date
+}
+
+export interface PrintTicketData {
+  ticketNumber: string
+  itemDescription: string
+  loanAmountCents: number
+  interestRate: number
+  periodDays: number
+  dueDate: Date
+  customerName: string
+  signatureUrl: string
+  issuedAt: Date
 }

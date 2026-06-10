@@ -1,11 +1,12 @@
-import { useEffect, useState, Fragment } from 'react'
+import { useEffect, useState, useCallback, Fragment } from 'react'
 import {
   collection, query, orderBy, where, onSnapshot, Timestamp,
 } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { db, functions } from '../../lib/firebase'
-import type { PawnRequest, PawnRequestStatus } from '../../lib/types'
+import type { PawnRequest, PawnRequestStatus, PrintTicketData } from '../../lib/types'
 import IssueLoanModal from './IssueLoanModal'
+import PrintableTicket from './PrintableTicket'
 
 type FilterValue = PawnRequestStatus | 'all'
 
@@ -73,6 +74,12 @@ export default function PawnInbox() {
   const [saveError, setSaveError] = useState<string | null>(null)
 
   const [issueLoanFor, setIssueLoanFor] = useState<string | null>(null)
+  const [printTicket, setPrintTicket] = useState<PrintTicketData | null>(null)
+
+  const handleReadyToPrint = useCallback((data: PrintTicketData) => {
+    setPrintTicket(data)
+    setTimeout(() => window.print(), 0)
+  }, [])
 
   useEffect(() => {
     const col = collection(db, 'pawnRequests')
@@ -342,7 +349,10 @@ export default function PawnInbox() {
         onClose={() => setIssueLoanFor(null)}
         pawnRequestId={issueLoanFor}
         itemDescription={issueLoanRequest?.itemDescription ?? ''}
+        onReadyToPrint={handleReadyToPrint}
       />
+
+      <PrintableTicket data={printTicket} />
     </div>
   )
 }

@@ -63,6 +63,10 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
 
   const ref = await db.collection('loanTickets').add(docData)
 
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  const ticketNumber = `PLT-${dateStr}-${ref.id.slice(0, 4).toUpperCase()}`
+  await ref.update({ ticketNumber })
+
   await db.collection('pawnRequests').doc(pawnRequestId).update({
     pawnLoanId: ref.id,
     status: 'completed',
@@ -77,7 +81,7 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
     createdAt: now,
   })
 
-  return { success: true, loanTicketId: ref.id }
+  return { success: true, loanTicketId: ref.id, ticketNumber }
 })
 
 interface RequestExtensionData {

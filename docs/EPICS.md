@@ -1461,3 +1461,37 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] Decision 0019 logged `[Comp]`
 - [x] **FIX_FIREBASE_INIT_ORDER CLOSED** | 2026-06-10
 
+---
+
+## Phase 27 — POS & In-Store Operations
+
+### E107 · Pawn Ticket Generation & Digital Signature (POS)
+
+> **Persona Gate — E107:**
+> - **Staff (Primary):** The POS operator must be able to collect a customer signature and print a ticket within the existing loan issuance flow — no separate application, no extra login step.
+> - **Makoonsii (Secondary):** The agreement text must be plain language. The signature canvas must have large, accessible touch targets (≥100px height, clear "Sign here" label). The printed ticket must include the item description, loan amount, due date, and ticket number in readable font.
+
+- [x] Schema: add `ticketNumber`, `signatureUrl`, `signedAt`, `agreementVersion`, `customerName` to `loanTickets/{id}` `[Comp]`
+- [x] CF: extend `createLoanTicket` to generate `ticketNumber` (date + doc-id prefix) on creation `[Staff]`
+- [x] CF: `signPawnAgreement(loanTicketId, signatureDataUrl, customerName)` — uploads PNG to Storage, writes `signatureUrl`/`signedAt`/`agreementVersion`, fires `pawn_agreement_signed` auditLog `[Comp]`
+- [x] UI: Add "Sign Agreement" step to `IssueLoanModal` — shows agreement terms + signature canvas after loan terms are confirmed `[Staff]` `[Mak]`
+- [x] UI: `PrintableTicket` component — print-optimized, renders all ticket fields + signature image `[Staff]`
+- [x] UI: Add "Print Ticket" button to `LoanTicketsAdminPage` row actions and post-sign success screen `[Staff]`
+- [x] Decision 0020 logged `[Comp]`
+- [x] User guide updated: `admin/loans.md` and `admin/pawn-inbox.md` `[Staff]`
+- [x] **E107 CLOSED** | 2026-06-10
+
+---
+
+### E108 · Server-Side PDF Pawn Tickets (Backlog)
+
+> **Persona Gate — E108:**
+> - **Staff (Primary):** Generate a server-side PDF for archival, email delivery, or when browser printing is unavailable.
+> - **Makoonsii (Secondary):** PDF must include all ticket fields, customer signature, and be retrievable by ticket number.
+
+- [ ] CF: `generateTicketPdf(loanTicketId)` — Cloud Function using `pdf-lib`, uploads PDF to `tickets/{id}/ticket.pdf`; returns download URL `[Staff]`
+- [ ] Schema: add `pdfUrl` field to `loanTickets/{id}` `[Comp]`
+- [ ] UI: "Download PDF" button on `LoanTicketsAdminPage` row for signed tickets `[Staff]`
+- [ ] Storage rule: staff-read-only for `tickets/{id}/ticket.pdf` (no public read) `[Comp]`
+- [ ] Decision log: PDF library selection and Storage access pattern `[Comp]`
+
