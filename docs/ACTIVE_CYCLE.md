@@ -157,6 +157,8 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 | **FIX_INVENTORY_BULK_CRUD CLOSED** | BUGFIX | 2026-06-10 |
 | `E73 Architecture Modernization — Quick Wins` — Converted 3 dynamic imports to static (eliminating all `INEFFECTIVE_DYNAMIC_IMPORT` warnings); added `manualChunks` to `vite.config.ts` (main bundle 1,019 kB → 43.69 kB, 96% reduction); added Firestore `withConverter` to `useItems.ts`. Strategy C (`react-hook-form`) logged to backlog. Decision 0018 logged. | E73 | 2026-06-10 |
 | **E73 Quick Wins CLOSED** | E73 | 2026-06-10 |
+| `FIX_FIREBASE_INIT_ORDER` — E73's static import conversion broke ES module evaluation order: `firebase.ts` called `getApp()` before `firebase-core.ts` ran `initializeApp()`, crashing the entire app on load. Fix: replaced `getApp()` with `import { app } from './firebase-core'` to encode the dependency in the module graph. Decision 0019 logged. | BUGFIX | 2026-06-10 |
+| **FIX_FIREBASE_INIT_ORDER CLOSED** | BUGFIX | 2026-06-10 |
 
 ---
 
@@ -187,4 +189,4 @@ E94 · Inventory Table Mode — Inline spreadsheet grid with click-to-edit cells
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — E73 Quick Wins CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-10 (Cycle 32 — FIX_FIREBASE_INIT_ORDER CLOSED)*

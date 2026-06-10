@@ -1,14 +1,10 @@
-// firebase-core must initialize the Firebase app before this module loads.
-// All getX(app) calls return cached singletons — no double-initialization risk.
-import { getApp } from 'firebase/app'
+import { app } from './firebase-core'
 import { getAuth } from 'firebase/auth'
 import { getFunctions } from 'firebase/functions'
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore'
 import { getStorage, connectStorageEmulator } from 'firebase/storage'
 import { getAnalytics } from 'firebase/analytics'
 import { getRemoteConfig } from 'firebase/remote-config'
-
-const app = getApp()
 export const auth      = getAuth(app)
 export const functions = getFunctions(app)
 export const db        = getFirestore(app)

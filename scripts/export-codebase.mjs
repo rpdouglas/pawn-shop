@@ -10,7 +10,11 @@ const OUTPUT_FILE = path.join(ROOT_DIR, 'codebase-export.txt')
 // Opt-in strategy: Only process these specific paths
 const TARGETS = [
   'src',
-  'functions/src',
+  'functions/core',
+  'functions/lib',
+  'functions/operations',
+  'functions/shared',
+  'functions/tests',
   'functions/package.json',
   'functions/tsconfig.json',
   'user-guide',

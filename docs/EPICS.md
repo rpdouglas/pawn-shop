@@ -1449,3 +1449,15 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] User guide updated: `admin/inventory.md` — Table View section and Batch Actions `[Staff]`
 - [x] **FIX_INVENTORY_BULK_CRUD CLOSED** | 2026-06-10
 
+---
+
+### FIX · Firebase Init Order — Site Down After E73 Static Import Conversion
+
+> **Persona Gate:** All personas — site was fully unloadable (P0 regression).
+
+**Root cause:** `src/lib/firebase.ts` called `getApp()` at module evaluation time, relying on `firebase-core.ts` having run `initializeApp()` first. E73's static import conversion changed the ES module evaluation order: `App.tsx` → `ViewContext.tsx` → `firebase.ts` now executed before `AuthContext.tsx` → `firebase-core.ts`, causing `getApp()` to throw `FirebaseError: No Firebase App '[DEFAULT]' has been created`.
+
+- [x] Replace `getApp()` in `firebase.ts` with `import { app } from './firebase-core'` — creates explicit module graph edge `[All]`
+- [x] Decision 0019 logged `[Comp]`
+- [x] **FIX_FIREBASE_INIT_ORDER CLOSED** | 2026-06-10
+
