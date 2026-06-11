@@ -53,7 +53,9 @@ The system runs a serial blacklist check automatically. If the serial number mat
 - The intake modal closes and the record appears in the inbox with a **Flagged** indicator.
 - **Do not issue a loan** until the flag has been reviewed and cleared per the standard protocol.
 
-If the check passes, the Loan Terms form opens immediately — continue to the steps below.
+If the check passes, the Loan Terms form opens immediately. The ID type and verified status you entered here are carried forward automatically — no need to re-enter them.
+
+> Continue to the steps below.
 
 > Walk-in records appear in the Pawn Inbox with a **Walk-in** badge so they are easy to distinguish from online enquiries.
 
@@ -67,13 +69,14 @@ Once an enquiry is in **Quoted** status (or immediately after a walk-in intake),
 2. An **Issue Loan** button appears (only visible when status is `Quoted` and no loan has been issued yet).
 3. Click **Issue Loan** to open the loan issuance form.
 4. Enter the **Loan Amount** (CAD $) and **Loan Term** (days).
-5. The **Interest Rate** field auto-fills to the legal maximum for this loan once both amount and term are entered. The cap is shown beneath the field — for example: *"Max for this loan: 3.95% (48% APR)"*. You may enter a lower rate; you cannot go above the displayed cap.
+5. The **Interest Rate** field auto-fills to the legal maximum for this loan once both amount and term are entered. The cap is shown beneath the field — for example: *"Max for this loan: 3.95% (48% APR)"*. You may enter a lower rate; you cannot go above the displayed cap without an override acknowledgement (see the APR override section in the [Loans guide](loans.md)).
 6. Enter the **Agreed Item Value** — the appraisal value agreed upon with the customer. This is required and printed on the ticket.
-7. Select the **ID Type** from the dropdown (if not already recorded at walk-in intake).
+7. Select the **ID Type** from the dropdown. For walk-in customers, this is pre-filled from the intake step.
 8. Check both confirmation boxes before submitting:
    - **I have verified the customer's government-issued photo ID**
    - **The item is physically in the shop's possession**
-9. Click **Issue Loan** to create the ticket. A human-readable ticket number (e.g. `PLT-20260610-A3F2`) is generated automatically.
+9. Once a valid amount, term, and rate are entered, a **Quote for Customer** panel appears below the confirmation boxes. This panel shows — in plain dollars — what the customer borrows, the interest charge, the total they owe back, the projected due date, and the implied APR. Turn the screen toward the customer so they can read it before you issue the loan.
+10. Click **Issue Loan** to create the ticket. A human-readable ticket number (e.g. `PLT-20260610-A3F2`) is generated automatically.
 
 > **Interest rate caps (Akwesasne — Ontario side):** Loans under $1,000 CAD — maximum 48% APR. Loans $1,000 CAD and over — maximum 35% APR. The system converts these annual rates to a per-period flat rate based on the loan term and blocks submission if the entered rate exceeds the cap.
 
@@ -97,7 +100,7 @@ After signing, a confirmation screen shows the ticket number and a **Print Ticke
 1. Click **Print Ticket** to open the browser print dialog.
 2. Select the connected printer and print. The ticket is a **two-page document**:
    - **Page 1** — Shop logo, ticket number, date, issuing staff member's name; full item block (description, category, make/model, colour, serial number, condition, notable markings, agreed item value); loan amount, interest rate (per period), term, due date, redemption total, and **Annual Percentage Rate (APR)**
-   - **Page 2** — Legal terms (sole-recourse clause, police hold clause, extension terms), age and ownership declaration above the customer's signature, and record retention notice
+   - **Page 2** — Legal terms (plain-language default summary, sole-recourse clause, police hold clause, actionable extension instructions with ID requirements), age and ownership declaration above the customer's signature, record retention notice, and a footer action line showing the due date
 3. Hand the printed ticket to the customer. They must keep it — photo ID plus this ticket is required to redeem their item.
 
 A loan can only be issued once per enquiry — the button is hidden if `pawnLoanId` is already set on the record.

@@ -92,6 +92,8 @@ export default function PawnInbox() {
     itemColour?: string
     condition?: string
     notableMarkings?: string
+    idType?: string
+    initialIdVerified?: boolean
   }
 
   const [issueLoanCtx, setIssueLoanCtx] = useState<IssueLoanCtx | null>(null)
@@ -107,13 +109,15 @@ export default function PawnInbox() {
     itemDesc: string,
     serialBlacklistHit: boolean,
     itemData?: { serialNumber?: string; itemCategory?: string; itemMake?: string; itemModel?: string; itemColour?: string; condition?: string; notableMarkings?: string },
+    idType?: string,
+    idVerified?: boolean,
   ) => {
     setWalkInModalOpen(false)
     if (serialBlacklistHit) {
       // Serial flagged — stay in PawnInbox so staff can review the flag before issuing a loan
       return
     }
-    setIssueLoanCtx({ pawnRequestId, itemDescription: itemDesc, ...itemData })
+    setIssueLoanCtx({ pawnRequestId, itemDescription: itemDesc, ...itemData, idType, initialIdVerified: idVerified })
   }, [])
 
   useEffect(() => {
@@ -410,6 +414,7 @@ export default function PawnInbox() {
       />
 
       <IssueLoanModal
+        key={issueLoanCtx?.pawnRequestId ?? 'none'}
         isOpen={!!issueLoanCtx}
         onClose={() => setIssueLoanCtx(null)}
         pawnRequestId={issueLoanCtx?.pawnRequestId ?? null}
@@ -421,6 +426,8 @@ export default function PawnInbox() {
         itemColour={issueLoanCtx?.itemColour}
         condition={issueLoanCtx?.condition}
         notableMarkings={issueLoanCtx?.notableMarkings}
+        initialIdType={issueLoanCtx?.idType}
+        initialIdVerified={issueLoanCtx?.initialIdVerified}
         onReadyToPrint={handleReadyToPrint}
       />
 

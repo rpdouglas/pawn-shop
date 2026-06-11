@@ -34,10 +34,10 @@ The ticket prints as a **two-page document**:
 | **Pledged Item** | 1 | Description, category, make/model, colour, serial number, condition, notable markings, and agreed item value |
 | **Loan Terms** | 1 | Loan amount, per-period interest rate, term length, due date, and redemption total |
 | **APR Disclosure** | 1 | Annual Percentage Rate — required under Criminal Interest Rate Regulations SOR/2024-114 |
-| **Legal Terms** | 2 | Sole-recourse clause (lender's only remedy on default is item seizure), police hold clause, extension terms, customer rights |
+| **Legal Terms** | 2 | Plain-language default summary; sole-recourse clause (lender's only remedy on default is item seizure); police hold clause; actionable extension instructions (visit in person, bring ticket and photo ID) |
 | **Declaration** | 2 | Customer confirms: 18+, lawful owner, not impaired |
 | **Signature** | 2 | Customer's on-screen signature and printed name |
-| **Footer** | 2 | Record retention notice and redemption instructions |
+| **Footer** | 2 | Record retention notice; action line with dynamic due date ("To redeem or extend: visit The Pawn Shop · Cornwall Island · Akwesasne before [date]"); CUSTOMER COPY notice |
 
 > The APR and sole-recourse language together satisfy the requirements for the 48% pawn loan exemption under s.347 of the Criminal Code of Canada (SOR/2024-114).
 

@@ -138,8 +138,9 @@ export default function PrintableTicket({ data }: Props) {
         <span className="print-ticket-label">Terms &amp; Conditions</span>
         <div className="print-ticket-agreement-text">
           <p>The customer leaves the above item as security for this loan. To reclaim the item, the full redemption amount must be paid by the due date shown above.</p>
+          <p>If you do not redeem the item by the due date and have not requested an extension, your item becomes the property of The Pawn Shop. No further debt, fees, or legal action will be taken against you.</p>
           <p>In the event of default, the lender&apos;s only remedy is possession and resale of the pledged item. No further charges, fees, or legal action will be pursued against the customer after forfeiture.</p>
-          <p>Extensions may be requested at the discretion of staff before the due date. Contact The Pawn Shop before the due date to discuss extension options.</p>
+          <p>To request an extension, visit The Pawn Shop in person or contact staff before the due date shown above. Extensions are granted at staff discretion and may require a partial interest payment. Bring this ticket and valid photo ID.</p>
           <p>The Pawn Shop reserves the right to place a police hold on any item at the request of a law enforcement agency. Items subject to a police hold cannot be redeemed until the hold is lifted; the loan period will be tolled for the duration of any hold.</p>
           <p>Ticket No. {data.ticketNumber} is proof of this agreement and must be presented with valid photo ID for redemption.</p>
         </div>
@@ -160,6 +161,7 @@ export default function PrintableTicket({ data }: Props) {
           <div className="print-ticket-footer-text">Issued by: {data.staffName}</div>
         )}
         <div className="print-ticket-footer-text">Authorized by The Pawn Shop · Cornwall Island, Akwesasne</div>
+        <div className="print-ticket-footer-text">To redeem or extend: visit The Pawn Shop · Cornwall Island · Akwesasne before {formatDate(data.dueDate)}.</div>
         <div className="print-ticket-footer-text">Records retained in accordance with applicable law.</div>
         <div className="print-ticket-footer-text">CUSTOMER COPY — Keep this ticket. Required for redemption with photo ID.</div>
       </div>

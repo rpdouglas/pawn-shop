@@ -45,6 +45,8 @@ interface IssueLoanModalProps {
   itemColour?: string
   condition?: string
   notableMarkings?: string
+  initialIdType?: string
+  initialIdVerified?: boolean
   onReadyToPrint?: (data: PrintTicketData) => void
 }
 
@@ -60,20 +62,23 @@ export default function IssueLoanModal({
   itemColour,
   condition,
   notableMarkings,
+  initialIdType,
+  initialIdVerified,
   onReadyToPrint,
 }: IssueLoanModalProps) {
   const { mutateAsync: issueLoan } = useIssueLoanTicket()
   const { mutateAsync: signAgreement } = useSignPawnAgreement()
   const { user } = useAuth()
 
+  const [todayMs] = useState(Date.now)
   const [step, setStep] = useState<Step>('terms')
   const [loanAmountDollars, setLoanAmountDollars] = useState('')
   const [periodDays, setPeriodDays] = useState('30')
   const [interestRatePct, setInterestRatePct] = useState('')
   const [aprOverrideChecked, setAprOverrideChecked] = useState(false)
   const [agreedItemValueDollars, setAgreedItemValueDollars] = useState('')
-  const [idType, setIdType] = useState('')
-  const [idVerified, setIdVerified] = useState(false)
+  const [idType, setIdType] = useState(initialIdType ?? '')
+  const [idVerified, setIdVerified] = useState(initialIdVerified ?? false)
   const [itemReceived, setItemReceived] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -276,6 +281,17 @@ export default function IssueLoanModal({
     return { capLabel: label, aprOverrideWarning: null }
   }, [loanAmountDollars, periodDays, interestRatePct])
 
+  const quotePreview = useMemo(() => {
+    const amountCents = Math.round(parseFloat(loanAmountDollars) * 100)
+    const days = parseInt(periodDays, 10)
+    const ratePct = parseFloat(interestRatePct)
+    if (isNaN(amountCents) || amountCents <= 0 || isNaN(days) || days <= 0 || isNaN(ratePct) || ratePct < 0) return null
+    const interestCents = Math.round(amountCents * (ratePct / 100))
+    const redemptionCents = amountCents + interestCents
+    const aprPct = (ratePct * (365 / days)).toFixed(1)
+    return { amountCents, interestCents, redemptionCents, days, aprPct }
+  }, [loanAmountDollars, periodDays, interestRatePct])
+
   if (!pawnRequestId) return null
 
   const redemptionCents = issuedData
@@ -469,6 +485,58 @@ export default function IssueLoanModal({
               The item is physically in the shop&apos;s possession *
             </label>
           </div>
+
+          {quotePreview && (
+            <div style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--space-1)',
+              padding: 'var(--space-4)',
+            }}>
+              <div style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--text-xs)',
+                fontWeight: 600,
+                color: 'var(--color-text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                marginBottom: 'var(--space-3)',
+              }}>
+                Quote for Customer
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontFamily: 'var(--font-body)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
+                  <span>You borrow</span>
+                  <span style={{ color: 'var(--color-text)' }}>{formatPrice(quotePreview.amountCents)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
+                  <span>Interest ({interestRatePct}% for {periodDays} days)</span>
+                  <span style={{ color: 'var(--color-text)' }}>{formatPrice(quotePreview.interestCents)}</span>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderTop: '1px solid var(--color-border)',
+                  paddingTop: 'var(--space-2)',
+                  marginTop: 'var(--space-1)',
+                }}>
+                  <span style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--color-text)' }}>You owe back</span>
+                  <span style={{ fontSize: 'var(--text-subheading)', fontWeight: 700, color: 'var(--color-primary)' }}>
+                    {formatPrice(quotePreview.redemptionCents)}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
+                  <span>Due date</span>
+                  <span style={{ color: 'var(--color-text)' }}>{formatDate(new Date(todayMs + quotePreview.days * 24 * 60 * 60 * 1000))}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>
+                  <span>APR</span>
+                  <span>~{quotePreview.aprPct}%</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {error && <p className="input-error" role="alert">{error}</p>}
 

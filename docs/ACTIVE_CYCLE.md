@@ -187,6 +187,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **E114 CLOSED** | E114 | 2026-06-11 |
 | `E115 APR Override Warning` — Replaced hard-block on over-cap interest rates with inline yellow warning banner + mandatory confirmation checkbox in `IssueLoanModal`. Server-side `createLoanTicket` CF now mirrors APR cap constants and rejects over-cap rates unless `aprOverrideConfirmed: true` is passed; override written to `loanTickets/{id}.aprOverrideConfirmed`; `loan_rate_override` auditLog fires on override (no PII). `IssueLoanArgs` updated with `aprOverrideConfirmed?`. Decision 0034 logged. | E115 | 2026-06-11 |
 | **E115 CLOSED** | E115 | 2026-06-11 |
+| `E116 Pawn Intake & Ticket UX Improvements` — Eliminated duplicate ID entry in walk-in pawn flow by threading `idType`/`idVerified` from `WalkInPawnModal` through `PawnInbox.IssueLoanCtx` into `IssueLoanModal` (pre-filled via `key`-prop remount). Added live "Quote for Customer" panel in Step 1 showing borrow amount, interest, redemption total, due date, and APR. Enhanced `PrintableTicket` page 2 with plain-language default summary, specific extension instructions (visit in person, bring ticket + ID), and a footer action line with dynamic due date. No schema changes. 4 files. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E116 | 2026-06-11 |
+| **E116 CLOSED** | E116 | 2026-06-11 |
 
 ---
 
@@ -217,4 +219,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-11 (Cycle 35 — E115 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-11 (Cycle 36 — E116 CLOSED)*

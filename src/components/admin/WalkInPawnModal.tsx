@@ -42,7 +42,7 @@ const createWalkInFn = httpsCallable<
 interface WalkInPawnModalProps {
   isOpen: boolean
   onClose: () => void
-  onSuccess: (pawnRequestId: string, itemDescription: string, serialBlacklistHit: boolean, itemData?: WalkInItemData) => void
+  onSuccess: (pawnRequestId: string, itemDescription: string, serialBlacklistHit: boolean, itemData?: WalkInItemData, idType?: string, idVerified?: boolean) => void
 }
 
 export default function WalkInPawnModal({ isOpen, onClose, onSuccess }: WalkInPawnModalProps) {
@@ -122,7 +122,7 @@ export default function WalkInPawnModal({ isOpen, onClose, onSuccess }: WalkInPa
         notableMarkings: notableMarkings.trim() || undefined,
       }
       handleClose()
-      onSuccess(result.data.pawnRequestId, itemDescription.trim(), result.data.serialBlacklistHit, itemData)
+      onSuccess(result.data.pawnRequestId, itemDescription.trim(), result.data.serialBlacklistHit, itemData, idType || undefined, idVerified || undefined)
     } catch (err) {
       setError((err as Error).message)
     } finally {

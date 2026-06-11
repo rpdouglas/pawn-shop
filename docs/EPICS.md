@@ -622,6 +622,24 @@
 
 ---
 
+### E116 · Pawn Intake & Ticket UX Improvements
+
+> **Persona Gate — E116:**
+> - **Staff (Primary):** Walk-in intake collects ID once; fields are pre-filled in the loan issuance form. Live "Quote for Customer" panel shows dollar amounts and due date before committing the loan.
+> - **Makoonsii (Secondary):** Printed ticket now gives plain-language extension instructions and default summary — she can read it at home and know exactly what to do without calling the shop.
+
+- [x] `WalkInPawnModal.tsx`: thread `idType` + `idVerified` through `onSuccess` callback `[Staff]`
+- [x] `PawnInbox.tsx`: add `idType?` + `initialIdVerified?` to `IssueLoanCtx`; `key` prop for remount-on-open `[Staff]`
+- [x] `IssueLoanModal.tsx`: accept `initialIdType?` + `initialIdVerified?` props; pre-fill ID fields from walk-in `[Staff]`
+- [x] `IssueLoanModal.tsx`: live "Quote for Customer" panel (borrow / interest / owe back / due date / APR) `[Staff]` `[Mak]`
+- [x] `PrintableTicket.tsx`: plain-language default summary before sole-recourse clause `[Mak]`
+- [x] `PrintableTicket.tsx`: actionable extension instructions (visit in person, bring ticket + ID) `[Mak]`
+- [x] `PrintableTicket.tsx`: footer action line with dynamic due date `[Mak]`
+- [x] User guide updated: `admin/pawn-inbox.md` + `admin/loans.md` `[Staff]`
+- [x] **E116 CLOSED** | 2026-06-11
+
+---
+
 ## Phase 10 — Inventory Intelligence
 
 > **Goal:** Data-driven merchandising. Automate stale-inventory turnover and close the cannabis product data gap vs. Dutchie/Jane. Schema updates in `docs/firestore-schema.md` and `docs/DECISIONS.md` are required before any implementation task begins.
