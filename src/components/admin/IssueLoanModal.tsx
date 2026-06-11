@@ -445,46 +445,63 @@ export default function IssueLoanModal({
             />
           </div>
 
-          <div className="input-wrapper">
-            <label className="input-label" htmlFor="issue-loan-id-type">ID Type Verified</label>
-            <select
-              id="issue-loan-id-type"
-              className="input-field input-field-select"
-              style={{ minHeight: '48px' }}
-              value={idType}
-              onChange={e => setIdType(e.target.value)}
+          {initialIdVerified ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-3)',
+              background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--color-primary) 20%, transparent)',
+              borderRadius: 'var(--space-1)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--text-sm)',
+              color: 'var(--color-text)',
+            }}>
+              <span style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 'var(--text-base)', flexShrink: 0 }}>✓</span>
+              <span>Government-issued photo ID verified at intake</span>
+            </div>
+          ) : (
+            <>
+              <div className="input-wrapper">
+                <label className="input-label" htmlFor="issue-loan-id-type">ID Type Verified</label>
+                <select
+                  id="issue-loan-id-type"
+                  className="input-field input-field-select"
+                  style={{ minHeight: '48px' }}
+                  value={idType}
+                  onChange={e => setIdType(e.target.value)}
+                  disabled={loading}
+                >
+                  <option value="">Select ID type…</option>
+                  <option value="drivers_licence">Driver&apos;s Licence</option>
+                  <option value="status_card">Status Card</option>
+                  <option value="passport">Passport</option>
+                  <option value="other">Other Government ID</option>
+                </select>
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', minHeight: '48px', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
+                <input
+                  type="checkbox"
+                  checked={idVerified}
+                  onChange={e => setIdVerified(e.target.checked)}
+                  disabled={loading}
+                  style={{ width: '20px', height: '20px', flexShrink: 0 }}
+                />
+                I have verified the customer&apos;s government-issued photo ID *
+              </label>
+            </>
+          )}
+          <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', minHeight: '48px', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
+            <input
+              type="checkbox"
+              checked={itemReceived}
+              onChange={e => setItemReceived(e.target.checked)}
               disabled={loading}
-            >
-              <option value="">Select ID type…</option>
-              <option value="drivers_licence">Driver&apos;s Licence</option>
-              <option value="status_card">Status Card</option>
-              <option value="passport">Passport</option>
-              <option value="other">Other Government ID</option>
-            </select>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', minHeight: '48px', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
-              <input
-                type="checkbox"
-                checked={idVerified}
-                onChange={e => setIdVerified(e.target.checked)}
-                disabled={loading}
-                style={{ width: '20px', height: '20px', flexShrink: 0 }}
-              />
-              I have verified the customer&apos;s government-issued photo ID *
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', minHeight: '48px', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: 'var(--text-sm)', color: 'var(--color-text)' }}>
-              <input
-                type="checkbox"
-                checked={itemReceived}
-                onChange={e => setItemReceived(e.target.checked)}
-                disabled={loading}
-                style={{ width: '20px', height: '20px', flexShrink: 0 }}
-              />
-              The item is physically in the shop&apos;s possession *
-            </label>
-          </div>
+              style={{ width: '20px', height: '20px', flexShrink: 0 }}
+            />
+            The item is physically in the shop&apos;s possession *
+          </label>
 
           {quotePreview && (
             <div style={{
