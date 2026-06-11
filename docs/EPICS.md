@@ -601,6 +601,27 @@
 
 ---
 
+### E115 · APR Override Warning
+
+> **Persona Gate — E115:**
+> - **Staff (Primary):** Loan issuance modal allows a deliberate rate above the legal APR cap — soft warning + confirmation checkbox instead of a hard block. Normal (under-cap) path is completely unaffected.
+> - **Makoonsii (Secondary):** Printed ticket and APR disclosure are unchanged regardless of override path.
+> - **Compliance:** Server-side cap enforcement added to `createLoanTicket` CF. Over-cap loans require `aprOverrideConfirmed: true` in the request. Override is recorded in `loanTickets/{id}` and a `loan_rate_override` audit log event is written (no PII).
+
+- [x] Schema: add `aprOverrideConfirmed` to `loanTickets/{id}`; add `loan_rate_override` to `auditLogs.eventType` — Decision 0034 `[Comp]`
+- [x] `IssueLoanModal.tsx`: replace hard-block with inline yellow warning banner + mandatory confirmation checkbox when rate exceeds cap `[Staff]`
+- [x] `IssueLoanModal.tsx`: reset `aprOverrideChecked` on any change to amount, term, or rate `[Staff]`
+- [x] `IssueLoanModal.tsx`: pass `aprOverrideConfirmed: true` to mutation when override was confirmed `[Comp]`
+- [x] `useLoanTickets.ts`: add `aprOverrideConfirmed?` to `IssueLoanArgs` interface `[Comp]`
+- [x] `createLoanTicket` CF: mirror APR cap constants; reject over-cap rates unless `aprOverrideConfirmed: true` `[Comp]`
+- [x] `createLoanTicket` CF: write `aprOverrideConfirmed: true` to `loanTickets` doc on override `[Comp]`
+- [x] `createLoanTicket` CF: write `loan_rate_override` audit log entry on override (no PII) `[Comp]`
+- [x] Decision 0034 logged `[Comp]`
+- [x] User guide updated: `admin/loans.md` `[Staff]`
+- [x] **E115 CLOSED** | 2026-06-11
+
+---
+
 ## Phase 10 — Inventory Intelligence
 
 > **Goal:** Data-driven merchandising. Automate stale-inventory turnover and close the cannabis product data gap vs. Dutchie/Jane. Schema updates in `docs/firestore-schema.md` and `docs/DECISIONS.md` are required before any implementation task begins.

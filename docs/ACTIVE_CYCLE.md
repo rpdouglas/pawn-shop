@@ -185,6 +185,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **E113 CLOSED** | E113 | 2026-06-10 |
 | `E114 Pawn Loan Receipt Email` — Extended `signPawnAgreement` CF with best-effort HTML receipt email auto-sent after signing. `buildReceiptHtml` dark-luxury template (matches `buildDigestHtml` pattern). Email resolution chain: `uid → users/{uid}.email → pawnRequests/{id}.email → skip`. Idempotency guard via `receiptEmailSentAt`. `pawn_receipt_emailed` auditLog (no PII). `receiptEmailAddress` snapshot on ticket. try/catch ensures email failure never blocks loan signing. Decision 0033 logged. | E114 | 2026-06-11 |
 | **E114 CLOSED** | E114 | 2026-06-11 |
+| `E115 APR Override Warning` — Replaced hard-block on over-cap interest rates with inline yellow warning banner + mandatory confirmation checkbox in `IssueLoanModal`. Server-side `createLoanTicket` CF now mirrors APR cap constants and rejects over-cap rates unless `aprOverrideConfirmed: true` is passed; override written to `loanTickets/{id}.aprOverrideConfirmed`; `loan_rate_override` auditLog fires on override (no PII). `IssueLoanArgs` updated with `aprOverrideConfirmed?`. Decision 0034 logged. | E115 | 2026-06-11 |
+| **E115 CLOSED** | E115 | 2026-06-11 |
 
 ---
 
@@ -215,4 +217,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-11 (Cycle 34 — E114 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-11 (Cycle 35 — E115 CLOSED)*

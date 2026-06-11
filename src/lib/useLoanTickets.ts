@@ -88,6 +88,7 @@ export interface IssueLoanArgs {
   agreedItemValue?: number
   idType?: string
   idVerified?: boolean
+  aprOverrideConfirmed?: boolean
 }
 
 export interface IssueLoanResult {

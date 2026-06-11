@@ -141,7 +141,8 @@
 | `itemDescription` | string | Description of the pawned item |
 | `itemId` | string | Reference to `items/{id}` if linked |
 | `loanAmount` | number | CAD cents |
-| `interestRate` | number | Per-period decimal rate stored as a fraction (e.g. 0.04 = 4%). Legal caps for Akwesasne (Ontario side): 48% APR for loans < $1,000 CAD; 35% APR for loans ≥ $1,000 CAD. Per-period max = APR_cap × (periodDays / 365). Enforced at UI level in `IssueLoanModal`. See decision 0023. |
+| `interestRate` | number | Per-period decimal rate stored as a fraction (e.g. 0.04 = 4%). Legal caps for Akwesasne (Ontario side): 48% APR for loans < $1,000 CAD; 35% APR for loans ≥ $1,000 CAD. Per-period max = APR_cap × (periodDays / 365). Enforced at UI level in `IssueLoanModal` and server-side in `createLoanTicket` CF. See decisions 0023, 0034. |
+| `aprOverrideConfirmed` | boolean | Optional. `true` when the issuing staff member explicitly confirmed the rate exceeded the legal APR cap at issuance time. Set by `createLoanTicket` CF when `aprOverrideConfirmed: true` is passed. Null/absent on loans issued within cap. See decision 0034. |
 | `periodDays` | number | Standard loan period in days |
 | `dueDate` | timestamp | Current due date for the loan |
 | `status` | string | `active` \| `extension_requested` \| `forfeited` \| `redeemed` |
@@ -325,7 +326,7 @@ Read access: public (no auth required — displayed on public pages). Write acce
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` `ebay_push` `ebay_sync_sold` `pawn_request_submit` `pawn_request_status_updated` `serial_blacklist_hit` `reservation_created` `reservation_confirmed` `reservation_declined` `reservation_completed` `store_hours_updated` `serial_blacklist_add` `serial_blacklist_remove` `data_purged` `staff_pick_set` `staff_pick_removed` `campaign_activated` `campaign_deactivated` `preorder_created` `preorder_confirmed` `preorder_ready` `preorder_collected` `preorder_cancelled` `dispute_created` `dispute_resolved` `item_restocked` `seasonal_reminder_sent` `pickup_reminder_sent` `weekly_digest_sent` `inventory_quantity_adjusted` `loan_ticket_created` `loan_redeemed` `loan_forfeited` `extension_requested` `extension_approved` `extension_declined` `pawn_agreement_signed` `walk_in_pawn_created` |
+| `eventType` | string | `login` `logout` `role_change` `mfa_enrolled` `age_gate_pass` `age_gate_fail` `police_hold_set` `item_published` `price_override` `hold_set` `hold_expired` `ebay_push` `ebay_sync_sold` `pawn_request_submit` `pawn_request_status_updated` `serial_blacklist_hit` `reservation_created` `reservation_confirmed` `reservation_declined` `reservation_completed` `store_hours_updated` `serial_blacklist_add` `serial_blacklist_remove` `data_purged` `staff_pick_set` `staff_pick_removed` `campaign_activated` `campaign_deactivated` `preorder_created` `preorder_confirmed` `preorder_ready` `preorder_collected` `preorder_cancelled` `dispute_created` `dispute_resolved` `item_restocked` `seasonal_reminder_sent` `pickup_reminder_sent` `weekly_digest_sent` `inventory_quantity_adjusted` `loan_ticket_created` `loan_redeemed` `loan_forfeited` `extension_requested` `extension_approved` `extension_declined` `pawn_agreement_signed` `walk_in_pawn_created` `loan_rate_override` |
 | `uid` | string | Actor UID |
 | `targetId` | string | Optional — item/user being acted on |
 | `details` | map | Context. **Never include PII** |

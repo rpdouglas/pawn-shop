@@ -4,6 +4,16 @@ import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 import { dispatchSms } from '@pawn-shop/shared/lib/sms'
 import { twilioAccountSid, twilioAuthToken } from '@pawn-shop/shared/lib/secrets'
 
+const APR_CAP_UNDER_1000 = 0.48
+const APR_CAP_OVER_1000  = 0.35
+const LOAN_THRESHOLD_CENTS = 100_000
+
+function calcMaxRate(amountCents: number, days: number): number {
+  if (amountCents <= 0 || days <= 0) return 0
+  const cap = amountCents < LOAN_THRESHOLD_CENTS ? APR_CAP_UNDER_1000 : APR_CAP_OVER_1000
+  return cap * (days / 365)
+}
+
 interface CreateLoanTicketData {
   pawnRequestId: string
   loanAmount: number
@@ -13,6 +23,7 @@ interface CreateLoanTicketData {
   agreedItemValue?: number
   idType?: string
   idVerified?: boolean
+  aprOverrideConfirmed?: boolean
 }
 
 // Derives uid and itemDescription from the pawnRequest document so the client
@@ -22,7 +33,7 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
     throw new HttpsError('permission-denied', 'Only staff can create loan tickets')
   }
 
-  const { pawnRequestId, loanAmount, periodDays, itemId, agreedItemValue, idType, idVerified } = request.data
+  const { pawnRequestId, loanAmount, periodDays, itemId, agreedItemValue, idType, idVerified, aprOverrideConfirmed } = request.data
   const interestRate = request.data.interestRate
 
   if (!pawnRequestId || loanAmount == null || periodDays == null) {
@@ -33,6 +44,13 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
   }
   if (loanAmount <= 0) throw new HttpsError('invalid-argument', 'loanAmount must be positive')
   if (periodDays <= 0) throw new HttpsError('invalid-argument', 'periodDays must be positive')
+
+  const maxRate = calcMaxRate(loanAmount, periodDays)
+  const isOverCap = maxRate > 0 && interestRate > maxRate
+  if (isOverCap && aprOverrideConfirmed !== true) {
+    const capPct = loanAmount < LOAN_THRESHOLD_CENTS ? 48 : 35
+    throw new HttpsError('invalid-argument', `Interest rate exceeds the legal cap (${capPct}% APR). Pass aprOverrideConfirmed: true to override.`)
+  }
 
   const db = getFirestore()
 
@@ -86,6 +104,7 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
   if (itemColour) docData['itemColour'] = itemColour
   if (condition) docData['condition'] = condition
   if (notableMarkings) docData['notableMarkings'] = notableMarkings
+  if (isOverCap) docData['aprOverrideConfirmed'] = true
 
   const ref = await db.collection('loanTickets').add(docData)
 
@@ -109,6 +128,18 @@ export const createLoanTicket = onCall<CreateLoanTicketData>({ cors: true }, asy
     details: { loanTicketId: ref.id, pawnRequestId, loanAmount, idVerified: idVerified ?? false },
     createdAt: now,
   })
+
+  if (isOverCap) {
+    const impliedApr = parseFloat((interestRate * (365 / periodDays) * 100).toFixed(2))
+    const capApr = loanAmount < LOAN_THRESHOLD_CENTS ? 48 : 35
+    await db.collection('auditLogs').add({
+      eventType: 'loan_rate_override',
+      uid: request.auth.uid,
+      targetId: ref.id,
+      details: { loanTicketId: ref.id, interestRate, impliedApr, capApr },
+      createdAt: now,
+    })
+  }
 
   return { success: true, loanTicketId: ref.id, ticketNumber, dueDate: dueDate.toISOString() }
 })

@@ -17,7 +17,7 @@ The Pawn Shop staff dashboard provides a central interface for managing active p
 
 Loan tickets are issued from the **Pawn Inbox**, not from the Loans dashboard. This applies whether the customer submitted an online enquiry or walked in at the counter — the [Pawn Inbox guide](pawn-inbox.md) covers both paths. The full three-step flow is identical in both cases: Loan Terms → Customer Signature → Print Ticket.
 
-> **Interest rate caps:** The system enforces the applicable legal maximums for Akwesasne (Ontario side) — 48% APR for loans under $1,000 CAD; 35% APR for loans $1,000 and over. The interest rate field auto-fills to the legal maximum and the system blocks submission if the entered rate exceeds it. See the [Pawn Inbox guide](pawn-inbox.md#step-1--loan-terms) for full details.
+> **Interest rate caps:** The applicable legal maximums for Akwesasne (Ontario side) are 48% APR for loans under $1,000 CAD and 35% APR for loans $1,000 and over. The interest rate field auto-fills to the legal maximum for the entered amount and term. If you enter a rate above the cap, a yellow warning banner appears explaining the overage — check the confirmation box to acknowledge the override and proceed. The override is recorded in the audit log. See the [Pawn Inbox guide](pawn-inbox.md#step-1--loan-terms) for full details.
 
 ## What Appears on the Printed Ticket
 

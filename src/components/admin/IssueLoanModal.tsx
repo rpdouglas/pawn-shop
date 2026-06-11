@@ -70,6 +70,7 @@ export default function IssueLoanModal({
   const [loanAmountDollars, setLoanAmountDollars] = useState('')
   const [periodDays, setPeriodDays] = useState('30')
   const [interestRatePct, setInterestRatePct] = useState('')
+  const [aprOverrideChecked, setAprOverrideChecked] = useState(false)
   const [agreedItemValueDollars, setAgreedItemValueDollars] = useState('')
   const [idType, setIdType] = useState('')
   const [idVerified, setIdVerified] = useState(false)
@@ -116,6 +117,7 @@ export default function IssueLoanModal({
     setLoanAmountDollars('')
     setPeriodDays('30')
     setInterestRatePct('')
+    setAprOverrideChecked(false)
     setAgreedItemValueDollars('')
     setIdType('')
     setIdVerified(false)
@@ -153,9 +155,9 @@ export default function IssueLoanModal({
       return
     }
     const maxRate = calcMaxRatePct(amountCents, days)
-    if (maxRate > 0 && ratePct > maxRate) {
-      const aprLabel = amountCents < LOAN_THRESHOLD_CENTS ? '48% APR — loans under $1,000' : '35% APR — loans $1,000 and over'
-      setError(`Rate exceeds the legal maximum of ${maxRate}% (${aprLabel})`)
+    const isOverCap = maxRate > 0 && ratePct > maxRate
+    if (isOverCap && !aprOverrideChecked) {
+      setError('Check the override confirmation box to proceed with a rate above the legal cap.')
       return
     }
     if (!agreedItemValueDollars || isNaN(agreedValueCents) || agreedValueCents <= 0) {
@@ -182,6 +184,7 @@ export default function IssueLoanModal({
         agreedItemValue: agreedValueCents,
         idType: idType || undefined,
         idVerified: true,
+        aprOverrideConfirmed: isOverCap ? true : undefined,
       })
       setIssuedData({
         loanTicketId: result.loanTicketId,
@@ -254,14 +257,24 @@ export default function IssueLoanModal({
     })
   }, [issuedData, itemDescription, customerName, signatureUrl, onReadyToPrint, user, serialNumber, itemCategory, itemMake, itemModel, itemColour, condition, notableMarkings])
 
-  const capLabel = useMemo(() => {
+  const { capLabel, aprOverrideWarning } = useMemo(() => {
     const amountCents = Math.round(parseFloat(loanAmountDollars) * 100)
     const days = parseInt(periodDays, 10)
+    const ratePct = parseFloat(interestRatePct)
     const max = calcMaxRatePct(amountCents, days)
-    if (max <= 0) return null
-    const aprPct = amountCents < LOAN_THRESHOLD_CENTS ? 48 : 35
-    return `Max for this loan: ${max}% (${aprPct}% APR)`
-  }, [loanAmountDollars, periodDays])
+    if (max <= 0) return { capLabel: null, aprOverrideWarning: null }
+    const aprCapPct = amountCents < LOAN_THRESHOLD_CENTS ? 48 : 35
+    const label = `Max for this loan: ${max}% (${aprCapPct}% APR)`
+    if (!isNaN(ratePct) && ratePct > max) {
+      const impliedApr = (ratePct * (365 / days)).toFixed(1)
+      const loanSizeLabel = amountCents < LOAN_THRESHOLD_CENTS ? 'loans under $1,000' : 'loans $1,000 and over'
+      return {
+        capLabel: label,
+        aprOverrideWarning: `Entered rate: ${ratePct}% (≈${impliedApr}% APR) — exceeds the legal cap of ${max}% (${aprCapPct}% APR for ${loanSizeLabel}).`,
+      }
+    }
+    return { capLabel: label, aprOverrideWarning: null }
+  }, [loanAmountDollars, periodDays, interestRatePct])
 
   if (!pawnRequestId) return null
 
@@ -298,6 +311,7 @@ export default function IssueLoanModal({
               value={loanAmountDollars}
               onChange={e => {
                 setLoanAmountDollars(e.target.value)
+                setAprOverrideChecked(false)
                 const max = calcMaxRatePct(Math.round(parseFloat(e.target.value) * 100), parseInt(periodDays, 10))
                 if (max > 0) setInterestRatePct(String(max))
               }}
@@ -317,6 +331,7 @@ export default function IssueLoanModal({
               value={periodDays}
               onChange={e => {
                 setPeriodDays(e.target.value)
+                setAprOverrideChecked(false)
                 const max = calcMaxRatePct(Math.round(parseFloat(loanAmountDollars) * 100), parseInt(e.target.value, 10))
                 if (max > 0) setInterestRatePct(String(max))
               }}
@@ -334,11 +349,11 @@ export default function IssueLoanModal({
               className="input-field"
               style={{ minHeight: '48px' }}
               value={interestRatePct}
-              onChange={e => setInterestRatePct(e.target.value)}
+              onChange={e => { setInterestRatePct(e.target.value); setAprOverrideChecked(false) }}
               disabled={loading}
               placeholder="Enter amount and term to calculate"
             />
-            {capLabel && (
+            {capLabel && !aprOverrideWarning && (
               <p style={{
                 marginTop: 'var(--space-1)',
                 fontSize: 'var(--text-xs)',
@@ -347,6 +362,54 @@ export default function IssueLoanModal({
               }}>
                 {capLabel}
               </p>
+            )}
+            {aprOverrideWarning && (
+              <div style={{
+                marginTop: 'var(--space-2)',
+                padding: 'var(--space-3)',
+                background: `color-mix(in srgb, var(--color-warning) 12%, transparent)`,
+                border: `1px solid color-mix(in srgb, var(--color-warning) 40%, transparent)`,
+                borderRadius: 'var(--space-1)',
+              }}>
+                <p style={{
+                  margin: 0,
+                  marginBottom: 'var(--space-2)',
+                  fontSize: 'var(--text-sm)',
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-warning)',
+                  fontWeight: 600,
+                }}>
+                  ⚠ Rate exceeds the legal cap
+                </p>
+                <p style={{
+                  margin: 0,
+                  marginBottom: 'var(--space-2)',
+                  fontSize: 'var(--text-xs)',
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text-muted)',
+                }}>
+                  {aprOverrideWarning}
+                </p>
+                <label style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 'var(--space-2)',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--color-text)',
+                  minHeight: '48px',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={aprOverrideChecked}
+                    onChange={e => setAprOverrideChecked(e.target.checked)}
+                    disabled={loading}
+                    style={{ width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
+                  />
+                  I confirm this rate exceeds the legal maximum APR and I am intentionally overriding the cap.
+                </label>
+              </div>
             )}
           </div>
 
