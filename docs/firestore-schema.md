@@ -164,6 +164,8 @@
 | `itemColour` | string | Optional. Copied from `pawnRequests/{id}.itemColour` at loan creation. |
 | `condition` | string | Optional. Copied from `pawnRequests/{id}.condition` at loan creation. |
 | `notableMarkings` | string | Optional. Copied from `pawnRequests/{id}.notableMarkings` at loan creation. |
+| `receiptEmailSentAt` | timestamp | Optional. Set by `signPawnAgreement` CF (or `emailLoanReceipt` CF — see E114) after a successful receipt email dispatch. Null until sent. Acts as idempotency guard to prevent duplicate sends. |
+| `receiptEmailAddress` | string | Optional. Email address the receipt was sent to. Captured at send time so reprints show the correct address even if the user later changes their `users/{uid}.email`. Never included in `auditLogs` events. |
 | `createdAt` | timestamp | Server timestamp |
 | `updatedAt` | timestamp | Server timestamp |
 

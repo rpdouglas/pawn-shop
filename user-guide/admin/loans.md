@@ -83,3 +83,18 @@ If a loan passes its due date without payment:
 5. Confirm forfeiture. The loan status updates to **Forfeited** and the item is immediately available for resale.
 
 All status changes and communications are logged securely in the `auditLogs` for compliance.
+
+## Receipt Email
+
+When a customer's pawn agreement is signed, the system automatically sends a branded HTML receipt email to the customer's email address on file — no staff action required.
+
+The receipt includes: ticket number, item description, loan amount, agreed item value (if recorded), interest rate, APR, due date, and the issuing staff member's name. It does not include the full legal terms, the signature image, or any staff notes.
+
+**Email resolution order:**
+1. If the loan is linked to a registered customer account, the email on file for that account is used.
+2. Otherwise, the email from the original pawn request form is used (walk-in customers who provided one).
+3. If no email is on file, the receipt is silently skipped — the signing workflow completes normally regardless.
+
+> **Idempotency:** The `receiptEmailSentAt` field on the loan ticket is set when the email is dispatched. The system will not send a duplicate receipt if the function is re-invoked.
+
+> **DNS setup required:** The receipt email is sent via SendGrid on behalf of your CanSpace.ca domain. Add the SPF `TXT` record (`v=spf1 include:sendgrid.net ~all`) and DKIM `CNAME` record (provided by the SendGrid domain verification wizard) to your CanSpace nameservers before going live. This is a one-time setup outside the codebase.

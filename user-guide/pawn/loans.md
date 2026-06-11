@@ -17,6 +17,14 @@ As a registered customer, you can view your active and past pawn loans through y
 
 To help you manage your loans, the system will automatically send you an SMS reminder **3 days before** your loan due date.
 
+## Receipt Email
+
+When your pawn agreement is signed at the counter, you will receive an email receipt automatically — no need to ask for one. The receipt confirms your ticket number, the item you pledged, your loan amount, the due date, and instructions for redeeming your item.
+
+Keep this email as your digital record. To redeem your item, visit us before the due date with this receipt and a valid photo ID.
+
+> If you did not receive a receipt email, please check your spam folder or ask staff to verify the email address on your account.
+
 ## Redemptions
 
 Currently, all pawn loan redemptions must be handled in-store or by contacting staff. We will be adding online payment processing soon. Please ensure you redeem your items before the due date to prevent forfeiture.

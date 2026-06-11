@@ -580,6 +580,27 @@
 
 ---
 
+### E114 · Pawn Loan Receipt Email
+
+> **Persona Gate — E114:**
+> - **Makoonsii (Primary):** Customer receives a plain-language digital copy of their loan agreement summary immediately after signing — ticket number, item, loan amount, due date, and redemption instructions. Automatic; no extra staff step required.
+> - **Staff (Primary):** Zero workflow change. Receipt dispatches silently after signature is captured. If the customer has no email on file, the loan signing still succeeds without error.
+> - **Jordan (Secondary):** Branded HTML email matches the dark luxury aesthetic — `#080706` background, `#C8A14A` gold headings, Georgia serif, consistent with `buildDigestHtml` in `notifications.ts`.
+> - **Compliance:** Transactional receipt — CASL opt-in not required. `pawn_receipt_emailed` auditLog entry with no PII. `staffNotes` and `serialNumber` excluded from email content.
+
+- [x] Schema: add `receiptEmailSentAt` + `receiptEmailAddress` to `loanTickets/{id}` — Decision 0032 `[Comp]`
+- [x] `signPawnAgreement` CF: best-effort email dispatch after signing — try/catch, never re-thrown `[Staff]` `[Mak]`
+- [x] Email address resolution: `uid → users/{uid}.email` → `pawnRequests/{id}.email` → skip silently `[Comp]`
+- [x] `buildReceiptHtml` helper: dark-luxury template matching `buildDigestHtml` pattern `[Jord]`
+- [x] Idempotency guard: skip if `receiptEmailSentAt` already set `[Comp]`
+- [x] `pawn_receipt_emailed` auditLog entry (no PII in details) `[Comp]`
+- [x] Update `loanTickets/{id}` with `receiptEmailSentAt` + `receiptEmailAddress` on successful send `[Comp]`
+- [x] Decision 0033 logged `[Comp]`
+- [x] User guide updated: `admin/loans.md` + `pawn/loans.md` `[Staff]` `[Mak]`
+- [x] **E114 CLOSED** | 2026-06-11
+
+---
+
 ## Phase 10 — Inventory Intelligence
 
 > **Goal:** Data-driven merchandising. Automate stale-inventory turnover and close the cannabis product data gap vs. Dutchie/Jane. Schema updates in `docs/firestore-schema.md` and `docs/DECISIONS.md` are required before any implementation task begins.
