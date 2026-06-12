@@ -45,13 +45,13 @@ export default function CountdownTimer({ targetDate, label }: CountdownTimerProp
         display: 'inline-flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '8px',
+        gap: 'var(--space-2)',
       }}
     >
       {label && (
         <p style={{
           fontFamily: 'var(--font-body)',
-          fontSize: '12px',
+          fontSize: 'var(--text-xs)',
           fontWeight: 600,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
@@ -66,7 +66,7 @@ export default function CountdownTimer({ targetDate, label }: CountdownTimerProp
         ? (
           <p style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '24px',
+            fontSize: 'var(--text-subheading)',
             color: 'var(--color-primary)',
             margin: 0,
           }}>
@@ -77,7 +77,7 @@ export default function CountdownTimer({ targetDate, label }: CountdownTimerProp
           <div
             aria-live="polite"
             aria-atomic="true"
-            style={{ display: 'flex', gap: '4px', alignItems: 'center' }}
+            style={{ display: 'flex', gap: 'var(--space-1)', alignItems: 'center' }}
           >
             {[
               { value: timeLeft.days,    unit: 'd' },
@@ -85,13 +85,13 @@ export default function CountdownTimer({ targetDate, label }: CountdownTimerProp
               { value: timeLeft.minutes, unit: 'm' },
               { value: timeLeft.seconds, unit: 's' },
             ].map(({ value, unit }, i) => (
-              <span key={unit} style={{ display: 'flex', alignItems: 'baseline', gap: '1px' }}>
+              <span key={unit} style={{ display: 'flex', alignItems: 'baseline' }}>
                 {i > 0 && (
                   <span style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: '28px',
+                    fontSize: 'var(--text-heading)',
                     color: 'var(--color-primary)',
-                    marginRight: '4px',
+                    marginRight: 'var(--space-1)',
                     lineHeight: 1,
                   }}>
                     :
@@ -102,7 +102,7 @@ export default function CountdownTimer({ targetDate, label }: CountdownTimerProp
                   className="countdown-digit"
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: '48px',
+                    fontSize: 'var(--text-display)',
                     fontWeight: 400,
                     color: 'var(--color-text)',
                     lineHeight: 1,
@@ -115,12 +115,11 @@ export default function CountdownTimer({ targetDate, label }: CountdownTimerProp
                 </span>
                 <span style={{
                   fontFamily: 'var(--font-body)',
-                  fontSize: '12px',
+                  fontSize: 'var(--text-xs)',
                   fontWeight: 500,
                   color: 'var(--color-text-muted)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
-                  marginLeft: '2px',
                 }}>
                   {unit}
                 </span>

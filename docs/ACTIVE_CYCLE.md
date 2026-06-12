@@ -193,6 +193,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **E117 CLOSED** | E117 | 2026-06-12 |
 | `E119 Edit Item Page` — Replaced the 3-step wizard edit flow with a dedicated single-page edit route (`/admin/item/:id/edit`). New `EditItemPage.tsx` with photos section (★ cover, × delete, + Add Photo via existing CFs), all item fields, condition as `<select>` dropdown, conditional cannabis/fireworks profiles, and a "Save Changes" action. `InventoryCard.tsx` "Full Edit" link updated. `extractData: false` on all edit-mode uploads. No new schema fields, no new CFs. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0036 logged. | E119 | 2026-06-12 |
 | **E119 CLOSED** | E119 | 2026-06-12 |
+| `E120 Fireworks Campaign Countdown` — Fixed 10 hardcoded px values in `CountdownTimer.tsx` (design token violations). Added Activate/Deactivate toggle and inline Edit form to `CampaignAdminPage.tsx` — staff can go live in seconds without waiting for the 5-min CF sweep or touching the Firestore console. Canada Day countdown ready to activate. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0037 logged. | E120 | 2026-06-12 |
+| **E120 CLOSED** | E120 | 2026-06-12 |
 
 ---
 
@@ -223,4 +225,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-12 (Cycle 33 — E119 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-12 (Cycle 33 — E120 CLOSED)*

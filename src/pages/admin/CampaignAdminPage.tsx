@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
-  collection, query, orderBy, onSnapshot,
-  addDoc, serverTimestamp,
+  collection, query, orderBy, onSnapshot, doc,
+  addDoc, updateDoc, serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import { useAuth } from '../../context/AuthContext'
@@ -11,23 +11,30 @@ import type { Campaign, CampaignViewTag } from '../../lib/types'
 
 const BANNER_COPY_MAX = 160
 
-function docToCampaign(doc: { id: string; data: () => Record<string, unknown> }): Campaign {
-  const d = doc.data()
+function docToCampaign(d: { id: string; data: () => Record<string, unknown> }): Campaign {
+  const data = d.data()
   return {
-    id: doc.id,
-    title:            String(d['title'] ?? ''),
-    viewTag:          (d['viewTag'] as CampaignViewTag) ?? 'pawn',
-    startDate:        (d['startDate'] as { toDate(): Date }).toDate(),
-    endDate:          (d['endDate'] as { toDate(): Date }).toDate(),
-    active:           Boolean(d['active']),
-    discountRule:     (d['discountRule'] as Campaign['discountRule']) ?? { type: 'fixed', value: 0 },
-    bannerCopy:       String(d['bannerCopy'] ?? ''),
-    countdownEnabled: Boolean(d['countdownEnabled']),
-    createdBy:        d['createdBy'] != null ? String(d['createdBy']) : undefined,
-    reminderSentAt:   d['reminderSentAt'] != null ? (d['reminderSentAt'] as { toDate(): Date }).toDate() : null,
-    updatedAt:        d['updatedAt'] != null ? (d['updatedAt'] as { toDate(): Date }).toDate() : undefined,
-    createdAt:        (d['createdAt'] as { toDate(): Date }).toDate(),
+    id: d.id,
+    title:            String(data['title'] ?? ''),
+    viewTag:          (data['viewTag'] as CampaignViewTag) ?? 'pawn',
+    startDate:        (data['startDate'] as { toDate(): Date }).toDate(),
+    endDate:          (data['endDate'] as { toDate(): Date }).toDate(),
+    active:           Boolean(data['active']),
+    discountRule:     (data['discountRule'] as Campaign['discountRule']) ?? { type: 'fixed', value: 0 },
+    bannerCopy:       String(data['bannerCopy'] ?? ''),
+    countdownEnabled: Boolean(data['countdownEnabled']),
+    createdBy:        data['createdBy'] != null ? String(data['createdBy']) : undefined,
+    reminderSentAt:   data['reminderSentAt'] != null ? (data['reminderSentAt'] as { toDate(): Date }).toDate() : null,
+    updatedAt:        data['updatedAt'] != null ? (data['updatedAt'] as { toDate(): Date }).toDate() : undefined,
+    createdAt:        (data['createdAt'] as { toDate(): Date }).toDate(),
   }
+}
+
+function dateToInputStr(d: Date): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 type DiscountType = 'percent' | 'fixed'
@@ -48,7 +55,7 @@ function CampaignAdmin() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [showForm, setShowForm] = useState(false)
 
-  // Form fields
+  // ── Create form state ────────────────────────────────────────────────────
   const [title, setTitle]                   = useState('')
   const [viewTag, setViewTag]               = useState<CampaignViewTag>('fireworks')
   const [startDate, setStartDate]           = useState(todayStr())
@@ -60,6 +67,20 @@ function CampaignAdmin() {
   const [submitting, setSubmitting]         = useState(false)
   const [formError, setFormError]           = useState<string | null>(null)
   const [formSuccess, setFormSuccess]       = useState(false)
+
+  // ── Edit + activate state ────────────────────────────────────────────────
+  const [editingId, setEditingId]               = useState<string | null>(null)
+  const [editTitle, setEditTitle]               = useState('')
+  const [editViewTag, setEditViewTag]           = useState<CampaignViewTag>('fireworks')
+  const [editStartDate, setEditStartDate]       = useState('')
+  const [editEndDate, setEditEndDate]           = useState('')
+  const [editBannerCopy, setEditBannerCopy]     = useState('')
+  const [editDiscountType, setEditDiscountType] = useState<DiscountType>('percent')
+  const [editDiscountValue, setEditDiscountValue] = useState<number>(0)
+  const [editCountdownEnabled, setEditCountdownEnabled] = useState(false)
+  const [editSubmitting, setEditSubmitting]     = useState(false)
+  const [editError, setEditError]               = useState<string | null>(null)
+  const [togglingId, setTogglingId]             = useState<string | null>(null)
 
   useEffect(() => {
     const q = query(collection(db, 'campaigns'), orderBy('createdAt', 'desc'))
@@ -117,59 +138,337 @@ function CampaignAdmin() {
     }
   }
 
-  const upcoming  = campaigns.filter((c) => !c.active && c.startDate > new Date())
-  const active    = campaigns.filter((c) => c.active)
-  const past      = campaigns.filter((c) => !c.active && c.endDate <= new Date())
+  const openEdit = (c: Campaign) => {
+    setEditingId(c.id)
+    setEditTitle(c.title)
+    setEditViewTag(c.viewTag)
+    setEditStartDate(dateToInputStr(c.startDate))
+    setEditEndDate(dateToInputStr(c.endDate))
+    setEditBannerCopy(c.bannerCopy)
+    setEditDiscountType(c.discountRule.type)
+    setEditDiscountValue(c.discountRule.value)
+    setEditCountdownEnabled(c.countdownEnabled)
+    setEditError(null)
+  }
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingId) return
+    if (!editTitle.trim())            { setEditError('Title is required'); return }
+    if (!editStartDate)               { setEditError('Start date is required'); return }
+    if (!editEndDate)                 { setEditError('End date is required'); return }
+    if (editEndDate <= editStartDate) { setEditError('End date must be after start date'); return }
+    if (!editBannerCopy.trim())       { setEditError('Banner copy is required'); return }
+    if (editBannerCopy.length > BANNER_COPY_MAX) { setEditError(`Banner copy must be ${BANNER_COPY_MAX} characters or fewer`); return }
+
+    setEditSubmitting(true)
+    setEditError(null)
+    try {
+      await updateDoc(doc(db, 'campaigns', editingId), {
+        title:        editTitle.trim(),
+        viewTag:      editViewTag,
+        startDate:    new Date(`${editStartDate}T00:00:00`),
+        endDate:      new Date(`${editEndDate}T23:59:59`),
+        bannerCopy:   editBannerCopy.trim(),
+        discountRule: { type: editDiscountType, value: editDiscountValue },
+        countdownEnabled: editCountdownEnabled,
+        updatedAt:    serverTimestamp(),
+      })
+      setEditingId(null)
+    } catch (err) {
+      setEditError((err as { message?: string }).message ?? 'Failed to update campaign')
+    } finally {
+      setEditSubmitting(false)
+    }
+  }
+
+  const handleToggleActive = async (id: string, currentActive: boolean) => {
+    setTogglingId(id)
+    try {
+      await updateDoc(doc(db, 'campaigns', id), {
+        active: !currentActive,
+        updatedAt: serverTimestamp(),
+      })
+    } catch {
+      // silent — onSnapshot reflects actual Firestore state
+    } finally {
+      setTogglingId(null)
+    }
+  }
+
+  const upcoming = campaigns.filter((c) => !c.active && c.startDate > new Date())
+  const active   = campaigns.filter((c) => c.active)
+  const past     = campaigns.filter((c) => !c.active && c.endDate <= new Date())
 
   function renderList(list: Campaign[], emptyMsg: string) {
     if (list.length === 0) {
       return <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text-muted)', fontStyle: 'italic', marginBottom: 'var(--space-4)' }}>{emptyMsg}</p>
     }
     return list.map((c) => (
-      <div key={c.id} style={{
-        backgroundColor: 'var(--color-surface)',
-        border: '1px solid var(--color-border)',
-        borderRadius: 'var(--radius-md)',
-        padding: 'var(--space-4) var(--space-5)',
-        marginBottom: 'var(--space-3)',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-          <div>
-            <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body)', color: 'var(--color-text)', margin: '0 0 var(--space-1)' }}>
-              {c.title}
-            </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: '0 0 var(--space-1)', textTransform: 'capitalize' }}>
-              {c.viewTag} · {c.startDate.toLocaleDateString('en-CA')} – {c.endDate.toLocaleDateString('en-CA')}
-              {c.countdownEnabled && ' · Countdown'}
-            </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: '0 0 var(--space-1)', fontStyle: 'italic' }}>
-              "{c.bannerCopy}"
-              {c.discountRule.value > 0 && (
-                <span style={{ marginLeft: 'var(--space-2)' }}>
-                  — {c.discountRule.type === 'percent' ? `${c.discountRule.value}%` : formatPrice(c.discountRule.value)} off
-                </span>
-              )}
-            </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: 0 }}>
-              {c.reminderSentAt != null
-                ? `Reminder sent: ${c.reminderSentAt.toLocaleDateString('en-CA')}`
-                : 'Reminder: not yet sent'}
-            </p>
+      <div key={c.id} style={{ marginBottom: 'var(--space-3)' }}>
+        {/* Campaign card */}
+        <div style={{
+          backgroundColor: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          borderRadius: editingId === c.id
+            ? 'var(--radius-md) var(--radius-md) 0 0'
+            : 'var(--radius-md)',
+          padding: 'var(--space-4) var(--space-5)',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+            <div>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body)', color: 'var(--color-text)', margin: '0 0 var(--space-1)' }}>
+                {c.title}
+              </p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: '0 0 var(--space-1)', textTransform: 'capitalize' }}>
+                {c.viewTag} · {c.startDate.toLocaleDateString('en-CA')} – {c.endDate.toLocaleDateString('en-CA')}
+                {c.countdownEnabled && ' · Countdown'}
+              </p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: '0 0 var(--space-1)', fontStyle: 'italic' }}>
+                "{c.bannerCopy}"
+                {c.discountRule.value > 0 && (
+                  <span style={{ marginLeft: 'var(--space-2)' }}>
+                    — {c.discountRule.type === 'percent' ? `${c.discountRule.value}%` : formatPrice(c.discountRule.value)} off
+                  </span>
+                )}
+              </p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', margin: 0 }}>
+                {c.reminderSentAt != null
+                  ? `Reminder sent: ${c.reminderSentAt.toLocaleDateString('en-CA')}`
+                  : 'Reminder: not yet sent'}
+              </p>
+            </div>
+            <span style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--text-xs)',
+              padding: 'var(--space-1) var(--space-2)',
+              backgroundColor: 'var(--color-bg)',
+              borderRadius: 'var(--radius-sm)',
+              color: c.active ? 'var(--color-primary)' : 'var(--color-text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              whiteSpace: 'nowrap',
+            }}>
+              {c.active ? 'Active' : c.startDate > new Date() ? 'Scheduled' : 'Ended'}
+            </span>
           </div>
-          <span style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 'var(--text-xs)',
-            padding: 'var(--space-1) var(--space-2)',
-            backgroundColor: 'var(--color-bg)',
-            borderRadius: 'var(--radius-sm)',
-            color: c.active ? 'var(--color-primary)' : 'var(--color-text-muted)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-            whiteSpace: 'nowrap',
-          }}>
-            {c.active ? 'Active' : c.startDate > new Date() ? 'Scheduled' : 'Ended'}
-          </span>
+
+          {/* Action buttons */}
+          <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-3)', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => handleToggleActive(c.id, c.active)}
+              disabled={togglingId === c.id}
+              style={{
+                minHeight: '48px',
+                padding: '0 var(--space-4)',
+                borderRadius: 'var(--radius-sm)',
+                border: c.active ? '1px solid var(--color-border)' : '1px solid var(--color-primary)',
+                backgroundColor: c.active ? 'transparent' : 'var(--color-primary)',
+                color: c.active ? 'var(--color-text-muted)' : 'var(--color-bg)',
+                fontSize: 'var(--text-small)',
+                fontFamily: 'var(--font-body)',
+                cursor: togglingId === c.id ? 'not-allowed' : 'pointer',
+                opacity: togglingId === c.id ? 0.6 : 1,
+              }}
+            >
+              {togglingId === c.id ? '…' : c.active ? 'Deactivate' : 'Activate'}
+            </button>
+            <button
+              type="button"
+              onClick={() => editingId === c.id ? setEditingId(null) : openEdit(c)}
+              style={{
+                minHeight: '48px',
+                padding: '0 var(--space-4)',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-border)',
+                backgroundColor: 'transparent',
+                color: 'var(--color-text-muted)',
+                fontSize: 'var(--text-small)',
+                fontFamily: 'var(--font-body)',
+                cursor: 'pointer',
+              }}
+            >
+              {editingId === c.id ? 'Cancel' : 'Edit'}
+            </button>
+          </div>
         </div>
+
+        {/* Inline edit form — expands below card when editing */}
+        {editingId === c.id && (
+          <form
+            onSubmit={handleSaveEdit}
+            noValidate
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderTop: 'none',
+              borderRadius: '0 0 var(--radius-md) var(--radius-md)',
+              padding: 'var(--space-5)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--space-4)',
+            }}
+          >
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-subheading)', color: 'var(--color-text)', margin: 0, fontWeight: 400 }}>
+              Edit Campaign
+            </h3>
+
+            <div className="input-wrapper">
+              <label className="input-label" htmlFor={`edit-title-${c.id}`}>Title</label>
+              <input
+                id={`edit-title-${c.id}`}
+                className="input-field"
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                required
+                disabled={editSubmitting}
+              />
+            </div>
+
+            <div className="input-wrapper">
+              <label className="input-label" htmlFor={`edit-view-${c.id}`}>View</label>
+              <select
+                id={`edit-view-${c.id}`}
+                className="input-field input-field-select"
+                value={editViewTag}
+                onChange={(e) => setEditViewTag(e.target.value as CampaignViewTag)}
+                disabled={editSubmitting}
+              >
+                {VIEW_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+              <div className="input-wrapper" style={{ flex: 1 }}>
+                <label className="input-label" htmlFor={`edit-start-${c.id}`}>Start date</label>
+                <input
+                  id={`edit-start-${c.id}`}
+                  className="input-field"
+                  type="date"
+                  value={editStartDate}
+                  onChange={(e) => setEditStartDate(e.target.value)}
+                  required
+                  disabled={editSubmitting}
+                />
+              </div>
+              <div className="input-wrapper" style={{ flex: 1 }}>
+                <label className="input-label" htmlFor={`edit-end-${c.id}`}>End date</label>
+                <input
+                  id={`edit-end-${c.id}`}
+                  className="input-field"
+                  type="date"
+                  value={editEndDate}
+                  onChange={(e) => setEditEndDate(e.target.value)}
+                  required
+                  disabled={editSubmitting}
+                />
+              </div>
+            </div>
+
+            <div className="input-wrapper">
+              <label className="input-label" htmlFor={`edit-banner-${c.id}`}>
+                Banner copy{' '}
+                <span style={{ color: editBannerCopy.length > BANNER_COPY_MAX ? 'var(--color-danger)' : 'var(--color-text-muted)' }}>
+                  ({editBannerCopy.length}/{BANNER_COPY_MAX})
+                </span>
+              </label>
+              <textarea
+                id={`edit-banner-${c.id}`}
+                className="input-field"
+                value={editBannerCopy}
+                onChange={(e) => setEditBannerCopy(e.target.value)}
+                rows={3}
+                maxLength={BANNER_COPY_MAX + 10}
+                required
+                disabled={editSubmitting}
+                style={{ resize: 'vertical' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+              <div className="input-wrapper" style={{ flex: '0 0 auto' }}>
+                <label className="input-label" htmlFor={`edit-disc-type-${c.id}`}>Discount type</label>
+                <select
+                  id={`edit-disc-type-${c.id}`}
+                  className="input-field input-field-select"
+                  value={editDiscountType}
+                  onChange={(e) => setEditDiscountType(e.target.value as DiscountType)}
+                  disabled={editSubmitting}
+                >
+                  <option value="percent">Percent off</option>
+                  <option value="fixed">Fixed amount off (cents)</option>
+                </select>
+              </div>
+              <div className="input-wrapper" style={{ flex: '0 0 auto' }}>
+                <label className="input-label" htmlFor={`edit-disc-val-${c.id}`}>
+                  Value {editDiscountType === 'percent' ? '(0–100)' : '(CAD cents)'}
+                </label>
+                <input
+                  id={`edit-disc-val-${c.id}`}
+                  className="input-field"
+                  type="number"
+                  min={0}
+                  max={editDiscountType === 'percent' ? 100 : undefined}
+                  value={editDiscountValue}
+                  onChange={(e) => setEditDiscountValue(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                  disabled={editSubmitting}
+                  style={{ width: '120px' }}
+                />
+              </div>
+            </div>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={editCountdownEnabled}
+                onChange={(e) => setEditCountdownEnabled(e.target.checked)}
+                disabled={editSubmitting}
+              />
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-text)' }}>
+                Show countdown timer (fireworks page only, uses real end date)
+              </span>
+            </label>
+
+            {editError && (
+              <p role="alert" style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-small)', color: 'var(--color-danger)', margin: 0 }}>
+                {editError}
+              </p>
+            )}
+
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+              <button
+                type="submit"
+                className="btn btn-primary btn-md"
+                disabled={editSubmitting}
+                aria-busy={editSubmitting}
+              >
+                {editSubmitting ? 'Saving…' : 'Save changes'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingId(null)}
+                disabled={editSubmitting}
+                style={{
+                  minHeight: '48px',
+                  padding: '0 var(--space-4)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--color-border)',
+                  backgroundColor: 'transparent',
+                  color: 'var(--color-text-muted)',
+                  fontSize: 'var(--text-body)',
+                  fontFamily: 'var(--font-body)',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     ))
   }
@@ -200,7 +499,7 @@ function CampaignAdmin() {
           color: 'var(--color-primary)',
           marginBottom: 'var(--space-4)',
         }}>
-          Campaign created. It will activate automatically when the start date arrives.
+          Campaign created. It will activate automatically when the start date arrives, or use the Activate button to go live immediately.
         </p>
       )}
 
@@ -242,7 +541,7 @@ function CampaignAdmin() {
             <label className="input-label" htmlFor="camp-view">View</label>
             <select
               id="camp-view"
-              className="input-field"
+              className="input-field input-field-select"
               value={viewTag}
               onChange={(e) => setViewTag(e.target.value as CampaignViewTag)}
               disabled={submitting}
@@ -284,7 +583,8 @@ function CampaignAdmin() {
 
           <div className="input-wrapper">
             <label className="input-label" htmlFor="camp-banner">
-              Banner copy <span style={{ color: bannerCopy.length > BANNER_COPY_MAX ? 'var(--color-danger)' : 'var(--color-text-muted)' }}>
+              Banner copy{' '}
+              <span style={{ color: bannerCopy.length > BANNER_COPY_MAX ? 'var(--color-danger)' : 'var(--color-text-muted)' }}>
                 ({bannerCopy.length}/{BANNER_COPY_MAX})
               </span>
             </label>
@@ -310,7 +610,7 @@ function CampaignAdmin() {
               <label className="input-label" htmlFor="camp-disc-type">Discount type</label>
               <select
                 id="camp-disc-type"
-                className="input-field"
+                className="input-field input-field-select"
                 value={discountType}
                 onChange={(e) => setDiscountType(e.target.value as DiscountType)}
                 disabled={submitting}

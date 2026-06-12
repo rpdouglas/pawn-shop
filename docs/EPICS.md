@@ -675,6 +675,22 @@
 
 ---
 
+### E120 · Fireworks Campaign Countdown
+
+> **Persona Gate — E120:**
+> - **Tanya (Primary):** Live countdown on the fireworks page to Canada Day — real end-date, not manufactured urgency. Staff can activate immediately from the admin UI.
+> - **Staff (Primary):** One-click Activate/Deactivate on any campaign. Edit existing campaigns (title, dates, banner copy, countdown toggle) without delete-and-recreate.
+> - **Jordan (Secondary):** All countdown typography governed by design tokens — no hardcoded px values in `CountdownTimer.tsx`.
+
+- [x] `CountdownTimer.tsx` — replaced 10 hardcoded `px` values with design tokens (`--text-display`, `--text-heading`, `--text-xs`, `--space-1`, `--space-2`) `[Jord]`
+- [x] `CampaignAdminPage.tsx` — Activate/Deactivate toggle button per campaign (client-side `updateDoc`, permitted by existing `isStaff()` rule) `[Staff]`
+- [x] `CampaignAdminPage.tsx` — inline Edit form per campaign (title, view, dates, banner copy, discount, countdown toggle) with `dateToInputStr` for correct local-timezone date display `[Staff]`
+- [x] Decision 0037 logged `[Comp]`
+- [x] User guide updated: `admin/campaigns.md` `[Staff]`
+- [x] **E120 CLOSED** | 2026-06-12
+
+---
+
 ## Phase 10 — Inventory Intelligence
 
 > **Goal:** Data-driven merchandising. Automate stale-inventory turnover and close the cannabis product data gap vs. Dutchie/Jane. Schema updates in `docs/firestore-schema.md` and `docs/DECISIONS.md` are required before any implementation task begins.
