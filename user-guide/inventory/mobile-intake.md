@@ -17,6 +17,18 @@ The first thing the wizard asks for is a View (Pawn, Cannabis, or Fireworks) and
 - **Camera:** Tap **Take Photo** to open your device camera. The back (environment-facing) lens is selected by default for product shots.
 - **Gallery:** Tap **Choose from Library** to select an existing image.
 
+### Managing Photos Before You Continue
+
+Captured photos appear as thumbnails below the camera buttons. You have full control before advancing:
+
+| Control | What it does |
+|---------|-------------|
+| **Cover badge** | Marks the first photo — this becomes the hero on every storefront card |
+| **★** (gold star) | Promotes that photo to cover position. Tap it on any non-first thumbnail. |
+| **×** | Permanently removes that photo. The item draft is updated immediately. |
+
+You can take multiple photos — remove any that are blurry or poorly lit before tapping **Next**.
+
 ### AI Processing & Auto-Advance
 
 Once uploaded, your photo is sent to the **3-stage AI processing pipeline**:

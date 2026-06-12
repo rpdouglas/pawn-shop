@@ -29,6 +29,16 @@ const processUploadedImageFn = httpsCallable<
   { success: boolean }
 >(functions, 'processUploadedImage')
 
+const removeItemImageFn = httpsCallable<
+  { itemId: string; imageUrl: string },
+  { success: boolean }
+>(functions, 'removeItemImage')
+
+const reorderItemImagesFn = httpsCallable<
+  { itemId: string; images: string[] },
+  { success: boolean }
+>(functions, 'reorderItemImages')
+
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -185,6 +195,8 @@ export default function MobileIntakePage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [publishError, setPublishError] = useState('')
   const [funStatusIndex, setFunStatusIndex] = useState(0)
+  const [photoOpsLoading, setPhotoOpsLoading] = useState(false)
+  const [photoOpsError, setPhotoOpsError] = useState('')
   // AI toggle — session-scoped: ON by default, persisted for batch workflows
   // Reads the same key as the desktop IntakeForm for cross-form consistency
   const [aiEnabled, setAiEnabled] = useState<boolean>(() => {
@@ -456,6 +468,37 @@ export default function MobileIntakePage() {
   const openGallery = async () => {
     if (await ensureItemCreated()) galleryRef.current?.click()
   }
+
+  // ── Photo management ──────────────────────────────────────────────────────
+
+  const handleMobileDeleteImage = useCallback(async (url: string) => {
+    const id = itemIdRef.current
+    if (!id || photoOpsLoading) return
+    setPhotoOpsLoading(true)
+    setPhotoOpsError('')
+    try {
+      await removeItemImageFn({ itemId: id, imageUrl: url })
+    } catch {
+      setPhotoOpsError('Could not remove photo — please try again.')
+    } finally {
+      setPhotoOpsLoading(false)
+    }
+  }, [photoOpsLoading])
+
+  const handleMobileSetCover = useCallback(async (url: string) => {
+    const id = itemIdRef.current
+    if (!id || photoOpsLoading) return
+    setPhotoOpsLoading(true)
+    setPhotoOpsError('')
+    try {
+      const newOrder = [url, ...images.filter(u => u !== url)]
+      await reorderItemImagesFn({ itemId: id, images: newOrder })
+    } catch {
+      setPhotoOpsError('Could not update cover photo — please try again.')
+    } finally {
+      setPhotoOpsLoading(false)
+    }
+  }, [images, photoOpsLoading])
 
   // ── Step navigation ───────────────────────────────────────────────────────
 
@@ -824,15 +867,81 @@ export default function MobileIntakePage() {
                 aria-label={`${images.length} photo${images.length !== 1 ? 's' : ''} captured`}
               >
                 {images.map((url, i) => (
-                  <li key={url}>
+                  <li key={url} style={{ position: 'relative', opacity: photoOpsLoading ? 0.5 : 1, transition: `opacity var(--motion-speed-fast) var(--motion-easing)` }}>
+                    {i === 0 && (
+                      <span style={{
+                        position: 'absolute',
+                        top: 'var(--space-1)',
+                        left: 'var(--space-1)',
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'var(--color-on-primary)',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 'var(--text-xs)',
+                        padding: '0 var(--space-1)',
+                        borderRadius: 'var(--radius-sm)',
+                        pointerEvents: 'none',
+                        zIndex: 1,
+                      }}>Cover</span>
+                    )}
                     <img
                       src={url}
                       alt={`Photo ${i + 1}`}
                       style={{ width: '72px', height: '72px', objectFit: 'cover', borderRadius: 'var(--radius-sm)', display: 'block' }}
                     />
+                    <div style={{ display: 'flex', gap: 'var(--space-1)', justifyContent: 'center', marginTop: 'var(--space-1)' }}>
+                      {i > 0 && (
+                        <button
+                          type="button"
+                          aria-label={`Set photo ${i + 1} as cover`}
+                          title="Set as cover"
+                          disabled={photoOpsLoading}
+                          onClick={() => handleMobileSetCover(url)}
+                          style={{
+                            minWidth: 'var(--space-12)',
+                            minHeight: 'var(--space-12)',
+                            background: 'none',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: 'var(--radius-sm)',
+                            color: 'var(--color-primary)',
+                            fontSize: 'var(--text-small)',
+                            lineHeight: 1,
+                            cursor: photoOpsLoading ? 'not-allowed' : 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 0,
+                          }}
+                        >★</button>
+                      )}
+                      <button
+                        type="button"
+                        aria-label={`Remove photo ${i + 1}`}
+                        title="Remove photo"
+                        disabled={photoOpsLoading}
+                        onClick={() => handleMobileDeleteImage(url)}
+                        style={{
+                          minWidth: 'var(--space-12)',
+                          minHeight: 'var(--space-12)',
+                          background: 'none',
+                          border: '1px solid var(--color-border)',
+                          borderRadius: 'var(--radius-sm)',
+                          color: 'var(--color-text-muted)',
+                          fontSize: 'var(--text-body)',
+                          lineHeight: 1,
+                          cursor: photoOpsLoading ? 'not-allowed' : 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: 0,
+                        }}
+                      >×</button>
+                    </div>
                   </li>
                 ))}
               </ul>
+              {photoOpsError && (
+                <p role="alert" style={{ ...ERROR_TEXT, marginTop: 'var(--space-2)' }}>{photoOpsError}</p>
+              )}
             </div>
           )}
 

@@ -189,6 +189,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **E115 CLOSED** | E115 | 2026-06-11 |
 | `E116 Pawn Intake & Ticket UX Improvements` — Eliminated duplicate ID entry in walk-in pawn flow by threading `idType`/`idVerified` from `WalkInPawnModal` through `PawnInbox.IssueLoanCtx` into `IssueLoanModal` (pre-filled via `key`-prop remount). Added live "Quote for Customer" panel in Step 1 showing borrow amount, interest, redemption total, due date, and APR. Enhanced `PrintableTicket` page 2 with plain-language default summary, specific extension instructions (visit in person, bring ticket + ID), and a footer action line with dynamic due date. No schema changes. 4 files. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E116 | 2026-06-11 |
 | **E116 CLOSED** | E116 | 2026-06-11 |
+| `E117 Inventory Photo Management` — Closed the photo management gap: ✕ delete and ★ set-cover controls on every uploaded photo thumbnail, on both desktop (`ImageUploadZone`) and mobile (`MobileIntakePage`). QR Desktop Bridge: "📱 Upload from Phone" button on desktop generates a QR code pointing to `/admin/item-photo/{itemId}` — staff scan with phone, take photo, desktop auto-updates via `onSnapshot`. Two new CFs: `removeItemImage` (Storage delete + `arrayRemove`) and `reorderItemImages` (URL-injection-safe full array write). `ItemPhotoPage` is the QR destination: `ProtectedRoute staffOnly`, `extractData=false`. 6 files + route. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0035 logged. | E117 | 2026-06-12 |
+| **E117 CLOSED** | E117 | 2026-06-12 |
 
 ---
 
@@ -219,4 +221,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-11 (Cycle 36 — E116 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-12 (Cycle 33 — E117 CLOSED)*

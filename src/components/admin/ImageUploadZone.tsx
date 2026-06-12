@@ -3,11 +3,22 @@ import { ref, uploadBytesResumable } from 'firebase/storage'
 import { httpsCallable } from 'firebase/functions'
 import imageCompression from 'browser-image-compression'
 import { storage, functions } from '../../lib/firebase'
+import QRUploadBridge from './QRUploadBridge'
 
 const processUploadedImageFn = httpsCallable<
   { filePath: string, extractData?: boolean, viewTag?: string },
   { success: boolean }
 >(functions, 'processUploadedImage')
+
+const removeItemImageFn = httpsCallable<
+  { itemId: string; imageUrl: string },
+  { success: boolean }
+>(functions, 'removeItemImage')
+
+const reorderItemImagesFn = httpsCallable<
+  { itemId: string; images: string[] },
+  { success: boolean }
+>(functions, 'reorderItemImages')
 
 interface UploadEntry {
   fileName: string
@@ -39,10 +50,26 @@ const COMPRESSION_OPTIONS = {
   useWebWorker: true,
 }
 
+const PHOTO_BTN: React.CSSProperties = {
+  minWidth: '44px',
+  minHeight: '44px',
+  background: 'none',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-sm)',
+  fontFamily: 'var(--font-body)',
+  fontSize: 'var(--text-body)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
+}
+
 export default function ImageUploadZone({ itemId, onRequireItemId, onProcessingChange, images, extractData, viewTag }: ImageUploadZoneProps) {
   const [uploads, setUploads] = useState<Map<string, UploadEntry>>(new Map())
   const [isDragging, setIsDragging] = useState(false)
   const [isMobile, setIsMobile] = useState(window.matchMedia('(max-width: 767px)').matches)
+  const [isPhotoOp, setIsPhotoOp] = useState(false)
+  const [photoOpError, setPhotoOpError] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   // Blobs kept for manual retry; keyed by upload key. Never read during render — use UploadEntry.hasBlob instead.
@@ -142,20 +169,16 @@ export default function ImageUploadZone({ itemId, onRequireItemId, onProcessingC
         })
 
         try {
-          console.log(`[AI Intake] Calling processUploadedImage for ${storageRef.fullPath}...`)
           const res = await processUploadedImageFn({ filePath: storageRef.fullPath, extractData, viewTag })
-          console.log(`[AI Intake] processUploadedImage completed successfully.`)
-          
           const responseData = res.data as { aiFailed?: boolean; aiError?: string };
           if (responseData?.aiFailed) {
             window.alert(`AI Extraction Unavailable: ${responseData.aiError}\n\nThe photo has been saved successfully. Please enter the details manually.`)
           }
         } catch (err) {
-          console.error(`[AI Intake] processUploadedImage failed:`, err)
           setUploads(prev => {
             const entry = prev.get(key)
             if (!entry) return prev
-            
+
             let errorMessage = 'Processing failed — tap to retry.'
             if (err instanceof Error) {
               errorMessage = err.message
@@ -164,9 +187,9 @@ export default function ImageUploadZone({ itemId, onRequireItemId, onProcessingC
               }
             }
 
-            return new Map(prev).set(key, { 
-              ...entry, 
-              processing: false, 
+            return new Map(prev).set(key, {
+              ...entry,
+              processing: false,
               error: errorMessage
             })
           })
@@ -233,6 +256,33 @@ export default function ImageUploadZone({ itemId, onRequireItemId, onProcessingC
     })
     doUpload(key, blob, fileName, 0, itemId)
   }, [itemId, doUpload])
+
+  const handleDeleteImage = useCallback(async (url: string) => {
+    if (!itemId || isPhotoOp) return
+    setIsPhotoOp(true)
+    setPhotoOpError('')
+    try {
+      await removeItemImageFn({ itemId, imageUrl: url })
+    } catch {
+      setPhotoOpError('Could not remove photo — please try again.')
+    } finally {
+      setIsPhotoOp(false)
+    }
+  }, [itemId, isPhotoOp])
+
+  const handleSetCover = useCallback(async (url: string) => {
+    if (!itemId || isPhotoOp) return
+    setIsPhotoOp(true)
+    setPhotoOpError('')
+    try {
+      const newOrder = [url, ...images.filter(u => u !== url)]
+      await reorderItemImagesFn({ itemId, images: newOrder })
+    } catch {
+      setPhotoOpError('Could not update cover photo — please try again.')
+    } finally {
+      setIsPhotoOp(false)
+    }
+  }, [itemId, images, isPhotoOp])
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (!files) return
@@ -375,18 +425,79 @@ export default function ImageUploadZone({ itemId, onRequireItemId, onProcessingC
       )}
 
       {images.length > 0 && (
-        <ul className="uploaded-images-list" aria-label={`${images.length} photo${images.length !== 1 ? 's' : ''} uploaded`}>
-          {images.map((url, i) => (
-            <li key={url} className="uploaded-image-item">
-              <img
-                src={url}
-                alt={`Item photo ${i + 1}`}
-                className="uploaded-image-thumb"
-              />
-              <span className="uploaded-image-label">Photo {i + 1}</span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul
+            className="uploaded-images-list"
+            aria-label={`${images.length} photo${images.length !== 1 ? 's' : ''} uploaded`}
+          >
+            {images.map((url, i) => (
+              <li key={url} className="uploaded-image-item" style={{ position: 'relative' }}>
+                {/* Cover badge — first image is always the hero */}
+                {i === 0 && (
+                  <span style={{
+                    position: 'absolute',
+                    top: 'var(--space-1)',
+                    left: 'var(--space-1)',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-on-primary)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--text-xs)',
+                    padding: '0 var(--space-2)',
+                    borderRadius: 'var(--radius-sm)',
+                    lineHeight: '20px',
+                    pointerEvents: 'none',
+                    zIndex: 1,
+                  }}>Cover</span>
+                )}
+                <img
+                  src={url}
+                  alt={`Item photo ${i + 1}`}
+                  className="uploaded-image-thumb"
+                  style={{ opacity: isPhotoOp ? 0.5 : 1, transition: 'opacity var(--motion-speed-fast) var(--motion-easing)' }}
+                />
+                <div style={{ display: 'flex', gap: 'var(--space-1)', justifyContent: 'center' }}>
+                  {/* Set as cover — only shown on non-first images */}
+                  {i > 0 && (
+                    <button
+                      type="button"
+                      aria-label={`Set photo ${i + 1} as cover`}
+                      title="Set as cover"
+                      disabled={isPhotoOp}
+                      onClick={() => handleSetCover(url)}
+                      style={{ ...PHOTO_BTN, color: 'var(--color-primary)', cursor: isPhotoOp ? 'not-allowed' : 'pointer' }}
+                    >★</button>
+                  )}
+                  {/* Delete */}
+                  <button
+                    type="button"
+                    aria-label={`Remove photo ${i + 1}`}
+                    title="Remove photo"
+                    disabled={isPhotoOp}
+                    onClick={() => handleDeleteImage(url)}
+                    style={{ ...PHOTO_BTN, color: 'var(--color-text-muted)', cursor: isPhotoOp ? 'not-allowed' : 'pointer' }}
+                  >×</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {photoOpError && (
+            <p
+              role="alert"
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--text-small)',
+                color: 'var(--color-error)',
+                margin: 'var(--space-2) 0 0',
+              }}
+            >{photoOpError}</p>
+          )}
+
+          {/* Desktop-only QR bridge — staff scan to upload from phone */}
+          {!isMobile && itemId && (
+            <QRUploadBridge itemId={itemId} imageCount={images.length} />
+          )}
+        </>
       )}
     </div>
   )

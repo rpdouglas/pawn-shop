@@ -609,6 +609,107 @@ export const clearRecycleBin = onCall<void>({ cors: true, timeoutSeconds: 300 },
   return { success: true, deletedCount }
 })
 
+// ── removeItemImage ───────────────────────────────────────────────────────────
+// Deletes a single photo from Storage and removes its URL from items/{id}.images[].
+// Staff role required. Gracefully handles missing Storage files (photo may already
+// be gone). Writes item_photo_removed audit log.
+
+interface RemoveItemImageData {
+  itemId: string
+  imageUrl: string
+}
+
+export const removeItemImage = onCall<RemoveItemImageData>({ cors: true }, async (request) => {
+  if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
+    throw new HttpsError('permission-denied', 'Staff role required')
+  }
+
+  const { itemId, imageUrl } = request.data
+  if (!itemId) throw new HttpsError('invalid-argument', 'itemId is required')
+  if (!imageUrl) throw new HttpsError('invalid-argument', 'imageUrl is required')
+
+  const db = getFirestore()
+  const itemRef = db.collection('items').doc(itemId)
+  const snap = await itemRef.get()
+  if (!snap.exists) throw new HttpsError('not-found', `Item ${itemId} not found`)
+
+  // Extract storage path: strip https://storage.googleapis.com/{bucket}/ prefix
+  const storagePath = imageUrl.replace(/^https:\/\/storage\.googleapis\.com\/[^/]+\//, '')
+  try {
+    await getStorage().bucket().file(storagePath).delete()
+  } catch {
+    // File already gone — continue to remove URL from Firestore
+  }
+
+  await itemRef.update({
+    images: FieldValue.arrayRemove(imageUrl),
+    updatedAt: FieldValue.serverTimestamp(),
+  })
+
+  await db.collection('auditLogs').add({
+    eventType: 'item_photo_removed',
+    uid: request.auth.uid,
+    targetId: itemId,
+    details: { itemId },
+    createdAt: FieldValue.serverTimestamp(),
+  })
+
+  return { success: true }
+})
+
+// ── reorderItemImages ─────────────────────────────────────────────────────────
+// Replaces items/{id}.images[] with a new ordered array of the same URLs.
+// Validates that every URL in the new array was already present in the existing
+// array (prevents URL injection). Staff role required.
+
+interface ReorderItemImagesData {
+  itemId: string
+  images: string[]
+}
+
+export const reorderItemImages = onCall<ReorderItemImagesData>({ cors: true }, async (request) => {
+  if (!request.auth || !isStaffToken(request.auth.token as Record<string, unknown>)) {
+    throw new HttpsError('permission-denied', 'Staff role required')
+  }
+
+  const { itemId, images: newImages } = request.data
+  if (!itemId) throw new HttpsError('invalid-argument', 'itemId is required')
+  if (!Array.isArray(newImages)) throw new HttpsError('invalid-argument', 'images must be an array')
+
+  const db = getFirestore()
+  const itemRef = db.collection('items').doc(itemId)
+  const snap = await itemRef.get()
+  if (!snap.exists) throw new HttpsError('not-found', `Item ${itemId} not found`)
+
+  const currentImages = ((snap.data() as Record<string, unknown>)['images'] as string[] | undefined) ?? []
+
+  if (newImages.length !== currentImages.length) {
+    throw new HttpsError('invalid-argument', 'images array length must match current images count')
+  }
+
+  const currentSet = new Set(currentImages)
+  for (const url of newImages) {
+    if (!currentSet.has(url)) {
+      throw new HttpsError('invalid-argument', 'images array contains unrecognised URLs')
+    }
+  }
+
+  await itemRef.update({
+    images: newImages,
+    updatedAt: FieldValue.serverTimestamp(),
+  })
+
+  await db.collection('auditLogs').add({
+    eventType: 'item_photos_reordered',
+    uid: request.auth.uid,
+    targetId: itemId,
+    details: { itemId },
+    createdAt: FieldValue.serverTimestamp(),
+  })
+
+  return { success: true }
+})
+
 // ── purgeRecycledItems ────────────────────────────────────────────────────────
 // Scheduled daily. Hard deletes items that have been in the recycle bin > 30 days.
 

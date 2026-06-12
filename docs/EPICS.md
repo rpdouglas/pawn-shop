@@ -638,6 +638,24 @@
 - [x] User guide updated: `admin/pawn-inbox.md` + `admin/loans.md` `[Staff]`
 - [x] **E116 CLOSED** | 2026-06-11
 
+### E117 · Inventory Photo Management
+
+> **Persona Gate — E117:**
+> - **Marcus (Primary):** Staff must be able to delete individual photos and promote a better shot to cover position without deleting the entire item.
+> - **Makoonsii (Secondary):** All photo controls meet the 48px touch target standard for one-handed operation in portrait mode.
+> - **Jordan (Supporting):** Cover photo selection is an intentional staff action — `images[0]` is always the hero on `ItemDetailPage` and card thumbnails.
+
+- [x] `removeItemImage` CF — staff+, deletes Storage file + `arrayRemove` from `items/{id}.images`, audit log `[Staff]`
+- [x] `reorderItemImages` CF — staff+, validates URL set membership, full array write, audit log `[Staff]`
+- [x] `ImageUploadZone.tsx` — Cover badge on `images[0]`, ★ set-cover on remaining, × delete on all `[Marc]` `[Mak]`
+- [x] `QRUploadBridge.tsx` — QR code popover ("📱 Upload from Phone") pointing to `/admin/item-photo/{itemId}`, auto-close on new photo `[Marc]`
+- [x] `ItemPhotoPage.tsx` — QR bridge destination, `ProtectedRoute staffOnly`, `extractData=false`, success banner `[Marc]`
+- [x] `MobileIntakePage.tsx` — Cover badge + ★ set-cover + × delete on 72px thumbnail grid `[Mak]`
+- [x] Route `/admin/item-photo/:itemId` added to `main.tsx` `[Marc]`
+- [x] `firestore-schema.md` updated with `item_photo_removed` + `item_photos_reordered` event types `[Comp]`
+- [x] User guide updated: `inventory/intake.md` + `inventory/mobile-intake.md` `[Staff]`
+- [x] **E117 CLOSED** | 2026-06-12
+
 ---
 
 ## Phase 10 — Inventory Intelligence

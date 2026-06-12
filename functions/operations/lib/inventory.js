@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.purgeRecycledItems = exports.clearRecycleBin = exports.deleteInventoryItem = exports.processUploadedImage = exports.resetExpiredHolds = exports.adjustInventory = exports.setPoliceHold = exports.setHold = exports.publishItem = exports.createDraftItem = exports.onItemPublished = void 0;
+exports.purgeRecycledItems = exports.reorderItemImages = exports.removeItemImage = exports.clearRecycleBin = exports.deleteInventoryItem = exports.processUploadedImage = exports.resetExpiredHolds = exports.adjustInventory = exports.setPoliceHold = exports.setHold = exports.publishItem = exports.createDraftItem = exports.onItemPublished = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const authHelpers_1 = require("@pawn-shop/shared/lib/authHelpers");
 const scheduler_1 = require("firebase-functions/v2/scheduler");
@@ -514,6 +514,78 @@ exports.clearRecycleBin = (0, https_1.onCall)({ cors: true, timeoutSeconds: 300 
         createdAt: firestore_2.FieldValue.serverTimestamp(),
     });
     return { success: true, deletedCount };
+});
+exports.removeItemImage = (0, https_1.onCall)({ cors: true }, async (request) => {
+    if (!request.auth || !isStaffToken(request.auth.token)) {
+        throw new https_1.HttpsError('permission-denied', 'Staff role required');
+    }
+    const { itemId, imageUrl } = request.data;
+    if (!itemId)
+        throw new https_1.HttpsError('invalid-argument', 'itemId is required');
+    if (!imageUrl)
+        throw new https_1.HttpsError('invalid-argument', 'imageUrl is required');
+    const db = (0, firestore_2.getFirestore)();
+    const itemRef = db.collection('items').doc(itemId);
+    const snap = await itemRef.get();
+    if (!snap.exists)
+        throw new https_1.HttpsError('not-found', `Item ${itemId} not found`);
+    // Extract storage path: strip https://storage.googleapis.com/{bucket}/ prefix
+    const storagePath = imageUrl.replace(/^https:\/\/storage\.googleapis\.com\/[^/]+\//, '');
+    try {
+        await (0, storage_1.getStorage)().bucket().file(storagePath).delete();
+    }
+    catch {
+        // File already gone — continue to remove URL from Firestore
+    }
+    await itemRef.update({
+        images: firestore_2.FieldValue.arrayRemove(imageUrl),
+        updatedAt: firestore_2.FieldValue.serverTimestamp(),
+    });
+    await db.collection('auditLogs').add({
+        eventType: 'item_photo_removed',
+        uid: request.auth.uid,
+        targetId: itemId,
+        details: { itemId },
+        createdAt: firestore_2.FieldValue.serverTimestamp(),
+    });
+    return { success: true };
+});
+exports.reorderItemImages = (0, https_1.onCall)({ cors: true }, async (request) => {
+    if (!request.auth || !isStaffToken(request.auth.token)) {
+        throw new https_1.HttpsError('permission-denied', 'Staff role required');
+    }
+    const { itemId, images: newImages } = request.data;
+    if (!itemId)
+        throw new https_1.HttpsError('invalid-argument', 'itemId is required');
+    if (!Array.isArray(newImages))
+        throw new https_1.HttpsError('invalid-argument', 'images must be an array');
+    const db = (0, firestore_2.getFirestore)();
+    const itemRef = db.collection('items').doc(itemId);
+    const snap = await itemRef.get();
+    if (!snap.exists)
+        throw new https_1.HttpsError('not-found', `Item ${itemId} not found`);
+    const currentImages = snap.data()['images'] ?? [];
+    if (newImages.length !== currentImages.length) {
+        throw new https_1.HttpsError('invalid-argument', 'images array length must match current images count');
+    }
+    const currentSet = new Set(currentImages);
+    for (const url of newImages) {
+        if (!currentSet.has(url)) {
+            throw new https_1.HttpsError('invalid-argument', 'images array contains unrecognised URLs');
+        }
+    }
+    await itemRef.update({
+        images: newImages,
+        updatedAt: firestore_2.FieldValue.serverTimestamp(),
+    });
+    await db.collection('auditLogs').add({
+        eventType: 'item_photos_reordered',
+        uid: request.auth.uid,
+        targetId: itemId,
+        details: { itemId },
+        createdAt: firestore_2.FieldValue.serverTimestamp(),
+    });
+    return { success: true };
 });
 // ── purgeRecycledItems ────────────────────────────────────────────────────────
 // Scheduled daily. Hard deletes items that have been in the recycle bin > 30 days.

@@ -57,6 +57,20 @@ Before an item can go live, it must pass a validation check. The following are *
 
 Clicking **Publish** generates search tokens and makes the item `Active` on the selected storefront.
 
+## Managing Photos
+
+Once a photo has been processed, it appears as a thumbnail in the photo zone. You have full control over the photo set at any time:
+
+- **Cover badge** — The first photo in the grid carries a "Cover" badge. This is the hero image shown on the storefront and every inventory card.
+- **★ Set as Cover** — Tap the gold star below any non-cover photo to promote it to position one. Useful when you upload a better composition after the fact.
+- **× Remove** — Tap the × below any photo to delete it permanently from both the item record and storage. Cannot be undone.
+
+### Upload from Your Phone (Desktop)
+
+Working at your desk but need a better camera shot? Below the photo grid you'll find a **📱 Upload from Phone** button. Tap it to reveal a QR code pointing to a secure staff-only upload page for this item. Scan it with your phone, take the photo, and it appears on the desktop in real time — the QR panel closes automatically.
+
+> Your phone must be signed in to a staff account to access the upload page.
+
 ## Step 4: Post-Publication Actions
 
 ### QR Labels
