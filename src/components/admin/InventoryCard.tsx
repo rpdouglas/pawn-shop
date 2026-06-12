@@ -242,7 +242,7 @@ export default function InventoryCard({ item, onOpenDrawer }: InventoryCardProps
       {/* Actions — ≥48px touch targets */}
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 'auto' }}>
         <Link
-          to={`/admin/mobile-intake/edit/${item.id}`}
+          to={`/admin/item/${item.id}/edit`}
           style={{
             display: 'flex',
             alignItems: 'center',

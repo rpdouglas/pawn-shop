@@ -122,6 +122,7 @@ const router = createBrowserRouter([
         { path: 'social/compose',    lazy: () => import('./pages/admin/social/SocialComposerPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'mobile-intake',     lazy: () => import('./pages/admin/MobileIntakePage.tsx').then(m => ({ Component: m.default })) },
         { path: 'mobile-intake/edit/:id', lazy: () => import('./pages/admin/MobileIntakePage.tsx').then(m => ({ Component: m.default })) },
+        { path: 'item/:id/edit',     lazy: () => import('./pages/admin/EditItemPage.tsx').then(m => ({ Component: m.default })) },
         { path: 'item-photo/:itemId',     lazy: () => import('./pages/admin/ItemPhotoPage.tsx').then(m => ({ Component: m.default })) },
       ]},
       { path: '*', element: <NotFoundPage /> },

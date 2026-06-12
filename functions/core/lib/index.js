@@ -305307,7 +305307,7 @@ function buildReceiptHtml(ticket, ticketNumber) {
 </html>`;
 }
 var signPawnAgreement = (0, import_https8.onCall)(
-  { cors: true, secrets: [import_secrets6.sendgridApiKey, import_secrets6.sendgridFromEmail] },
+  { cors: true, secrets: [import_secrets6.sendgridApiKey] },
   async (request) => {
     if (!request.auth?.token.admin && !request.auth?.token.manager && !request.auth?.token.inventory_staff) {
       throw new import_https8.HttpsError("permission-denied", "Only staff can sign pawn agreements");

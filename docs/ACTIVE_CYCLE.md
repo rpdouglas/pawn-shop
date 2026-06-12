@@ -191,6 +191,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **E116 CLOSED** | E116 | 2026-06-11 |
 | `E117 Inventory Photo Management` — Closed the photo management gap: ✕ delete and ★ set-cover controls on every uploaded photo thumbnail, on both desktop (`ImageUploadZone`) and mobile (`MobileIntakePage`). QR Desktop Bridge: "📱 Upload from Phone" button on desktop generates a QR code pointing to `/admin/item-photo/{itemId}` — staff scan with phone, take photo, desktop auto-updates via `onSnapshot`. Two new CFs: `removeItemImage` (Storage delete + `arrayRemove`) and `reorderItemImages` (URL-injection-safe full array write). `ItemPhotoPage` is the QR destination: `ProtectedRoute staffOnly`, `extractData=false`. 6 files + route. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0035 logged. | E117 | 2026-06-12 |
 | **E117 CLOSED** | E117 | 2026-06-12 |
+| `E119 Edit Item Page` — Replaced the 3-step wizard edit flow with a dedicated single-page edit route (`/admin/item/:id/edit`). New `EditItemPage.tsx` with photos section (★ cover, × delete, + Add Photo via existing CFs), all item fields, condition as `<select>` dropdown, conditional cannabis/fireworks profiles, and a "Save Changes" action. `InventoryCard.tsx` "Full Edit" link updated. `extractData: false` on all edit-mode uploads. No new schema fields, no new CFs. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0036 logged. | E119 | 2026-06-12 |
+| **E119 CLOSED** | E119 | 2026-06-12 |
 
 ---
 
@@ -221,4 +223,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-12 (Cycle 33 — E117 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-12 (Cycle 33 — E119 CLOSED)*

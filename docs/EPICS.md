@@ -658,6 +658,23 @@
 
 ---
 
+### E119 · Edit Item Page
+
+> **Persona Gate — E119:**
+> - **Marcus (Primary):** All E117 photo controls (★ cover, × delete, + Add Photo) available on the edit page — no wizard navigation required.
+> - **Staff (Primary):** A price, condition, or description change requires zero wizard steps — all fields on one scrollable page with a single "Save Changes" action.
+> - **Makoonsii (Secondary):** All touch targets ≥48px. Condition is a single-tap `<select>` dropdown. Single-column layout; no horizontal scrolling.
+
+- [x] `EditItemPage.tsx` — single-page edit form: photos section (Cover badge, ★ set-cover, × delete, + Add Photo), item details, pricing & stock, condition `<select>`, cannabis/fireworks conditional profiles, Save Changes action `[Marc]` `[Staff]` `[Mak]`
+- [x] Route `/admin/item/:id/edit` added to `main.tsx` `[Staff]`
+- [x] `InventoryCard.tsx` — "Full Edit" link updated from `/admin/mobile-intake/edit/:id` to `/admin/item/${item.id}/edit` `[Staff]`
+- [x] `extractData: false` on all photo uploads in edit mode — existing staff-written data is never overwritten by AI `[Marc]` `[Comp]`
+- [x] Decision 0036 logged `[Comp]`
+- [x] User guide updated: `admin/inventory.md` `[Staff]`
+- [x] **E119 CLOSED** | 2026-06-12
+
+---
+
 ## Phase 10 — Inventory Intelligence
 
 > **Goal:** Data-driven merchandising. Automate stale-inventory turnover and close the cannabis product data gap vs. Dutchie/Jane. Schema updates in `docs/firestore-schema.md` and `docs/DECISIONS.md` are required before any implementation task begins.

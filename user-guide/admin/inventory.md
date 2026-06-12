@@ -45,7 +45,7 @@ Each card has a row of action buttons at the bottom (all ≥48px for comfortable
 
 | Button | What it does |
 |--------|-------------|
-| **Full Edit** | Opens the full intake form (`/admin/mobile-intake/edit/:id`) for fields not available inline (images, markdown config, provenance, etc.) |
+| **Full Edit** | Opens the dedicated Edit Item page (`/admin/item/:id/edit`) — a single-page form with photo management (add, delete, promote to cover), all item fields, condition dropdown, and cannabis/fireworks profiles. Identical experience on mobile and desktop. |
 | **Archive** | Sets `status: archived` — hides the item from public listings without moving it to the Recycle Bin |
 | **Delete** | Moves the item to the Recycle Bin (`status: deleted`) |
 | **Restore** | Visible on deleted items only — returns the item to Draft status |
