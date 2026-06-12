@@ -2,6 +2,12 @@
 
 Welcome to The Pawn Shop — a multi-vertical retail platform serving Cornwall Island, Akwesasne across three distinct storefronts. This page orients you to the platform shell before you dive into any specific workflow.
 
+## The Home Page
+
+The home page (`/`) opens with a full-height cinematic hero: the shop logo centred over an atmospheric background image, with the brand statement *Dapper. Debonair. Distinctly Akwesasne.* in gold below it.
+
+Below the hero, the four store verticals are presented in a 2×2 grid on desktop and a single column on mobile. Tap any card to enter that storefront — Cannabis and Fireworks will prompt for age confirmation before proceeding.
+
 ![Home Page](/screenshots/home-page.png)
 
 ---

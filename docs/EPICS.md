@@ -689,6 +689,23 @@
 - [x] User guide updated: `admin/campaigns.md` `[Staff]`
 - [x] **E120 CLOSED** | 2026-06-12
 
+### E121 · Home Page Hero Redesign
+
+> **Persona Gate — E121:**
+> - **Jordan (Primary):** Brand statement must clear the editorial bar — cinematic hero, `hero.png` used atmospherically, typography governed by design tokens.
+> - **Sandra (Secondary):** 2×2 grid makes all four verticals visible in a single scan — no sequential list reading required.
+> - **Marcus (Secondary):** `hero.png` displayed with dark gradient overlay and controlled cinematic reveal — not a flat image dump.
+> - **Makoonsii (Secondary):** 48px grid card touch targets. Plain language. No untested Kanien'kéha.
+
+- [x] New `HomeHero.tsx` — ≥80vh cinematic hero, `hero.png` background, dark overlay, logo + brand name + tagline + location `[Jord]` `[Marc]`
+- [x] Responsive 2×2 CSS grid for vertical cards (`repeat(2, 1fr)` ≥768px, `1fr` mobile) `[Sand]`
+- [x] `PortalCard` `variant` prop added (`'list'` default — TobaccoPage unaffected, `'grid'` for HomePage) `[Comp]`
+- [x] `heroReveal` cinematic animation (approved pattern) — suppressed by global `prefers-reduced-motion` rule `[Jord]`
+- [x] Zero hardcoded hex / px font-size / spacing violations in all new code `[Comp]`
+- [x] Decision 0038 logged `[Comp]`
+- [x] User guide updated: `getting-started.md` homepage description updated `[Staff]`
+- [x] **E121 CLOSED** | 2026-06-12
+
 ---
 
 ## Phase 10 — Inventory Intelligence

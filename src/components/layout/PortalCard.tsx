@@ -6,21 +6,27 @@ interface PortalCardProps {
   icon: React.ReactNode
   title: string
   description: string
+  variant?: 'list' | 'grid'
 }
 
-export default function PortalCard({ to, icon, title, description }: PortalCardProps) {
+export default function PortalCard({ to, icon, title, description, variant = 'list' }: PortalCardProps) {
+  const isGrid = variant === 'grid'
   return (
-    <Link to={to} className="portal-card" onMouseEnter={() => prefetchRoute(to)}>
-      <div className="portal-card-icon">
-        {icon}
-      </div>
+    <Link
+      to={to}
+      className={`portal-card${isGrid ? ' portal-card--grid' : ''}`}
+      onMouseEnter={() => prefetchRoute(to)}
+    >
+      <div className="portal-card-icon">{icon}</div>
       <div className="portal-card-content">
         <h3 className="portal-card-title">{title}</h3>
         <p className="portal-card-desc">{description}</p>
       </div>
-      <div className="portal-card-chevron">
-        <span className="ti ti-chevron-right" />
-      </div>
+      {!isGrid && (
+        <div className="portal-card-chevron">
+          <span className="ti ti-chevron-right" />
+        </div>
+      )}
     </Link>
   )
 }

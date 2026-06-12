@@ -195,6 +195,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | **E119 CLOSED** | E119 | 2026-06-12 |
 | `E120 Fireworks Campaign Countdown` — Fixed 10 hardcoded px values in `CountdownTimer.tsx` (design token violations). Added Activate/Deactivate toggle and inline Edit form to `CampaignAdminPage.tsx` — staff can go live in seconds without waiting for the 5-min CF sweep or touching the Firestore console. Canada Day countdown ready to activate. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0037 logged. | E120 | 2026-06-12 |
 | **E120 CLOSED** | E120 | 2026-06-12 |
+| `E121 Home Page Hero Redesign` — Replaced plain portal header with `HomeHero.tsx`: ≥80vh cinematic section using `hero.png` background, dark gradient overlay, centered logo + brand name ("The Pawn Shop") + tagline ("Dapper. Debonair. Distinctly Akwesasne.") + location. Replaced vertical card list with responsive 2×2 CSS grid (2 columns ≥768px, 1 column mobile). `PortalCard` extended with `variant` prop — TobaccoPage unaffected. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0038 logged. | E121 | 2026-06-12 |
+| **E121 CLOSED** | E121 | 2026-06-12 |
 
 ---
 
@@ -225,4 +227,4 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-12 (Cycle 33 — E120 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-12 (Cycle 33 — E121 CLOSED)*
