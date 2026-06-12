@@ -2,7 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
 import { getStorage } from 'firebase-admin/storage'
 import { dispatchEmail } from '@pawn-shop/shared/lib/email'
-import { sendgridApiKey, sendgridFromEmail } from '@pawn-shop/shared/lib/secrets'
+import { sendgridApiKey } from '@pawn-shop/shared/lib/secrets'
 
 interface SignPawnAgreementData {
   loanTicketId: string
@@ -97,7 +97,7 @@ function buildReceiptHtml(ticket: Record<string, unknown>, ticketNumber: string)
 }
 
 export const signPawnAgreement = onCall<SignPawnAgreementData>(
-  { cors: true, secrets: [sendgridApiKey, sendgridFromEmail] },
+  { cors: true, secrets: [sendgridApiKey] },
   async (request) => {
     if (!request.auth?.token.admin && !request.auth?.token.manager && !request.auth?.token.inventory_staff) {
       throw new HttpsError('permission-denied', 'Only staff can sign pawn agreements')

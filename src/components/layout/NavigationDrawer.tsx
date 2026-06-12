@@ -38,11 +38,11 @@ export default function NavigationDrawer() {
   const getPageTitle = () => {
     const path = location.pathname
     if (path === '/') return 'The Pawn Shop'
-    if (path.startsWith('/pawn')) return 'The Pawn Shop - Pawn & Resale'
-    if (path.startsWith('/cannabis')) return 'The Pawn Shop - Cannabis'
-    if (path.startsWith('/fireworks')) return 'The Pawn Shop - Fireworks'
-    if (path.startsWith('/tobacco')) return 'The Pawn Shop - Tobacco'
-    if (path.startsWith('/admin')) return 'The Pawn Shop - Admin'
+    if (path.startsWith('/pawn')) return 'Pawn & Resale'
+    if (path.startsWith('/cannabis')) return 'Cannabis'
+    if (path.startsWith('/fireworks')) return 'Fireworks'
+    if (path.startsWith('/tobacco')) return 'Tobacco'
+    if (path.startsWith('/admin')) return 'Admin'
     return 'The Pawn Shop'
   }
 
