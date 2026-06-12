@@ -17,8 +17,8 @@ function docToCampaign(d: { id: string; data: () => Record<string, unknown> }): 
     id: d.id,
     title:            String(data['title'] ?? ''),
     viewTag:          (data['viewTag'] as CampaignViewTag) ?? 'pawn',
-    startDate:        (data['startDate'] as { toDate(): Date }).toDate(),
-    endDate:          (data['endDate'] as { toDate(): Date }).toDate(),
+    startDate:        data['startDate'] != null ? (data['startDate'] as { toDate(): Date }).toDate() : new Date(),
+    endDate:          data['endDate'] != null ? (data['endDate'] as { toDate(): Date }).toDate() : new Date(),
     active:           Boolean(data['active']),
     discountRule:     (data['discountRule'] as Campaign['discountRule']) ?? { type: 'fixed', value: 0 },
     bannerCopy:       String(data['bannerCopy'] ?? ''),
@@ -26,7 +26,7 @@ function docToCampaign(d: { id: string; data: () => Record<string, unknown> }): 
     createdBy:        data['createdBy'] != null ? String(data['createdBy']) : undefined,
     reminderSentAt:   data['reminderSentAt'] != null ? (data['reminderSentAt'] as { toDate(): Date }).toDate() : null,
     updatedAt:        data['updatedAt'] != null ? (data['updatedAt'] as { toDate(): Date }).toDate() : undefined,
-    createdAt:        (data['createdAt'] as { toDate(): Date }).toDate(),
+    createdAt:        data['createdAt'] != null ? (data['createdAt'] as { toDate(): Date }).toDate() : new Date(),
   }
 }
 
