@@ -708,6 +708,24 @@
 
 ---
 
+### E122 · Fireworks Hero Canvas Animation
+
+> **Persona Gate — E122:**
+> - **Tanya (Primary):** The fireworks hero is her primary landing experience. A live canvas animation — physics-based rockets, gold-dominant bursts — creates genuine event anticipation before the YouTube video.
+> - **Jordan (Secondary):** Editorial quality above fold. Interval-burst ("cinematic moments") pacing ensures the animation serves the moment without competing with the headline or countdown.
+> - **Marcus (Secondary):** Dark luxury standard maintained — animation runs behind the content as atmospheric backdrop, not as foreground decoration.
+
+- [x] Create `src/hooks/useFireworksCanvas.ts` — TypeScript port of physics engine: `Particle`, `Rocket`, `explode()`, interval-burst episode state machine `[Tan]` `[Jord]`
+- [x] Episode cycle: 4 staggered rockets per salvo → fadeout → 6s quiet → repeat. rAF loop paused between episodes (not continuous). `[Jord]` `[Marc]`
+- [x] `prefers-reduced-motion: reduce` disables all animation at hook level `[Comp]` `[Mak]`
+- [x] Canvas `aria-hidden="true"` — invisible to screen readers `[Comp]` `[Mak]`
+- [x] `src/components/fireworks/FireworksHero.tsx` — canvas element added as absolute background; `minHeight: 80vh` on section `[Tan]` `[Jord]`
+- [x] Gold-dominant palette (`--color-accent` amber + `--color-primary` red) — canvas token exception documented `[Comp]`
+- [x] Decision 0039 logged (§4.3 resolution + canvas/CSS-token exception) `[Comp]`
+- [x] **E122 CLOSED** | 2026-06-13
+
+---
+
 ## Phase 10 — Inventory Intelligence
 
 > **Goal:** Data-driven merchandising. Automate stale-inventory turnover and close the cannabis product data gap vs. Dutchie/Jane. Schema updates in `docs/firestore-schema.md` and `docs/DECISIONS.md` are required before any implementation task begins.

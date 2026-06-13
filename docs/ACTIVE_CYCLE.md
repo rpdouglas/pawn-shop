@@ -16,7 +16,9 @@
 
 ## Cycle Goal
 
-E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow, walk-in intake, interest rate compliance, and full pawn ticket legal compliance all complete. APR disclosure, agreed item value, sole-recourse terms, police hold clause, age declaration, and structured intake fields in place. (COMPLETED)
+E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow, walk-in intake, interest rate compliance, and full pawn ticket legal compliance all complete. (COMPLETED)
+
+E122 · Fireworks Hero Canvas Animation — Physics-based interval-burst canvas animation added to `FireworksHero.tsx`. (COMPLETED)
 
 ---
 
@@ -196,6 +198,7 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 | `E120 Fireworks Campaign Countdown` — Fixed 10 hardcoded px values in `CountdownTimer.tsx` (design token violations). Added Activate/Deactivate toggle and inline Edit form to `CampaignAdminPage.tsx` — staff can go live in seconds without waiting for the 5-min CF sweep or touching the Firestore console. Canada Day countdown ready to activate. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0037 logged. | E120 | 2026-06-12 |
 | **E120 CLOSED** | E120 | 2026-06-12 |
 | `E121 Home Page Hero Redesign` — Replaced plain portal header with `HomeHero.tsx`: ≥80vh cinematic section using `hero.png` background, dark gradient overlay, centered logo + brand name ("The Pawn Shop") + tagline ("Dapper. Debonair. Distinctly Akwesasne.") + location. Replaced vertical card list with responsive 2×2 CSS grid (2 columns ≥768px, 1 column mobile). `PortalCard` extended with `variant` prop — TobaccoPage unaffected. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0038 logged. | E121 | 2026-06-12 |
+| `E122 Fireworks Hero Canvas Animation` — Added physics-based interval-burst canvas fireworks animation to `FireworksHero.tsx`. New `useFireworksCanvas` hook (TypeScript): `Particle` + `Rocket` classes, 3 burst styles (radial, double-ring, chrysanthemum), 4-rocket staggered salvo every ~8s. rAF loop paused between episodes. `prefers-reduced-motion` fully disables. `aria-hidden` canvas. `minHeight: 80vh` on section. Decision 0039 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E122 | 2026-06-13 |
 | **E121 CLOSED** | E121 | 2026-06-12 |
 
 ---

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { collection, query, where, limit, getDocs } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import CountdownTimer from './CountdownTimer'
 import { useHeroMedia } from '../../hooks/useHeroMedia'
 import { ImageCarousel } from '../ui/ImageCarousel'
 import { YouTubeFacade } from '../ui/YouTubeFacade'
+import { useFireworksCanvas } from '../../hooks/useFireworksCanvas'
 import type { Campaign, CampaignViewTag } from '../../lib/types'
 
 const DEFAULT_VIDEO_ID = '8rmpm3ZOn50'
@@ -29,6 +30,8 @@ function docToCampaign(doc: { id: string; data: () => Record<string, unknown> })
 
 export default function FireworksHero() {
   const heroMedia = useHeroMedia('fireworks')
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  useFireworksCanvas(canvasRef)
   // undefined = loading, null = no active countdown campaign, Campaign = found
   const [countdownCampaign, setCountdownCampaign] = useState<Campaign | null | undefined>(undefined)
 
@@ -70,8 +73,22 @@ export default function FireworksHero() {
         textAlign: 'center',
         borderBottom: '1px solid var(--color-border)',
         overflow: 'hidden',
+        minHeight: '80vh',
       }}
     >
+      {/* Fireworks canvas — absolute background, behind overlay and content */}
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Optional carousel background */}
       {heroMedia?.mediaType === 'carousel' && heroMedia.carouselImages && heroMedia.carouselImages.length > 0 && (
         <div aria-hidden="true" style={{ position: 'absolute', inset: 0 }}>
