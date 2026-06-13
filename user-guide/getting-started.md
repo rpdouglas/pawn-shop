@@ -1,27 +1,28 @@
 # Getting Started
 
-Welcome to The Pawn Shop — a multi-vertical retail platform serving Cornwall Island, Akwesasne across three distinct storefronts. This page orients you to the platform shell before you dive into any specific workflow.
+Welcome to The Pawn Shop — a multi-vertical retail platform serving Cornwall Island, Akwesasne. This page orients you to the platform shell before you dive into any specific workflow.
 
 ## The Home Page
 
 The home page (`/`) opens with a full-height cinematic hero: the shop logo centred over an atmospheric background image, with the brand statement *Dapper. Debonair. Distinctly Akwesasne.* in gold below it.
 
-Below the hero, the four store verticals are presented in a 2×2 grid on desktop and a single column on mobile. Tap any card to enter that storefront — Cannabis and Fireworks will prompt for age confirmation before proceeding.
+Below the hero, the active store verticals are presented in a grid on desktop and a single column on mobile. Tap any card to enter that storefront — Fireworks and Tobacco will prompt for age confirmation before proceeding.
 
 ![Home Page](/screenshots/home-page.png)
 
 ---
 
-## The Three Views
+## The Active Views
 
-The platform operates three independent storefronts under one roof, each with its own aesthetic and compliance requirements.
+The platform operates independent storefronts under one roof, each with its own aesthetic and compliance requirements.
 
 | View | Path | Notes |
 |---|---|---|
 | **Pawn & Resale** | `/pawn` | Open to all visitors |
-| **Cannabis Wellness** | `/cannabis` | 19+ age verification required |
 | **Fireworks** | `/fireworks` | 18+ age verification required |
 | **Tobacco** | `/tobacco` | 19+ age verification required |
+
+> **Cannabis Wellness** (`/cannabis`) is temporarily unavailable pending legal review. All product data and functionality are preserved and will be reinstated when clearance is received.
 
 Each view has its own colour palette, typography, and editorial voice — but shares the same inventory engine, notification system, and staff tooling.
 
@@ -36,10 +37,10 @@ Every page on the platform shares the same persistent header. It contains two el
 The hamburger icon in the top-left corner opens the navigation drawer. It contains:
 
 - **Home** — the platform landing page
-- **Pawn**, **Cannabis**, **Fireworks**, **Tobacco** — the four storefronts
+- **Pawn**, **Fireworks**, **Tobacco** — the active storefronts
 - **Admin Dashboard** — visible only to staff accounts
 
-The page title to the right of the icon always reflects your current location — for example, **The Pawn Shop · Cannabis** — so you always know which view you are in.
+The page title to the right of the icon always reflects your current location — so you always know which view you are in.
 
 ### Account Menu
 
@@ -67,7 +68,7 @@ All staff tools are accessible from a single entry point: the navigation drawer.
 
 ## Age Verification
 
-The Cannabis and Fireworks storefronts require age confirmation before any content is displayed. The gate is enforced at the router level — it cannot be bypassed by navigating directly to a product URL.
+The Fireworks and Tobacco storefronts require age confirmation before any content is displayed. The gate is enforced at the router level — it cannot be bypassed by navigating directly to a product URL.
 
 - Every pass and fail is logged to the audit trail for compliance purposes
 - Verification is session-scoped: re-opening the browser will prompt again

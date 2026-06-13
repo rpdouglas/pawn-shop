@@ -43,20 +43,21 @@ const router = createBrowserRouter([
       { path: 'pawn',      lazy: () => import('./pages/PawnPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'pawn/sell', lazy: () => import('./pages/pawn/SellPage.tsx').then(m => ({ Component: m.default })) },
       { path: 'pawn/my-loans', lazy: () => import('./pages/LoanTicketsPage.tsx').then(m => ({ Component: m.default })) },
-      {
-        path: 'cannabis',
-        lazy: async () => {
-          const { default: CannabisPage } = await import('./pages/CannabisPage.tsx')
-          return { element: <AgeGate minAge={19} viewTag="cannabis"><CannabisPage /></AgeGate> }
-        },
-      },
-      {
-        path: 'cannabis/collections/:mood',
-        lazy: async () => {
-          const { default: MoodCollectionPage } = await import('./pages/cannabis/MoodCollectionPage.tsx')
-          return { element: <AgeGate minAge={19} viewTag="cannabis"><MoodCollectionPage /></AgeGate> }
-        },
-      },
+      // CANNABIS SUSPENDED — E123 (legal hold). To re-enable, uncomment the two route blocks below.
+      // {
+      //   path: 'cannabis',
+      //   lazy: async () => {
+      //     const { default: CannabisPage } = await import('./pages/CannabisPage.tsx')
+      //     return { element: <AgeGate minAge={19} viewTag="cannabis"><CannabisPage /></AgeGate> }
+      //   },
+      // },
+      // {
+      //   path: 'cannabis/collections/:mood',
+      //   lazy: async () => {
+      //     const { default: MoodCollectionPage } = await import('./pages/cannabis/MoodCollectionPage.tsx')
+      //     return { element: <AgeGate minAge={19} viewTag="cannabis"><MoodCollectionPage /></AgeGate> }
+      //   },
+      // },
       {
         path: 'fireworks',
         lazy: async () => {

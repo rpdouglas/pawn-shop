@@ -200,6 +200,8 @@ E122 · Fireworks Hero Canvas Animation — Physics-based interval-burst canvas 
 | `E121 Home Page Hero Redesign` — Replaced plain portal header with `HomeHero.tsx`: ≥80vh cinematic section using `hero.png` background, dark gradient overlay, centered logo + brand name ("The Pawn Shop") + tagline ("Dapper. Debonair. Distinctly Akwesasne.") + location. Replaced vertical card list with responsive 2×2 CSS grid (2 columns ≥768px, 1 column mobile). `PortalCard` extended with `variant` prop — TobaccoPage unaffected. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0038 logged. | E121 | 2026-06-12 |
 | `E122 Fireworks Hero Canvas Animation` — Added physics-based interval-burst canvas fireworks animation to `FireworksHero.tsx`. New `useFireworksCanvas` hook (TypeScript): `Particle` + `Rocket` classes, 3 burst styles (radial, double-ring, chrysanthemum), 4-rocket staggered salvo every ~8s. rAF loop paused between episodes. `prefers-reduced-motion` fully disables. `aria-hidden` canvas. `minHeight: 80vh` on section. Decision 0039 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E122 | 2026-06-13 |
 | **E121 CLOSED** | E121 | 2026-06-12 |
+| `E123 Cannabis Vertical Suspension` — Commented out `/cannabis` + `/cannabis/collections/:mood` routes in `main.tsx`, Cannabis `<PortalCard>` in `HomePage.tsx`, Cannabis LINKS entry + `getPageTitle` case in `NavigationDrawer.tsx`. All Cannabis source files preserved. Each comment marked `// CANNABIS SUSPENDED — E123 (legal hold)` with inline re-enable instructions. Decision 0040 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E123 | 2026-06-13 |
+| **E123 CLOSED** | E123 | 2026-06-13 |
 
 ---
 

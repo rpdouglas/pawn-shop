@@ -12,7 +12,8 @@ interface NavLink {
 const LINKS: NavLink[] = [
   { to: '/', label: 'Home' },
   { to: '/pawn', label: 'Pawn' },
-  { to: '/cannabis', label: 'Cannabis' },
+  // CANNABIS SUSPENDED — E123 (legal hold). To re-enable, uncomment the line below.
+  // { to: '/cannabis', label: 'Cannabis' },
   { to: '/fireworks', label: 'Fireworks' },
   { to: '/tobacco', label: 'Tobacco' },
 ]
@@ -39,7 +40,7 @@ export default function NavigationDrawer() {
     const path = location.pathname
     if (path === '/') return 'The Pawn Shop'
     if (path.startsWith('/pawn')) return 'Pawn & Resale'
-    if (path.startsWith('/cannabis')) return 'Cannabis'
+    // CANNABIS SUSPENDED — E123. if (path.startsWith('/cannabis')) return 'Cannabis'
     if (path.startsWith('/fireworks')) return 'Fireworks'
     if (path.startsWith('/tobacco')) return 'Tobacco'
     if (path.startsWith('/admin')) return 'Admin'

@@ -1,5 +1,9 @@
 # Cannabis Storefront Overview
 
+> **Temporarily Unavailable.** The Cannabis vertical is suspended pending legal review. The `/cannabis` route, homepage card, and navigation link have been removed from public access. All product data, compliance systems, and source code are fully preserved. Reinstatement requires uncommenting three marked blocks (search `CANNABIS SUSPENDED — E123`) and redeploying. See `docs/decisions/0040-e123-cannabis-suspension.md`.
+
+---
+
 Welcome to the Cannabis storefront. This section operates under strict compliance rules designed to maintain privacy, discretion, and legal standards.
 
 ## Access & Age Verification

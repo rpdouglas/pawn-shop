@@ -16,6 +16,7 @@ export default function HomePage() {
           description="Verified deals, transparent valuation, and community trust."
           variant="grid"
         />
+        {/* CANNABIS SUSPENDED — E123 (legal hold). To re-enable, uncomment the block below.
         <PortalCard
           to="/cannabis"
           icon={<span className="ti ti-leaf" />}
@@ -23,6 +24,7 @@ export default function HomePage() {
           description="Premium wellness selections for the discerning connoisseur."
           variant="grid"
         />
+        */}
         <PortalCard
           to="/fireworks"
           icon={<span className="ti ti-star" />}

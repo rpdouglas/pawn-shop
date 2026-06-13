@@ -1,6 +1,6 @@
 # The Pawn Shop Manual
 
-Welcome to the central documentation for The Pawn Shop — a multi-vertical retail platform for Cornwall Island, Akwesasne. This guide covers the operational workflows for our four specialized storefronts.
+Welcome to the central documentation for The Pawn Shop — a multi-vertical retail platform for Cornwall Island, Akwesasne. This guide covers the operational workflows for the active storefronts.
 
 ## Core Pillars
 
@@ -23,7 +23,7 @@ Details on our one-handed mobile pawn enquiry form, the server-side serial black
 - [FAQ Management](/admin/faq-management)
 
 ### 🛡️ Storefronts & Compliance
-Our platform manages high-stakes retail. Learn about our router-level age verification for Cannabis and Fireworks, our custom prefix-search discovery engine, and our regional search landing pages.
+Our platform manages high-stakes retail. Learn about our router-level age verification for Fireworks and Tobacco, our custom prefix-search discovery engine, and our regional search landing pages.
 - [Age Verification (18+/19+)](/compliance/age-gates)
 - [Search & Discovery](/inventory/search)
 - [Regional Search (Local SEO)](/admin/local-seo)

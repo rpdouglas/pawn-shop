@@ -726,6 +726,21 @@
 
 ---
 
+### E123 · Cannabis Vertical Suspension (Legal Hold)
+
+> **Persona Gate — E123:**
+> - **Marie (Compliance Anchor):** Cannabis vertical must not be publicly accessible until legal clearance is received.
+> - **Jordan:** Homepage and nav must remain visually coherent with Cannabis absent.
+> - **Makoonsii:** Navigation and homepage remain keyboard-navigable and accessible.
+
+- [x] Comment out 2 cannabis routes in `src/main.tsx` with `// CANNABIS SUSPENDED — E123` marker `[Marie]` `[Comp]`
+- [x] Comment out Cannabis `<PortalCard>` in `src/pages/HomePage.tsx` `[Jord]` `[Mak]`
+- [x] Comment out Cannabis LINKS entry + `getPageTitle` case in `NavigationDrawer.tsx` `[Mak]`
+- [x] Decision 0040 logged `[Comp]`
+- [x] **E123 CLOSED** | 2026-06-13
+
+---
+
 ## Phase 10 — Inventory Intelligence
 
 > **Goal:** Data-driven merchandising. Automate stale-inventory turnover and close the cannabis product data gap vs. Dutchie/Jane. Schema updates in `docs/firestore-schema.md` and `docs/DECISIONS.md` are required before any implementation task begins.
