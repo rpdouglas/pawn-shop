@@ -14,7 +14,7 @@ import ReturnRequestForm from './ReturnRequestForm'
 import CannabisProductData from '../cannabis/CannabisProductData'
 import { formatPrice } from '../../lib/format'
 import type { Item, ConditionGrade, ViewType } from '../../lib/types'
-import { Analytics } from '../../lib/analytics'
+import { Analytics, toGA4Item } from '../../lib/analytics'
 import { functions } from '../../lib/firebase'
 
 const logActivityFn = httpsCallable<{ viewTag: ViewType }, { success: boolean }>(functions, 'logActivity')
@@ -52,9 +52,13 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
 
   // Fires once per item open — item_id is pseudonymous Firestore doc ID, not PII
   useEffect(() => {
-    Analytics.itemView({ item_id: item.id, view: item.viewTag, category: item.category })
+    Analytics.selectItem({
+      item_list_name: 'quick_view',
+      view: item.viewTag,
+      items: [toGA4Item(item, 'quick_view')],
+    })
     logActivityFn({ viewTag: item.viewTag }).catch(console.error)
-  }, [item.id, item.viewTag, item.category])
+  }, [item])
 
   // Body scroll lock
   useEffect(() => {
@@ -342,7 +346,15 @@ export default function ItemQuickView({ item, onClose, onCollect, onSelectRelate
                     />
                     {user && (
                       <button
-                        onClick={() => toggleFavourite(item.id)}
+                        onClick={() => {
+                          const adding = !isFavourite(item.id)
+                          toggleFavourite(item.id)
+                          if (adding) {
+                            Analytics.wishlistAdd({ view: item.viewTag, items: [toGA4Item(item, 'quick_view')] })
+                          } else {
+                            Analytics.wishlistRemove({ view: item.viewTag, items: [toGA4Item(item, 'quick_view')] })
+                          }
+                        }}
                         aria-label={isFavourite(item.id) ? 'Remove from favourites' : 'Add to favourites'}
                         style={{
                           background: 'none',

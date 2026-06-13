@@ -4,6 +4,7 @@ import { onAuthStateChanged, getIdTokenResult, multiFactor, signOut } from 'fire
 import { httpsCallable } from 'firebase/functions'
 import type { User } from 'firebase/auth'
 import { auth, functions } from '../lib/firebase-core'
+import { setAnalyticsUserProperties } from '../lib/analytics'
 import type { AuthUser, StaffRole } from '../lib/types'
 
 interface AuthContextValue {
@@ -62,10 +63,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!firebaseUser) {
         setUser(null)
+        setAnalyticsUserProperties({ is_staff: 'false' })
         setLoading(false)
         return
       }
-      setUser(await buildAuthUser(firebaseUser))
+      const builtUser = await buildAuthUser(firebaseUser)
+      setUser(builtUser)
+      setAnalyticsUserProperties({ is_staff: builtUser.isStaff ? 'true' : 'false' })
       setLoading(false)
     })
     return unsubscribe

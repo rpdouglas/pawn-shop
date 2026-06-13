@@ -20,6 +20,8 @@ E107 + E109 + E110 · POS Loan Issuance & Compliance — Digital signature flow,
 
 E122 · Fireworks Hero Canvas Animation — Physics-based interval-burst canvas animation added to `FireworksHero.tsx`. (COMPLETED)
 
+E124 · Site Analytics: GA4 Activation & Enhanced Event Tracking — Full GA4 recommended event catalog active. UTM passthrough live. (COMPLETED)
+
 ---
 
 ## In Progress
@@ -202,6 +204,8 @@ E122 · Fireworks Hero Canvas Animation — Physics-based interval-burst canvas 
 | **E121 CLOSED** | E121 | 2026-06-12 |
 | `E123 Cannabis Vertical Suspension` — Commented out `/cannabis` + `/cannabis/collections/:mood` routes in `main.tsx`, Cannabis `<PortalCard>` in `HomePage.tsx`, Cannabis LINKS entry + `getPageTitle` case in `NavigationDrawer.tsx`. All Cannabis source files preserved. Each comment marked `// CANNABIS SUSPENDED — E123 (legal hold)` with inline re-enable instructions. Decision 0040 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E123 | 2026-06-13 |
 | **E123 CLOSED** | E123 | 2026-06-13 |
+| `E124 Site Analytics: GA4 Activation` — Rewrote `src/lib/analytics.ts` with full GA4 recommended event catalog: `view_item_list`, `select_item`, `view_item`, `generate_lead`, `search`, `campaign_view`, `add_to_wishlist`, `remove_from_wishlist`. Added `GA4Item` interface, `toGA4Item()` helper, UTM passthrough in every `fire()` call. User properties: `is_staff` (AuthContext), `preferred_view` (ViewContext) — no PII. Wired events in 9 source files. Root cause fix: added missing `VITE_FIREBASE_MEASUREMENT_ID=` to `.env.example`. Decision 0041 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E124 | 2026-06-13 |
+| **E124 CLOSED** | E124 | 2026-06-13 |
 
 ---
 
@@ -232,4 +236,4 @@ E122 · Fireworks Hero Canvas Animation — Physics-based interval-burst canvas 
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-12 (Cycle 33 — E121 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-13 (Cycle 33 — E124 CLOSED)*

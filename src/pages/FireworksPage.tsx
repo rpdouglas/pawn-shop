@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import FireworksHero from '../components/fireworks/FireworksHero'
 import BundleCard from '../components/fireworks/BundleCard'
 import UrgencyBadge from '../components/fireworks/UrgencyBadge'
@@ -7,7 +7,7 @@ import PreorderModal from '../components/fireworks/PreorderModal'
 import ArticleSection from '../components/ArticleSection'
 import { useItems } from '../hooks/useItems'
 import type { Item } from '../lib/types'
-import { Analytics } from '../lib/analytics'
+import { Analytics, toGA4Item } from '../lib/analytics'
 
 export default function FireworksPage() {
   const { items, loading, error } = useItems('fireworks')
@@ -16,6 +16,17 @@ export default function FireworksPage() {
   useEffect(() => {
     Analytics.pageView({ view: 'fireworks', page_path: '/fireworks' })
   }, [])
+
+  const firedListRef = useRef(false)
+  useEffect(() => {
+    if (loading || items.length === 0 || firedListRef.current) return
+    firedListRef.current = true
+    Analytics.viewItemList({
+      item_list_name: 'fireworks_bundles',
+      view: 'fireworks',
+      items: items.slice(0, 10).map(i => toGA4Item(i, 'fireworks_bundles')),
+    })
+  }, [items, loading])
 
   return (
     <div>

@@ -741,6 +741,33 @@
 
 ---
 
+### E124 · Site Analytics: GA4 Activation & Enhanced Event Tracking
+
+> **Persona Gate — E124:**
+> - **Jordan (Primary — Brand Quality):** GA4 standard reports (Item Performance, Lead Generation, Site Search Funnel) require recommended event names. Custom event names produce no usable GA4 report.
+> - **Sandra (Primary — Discovery):** `view_item_list`, `select_item`, `add_to_wishlist` events track the browse-to-wishlist funnel Sandra represents.
+> - **Dale (Secondary — Conversion):** `search` event with `search_term` measures search efficacy for the inventory-browsing persona.
+> - **Marie (Compliance Anchor):** `view: 'cannabis'` is an internal GA4 dimension — never rendered to public HTML. PII prohibition enforced by typed interfaces.
+
+- [x] Root cause: `VITE_FIREBASE_MEASUREMENT_ID` was absent from `.env.example` — all analytics silently no-oped `[All]`
+- [x] Rewrite `src/lib/analytics.ts` — GA4 recommended event catalog (`view_item_list`, `select_item`, `view_item`, `generate_lead`, `search`, `campaign_view`, `add_to_wishlist`, `remove_from_wishlist`) `[All]` `[Comp]`
+- [x] `GA4Item` interface + `toGA4Item()` helper — price in CAD dollars (converted from cents), item metadata `[All]`
+- [x] UTM passthrough — `getUtm()` merged into every `fire()` call `[All]`
+- [x] User properties: `is_staff` (AuthContext), `preferred_view` (ViewContext) — no PII `[All]` `[Comp]`
+- [x] `HomePage.tsx` — add missing `pageView` on mount `[Jord]`
+- [x] `PawnPage.tsx` — `pageView`, `viewItemList` (deduped), `search` (500ms debounce) `[San]` `[Dale]`
+- [x] `FireworksPage.tsx` — `viewItemList` on load `[Tan]`
+- [x] `ItemDetailPage.tsx` — `view_item` with `GA4Item` `[Marc]` `[Jord]`
+- [x] `ItemQuickView.tsx` — `select_item` with `GA4Item`; `add_to_wishlist` / `remove_from_wishlist` `[San]` `[Marc]`
+- [x] `ClickCollectModal.tsx` — `generate_lead` with item + value `[Tan]` `[Dale]`
+- [x] `PreorderModal.tsx` — `generate_lead` with item + value `[Tan]`
+- [x] `PawnEnquiryForm.tsx` — `generate_lead` (general enquiry, no item) `[Mak]`
+- [x] `CampaignBanner.tsx` — `campaign_view` on campaign load `[Tan]` `[Jord]`
+- [x] Decision 0041 logged `[Comp]`
+- [x] **E124 CLOSED** | 2026-06-13
+
+---
+
 ## Phase 10 — Inventory Intelligence
 
 > **Goal:** Data-driven merchandising. Automate stale-inventory turnover and close the cannabis product data gap vs. Dutchie/Jane. Schema updates in `docs/firestore-schema.md` and `docs/DECISIONS.md` are required before any implementation task begins.

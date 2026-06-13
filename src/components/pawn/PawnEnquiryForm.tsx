@@ -165,7 +165,7 @@ export default function PawnEnquiryForm() {
         notableMarkings: notableMarkings.trim() || undefined,
         requestedAmount: requestedAmountCents && requestedAmountCents > 0 ? requestedAmountCents : undefined,
       })
-      Analytics.pawnFormSubmit({ view: 'pawn' })
+      Analytics.generateLead({ view: 'pawn' })
       setSubmitted(true)
     } catch {
       setSubmitError('Something went wrong — please try again or call us directly.')

@@ -14,7 +14,7 @@ import MerchandisingBadge from '../components/MerchandisingBadge'
 import HoldCountdownBadge from '../components/pawn/HoldCountdownBadge'
 import { useAuth } from '../context/AuthContext'
 import CannabisProductData from '../components/cannabis/CannabisProductData'
-import { Analytics } from '../lib/analytics'
+import { Analytics, toGA4Item } from '../lib/analytics'
 
 const CONDITION_LABELS: Record<ConditionGrade, string> = {
   'new':      'New',
@@ -66,7 +66,7 @@ export default function ItemDetailPage() {
       }
       meta.setAttribute('content', item.description || `Buy ${item.title} at The Pawn Shop.`)
       
-      Analytics.itemView({ item_id: item.id, view: item.viewTag, category: item.category })
+      Analytics.viewItem({ view: item.viewTag, items: [toGA4Item(item, 'item_detail')] })
     }
     return () => {
       document.title = 'The Pawn Shop'

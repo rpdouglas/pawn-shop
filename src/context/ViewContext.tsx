@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { doc, updateDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
+import { setAnalyticsUserProperties } from '../lib/analytics'
 import { useAuth } from './AuthContext'
 import type { ReactNode } from 'react'
 import type { ViewType } from '../lib/types'
@@ -40,6 +41,8 @@ export function ViewProvider({ children }: { children: ReactNode }) {
         // Non-critical — cross-view flag is a CRM signal, not a blocking operation
       })
     }
+
+    setAnalyticsUserProperties({ preferred_view: view })
   }, [view, user])
 
   return (

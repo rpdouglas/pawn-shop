@@ -12,7 +12,7 @@ If the link is absent, your account has not been granted a staff role. Contact y
 
 The dashboard surfaces critical data points:
 - **Inventory Counts:** Breakdown of items by status (Active, Draft, Sold, Reserved).
-- **View Performance:** Analysis of traffic across the Pawn, Cannabis, and Fireworks views.
+- **View Performance:** Traffic analysis across Pawn, Fireworks, and Tobacco views — powered by GA4 via Firebase Analytics. Full ecommerce funnel data (browse → select → enquire → convert) flows into GA4 standard reports once `VITE_FIREBASE_MEASUREMENT_ID` is configured.
 - **Pawn Volume:** Tracking the number of incoming pawn enquiries and their conversion status.
 
 ## Trending Items

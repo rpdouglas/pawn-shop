@@ -20,7 +20,7 @@ import SaveSearchButton from '../components/pawn/SaveSearchButton'
 import { useItemSearch } from '../hooks/useItemSearch'
 import { docToItem } from '../hooks/useItems'
 import type { Item } from '../lib/types'
-import { Analytics } from '../lib/analytics'
+import { Analytics, toGA4Item } from '../lib/analytics'
 import { useFeatureFlags } from '../lib/featureFlags'
 
 export default function PawnPage() {
@@ -33,6 +33,32 @@ export default function PawnPage() {
   useEffect(() => {
     Analytics.pageView({ view: 'pawn', page_path: '/pawn' })
   }, [])
+
+  // Fire view_item_list whenever the displayed result set changes
+  const lastListKeyRef = useRef('')
+  useEffect(() => {
+    if (loading || items.length === 0) return
+    const listName = searchValue ? 'search_results' : 'pawn_discover'
+    const key = `${searchValue}:${items.length}`
+    if (lastListKeyRef.current === key) return
+    lastListKeyRef.current = key
+    Analytics.viewItemList({
+      item_list_name: listName,
+      view: 'pawn',
+      items: items.slice(0, 10).map(i => toGA4Item(i, listName)),
+    })
+  }, [items, loading, searchValue])
+
+  // Fire search event when search term settles (500ms debounce)
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => {
+    if (!searchValue) return
+    clearTimeout(searchDebounceRef.current)
+    searchDebounceRef.current = setTimeout(() => {
+      Analytics.search({ search_term: searchValue, view: 'pawn' })
+    }, 500)
+    return () => clearTimeout(searchDebounceRef.current)
+  }, [searchValue])
 
   // Pre-fetch cache: hover triggers getDoc so click opens modal with fresh data
   const prefetchCache = useRef<Map<string, Item>>(new Map())

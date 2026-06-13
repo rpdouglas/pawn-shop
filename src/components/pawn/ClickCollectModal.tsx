@@ -6,7 +6,7 @@ import { useStoreConfig } from '../../lib/useStoreConfig'
 
 import Modal from '../ui/Modal'
 import type { Item, StoreHours, StoreHoursDay } from '../../lib/types'
-import { Analytics } from '../../lib/analytics'
+import { Analytics, toGA4Item } from '../../lib/analytics'
 
 interface Props {
   item: Item
@@ -126,7 +126,12 @@ export default function ClickCollectModal({ item, onClose }: Props) {
         pickupWindow: buildPickupWindow(selectedDate, selectedSlot),
         viewTag: item.viewTag,
       })
-      Analytics.enquirySubmit({ view: item.viewTag, category: item.category })
+      Analytics.generateLead({
+        view: item.viewTag,
+        items: [toGA4Item(item, 'click_collect')],
+        value: item.price / 100,
+        currency: 'CAD',
+      })
       setSubmitted(true)
     } catch (err) {
       setError((err as { message?: string }).message ?? 'Something went wrong — please try again')

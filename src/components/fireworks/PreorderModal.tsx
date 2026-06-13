@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import Modal from '../ui/Modal'
 import { formatPrice } from '../../lib/format'
 import type { Item } from '../../lib/types'
-import { Analytics } from '../../lib/analytics'
+import { Analytics, toGA4Item } from '../../lib/analytics'
 
 interface Props {
   item: Item
@@ -55,7 +55,12 @@ export default function PreorderModal({ item, onClose }: Props) {
         customerPhone: phone.trim(),
         quantity,
       })
-      Analytics.enquirySubmit({ view: 'fireworks', category: item.category })
+      Analytics.generateLead({
+        view: 'fireworks',
+        items: [toGA4Item(item, 'fireworks_preorder')],
+        value: item.price / 100,
+        currency: 'CAD',
+      })
       setSubmitted(true)
     } catch (err) {
       setError((err as { message?: string }).message ?? 'Something went wrong — please try again')

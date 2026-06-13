@@ -1,9 +1,15 @@
+import { useEffect } from 'react'
 import { useView } from '../context/ViewContext'
 import HomeHero from '../components/home/HomeHero'
 import PortalCard from '../components/layout/PortalCard'
+import { Analytics } from '../lib/analytics'
 
 export default function HomePage() {
   const { view } = useView()
+
+  useEffect(() => {
+    Analytics.pageView({ view: 'pawn', page_path: '/' })
+  }, [])
 
   return (
     <div className={`view-${view}`} style={{ backgroundColor: 'var(--color-bg)' }}>

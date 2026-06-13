@@ -3,6 +3,7 @@ import { collection, query, where, limit, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useView } from '../context/ViewContext'
 import { formatPrice } from '../lib/format'
+import { Analytics } from '../lib/analytics'
 import type { Campaign, CampaignViewTag } from '../lib/types'
 
 function docToCampaign(doc: { id: string; data: () => Record<string, unknown> }): Campaign {
@@ -26,6 +27,11 @@ function docToCampaign(doc: { id: string; data: () => Record<string, unknown> })
 export default function CampaignBanner() {
   const { view } = useView()
   const [campaign, setCampaign] = useState<Campaign | null>(null)
+
+  useEffect(() => {
+    if (!campaign) return
+    Analytics.campaignView({ campaign_id: campaign.id, campaign_name: campaign.title, view })
+  }, [campaign, view])
 
   useEffect(() => {
     const q = query(
