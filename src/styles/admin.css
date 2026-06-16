@@ -1,0 +1,48 @@
+/* Gunmetal Club Admin Theme — E125
+   Scoped to .gmc-admin. Never imported by the public storefront. */
+
+.gmc-admin {
+  /* ── Raw GMC colour tokens ───────────────────────── */
+  --gmc-bg-base:             #2A2D35;
+  --gmc-bg-surface:          #32363F;
+  --gmc-bg-elevated:         #3D4149;
+  --gmc-bg-hover:            #454951;
+  --gmc-text-primary:        #F0EDE8;
+  --gmc-text-secondary:      #BDB9B3;
+  --gmc-text-muted:          #9B9FA8;
+  --gmc-text-disabled:       #5C6270;
+  --gmc-gold-primary:        #C8A14A;
+  --gmc-gold-dim:            #8B6E32;
+  --gmc-gold-subtle:         #3A3020;
+  --gmc-border-default:      #454951;
+  --gmc-border-strong:       #6B7280;
+  --gmc-status-active:       #4CAF7D;
+  --gmc-status-active-bg:    #1E3D2F;
+  --gmc-status-reserved:     #5B9BD5;
+  --gmc-status-reserved-bg:  #1A2E44;
+  --gmc-status-hold:         #E57373;
+  --gmc-status-hold-bg:      #3D1A1A;
+
+  /* ── GMC typography tokens ───────────────────────── */
+  --gmc-font-display: Georgia, serif;
+  --gmc-font-body:    Arial, sans-serif;
+  --gmc-font-mono:    'Courier New', monospace;
+
+  /* ── Remap project tokens → GMC values ──────────── */
+  /* Existing components inside .gmc-admin auto-inherit the new palette. */
+  --color-bg:            var(--gmc-bg-base);
+  --color-surface:       var(--gmc-bg-surface);
+  --color-border:        var(--gmc-border-default);
+  --color-text:          var(--gmc-text-primary);
+  --color-text-muted:    var(--gmc-text-muted);
+  --color-primary:       var(--gmc-gold-primary);
+  --color-primary-hover: var(--gmc-gold-dim);
+  --color-on-primary:    var(--gmc-bg-base);
+  --color-error:         var(--gmc-status-hold);
+  --font-display:        var(--gmc-font-display);
+  --font-body:           var(--gmc-font-body);
+
+  /* ── Shell base ──────────────────────────────────── */
+  background-color: var(--gmc-bg-base);
+  color:            var(--gmc-text-primary);
+}

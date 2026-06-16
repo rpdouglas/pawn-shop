@@ -1,3 +1,4 @@
+import '../../styles/admin.css';
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AdminShellProvider } from '../../context/AdminShellContext';
@@ -19,7 +20,8 @@ export default function AdminLayout() {
   if (!isDesktop) {
     return (
       <AcknowledgmentWall>
-        <div style={{ paddingBottom: 'var(--space-16)' }}>
+        <div className="gmc-admin" style={{ paddingBottom: 'calc(var(--space-12) + var(--space-8))' }}>
+          <AdminTopbar />
           <Outlet />
         </div>
         <AdminMobileNav />
@@ -30,7 +32,7 @@ export default function AdminLayout() {
   return (
     <AdminShellProvider value={{ isAdminDesktop: true }}>
       <AcknowledgmentWall>
-        <div className="admin-shell" style={{ display: 'grid', gridTemplateColumns: '210px 1fr', minHeight: '100vh' }}>
+        <div className="admin-shell gmc-admin" style={{ display: 'grid', gridTemplateColumns: '210px 1fr', minHeight: '100vh' }}>
           <AdminSidebar />
           <div className="admin-main" style={{ display: 'flex', flexDirection: 'column' }}>
             <AdminTopbar />

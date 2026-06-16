@@ -104,6 +104,15 @@ export default function InventoryPage() {
   }, [collapsedGroups])
 
   // ---------------------------------------------------------------------------
+  // Stat strip counts (full dataset, not filtered)
+  // ---------------------------------------------------------------------------
+
+  const totalActive   = useMemo(() => items.filter(i => i.status === 'active').length,   [items])
+  const totalReserved = useMemo(() => items.filter(i => i.status === 'reserved').length, [items])
+  const totalDraft    = useMemo(() => items.filter(i => i.status === 'draft').length,    [items])
+  const totalItems    = useMemo(() => items.filter(i => i.status !== 'deleted').length,  [items])
+
+  // ---------------------------------------------------------------------------
   // AI apply handlers (table mode)
   // ---------------------------------------------------------------------------
 
@@ -241,10 +250,14 @@ export default function InventoryPage() {
   // Render
   // ---------------------------------------------------------------------------
 
+  const accentLabel = statusFilter === 'all'
+    ? 'All'
+    : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)
+
   return (
     <ProtectedRoute staffOnly>
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: 'var(--space-8) var(--space-6)' }}>
-        <header style={{ marginBottom: 'var(--space-8)' }}>
+        <header style={{ marginBottom: 'var(--space-6)' }}>
           <h1 style={{
             fontFamily: 'var(--font-display)',
             fontSize: 'var(--text-display)',
@@ -274,38 +287,96 @@ export default function InventoryPage() {
           </p>
         ) : (
           <div>
-            {/* Search */}
-            <input
-              type="search"
-              placeholder="Search items…"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              aria-label="Search inventory"
-              style={{
-                width: '100%',
-                minHeight: '48px',
-                padding: '0 var(--space-4)',
-                backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--color-text)',
-                fontFamily: 'var(--font-body)',
-                fontSize: 'var(--text-body)',
-                marginBottom: 'var(--space-4)',
-                boxSizing: 'border-box',
-              }}
-            />
+            {/* ── Stat strip ─────────────────────────────── */}
+            <div style={{
+              display: 'flex',
+              backgroundColor: 'var(--gmc-bg-surface)',
+              border: '1px solid var(--gmc-border-default)',
+              borderRadius: 'var(--radius-md)',
+              overflow: 'hidden',
+              marginBottom: 'var(--space-4)',
+            }}>
+              {([
+                { label: 'ACTIVE',   value: totalActive,   color: 'var(--gmc-status-active)'   },
+                { label: 'RESERVED', value: totalReserved, color: 'var(--gmc-status-reserved)' },
+                { label: 'DRAFT',    value: totalDraft,    color: 'var(--gmc-text-muted)'       },
+                { label: 'TOTAL',    value: totalItems,    color: 'var(--gmc-gold-primary)'     },
+              ] as const).map((stat, i, arr) => (
+                <div key={stat.label} style={{
+                  flex: 1,
+                  padding: 'var(--space-3) var(--space-2)',
+                  textAlign: 'center',
+                  borderRight: i < arr.length - 1 ? '1px solid var(--gmc-border-default)' : 'none',
+                }}>
+                  <div style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--text-subheading)',
+                    color: stat.value > 0 ? stat.color : 'var(--gmc-text-disabled)',
+                    lineHeight: 1,
+                  }}>
+                    {stat.value}
+                  </div>
+                  <div style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--text-xs)',
+                    color: 'var(--gmc-text-muted)',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    marginTop: 'var(--space-1)',
+                  }}>
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
 
-            {/* Toolbar row */}
+            {/* ── Search with icon ───────────────────────── */}
+            <div style={{ position: 'relative', marginBottom: 'var(--space-4)' }}>
+              <span
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  left: 'var(--space-3)',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  fontSize: 'var(--text-small)',
+                  color: 'var(--color-text-muted)',
+                  pointerEvents: 'none',
+                }}
+              >
+                🔍
+              </span>
+              <input
+                type="search"
+                placeholder="Search items…"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                aria-label="Search inventory"
+                style={{
+                  width: '100%',
+                  minHeight: '48px',
+                  padding: '0 var(--space-4) 0 calc(var(--space-6) + var(--space-2))',
+                  backgroundColor: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--color-text)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--text-body)',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* ── Toolbar row ────────────────────────────── */}
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: 'var(--space-6)',
+              marginBottom: 'var(--space-4)',
               gap: 'var(--space-3)',
               flexWrap: 'wrap',
             }}>
-              {/* Status filters */}
+              {/* Status filter chips */}
               <div
                 role="group"
                 aria-label="Filter by status"
@@ -326,18 +397,16 @@ export default function InventoryPage() {
                       flexShrink: 0,
                       minHeight: '44px',
                       padding: '0 var(--space-4)',
-                      borderRadius: 'var(--radius-lg)',
-                      border: '1px solid var(--color-border)',
-                      backgroundColor: statusFilter === f.value
-                        ? 'var(--color-primary)'
-                        : 'var(--color-surface)',
-                      color: statusFilter === f.value
-                        ? 'var(--color-on-primary)'
-                        : 'var(--color-text-muted)',
+                      borderRadius: 'var(--radius-sm)',
+                      border: `1px solid ${statusFilter === f.value ? 'var(--gmc-gold-dim)' : 'var(--color-border)'}`,
+                      backgroundColor: statusFilter === f.value ? 'var(--gmc-gold-subtle)' : 'transparent',
+                      color: statusFilter === f.value ? 'var(--color-primary)' : 'var(--color-text-muted)',
                       fontFamily: 'var(--font-body)',
-                      fontSize: 'var(--text-small)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: statusFilter === f.value ? 700 : 400,
+                      letterSpacing: '0.08em',
                       cursor: 'pointer',
-                      transition: `background-color var(--motion-speed-fast) var(--motion-easing), color var(--motion-speed-fast) var(--motion-easing)`,
+                      transition: 'background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease',
                     }}
                   >
                     {f.label}
@@ -401,12 +470,8 @@ export default function InventoryPage() {
                         minHeight: '36px',
                         padding: '0 var(--space-3)',
                         border: 'none',
-                        backgroundColor: viewMode === mode
-                          ? 'var(--color-primary)'
-                          : 'var(--color-surface)',
-                        color: viewMode === mode
-                          ? 'var(--color-on-primary)'
-                          : 'var(--color-text-muted)',
+                        backgroundColor: viewMode === mode ? 'var(--color-primary)' : 'var(--color-surface)',
+                        color: viewMode === mode ? 'var(--color-on-primary)' : 'var(--color-text-muted)',
                         fontFamily: 'var(--font-body)',
                         fontSize: 'var(--text-xs)',
                         cursor: 'pointer',
@@ -423,7 +488,7 @@ export default function InventoryPage() {
                     onClick={handleEmptyRecycleBin}
                     style={{
                       backgroundColor: 'var(--color-error)',
-                      color: 'white',
+                      color: 'var(--color-on-primary)',
                       border: 'none',
                       padding: 'var(--space-2) var(--space-4)',
                       borderRadius: 'var(--radius-md)',
@@ -436,6 +501,34 @@ export default function InventoryPage() {
                   </button>
                 )}
               </div>
+            </div>
+
+            {/* ── Section accent bar ─────────────────────── */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              marginBottom: 'var(--space-3)',
+            }}>
+              <div
+                aria-hidden="true"
+                style={{
+                  width: '3px',
+                  height: 'var(--space-3)',
+                  backgroundColor: 'var(--color-primary)',
+                  borderRadius: '2px',
+                  flexShrink: 0,
+                }}
+              />
+              <span style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--text-xs)',
+                color: 'var(--color-primary)',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+              }}>
+                {accentLabel} · {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'}
+              </span>
             </div>
 
             {/* ---- Table View ---- */}

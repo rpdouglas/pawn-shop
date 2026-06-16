@@ -17,8 +17,10 @@ export default function AdminMobileNav() {
         left: 0,
         right: 0,
         display: 'flex',
-        backgroundColor: 'var(--color-surface)',
-        borderTop: '1px solid var(--color-border)',
+        backgroundColor: 'var(--gmc-bg-surface)',
+        borderTop: '1px solid var(--gmc-border-default)',
+        paddingTop: 'var(--space-2)',
+        paddingBottom: 'calc(var(--space-2) + env(safe-area-inset-bottom))',
         zIndex: 1100,
       }}
     >
@@ -33,23 +35,25 @@ export default function AdminMobileNav() {
             flexDirection: 'column' as const,
             alignItems: 'center',
             justifyContent: 'center',
-            minHeight: '56px',
+            minHeight: '48px',
             textDecoration: 'none',
-            padding: 'var(--space-2)',
-            color: isActive ? 'var(--color-primary)' : 'var(--color-text-muted)',
-            transition: `color var(--motion-speed-fast) var(--motion-easing)`,
+            padding: '0 var(--space-1)',
+            color: isActive ? 'var(--gmc-gold-primary)' : 'var(--gmc-text-muted)',
+            transition: 'color 0.12s ease',
           })}
         >
           {({ isActive }) => (
             <>
-              <span style={{ fontSize: '20px', lineHeight: 1 }} aria-hidden="true">
+              <span style={{ fontSize: '22px', lineHeight: 1 }} aria-hidden="true">
                 {tab.icon}
               </span>
               <span style={{
-                fontFamily: 'var(--font-body)',
+                fontFamily: 'var(--gmc-font-body)',
                 fontSize: 'var(--text-xs)',
                 marginTop: 'var(--space-1)',
-                color: isActive ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                letterSpacing: '0.08em',
+                fontWeight: isActive ? 700 : 400,
+                color: isActive ? 'var(--gmc-gold-primary)' : 'var(--gmc-text-muted)',
               }}>
                 {tab.label}
               </span>

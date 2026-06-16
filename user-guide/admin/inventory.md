@@ -6,12 +6,27 @@ The **Inventory Management** page (`/admin/inventory`) is the central hub for ov
 
 ---
 
+## Stat Strip
+
+Directly below the page header, a four-cell horizontal bar gives you an instant count of your catalogue:
+
+| Cell | What it counts |
+|------|----------------|
+| **ACTIVE** | Items live on the storefront (green when non-zero) |
+| **RESERVED** | Items held for a customer (blue when non-zero) |
+| **DRAFT** | Unpublished items (muted when zero) |
+| **TOTAL** | All non-deleted items (gold when non-zero) |
+
+These counts always reflect the full dataset — they do not change when you apply filters below.
+
+---
+
 ## Toolbar
 
-At the top of the page you'll find the core controls, all on one row:
+Below the stat strip you'll find the core controls:
 
-- **Search** — A full-width field filters by item title in real time.
-- **Status filter chips** — All · Active · Draft · Reserved · Sold · Recycle Bin. Tap any chip to narrow the list.
+- **Search** — A full-width field (🔍 icon prefix) filters by item title in real time.
+- **Status filter chips** — All · Active · Draft · Reserved · Sold · Recycle Bin. Tap any chip to narrow the list. The active chip shows a gold border and text.
 - **Group by** — Organise items into collapsible sections by **View Tag** (Pawn / Cannabis / Fireworks / Other), **Category** (alphabetical), **Status** (workflow order), or **None** (flat list).
 - **⊞ Grid / ☰ Table** — Toggle between Grid and Table view. Your choice is remembered for next time.
 - **Empty Recycle Bin** — Visible to Admins only when the Recycle Bin filter is active. Permanently and irreversibly removes every deleted item.
@@ -39,16 +54,20 @@ Every card supports editing the most common fields directly without navigating t
 
 Changes save to Firestore the moment you confirm or blur the field.
 
+### Section Accent Bar
+
+Just above the item list (whether grid or table), a thin gold rule and an uppercase label shows you exactly what you're looking at — for example, `ACTIVE · 14 items`. This updates live as you change filters or search.
+
 ### Card Actions
 
 Each card has a row of action buttons at the bottom (all ≥48px for comfortable tapping on mobile):
 
 | Button | What it does |
 |--------|-------------|
-| **Full Edit** | Opens the dedicated Edit Item page (`/admin/item/:id/edit`) — a single-page form with photo management (add, delete, promote to cover), all item fields, condition dropdown, and cannabis/fireworks profiles. Identical experience on mobile and desktop. |
-| **Archive** | Sets `status: archived` — hides the item from public listings without moving it to the Recycle Bin |
-| **Delete** | Moves the item to the Recycle Bin (`status: deleted`) |
-| **Restore** | Visible on deleted items only — returns the item to Draft status |
+| **EDIT** | Opens the dedicated Edit Item page (`/admin/item/:id/edit`) — a single-page form with photo management (add, delete, promote to cover), all item fields, condition dropdown, and cannabis/fireworks profiles. Identical experience on mobile and desktop. |
+| **ARCHIVE** | Sets `status: archived` — hides the item from public listings without moving it to the Recycle Bin |
+| **DELETE** | Moves the item to the Recycle Bin (`status: deleted`) |
+| **RESTORE** | Visible on deleted items only — returns the item to Draft status |
 
 Click the item **thumbnail** to open the **AI Assistant Drawer** for that item without navigating away.
 

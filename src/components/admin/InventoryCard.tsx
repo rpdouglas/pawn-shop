@@ -22,6 +22,7 @@ type EditingField = 'title' | 'status' | 'condition' | 'price' | null
 
 export default function InventoryCard({ item, onOpenDrawer }: InventoryCardProps) {
   const [editing, setEditing] = useState<EditingField>(null)
+  const [hovered, setHovered] = useState(false)
 
   const save = async (field: string, value: unknown) => {
     setEditing(null)
@@ -63,14 +64,18 @@ export default function InventoryCard({ item, onOpenDrawer }: InventoryCardProps
 
   return (
     <article
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         display: 'flex',
         flexDirection: 'column',
         padding: 'var(--space-4)',
-        backgroundColor: 'var(--color-surface)',
+        backgroundColor: hovered ? 'var(--gmc-bg-elevated)' : 'var(--color-surface)',
         borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--color-border)',
+        border: `1px solid ${hovered ? 'var(--gmc-border-strong)' : 'var(--color-border)'}`,
+        boxShadow: hovered ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
         gap: 'var(--space-3)',
+        transition: 'background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
       }}
     >
       {/* Thumbnail + key fields */}
@@ -129,7 +134,7 @@ export default function InventoryCard({ item, onOpenDrawer }: InventoryCardProps
                 cursor: 'text',
                 fontFamily: 'var(--font-body)',
                 fontSize: 'var(--text-small)',
-                fontWeight: 500,
+                fontWeight: 600,
                 color: 'var(--color-text)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -190,7 +195,7 @@ export default function InventoryCard({ item, onOpenDrawer }: InventoryCardProps
         </div>
       </div>
 
-      {/* Price */}
+      {/* Price — Georgia font, always gold */}
       <div>
         {editing === 'price' ? (
           <PriceCellEditor
@@ -211,15 +216,16 @@ export default function InventoryCard({ item, onOpenDrawer }: InventoryCardProps
               border: 'none',
               padding: 0,
               cursor: 'text',
-              fontFamily: 'var(--font-body)',
-              fontSize: 'var(--text-md)',
-              fontWeight: 600,
-              color: item.originalPrice ? 'var(--color-primary)' : 'var(--color-text)',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--text-body)',
+              fontWeight: 700,
+              color: 'var(--color-primary)',
             }}
           >
             {formatPrice(item.price ?? 0)}
             {item.originalPrice && (
               <span style={{
+                fontFamily: 'var(--font-body)',
                 fontSize: 'var(--text-xs)',
                 textDecoration: 'line-through',
                 color: 'var(--color-text-muted)',
@@ -250,14 +256,17 @@ export default function InventoryCard({ item, onOpenDrawer }: InventoryCardProps
             minHeight: '48px',
             padding: '0 var(--space-3)',
             borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--color-border)',
-            backgroundColor: 'var(--color-surface)',
-            color: 'var(--color-text-muted)',
-            fontSize: 'var(--text-small)',
+            border: '1px solid var(--gmc-gold-dim)',
+            backgroundColor: 'transparent',
+            color: 'var(--color-primary)',
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--text-xs)',
+            fontWeight: 600,
+            letterSpacing: '0.06em',
             textDecoration: 'none',
           }}
         >
-          Full Edit
+          EDIT
         </Link>
         {item.status === 'deleted' ? (
           <button
@@ -270,11 +279,13 @@ export default function InventoryCard({ item, onOpenDrawer }: InventoryCardProps
               border: '1px solid var(--color-primary)',
               backgroundColor: 'transparent',
               color: 'var(--color-primary)',
-              fontSize: 'var(--text-small)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--text-xs)',
               cursor: 'pointer',
+              letterSpacing: '0.06em',
             }}
           >
-            Restore
+            RESTORE
           </button>
         ) : (
           <>
@@ -288,11 +299,13 @@ export default function InventoryCard({ item, onOpenDrawer }: InventoryCardProps
                 border: '1px solid var(--color-border)',
                 backgroundColor: 'transparent',
                 color: 'var(--color-text-muted)',
-                fontSize: 'var(--text-small)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--text-xs)',
                 cursor: 'pointer',
+                letterSpacing: '0.06em',
               }}
             >
-              Archive
+              ARCHIVE
             </button>
             <button
               type="button"
@@ -304,11 +317,13 @@ export default function InventoryCard({ item, onOpenDrawer }: InventoryCardProps
                 border: '1px solid var(--color-error)',
                 backgroundColor: 'transparent',
                 color: 'var(--color-error)',
-                fontSize: 'var(--text-small)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--text-xs)',
                 cursor: 'pointer',
+                letterSpacing: '0.06em',
               }}
             >
-              Delete
+              DELETE
             </button>
           </>
         )}

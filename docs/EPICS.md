@@ -1838,3 +1838,23 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [ ] Storage rule: staff-read-only for `tickets/{id}/ticket.pdf` (no public read) `[Comp]`
 - [ ] Decision log: PDF library selection and Storage access pattern `[Comp]`
 
+---
+
+### E125 · Gunmetal Club Admin Theme
+
+> **Persona Gate — E125:**
+> - **Staff (Primary):** Operational slate palette improves scan speed on shop floor; clear stat strip + filter chips reduce cognitive load.
+> - **Jordan (Secondary):** Admin quality reflects brand quality — "Dapper. Debonair." must hold inside the tooling.
+> - **Marcus (Secondary):** Premium aesthetic maintained throughout; zero hardcoded values, approved motion only.
+
+**Status:** 🔄 IN PROGRESS · **Priority:** MEDIUM · **Cycle:** 33
+
+- [x] `src/styles/admin.css` — new file: full `--gmc-*` CSS custom properties from `gunmetal-club-design-tokens.md` `[Staff]` `[Jord]`
+- [x] `AdminLayout.tsx` — import `admin.css`; inject `gmc-admin` class on mobile and desktop admin containers `[Staff]`
+- [x] `AdminTopbar.tsx` — remove hardcoded `#1c1400`; GMC sticky top bar (gold vertical rule, wordmark, live dot, avatar) `[Jord]` `[Staff]`
+- [x] `AdminMobileNav.tsx` — GMC bottom nav: 64px, `env(safe-area-inset-bottom)`, bold active label, gold active state `[Staff]` `[Mak]`
+- [x] `InventoryCard.tsx` — GMC card anatomy: Georgia price, Courier SKU, status/tag badge strip, ≥44px action buttons `[Staff]` `[Mak]`
+- [x] `InventoryPage.tsx` — mobile toolbar: horizontal stat strip + search with icon prefix + filter chips + section accent bar `[Staff]`
+- [x] `DashboardPage.tsx` — GMC StatCard: 2×2 grid, Georgia number 22–36px, uppercase muted label, gold non-zero colour `[Staff]` `[Jord]`
+- [x] **E125 CLOSED** | 2026-06-16
+

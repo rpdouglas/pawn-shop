@@ -22,6 +22,8 @@ E122 · Fireworks Hero Canvas Animation — Physics-based interval-burst canvas 
 
 E124 · Site Analytics: GA4 Activation & Enhanced Event Tracking — Full GA4 recommended event catalog active. UTM passthrough live. (COMPLETED)
 
+E125 · Gunmetal Club Admin Theme — Full GMC slate palette applied to admin shell. `--gmc-*` token namespace, hardcoded hex removed from AdminTopbar. Mobile stat strip, icon search, accent bar, compact stat cards. (COMPLETED)
+
 ---
 
 ## In Progress
@@ -205,6 +207,8 @@ E124 · Site Analytics: GA4 Activation & Enhanced Event Tracking — Full GA4 re
 | `E123 Cannabis Vertical Suspension` — Commented out `/cannabis` + `/cannabis/collections/:mood` routes in `main.tsx`, Cannabis `<PortalCard>` in `HomePage.tsx`, Cannabis LINKS entry + `getPageTitle` case in `NavigationDrawer.tsx`. All Cannabis source files preserved. Each comment marked `// CANNABIS SUSPENDED — E123 (legal hold)` with inline re-enable instructions. Decision 0040 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E123 | 2026-06-13 |
 | **E123 CLOSED** | E123 | 2026-06-13 |
 | `E124 Site Analytics: GA4 Activation` — Rewrote `src/lib/analytics.ts` with full GA4 recommended event catalog: `view_item_list`, `select_item`, `view_item`, `generate_lead`, `search`, `campaign_view`, `add_to_wishlist`, `remove_from_wishlist`. Added `GA4Item` interface, `toGA4Item()` helper, UTM passthrough in every `fire()` call. User properties: `is_staff` (AuthContext), `preferred_view` (ViewContext) — no PII. Wired events in 9 source files. Root cause fix: added missing `VITE_FIREBASE_MEASUREMENT_ID=` to `.env.example`. Decision 0041 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E124 | 2026-06-13 |
+| `E125 Gunmetal Club Admin Theme` — New `src/styles/admin.css` defines `--gmc-*` token namespace scoped to `.gmc-admin`; remaps project tokens so existing components auto-inherit GMC palette. Hardcoded `#1c1400` removed from `AdminTopbar`. Mobile: 48px sticky topbar + gold avatar initials + live dot. Bottom nav: slate bg, gold active state, `env(safe-area-inset-bottom)`. InventoryCard: Georgia price (always gold), hover lift, uppercase EDIT/ARCHIVE/DELETE labels. InventoryPage: 4-cell stat strip, 🔍 icon search, gold accent bar with filtered count. DashboardPage: compact StatCard (24px number, conditional gold on non-zero). Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0042 logged. | E125 | 2026-06-16 |
+| **E125 CLOSED** | E125 | 2026-06-16 |
 | **E124 CLOSED** | E124 | 2026-06-13 |
 
 ---
@@ -236,4 +240,4 @@ E124 · Site Analytics: GA4 Activation & Enhanced Event Tracking — Full GA4 re
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-13 (Cycle 33 — E124 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-16 (Cycle 33 — E125 CLOSED)*

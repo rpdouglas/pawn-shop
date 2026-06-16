@@ -33,7 +33,7 @@ interface DashboardStats {
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <div style={{
-      padding: 'var(--space-6)',
+      padding: 'var(--space-3) var(--space-2)',
       backgroundColor: 'var(--color-surface)',
       borderRadius: 'var(--radius-md)',
       border: '1px solid var(--color-border)',
@@ -41,8 +41,8 @@ function StatCard({ label, value }: { label: string; value: number }) {
     }}>
       <div style={{
         fontFamily: 'var(--font-display)',
-        fontSize: 'var(--text-display)',
-        color: 'var(--color-primary)',
+        fontSize: 'var(--text-subheading)',
+        color: value > 0 ? 'var(--color-primary)' : 'var(--color-text-muted)',
         lineHeight: 1,
         marginBottom: 'var(--space-2)',
       }}>
@@ -50,7 +50,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
       </div>
       <div style={{
         fontFamily: 'var(--font-body)',
-        fontSize: 'var(--text-small)',
+        fontSize: 'var(--text-xs)',
         color: 'var(--color-text-muted)',
         textTransform: 'uppercase',
         letterSpacing: '0.08em',

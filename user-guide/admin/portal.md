@@ -7,7 +7,7 @@ The Admin Desktop Portal provides a persistent, high-efficiency navigation shell
 The desktop portal consists of two primary areas:
 
 1. **Sidebar (Fixed Left, 210px):** A labeled navigation panel with collapsible section groups. Each section heading is clickable — tap it to expand or collapse that group of functions.
-2. **Slim Topbar (Fixed Top):** A 38px utility bar displaying the brand name and the current user's email and role badge.
+2. **Topbar (Fixed Top, 48px):** A utility bar in the Gunmetal Club slate palette. Left side: a gold vertical rule, "The Pawn Shop" wordmark (Georgia), and "· Akwesasne" in muted text. Right side: a green live dot + **LIVE** status label, your role badge, and a gold avatar circle showing your account initials.
 
 ## Sidebar Navigation Groups
 
@@ -33,7 +33,7 @@ To receive a new item, use the **+ Add Item** button on the Inventory page — i
 The portal shell is only rendered for users with a verified staff role (`admin`, `manager`, `inventory_staff`, or `marketing_staff`).
 
 - **Desktop Efficiency:** On screens 1024px or wider, the sidebar stays fixed so you can move between admin sections without ever reopening a menu.
-- **Mobile Continuity:** On viewports smaller than 1024px, the sidebar and topbar are replaced by a **bottom tab bar** with four quick-access tabs — Inventory, Add Item (camera-first Mobile Intake), Customers, and Dashboard.
+- **Mobile Continuity:** On viewports smaller than 1024px, the sidebar is replaced by a **bottom tab bar** with four quick-access tabs — Inventory, Add Item (camera-first Mobile Intake), Customers, and Dashboard. The topbar remains visible at the top of every mobile admin screen. Both the topbar and bottom nav use the Gunmetal Club palette — slate-grey surfaces with a gold active state on the selected tab.
 
 ---
 
