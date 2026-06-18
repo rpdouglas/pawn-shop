@@ -29,6 +29,7 @@ Below the stat strip you'll find the core controls:
 - **Status filter chips** — All · Active · Draft · Reserved · Sold · Recycle Bin. Tap any chip to narrow the list. The active chip shows a gold border and text.
 - **Group by** — Organise items into collapsible sections by **View Tag** (Pawn / Cannabis / Fireworks / Other), **Category** (alphabetical), **Status** (workflow order), or **None** (flat list).
 - **⊞ Grid / ☰ Table** — Toggle between Grid and Table view. Your choice is remembered for next time.
+- **↓ Export CSV** — Downloads a CSV snapshot of every active item (items with `status: Active` and no police hold). The file opens in Excel or Google Sheets and contains 22 columns including title, category, condition, price in CAD dollars, serial number, merchandising tags, and provenance notes. The filename is stamped with the export date — for example, `inventory-active-2026-06-18.csv`. The button is disabled when there are no active items.
 - **Empty Recycle Bin** — Visible to Admins only when the Recycle Bin filter is active. Permanently and irreversibly removes every deleted item.
 
 ---

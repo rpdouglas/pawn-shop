@@ -1858,3 +1858,20 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] `DashboardPage.tsx` — GMC StatCard: 2×2 grid, Georgia number 22–36px, uppercase muted label, gold non-zero colour `[Staff]` `[Jord]`
 - [x] **E125 CLOSED** | 2026-06-16
 
+---
+
+### E126 · Inventory CSV Export
+
+> **Persona Gate — E126:**
+> - **Staff (Primary):** One-click CSV snapshot of active inventory for accounting, purchasing, or external reporting.
+> - **Dale (Secondary):** Pricing data in the export reflects accurate CAD dollar values.
+> - **Marcus (Secondary):** Provenance notes and merchandising tags included in the export for catalog management.
+
+**Status:** 🔄 IN PROGRESS · **Priority:** MEDIUM · **Cycle:** 33
+
+- [x] "Export CSV" button in `InventoryPage.tsx` toolbar — staff-only, active items only `[Staff]`
+- [x] Client-side CSV builder: price converted cents→CAD, arrays joined, dates formatted `[Staff]`
+- [x] `policeHold: true` items excluded from export `[Comp]`
+- [x] Filename stamped with export date `[Staff]`
+- [x] **E126 CLOSED** | 2026-06-18
+

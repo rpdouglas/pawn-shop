@@ -59,6 +59,66 @@ function formatGroupLabel(key: string): string {
   return key.charAt(0).toUpperCase() + key.slice(1).replace(/-/g, ' ')
 }
 
+function csvCell(value: string | null): string {
+  if (value === null) return ''
+  if (value.includes('"') || value.includes(',') || value.includes('\n') || value.includes('\r')) {
+    return `"${value.replace(/"/g, '""')}"`
+  }
+  return value
+}
+
+function exportActiveToCsv(allItems: Item[]): void {
+  const rows = allItems.filter(i => i.status === 'active' && !i.policeHold)
+
+  const headers = [
+    'id', 'title', 'description', 'category', 'view_tag', 'status', 'condition',
+    'price_cad', 'original_price_cad', 'quantity', 'serial_number', 'police_hold',
+    'ebay_listing_id', 'merchandising_tags', 'provenance_notes', 'trending_score',
+    'view_count', 'enquiry_count', 'markdown_enabled', 'published_by',
+    'created_at', 'updated_at',
+  ]
+
+  const lines: string[] = [headers.join(',')]
+  for (const item of rows) {
+    const cols: Array<string | null> = [
+      item.id,
+      item.title,
+      item.description,
+      item.category,
+      item.viewTag,
+      item.status,
+      item.condition,
+      (item.price / 100).toFixed(2),
+      item.originalPrice != null ? (item.originalPrice / 100).toFixed(2) : null,
+      item.quantity != null ? String(item.quantity) : null,
+      item.serialNumber ?? null,
+      item.policeHold != null ? String(item.policeHold) : null,
+      item.ebayListingId ?? null,
+      item.merchandisingTags?.join('|') ?? null,
+      item.provenanceNotes ?? null,
+      item.trendingScore != null ? String(item.trendingScore) : null,
+      item.viewCount != null ? String(item.viewCount) : null,
+      item.enquiryCount != null ? String(item.enquiryCount) : null,
+      item.markdownEnabled != null ? String(item.markdownEnabled) : null,
+      item.publishedBy ?? null,
+      item.createdAt?.toISOString().slice(0, 10) ?? null,
+      item.updatedAt?.toISOString().slice(0, 10) ?? null,
+    ]
+    lines.push(cols.map(csvCell).join(','))
+  }
+
+  const csv = lines.join('\r\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = `inventory-active-${new Date().toISOString().slice(0, 10)}.csv`
+  document.body.appendChild(anchor)
+  anchor.click()
+  document.body.removeChild(anchor)
+  URL.revokeObjectURL(url)
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -482,6 +542,35 @@ export default function InventoryPage() {
                     </button>
                   ))}
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => exportActiveToCsv(items)}
+                  disabled={totalActive === 0}
+                  title={
+                    totalActive === 0
+                      ? 'No active items to export'
+                      : `Export ${totalActive} active item${totalActive !== 1 ? 's' : ''} to CSV`
+                  }
+                  aria-label={`Export ${totalActive} active items to CSV`}
+                  style={{
+                    minHeight: '44px',
+                    padding: '0 var(--space-4)',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--color-border)',
+                    backgroundColor: 'transparent',
+                    color: totalActive > 0 ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--text-xs)',
+                    letterSpacing: '0.08em',
+                    cursor: totalActive > 0 ? 'pointer' : 'not-allowed',
+                    opacity: totalActive > 0 ? 1 : 0.5,
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
+                  ↓ Export CSV
+                </button>
 
                 {statusFilter === 'deleted' && user?.isAdmin && (
                   <button
