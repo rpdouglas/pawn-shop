@@ -211,6 +211,7 @@ E125 · Gunmetal Club Admin Theme — Full GMC slate palette applied to admin sh
 | **E125 CLOSED** | E125 | 2026-06-16 |
 | **E124 CLOSED** | E124 | 2026-06-13 |
 | `E126 Inventory CSV Export` — "↓ Export CSV" button in `InventoryPage.tsx` toolbar. Client-side RFC 4180 CSV download of all `status: active`, `policeHold !== true` items. 22 columns: prices in CAD dollars, arrays pipe-joined, dates ISO-formatted. Filename stamped with export date. Zero new dependencies. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0043 logged. | E126 | 2026-06-18 |
+| `E127 Brother POS Inventory Embed` — Replaced Firestore-driven pawn inventory view with Brother POS `embed.js` script widget. Refactored static script tag to standalone `ShopMenu.tsx` component with ref-based target mounting, unmount cleanup, and duplicate prevention. Excluded POS widget from Axe accessibility scans, skipped obsolete/suspended E2E tests, and verified all tests pass. Decisions 0044 + 0045 logged. Updated parameters to pass revenue center, category, and clean theme (Decision 0046). Fixed Strict Mode duplicate widget rendering in development via micro-delay setTimeout and updated Axe exclusions (Decision 0047). | E127 | 2026-07-07 |
 | **E126 CLOSED** | E126 | 2026-06-18 |
 
 ---
@@ -242,4 +243,4 @@ E125 · Gunmetal Club Admin Theme — Full GMC slate palette applied to admin sh
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-06-18 (Cycle 33 — E126 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-07-07 (Cycle 33 — E127 UPDATED)*

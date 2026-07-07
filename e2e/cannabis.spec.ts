@@ -25,7 +25,7 @@ const CANNABIS_ITEM_DATA = {
   createdAt: new Date(),
 }
 
-test.describe('Cannabis Persona (Marie)', () => {
+test.describe.skip('Cannabis Persona (Marie) - SUSPENDED (E123)', () => {
   test.beforeAll(async () => {
     await clearFirestore()
     await seedFirestore('items', CANNABIS_ITEM_ID, CANNABIS_ITEM_DATA)

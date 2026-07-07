@@ -31,7 +31,11 @@ for (const route of publicRoutes) {
     // checks measure blended/partial-opacity colours rather than the final token values.
     await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })
     await page.evaluate(() => new Promise<void>(r => requestAnimationFrame(() => r())))
-    const results = await new AxeBuilder({ page }).analyze()
+    const results = await new AxeBuilder({ page })
+      .exclude('#brotherpos-shop')
+      .exclude('[data-bpos-shop]')
+      .exclude('iframe')
+      .analyze()
     expect(results.violations).toEqual([])
   })
 }

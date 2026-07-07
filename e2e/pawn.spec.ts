@@ -20,7 +20,7 @@ const mockUser = {
   displayName: 'Makoonsii Bear',
 }
 
-test.describe('Pawn Persona (Makoonsii)', () => {
+test.describe.skip('Pawn Persona (Makoonsii) - SUSPENDED (E127)', () => {
   test.setTimeout(60000);
   test.beforeAll(async () => {
     await clearFirestore()

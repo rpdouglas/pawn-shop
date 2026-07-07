@@ -1,19 +1,23 @@
 # Browsing the Collection
 
-Welcome to the Pawn & Resale storefront, a curated destination where discovery meets luxury. We’ve designed the browsing experience to be flexible without sacrificing our signature aesthetic.
+Welcome to the Pawn & Resale storefront — a curated destination where discovery meets value. The shop now runs on a live, real-time inventory feed powered by Brother POS, so every item you see is exactly what's available on the floor today.
 
-## Layout Options
+## What You'll Find
 
-At the top of the collection page, you will find our layout toggle. This allows you to customize how items are presented to match your preferred shopping style.
+The collection page features our full liquidation and fireworks inventory, updated in real time as items arrive and sell. Pricing is set by our team and reflects current market conditions — what you see is what we're asking.
 
-### The Signature Masonry View
-By default, the storefront is presented in our signature **Masonry Grid**. This layout respects the natural aspect ratios of our product photography, allowing taller or wider items to breathe organically. It evokes the feeling of scanning an eclectic collector's cabinet.
+## Browsing the Catalog
 
-### Structured Grid
-For a more uniform browsing experience, you can select the **Grid** layout. This view presents items in a structured, consistent grid using our premium product cards. This is ideal when you want to scan multiple items side-by-side efficiently.
+The inventory widget loads automatically when you visit the Pawn page. Use the widget's built-in search and filter tools to explore by category, price, or keyword. Every listing includes item details and pricing at a glance — no click-through required.
 
-### Detailed List
-The **List** view stacks items vertically, dedicating more horizontal space to each piece. This layout provides a focused, magazine-like experience where the details and photography of a single item command your full attention before you scroll to the next.
+## Above the Collection
 
-## Refined Discovery
-No matter which layout you choose, our design tokens ensure a seamless, dark luxury aesthetic. The interface is purposefully muted to let the rich photography and the provenance of each piece take center stage. Enjoy the hunt!
+Before you reach the inventory, you'll pass through a few features worth knowing:
+
+- **Recently Sold** — a live strip of items that just found new homes. A useful signal for what moves quickly and at what price.
+- **Activity Feed** — a privacy-safe view of recent browsing activity on the site, showing general interest patterns without identifying anyone.
+- **Campaign Banners** — any active promotions or seasonal events will appear here. Dates are real; urgency is never manufactured.
+
+## Below the Collection
+
+After the inventory, you'll find our **Akwesasne Narrative** — editorial pieces about the community, the shop's history, and the stories behind what we carry. Dapper. Debonair. Distinctly Akwesasne.

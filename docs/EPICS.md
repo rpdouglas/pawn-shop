@@ -1867,11 +1867,33 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 > - **Dale (Secondary):** Pricing data in the export reflects accurate CAD dollar values.
 > - **Marcus (Secondary):** Provenance notes and merchandising tags included in the export for catalog management.
 
-**Status:** 🔄 IN PROGRESS · **Priority:** MEDIUM · **Cycle:** 33
+**Status:** ✅ CLOSED · **Priority:** MEDIUM · **Cycle:** 33
 
 - [x] "Export CSV" button in `InventoryPage.tsx` toolbar — staff-only, active items only `[Staff]`
 - [x] Client-side CSV builder: price converted cents→CAD, arrays joined, dates formatted `[Staff]`
 - [x] `policeHold: true` items excluded from export `[Comp]`
 - [x] Filename stamped with export date `[Staff]`
 - [x] **E126 CLOSED** | 2026-06-18
+
+---
+
+### E127 · Brother POS Inventory Embed
+
+> **Persona Gate — E127:**
+> - **Dale (Primary):** Authoritative live POS inventory displayed on the pawn page — pricing matches what's actually in stock.
+> - **Sandra (Primary):** Discovery experience replaced with live Brother POS product catalog.
+> - **Jordan (Secondary):** Brand hero, articles, and trust signals preserved above and below the widget.
+
+**Status:** ✅ CLOSED · **Priority:** MEDIUM · **Cycle:** 33
+
+- [x] Remove Firestore-driven inventory section from `PawnPage.tsx` (search bar, staff picks, featured items, masonry/grid/list grid, quick-view modal, click-collect modal) `[Dale]` `[San]`
+- [x] Inject Brother POS `embed.js` via `useEffect` + `document.createElement('script')` — `data-mode="menu"`, guard against double-inject `[Dale]`
+- [x] Add `<div id="brotherpos-shop">` mount point in Discover section `[San]`
+- [x] Retain page-level features: `PawnHero`, `RecentlySoldStrip`, `ActivityFeed`, `CampaignBanner`, `ArticleSection`, `YearsInBusinessBadge` `[Mak]` `[Dale]` `[Jord]`
+- [x] Refactor static embed to standalone `ShopMenu.tsx` component with ref-based target mounting, duplicate prevention, and unmount cleanup `[San]`
+- [x] Exclude POS widget from Axe accessibility scans and skip obsolete/suspended E2E tests `[Comp]`
+- [x] Decision 0044 + 0045 logged `[Comp]`
+- [x] User guide updated: `pawn/browsing.md` `[All]`
+- [x] **E127 CLOSED** | 2026-06-23
+
 
