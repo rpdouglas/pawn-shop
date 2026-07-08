@@ -1896,4 +1896,18 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] User guide updated: `pawn/browsing.md` `[All]`
 - [x] **E127 CLOSED** | 2026-06-23
 
+---
+
+### FIX · Pawn Hero Headline Line-Wrap (E102 / Decision 0048 follow-up)
+
+> **Persona Gate:** Sandra (Primary) — first-impression discovery moment on `/pawn` landing. Jordan (Secondary) — editorial brand quality; a wrapped hero headline reads as unpolished.
+
+**Root cause:** Decision 0048's new headline copy ("Clear Freight. Direct Trade.") wrapped to two lines on desktop, because `h1` font-size clamped to a fixed 72px ceiling regardless of the 720px content column, and wrapped on mobile because the clamp's 32px floor didn't fit the ~311px column at the 375px baseline.
+
+- [x] Removed `maxWidth: 720px` from `.pawn-hero-content` wrapper — `h1` now uses the section's full padded width `[San]`
+- [x] Retuned `h1` `fontSize` clamp from `clamp(var(--text-heading), 6vw, var(--text-hero))` to `clamp(1.375rem, 5vw, 3.75rem)`, verified empirically (not estimated) `[Jord]`
+- [x] Verified single-line, zero horizontal-overflow rendering at 375/414/768/1024/1280/1440/1920px via headless Chromium `[Comp]`
+- [x] Decision 0049 logged `[Comp]`
+- [x] **FIX_PAWN_HERO_HEADLINE_WRAP CLOSED** | 2026-07-08
+
 

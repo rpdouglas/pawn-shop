@@ -7,7 +7,7 @@
 
 ## Current Cycle
 
-**Cycle:** 32
+**Cycle:** 33
 **Started:** 2026-05-22
 **Target close:** TBD
 **Deploy target:** dev
@@ -23,6 +23,12 @@ E122 · Fireworks Hero Canvas Animation — Physics-based interval-burst canvas 
 E124 · Site Analytics: GA4 Activation & Enhanced Event Tracking — Full GA4 recommended event catalog active. UTM passthrough live. (COMPLETED)
 
 E125 · Gunmetal Club Admin Theme — Full GMC slate palette applied to admin shell. `--gmc-*` token namespace, hardcoded hex removed from AdminTopbar. Mobile stat strip, icon search, accent bar, compact stat cards. (COMPLETED)
+
+E126 · Inventory CSV Export — Client-side RFC 4180 export of active inventory. (COMPLETED)
+
+E127 · Brother POS Inventory Embed — Firestore-driven pawn inventory replaced with Brother POS `embed.js` widget. (COMPLETED)
+
+FIX · Pawn Hero Headline Line-Wrap — "Clear Freight. Direct Trade." now renders on one line at every breakpoint from 375px to 1920px. (COMPLETED)
 
 ---
 
@@ -213,6 +219,8 @@ E125 · Gunmetal Club Admin Theme — Full GMC slate palette applied to admin sh
 | `E126 Inventory CSV Export` — "↓ Export CSV" button in `InventoryPage.tsx` toolbar. Client-side RFC 4180 CSV download of all `status: active`, `policeHold !== true` items. 22 columns: prices in CAD dollars, arrays pipe-joined, dates ISO-formatted. Filename stamped with export date. Zero new dependencies. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. Decision 0043 logged. | E126 | 2026-06-18 |
 | `E127 Brother POS Inventory Embed` — Replaced Firestore-driven pawn inventory view with Brother POS `embed.js` script widget. Refactored static script tag to standalone `ShopMenu.tsx` component with ref-based target mounting, unmount cleanup, and duplicate prevention. Excluded POS widget from Axe accessibility scans, skipped obsolete/suspended E2E tests, and verified all tests pass. Decisions 0044 + 0045 logged. Updated parameters to pass revenue center, category, and clean theme (Decision 0046). Fixed Strict Mode duplicate widget rendering in development via micro-delay setTimeout and updated Axe exclusions (Decision 0047). | E127 | 2026-07-07 |
 | **E126 CLOSED** | E126 | 2026-06-18 |
+| `FIX Pawn Hero Headline Line-Wrap` — Removed `maxWidth: 720px` from `.pawn-hero-content` wrapper and retuned `h1` `fontSize` clamp from `clamp(var(--text-heading), 6vw, var(--text-hero))` to `clamp(1.375rem, 5vw, 3.75rem)`. Verified single-line rendering with zero horizontal overflow at 375/414/768/1024/1280/1440/1920px via headless Chromium. Decision 0049 logged. Build ✅ Lint ✅ Tests 29/29 ✅. | FIX_PAWN_HERO_HEADLINE_WRAP | 2026-07-08 |
+| **FIX_PAWN_HERO_HEADLINE_WRAP CLOSED** | FIX_PAWN_HERO_HEADLINE_WRAP | 2026-07-08 |
 
 ---
 
@@ -243,4 +251,4 @@ E125 · Gunmetal Club Admin Theme — Full GMC slate palette applied to admin sh
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-07-07 (Cycle 33 — E127 UPDATED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-07-08 (Cycle 33 — FIX_PAWN_HERO_HEADLINE_WRAP CLOSED)*
