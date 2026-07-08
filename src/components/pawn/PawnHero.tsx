@@ -44,7 +44,7 @@ export default function PawnHero() {
       {/* Content — staggered text reveal (approved cinematic reveal pattern §4.2) */}
       <div
         className="pawn-hero-content"
-        style={{ position: 'relative', maxWidth: '720px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
       >
         <p style={{
           fontFamily: 'var(--font-body)',
@@ -60,7 +60,7 @@ export default function PawnHero() {
 
         <h1 style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(var(--text-heading), 6vw, var(--text-hero))',
+          fontSize: 'clamp(1.375rem, 5vw, 3.75rem)',
           fontWeight: 700,
           color: 'var(--color-primary)',
           lineHeight: 1.05,
