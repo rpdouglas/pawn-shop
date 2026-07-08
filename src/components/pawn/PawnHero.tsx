@@ -67,7 +67,7 @@ export default function PawnHero() {
           letterSpacing: '-0.01em',
           marginBottom: 'var(--space-6)',
         }}>
-          Quiet confidence. Curated objects of distinction.
+          Clear Freight. Direct Trade.
         </h1>
 
         <p style={{
@@ -80,12 +80,12 @@ export default function PawnHero() {
           maxWidth: '540px',
           margin: '0 auto var(--space-8) auto',
         }}>
-          An uncompromising collection of timepieces, instruments, and heirlooms—presented with editorial precision.
+          Sourcing bulk liquidation stock and clearing the floor at rock-bottom prices. High utility, zero markup—Akwesasne’s direct pipeline to smart savings.
         </p>
 
         <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center', width: '100%', maxWidth: '380px', margin: '0 auto' }}>
           <Button variant="primary" onClick={scrollToDiscovery} style={{ flex: 1, paddingLeft: 0, paddingRight: 0, whiteSpace: 'nowrap' }}>
-            Browse Inventory
+            Browse Liquidations
           </Button>
           <Button variant="secondary" onClick={() => navigate('/pawn/sell')} style={{ flex: 1, paddingLeft: 0, paddingRight: 0, whiteSpace: 'nowrap' }}>
             Pawn or Sell

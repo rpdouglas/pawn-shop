@@ -1,6 +1,6 @@
 # Browsing the Collection
 
-Welcome to the Pawn & Resale storefront — a curated destination where discovery meets value. The shop now runs on a live, real-time inventory feed powered by Brother POS, so every item you see is exactly what's available on the floor today.
+Welcome to the Pawn & Resale storefront — Akwesasne's direct pipeline for liquidation freight and sourced inventory at rock-bottom prices. The shop runs on a live, real-time inventory feed powered by Brother POS, so every item you see is exactly what's available on the floor today.
 
 ## What You'll Find
 
