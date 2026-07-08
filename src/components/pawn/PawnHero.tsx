@@ -17,7 +17,6 @@ export default function PawnHero() {
       aria-label="Pawn Shop — find your next discovery"
       style={{
         position: 'relative',
-        minHeight: '80vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
