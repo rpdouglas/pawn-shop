@@ -30,6 +30,8 @@ E127 · Brother POS Inventory Embed — Firestore-driven pawn inventory replaced
 
 FIX · Pawn Hero Headline Line-Wrap — "Clear Freight. Direct Trade." now renders on one line at every breakpoint from 375px to 1920px. (COMPLETED)
 
+FIX · Pawn Hero Dead Space — Removed `minHeight: 80vh` floor on `PawnHero.tsx`; large empty gaps above the eyebrow text and below the CTA buttons resolved. (COMPLETED)
+
 ---
 
 ## In Progress
@@ -221,6 +223,8 @@ FIX · Pawn Hero Headline Line-Wrap — "Clear Freight. Direct Trade." now rende
 | **E126 CLOSED** | E126 | 2026-06-18 |
 | `FIX Pawn Hero Headline Line-Wrap` — Removed `maxWidth: 720px` from `.pawn-hero-content` wrapper and retuned `h1` `fontSize` clamp from `clamp(var(--text-heading), 6vw, var(--text-hero))` to `clamp(1.375rem, 5vw, 3.75rem)`. Verified single-line rendering with zero horizontal overflow at 375/414/768/1024/1280/1440/1920px via headless Chromium. Decision 0049 logged. Build ✅ Lint ✅ Tests 29/29 ✅. | FIX_PAWN_HERO_HEADLINE_WRAP | 2026-07-08 |
 | **FIX_PAWN_HERO_HEADLINE_WRAP CLOSED** | FIX_PAWN_HERO_HEADLINE_WRAP | 2026-07-08 |
+| `FIX Pawn Hero Dead Space` — Removed `minHeight: 80vh` from `PawnHero.tsx` section style; the 80vh floor was centering short text-only hero content (no media block configured) inside an artificially tall box, producing large empty gaps above the eyebrow text and below the CTA buttons. Verified gaps now match intentional padding (48px section + 32px page wrapper) at 412px and 1440px via headless Chromium. Decision 0050 logged. Build ✅ Lint ✅ Tests 29/29 ✅. | FIX_PAWN_HERO_DEAD_SPACE | 2026-07-08 |
+| **FIX_PAWN_HERO_DEAD_SPACE CLOSED** | FIX_PAWN_HERO_DEAD_SPACE | 2026-07-08 |
 
 ---
 
@@ -251,4 +255,4 @@ FIX · Pawn Hero Headline Line-Wrap — "Clear Freight. Direct Trade." now rende
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-07-08 (Cycle 33 — FIX_PAWN_HERO_HEADLINE_WRAP CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-07-08 (Cycle 33 — FIX_PAWN_HERO_DEAD_SPACE CLOSED)*

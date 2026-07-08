@@ -1910,4 +1910,17 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] Decision 0049 logged `[Comp]`
 - [x] **FIX_PAWN_HERO_HEADLINE_WRAP CLOSED** | 2026-07-08
 
+---
+
+### FIX · Pawn Hero Dead Space (E102 / Decisions 0048–0049 follow-up)
+
+> **Persona Gate:** Sandra (Primary) — first-impression discovery moment on `/pawn` landing. Jordan (Secondary) — editorial brand quality; large empty gaps read as broken layout, not intentional whitespace.
+
+**Root cause:** `PawnHero.tsx`'s section carried `minHeight: '80vh'` with `justifyContent: 'center'`, sized for a hero that centers text above an optional media block (carousel/video). With no `heroData.pawn` configured in Firestore, the media block never renders, so the short text-only content was centered inside an artificially tall 80vh box — producing large empty gaps above the eyebrow text and below the CTA buttons, before the Brother POS "Liquidation Items" section.
+
+- [x] Removed `minHeight: '80vh'` from `PawnHero.tsx` section style — section now sizes to its content `[San]`
+- [x] Verified gaps now match intentional padding (48px section + 32px page wrapper) at 412px and 1440px via headless Chromium `[Comp]`
+- [x] Decision 0050 logged `[Comp]`
+- [x] **FIX_PAWN_HERO_DEAD_SPACE CLOSED** | 2026-07-08
+
 
