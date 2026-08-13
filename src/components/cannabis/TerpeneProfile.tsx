@@ -1,8 +1,3 @@
-// NOTE (E128/E129): the `var(--x, #hex)` fallbacks in this file are load-bearing —
-// there is no .view-cannabis CSS override for --color-primary/--color-border-subtle,
-// so removing the fallbacks would silently turn this chart gold instead of purple
-// when Cannabis is reactivated (E123). Left as-is pending E129 (per-view token gap).
-
 const STANDARD_TERPENES = ['Myrcene', 'Limonene', 'Caryophyllene', 'Linalool', 'Pinene']
 
 export default function TerpeneProfile({ terpenes = [] }: { terpenes?: string[] }) {
@@ -41,7 +36,7 @@ export default function TerpeneProfile({ terpenes = [] }: { terpenes?: string[] 
         <polygon 
           points={bgPoints} 
           fill="none" 
-          stroke="var(--color-border-subtle, #333)" 
+          stroke="var(--color-border)"
           strokeWidth="1" 
         />
         
@@ -55,7 +50,7 @@ export default function TerpeneProfile({ terpenes = [] }: { terpenes?: string[] 
               y1={center} 
               x2={end.x} 
               y2={end.y} 
-              stroke="var(--color-border-subtle, #333)" 
+              stroke="var(--color-border)"
               strokeWidth="1" 
             />
           )
@@ -64,9 +59,9 @@ export default function TerpeneProfile({ terpenes = [] }: { terpenes?: string[] 
         {/* Data polygon */}
         <polygon 
           points={points} 
-          fill="var(--color-primary, #7B4FA0)" 
+          fill="var(--color-primary)"
           fillOpacity="0.4"
-          stroke="var(--color-primary, #7B4FA0)" 
+          stroke="var(--color-primary)"
           strokeWidth="2" 
         />
 
@@ -82,7 +77,7 @@ export default function TerpeneProfile({ terpenes = [] }: { terpenes?: string[] 
               key={t}
               x={lx} 
               y={ly} 
-              fill="var(--color-text-muted, #aaa)" 
+              fill="var(--color-text-muted)"
               fontSize="10"
               textAnchor="middle"
               alignmentBaseline="middle"

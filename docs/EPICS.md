@@ -1932,15 +1932,15 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 > - **Compliance:** `CLAUDE.md` guardrails ("Never hardcode hex values", "No `any` types") are explicit non-negotiables.
 > - **Makoonsii / All:** No user-facing behavior change intended — internal-quality pass only.
 
-**Status:** ✅ CLOSED (partial) · **Priority:** MEDIUM · **Cycle:** 34
+**Status:** ✅ CLOSED (hex/`any` complete, `px` triage deferred) · **Priority:** MEDIUM · **Cycle:** 34
 
-- [x] Replace hardcoded hex in 7 of 10 identified files with `--color-*` tokens / consolidated `src/lib/theme-colors.ts` `[Jord]` `[Comp]`
-- [x] 3 files (`TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx`) excluded — hex is load-bearing pending E129, see Decision 0051 `[Comp]`
+- [x] Replace hardcoded hex in all 10 identified files with `--color-*` tokens / consolidated `src/lib/theme-colors.ts` `[Jord]` `[Comp]`
+- [x] `TerpeneProfile.tsx`/`LuxuryProductCard.tsx`/`CannabisPage.tsx` completed same-day once E129 confirmed no divergent per-view palette exists — reused existing `--color-accent`/`--color-success` tokens, no new tokens needed `[Comp]`
 - [x] Resolve 3 `any` types (`AcknowledgmentWall.tsx`, `LoanTicketsAdminPage.tsx` ×2) `[Comp]`
 - [ ] Triage ~97 raw-`px` files — deferred (2 fixed incidentally in `index.css`) `[Jord]` `[Comp]`
 - [x] Zero-diff build/lint/test/tsc gates pass `[Comp]`
-- [x] Decision 0051 logged
-- [x] **E128 CLOSED (partial)** | 2026-08-13
+- [x] Decisions 0051 + 0052 logged
+- [x] **E128 CLOSED (hex/`any` complete)** | 2026-08-13
 
 See `docs/projects/E128_DESIGN_TOKEN_CLEANUP.md`, `docs/reports/AUDIT_2026-08-13.md`, and `docs/reports/FINDING_2026-08-13_VIEW_TOKEN_CSS_GAP.md`.
 
