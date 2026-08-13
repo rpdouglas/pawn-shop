@@ -2,12 +2,7 @@ import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { useView } from '../../context/ViewContext'
 import GlobalHeader from './GlobalHeader'
-
-const THEME_COLORS: Record<string, string> = {
-  pawn:      '#C8A14A',
-  cannabis:  '#7B4FA0',
-  fireworks: '#C0392B',
-}
+import { VIEW_META_THEME_COLORS } from '../../lib/theme-colors'
 
 const VIEW_META: Record<string, { title: string; description: string }> = {
   pawn: {
@@ -35,7 +30,11 @@ export default function ViewLayout({ children }: ViewLayoutProps) {
 
   useEffect(() => {
     const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
-    if (themeColor) themeColor.content = THEME_COLORS[view] ?? '#C8A14A'
+    if (themeColor) {
+      themeColor.content = view in VIEW_META_THEME_COLORS
+        ? VIEW_META_THEME_COLORS[view as 'pawn' | 'cannabis' | 'fireworks']
+        : VIEW_META_THEME_COLORS.pawn
+    }
 
     const viewMeta = VIEW_META[view]
     if (!viewMeta) return

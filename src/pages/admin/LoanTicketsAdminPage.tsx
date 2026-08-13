@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useAllLoanTickets, useProcessExtension, useRedeemLoan, useForfeitLoan } from '../../lib/useLoanTickets'
 import Table from '../../components/ui/Table'
+import type { Column } from '../../components/ui/Table'
 import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
 import { formatPrice, formatDate } from '../../lib/format'
@@ -87,7 +88,7 @@ export default function LoanTicketsAdminPage() {
   }
 
 
-  const columns = [
+  const columns: Column<LoanTicket>[] = [
     { key: 'itemDescription' as const, header: 'Item' },
     { key: 'loanAmount' as const, header: 'Amount', render: (row: LoanTicket) => formatPrice(row.loanAmount) },
     { key: 'dueDate' as const, header: 'Due Date', render: (row: LoanTicket) => formatDate(row.dueDate) },
@@ -128,11 +129,6 @@ export default function LoanTicketsAdminPage() {
     )}
   ]
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tableColumns: any = columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tableData: any = tickets
-
   return (
     <div className="p-8">
       <h1 className="text-3xl font-serif text-stone-900 mb-8">Pawn Loans</h1>
@@ -140,7 +136,7 @@ export default function LoanTicketsAdminPage() {
       {(!tickets || tickets.length === 0) ? (
         <p className="text-stone-500">No active loans.</p>
       ) : (
-        <Table columns={tableColumns} data={tableData} />
+        <Table columns={columns} data={tickets} />
       )}
 
       <PrintableTicket data={printTicket} />

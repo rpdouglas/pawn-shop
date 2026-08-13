@@ -1923,4 +1923,46 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] Decision 0050 logged `[Comp]`
 - [x] **FIX_PAWN_HERO_DEAD_SPACE CLOSED** | 2026-07-08
 
+---
+
+### E128 · Design Token & Type-Safety Cleanup
+
+> **Persona Gate — E128:**
+> - **Jordan (Primary):** Editorial brand quality — inconsistent hardcoded colours drift from the token system over time.
+> - **Compliance:** `CLAUDE.md` guardrails ("Never hardcode hex values", "No `any` types") are explicit non-negotiables.
+> - **Makoonsii / All:** No user-facing behavior change intended — internal-quality pass only.
+
+**Status:** ✅ CLOSED (partial) · **Priority:** MEDIUM · **Cycle:** 34
+
+- [x] Replace hardcoded hex in 7 of 10 identified files with `--color-*` tokens / consolidated `src/lib/theme-colors.ts` `[Jord]` `[Comp]`
+- [x] 3 files (`TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx`) excluded — hex is load-bearing pending E129, see Decision 0051 `[Comp]`
+- [x] Resolve 3 `any` types (`AcknowledgmentWall.tsx`, `LoanTicketsAdminPage.tsx` ×2) `[Comp]`
+- [ ] Triage ~97 raw-`px` files — deferred (2 fixed incidentally in `index.css`) `[Jord]` `[Comp]`
+- [x] Zero-diff build/lint/test/tsc gates pass `[Comp]`
+- [x] Decision 0051 logged
+- [x] **E128 CLOSED (partial)** | 2026-08-13
+
+See `docs/projects/E128_DESIGN_TOKEN_CLEANUP.md`, `docs/reports/AUDIT_2026-08-13.md`, and `docs/reports/FINDING_2026-08-13_VIEW_TOKEN_CSS_GAP.md`.
+
+---
+
+### E129 · Per-View CSS Token Override "Gap" — Closed As Non-Bug
+
+> Flagged 2026-08-13 during E128 as a potential correctness gap (Fireworks
+> possibly rendering Pawn gold instead of red in production). Confirmed by
+> the product owner same day: **not a bug** — the product direction unified
+> all three verticals onto one Pawn Shop theme on purpose; the distinct
+> per-view palette described in `docs/design-system.md` was designed but
+> deliberately never implemented. See Decision 0052.
+
+**Status:** ✅ CLOSED (non-bug) · **Cycle:** 34
+
+- [x] Confirmed with product owner: single unified theme is intentional, not a gap
+- [x] `CLAUDE.md` Three-View Architecture table corrected — removed per-view Primary/Font columns and the now-obsolete Cannabis-purple-contrast guardrail
+- [x] `docs/design-system.md` §1–4 marked superseded, historical tables retained for reference
+- [x] Decision 0052 logged
+- [x] Unblocks finishing E128's deferred scope (hex in `TerpeneProfile.tsx`/`LuxuryProductCard.tsx`/`CannabisPage.tsx` — tracked as follow-up, not yet done)
+
+See `docs/reports/FINDING_2026-08-13_VIEW_TOKEN_CSS_GAP.md` and `docs/decisions/0052-unified-pawn-shop-theme.md`.
+
 

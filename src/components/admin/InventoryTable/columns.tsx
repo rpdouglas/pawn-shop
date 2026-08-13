@@ -600,7 +600,7 @@ export function buildColumns(): ColumnDef<Item, unknown>[] {
             {status === 'loading' ? (
               <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>…</span>
             ) : status === 'done' ? (
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-success, #4caf50)' }}>✓</span>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-success)' }}>✓</span>
             ) : status === 'error' ? (
               <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-error)' }}>✗</span>
             ) : null}
