@@ -32,7 +32,9 @@ FIX · Pawn Hero Headline Line-Wrap — "Clear Freight. Direct Trade." now rende
 
 FIX · Pawn Hero Dead Space — Removed `minHeight: 80vh` floor on `PawnHero.tsx`; large empty gaps above the eyebrow text and below the CTA buttons resolved. (COMPLETED)
 
-E128 · Design Token & Type-Safety Cleanup — Hardcoded hex fixed in 7/10 flagged files, 3 `any` types resolved, `src/lib/theme-colors.ts` added. Discovered and flagged E129 (missing per-view CSS token overrides) along the way. (COMPLETED — partial, px triage deferred)
+E128 · Design Token & Type-Safety Cleanup — Hardcoded hex fixed in 7/10 flagged files, 3 `any` types resolved, `src/lib/theme-colors.ts` added. (COMPLETED — partial, px triage deferred)
+
+E129 · Per-View CSS Token "Gap" — Closed as non-bug; confirmed the single unified Pawn Shop theme across all verticals is intentional. `CLAUDE.md` and `design-system.md` corrected. (COMPLETED)
 
 ---
 
@@ -227,8 +229,10 @@ E128 · Design Token & Type-Safety Cleanup — Hardcoded hex fixed in 7/10 flagg
 | **FIX_PAWN_HERO_HEADLINE_WRAP CLOSED** | FIX_PAWN_HERO_HEADLINE_WRAP | 2026-07-08 |
 | `FIX Pawn Hero Dead Space` — Removed `minHeight: 80vh` from `PawnHero.tsx` section style; the 80vh floor was centering short text-only hero content (no media block configured) inside an artificially tall box, producing large empty gaps above the eyebrow text and below the CTA buttons. Verified gaps now match intentional padding (48px section + 32px page wrapper) at 412px and 1440px via headless Chromium. Decision 0050 logged. Build ✅ Lint ✅ Tests 29/29 ✅. | FIX_PAWN_HERO_DEAD_SPACE | 2026-07-08 |
 | **FIX_PAWN_HERO_DEAD_SPACE CLOSED** | FIX_PAWN_HERO_DEAD_SPACE | 2026-07-08 |
-| `E128 Design Token & Type-Safety Cleanup` — Fixed hardcoded hex in 7/10 flagged files; new `src/lib/theme-colors.ts` consolidates the 3 literal-required exceptions (YouTube brand SVG, meta theme-color, QR contrast). Fixed 3 `any` types — root cause was `Table.tsx`'s overly strict generic constraint, relaxed `Record<string, unknown>` → `object`. Fixed 2 incidental `px`/non-scale violations in `index.css`. **Gate 2 discovery:** the `.view-cannabis`/`.view-fireworks` CSS token override system described in `design-system.md` doesn't exist anywhere in the codebase — `--color-primary` etc. are defined once at `:root` and never remapped per view, meaning live Fireworks components may be rendering Pawn gold in production. Flagged as E129 (not yet spec'd) rather than fixed here; the 3 Cannabis-view files whose hex depends on this gap (`TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx`) were left untouched (comment-only) per user direction. Decision 0051 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E128 | 2026-08-13 |
+| `E128 Design Token & Type-Safety Cleanup` — Fixed hardcoded hex in 7/10 flagged files; new `src/lib/theme-colors.ts` consolidates the 3 literal-required exceptions (YouTube brand SVG, meta theme-color, QR contrast). Fixed 3 `any` types — root cause was `Table.tsx`'s overly strict generic constraint, relaxed `Record<string, unknown>` → `object`. Fixed 2 incidental `px`/non-scale violations in `index.css`. **Gate 2 discovery:** the `.view-cannabis`/`.view-fireworks` CSS token override system described in `design-system.md` doesn't exist anywhere in the codebase — `--color-primary` etc. are defined once at `:root` and never remapped per view. Flagged as E129 rather than fixed here; the 3 Cannabis-view files whose hex depends on this (`TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx`) were left untouched (comment-only) per user direction. Decision 0051 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E128 | 2026-08-13 |
 | **E128 CLOSED (partial)** | E128 | 2026-08-13 |
+| `E129 Per-View CSS Token "Gap"` — Closed as non-bug. Confirmed with product owner: distinct per-view palettes (Cannabis purple, Fireworks red) were designed but never implemented, and the product direction has since unified all three verticals onto one Pawn Shop theme (gold/black/Playfair/Lora) on purpose. `CLAUDE.md`'s Three-View Architecture table and the obsolete Cannabis-purple-contrast guardrail corrected; `docs/design-system.md` §1–4 marked superseded with historical tables retained for reference. Decision 0052 logged. Unblocks finishing E128's deferred hex cleanup as a follow-up. | E129 | 2026-08-13 |
+| **E129 CLOSED (non-bug)** | E129 | 2026-08-13 |
 
 ---
 
@@ -250,7 +254,6 @@ E128 · Design Token & Type-Safety Cleanup — Hardcoded hex fixed in 7/10 flagg
 | Question | Context | Urgency |
 |---|---|---|
 | Legal counsel on cannabis/fireworks regulation | Required before E11 features ship to prod | Before prod deploy |
-| Prioritize E129 (missing per-view CSS token overrides)? | Discovered 2026-08-13 during E128 — `.view-cannabis`/`.view-fireworks` never remap `--color-primary` etc.; live Fireworks components may be rendering Pawn gold instead of red in production. See `docs/reports/FINDING_2026-08-13_VIEW_TOKEN_CSS_GAP.md`. First step is just confirming actual behavior on deployed dev. | Needs owner triage — possibly high if confirmed live |
 
 ---
 
@@ -260,4 +263,4 @@ E128 · Design Token & Type-Safety Cleanup — Hardcoded hex fixed in 7/10 flagg
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-08-13 (Cycle 34 — E128 CLOSED partial, E129 flagged)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-08-13 (Cycle 34 — E128 CLOSED partial, E129 CLOSED non-bug)*

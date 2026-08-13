@@ -1,8 +1,11 @@
 # Finding — Per-View CSS Token Overrides Are Missing (2026-08-13)
 
 **Discovered during:** E128 (Design Token & Type-Safety Cleanup), Gate 2 verification
-**Severity:** High — potentially affects live, non-suspended production views
-**Status:** Flagged, not yet fixed or scoped as its own epic
+**Severity:** ~~High~~ **RESOLVED — not a bug.** See update below.
+**Status:** ✅ Closed as non-bug 2026-08-13. Confirmed by product owner: the
+three-vertical palette was designed but never implemented, and the product
+direction has since moved to one unified Pawn Shop theme across all views on
+purpose. See `docs/decisions/0052-unified-pawn-shop-theme.md`.
 
 ---
 
@@ -40,14 +43,21 @@ resolve correctly. That assumption was wrong — verified by reading the full
 were pulled out of E128's execution scope as a result; see the code comments left
 in each file.
 
-## Suggested Next Step (not decided — flagging for prioritization)
+## Resolution (2026-08-13)
 
-1. Confirm empirically whether `/fireworks` in the deployed dev environment
-   (`nats-rack.web.app/fireworks`) actually renders red/amber or gold — this
-   determines urgency. If it's rendering gold, this is a visible production bug
-   on a live, unsuspended view and should likely jump the queue.
-2. If confirmed, the fix is architectural: add `.view-cannabis { --color-primary: ...; --color-bg: ...; ... }` and `.view-fireworks { ... }` override blocks to `src/index.css`, remapping every per-view token in `docs/design-system.md` §1's table. This is a meaningfully sized change (touches the core theming file, needs a visual regression pass on all three views) and should go through the project's normal spec-first workflow as its own epic (tentatively E129) rather than being folded into E128's cleanup scope.
-3. Once the real override exists, the fallback hex in `TerpeneProfile.tsx` / `LuxuryProductCard.tsx` / `CannabisPage.tsx` (and the `--color-primary-dim` / `--color-border-subtle` tokens they're waiting on) can be safely formalized — that remaining piece of E128 becomes trivial once E129 lands.
+Confirmed by the product owner: the distinct per-view palette (Cannabis
+purple, Fireworks red) was designed but the product direction changed to a
+single unified Pawn Shop theme (gold/black/Playfair/Lora) across all three
+verticals, on purpose. The code already correctly implements this — `:root`
+defining the tokens once, with no per-view override, is not a gap, it's the
+intended architecture for a one-theme product. No code fix needed.
+
+**Follow-up:** this unblocks finishing E128's deferred scope — the hex left
+in `TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, and `CannabisPage.tsx` was
+excluded because it looked load-bearing pending this exact question. Now that
+there's no future divergent palette to protect, those fallbacks can be
+formalized/removed as a small follow-up. See
+`docs/decisions/0052-unified-pawn-shop-theme.md`.
 
 ---
 

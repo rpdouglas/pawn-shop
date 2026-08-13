@@ -1946,20 +1946,23 @@ See `docs/projects/E128_DESIGN_TOKEN_CLEANUP.md`, `docs/reports/AUDIT_2026-08-13
 
 ---
 
-### E129 · Per-View CSS Token Override System (Not Yet Spec'd)
+### E129 · Per-View CSS Token Override "Gap" — Closed As Non-Bug
 
-> **Persona Gate — E129 (preliminary):**
-> - **Tanya (Primary):** If `/fireworks` is rendering Pawn gold instead of Fireworks red in production, this is a live first-impression bug directly on her primary view.
-> - **Marie:** Cannabis is currently suspended (E123) so not customer-visible, but the same gap applies and must be fixed before any reactivation.
-> - **Jordan / Compliance:** The three-view theming system is a foundational guardrail (`CLAUDE.md`, `docs/design-system.md` §1) — if it was never actually wired up at the CSS layer, that's a correctness gap, not a style nit.
+> Flagged 2026-08-13 during E128 as a potential correctness gap (Fireworks
+> possibly rendering Pawn gold instead of red in production). Confirmed by
+> the product owner same day: **not a bug** — the product direction unified
+> all three verticals onto one Pawn Shop theme on purpose; the distinct
+> per-view palette described in `docs/design-system.md` was designed but
+> deliberately never implemented. See Decision 0052.
 
-**Status:** 🔴 NOT STARTED (flagged 2026-08-13, discovered during E128) · **Priority:** TBD — pending confirmation of production impact · **Cycle:** TBD
+**Status:** ✅ CLOSED (non-bug) · **Cycle:** 34
 
-- [ ] Confirm whether `/fireworks` on deployed dev renders red/amber or gold in practice
-- [ ] If confirmed: add `.view-cannabis`/`.view-fireworks` CSS override blocks to `src/index.css`, remapping every per-view token in `docs/design-system.md` §1
-- [ ] Visual regression pass on all three views
-- [ ] Unblocks formalizing the hex left in place by E128 (`TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx`)
+- [x] Confirmed with product owner: single unified theme is intentional, not a gap
+- [x] `CLAUDE.md` Three-View Architecture table corrected — removed per-view Primary/Font columns and the now-obsolete Cannabis-purple-contrast guardrail
+- [x] `docs/design-system.md` §1–4 marked superseded, historical tables retained for reference
+- [x] Decision 0052 logged
+- [x] Unblocks finishing E128's deferred scope (hex in `TerpeneProfile.tsx`/`LuxuryProductCard.tsx`/`CannabisPage.tsx` — tracked as follow-up, not yet done)
 
-See `docs/reports/FINDING_2026-08-13_VIEW_TOKEN_CSS_GAP.md` for full evidence. Needs its own spec doc (`docs/projects/E129_...md`) and `/plan` before execution — not yet started.
+See `docs/reports/FINDING_2026-08-13_VIEW_TOKEN_CSS_GAP.md` and `docs/decisions/0052-unified-pawn-shop-theme.md`.
 
 

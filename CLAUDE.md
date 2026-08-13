@@ -24,11 +24,13 @@ Brand voice: **Dapper. Debonair. Distinctly Akwesasne.**
 
 ## Three-View Architecture
 
-| View | Route | Age Gate | CSS Class | Primary | Font |
-|---|---|---|---|---|---|
-| Pawn | `/pawn` | None | `.view-pawn` | `#C8A14A` Gold | Playfair Display / IM Fell English |
-| Cannabis | `/cannabis` | 19+ | `.view-cannabis` | `#7B4FA0` Purple | Cormorant Garamond / DM Sans |
-| Fireworks | `/fireworks` | 18+ | `.view-fireworks` | `#C0392B` Red | Bebas Neue / Oswald |
+| View | Route | Age Gate | CSS Class |
+|---|---|---|---|
+| Pawn | `/pawn` | None | `.view-pawn` |
+| Cannabis | `/cannabis` | 19+ | `.view-cannabis` |
+| Fireworks | `/fireworks` | 18+ | `.view-fireworks` |
+
+**Unified visual theme (Decision 0052):** All views share one palette and typography — `#C8A14A` Gold on `#080706` Near-black, Playfair Display / Lora. Distinct per-view palettes (Cannabis purple, Fireworks red) were originally designed but never implemented at the CSS layer, and the product direction has since settled on one Pawn Shop identity across all verticals. Routes, age gates, and content remain per-view — only the visual theme is unified. The `.view-*` CSS class is still applied per view for structural/JS hooks; it no longer carries different `--color-*`/`--font-*`/`--motion-*` token values.
 
 ---
 
@@ -45,7 +47,6 @@ Do not proceed if any of these would be violated.
 - Never use JS conditionals for view theming. Use `.view-*` CSS class from `ViewContext`.
 - Never hardcode font sizes. Use `--text-*` scale tokens (`--text-hero` → `--text-xs`).
 - Never hardcode spacing values. Use `--space-*` tokens (`--space-1` → `--space-24`).
-- Cannabis view: `--color-primary` (`#7B4FA0`) on `--color-bg` is only 2.8:1 contrast — use at `--text-subheading` (24px) or larger only. Never for body copy or labels.
 - Motion: use only the approved patterns in `docs/design-system.md §4`. Bounce, particle effects, and constant micro-animations are prohibited and are a QA blocker.
 
 **Compliance — hard stops:**

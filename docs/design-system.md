@@ -4,6 +4,17 @@
 > This file is the AI-readable extract of the master design system. The DOCX is the design authority; this file is the machine-readable version for planning, execution, and QA.
 > When the DOCX changes, update this file to match.
 
+> **⚠ Superseded — Decision 0052 (2026-08-13):** Sections 1–4 below describe a
+> **three-palette system (Pawn gold / Cannabis purple / Fireworks red)** that
+> was designed but never implemented at the CSS layer, and the product
+> direction has since moved to **one unified Pawn Shop theme across all
+> verticals** — gold on near-black, Playfair Display / Lora, everywhere.
+> Routes, age gates, and content still differ per view; the visual theme does
+> not. The tables below are kept for historical/reference context (they match
+> the original DOCX) but **do not reflect the live token values in
+> `src/index.css`**, which define one theme only. See
+> `docs/decisions/0052-unified-pawn-shop-theme.md`.
+
 ---
 
 ## 1. Design Token Reference (Complete CSS Custom Properties)
