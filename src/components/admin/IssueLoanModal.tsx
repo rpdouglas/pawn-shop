@@ -630,7 +630,7 @@ export default function IssueLoanModal({
                 cursor: 'crosshair',
                 touchAction: 'none',
                 display: 'block',
-                background: '#fff',
+                background: 'var(--color-signature-bg)',
               }}
             />
             <button

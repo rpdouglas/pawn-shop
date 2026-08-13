@@ -3,20 +3,20 @@ import type { ReactNode } from 'react'
 
 type SortDirection = 'asc' | 'desc'
 
-interface Column<T> {
+export interface Column<T> {
   key: keyof T & string
   header: string
   sortable?: boolean
   render?: (row: T) => ReactNode
 }
 
-interface TableProps<T extends Record<string, unknown>> {
+interface TableProps<T extends object> {
   columns: Column<T>[]
   data: T[]
   onSort?: (key: string, direction: SortDirection) => void
 }
 
-export default function Table<T extends Record<string, unknown>>({
+export default function Table<T extends object>({
   columns,
   data,
   onSort,

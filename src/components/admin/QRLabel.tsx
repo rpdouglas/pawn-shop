@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
 import type { ViewType } from '../../lib/types'
 import { formatPrice } from '../../lib/format'
+import { QR_CODE_COLORS } from '../../lib/theme-colors'
 
 interface QRLabelProps {
   id: string
@@ -18,7 +19,7 @@ export default function QRLabel({ id, title, price, viewTag }: QRLabelProps) {
     QRCode.toDataURL(itemUrl, {
       width: 160,
       margin: 1,
-      color: { dark: '#080706', light: '#F5F0E8' },
+      color: QR_CODE_COLORS,
     }).then(setQrDataUrl).catch(() => {})
   }, [itemUrl])
 

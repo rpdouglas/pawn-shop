@@ -1932,14 +1932,34 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 > - **Compliance:** `CLAUDE.md` guardrails ("Never hardcode hex values", "No `any` types") are explicit non-negotiables.
 > - **Makoonsii / All:** No user-facing behavior change intended — internal-quality pass only.
 
-**Status:** 🟡 SPEC · **Priority:** MEDIUM · **Cycle:** 34
+**Status:** ✅ CLOSED (partial) · **Priority:** MEDIUM · **Cycle:** 34
 
-- [ ] Replace hardcoded hex in 10 identified files with `--color-*` tokens `[Jord]` `[Comp]`
-- [ ] Resolve 3 `any` types (`AcknowledgmentWall.tsx`, `LoanTicketsAdminPage.tsx` ×2) `[Comp]`
-- [ ] Triage ~97 raw-`px` files; fix real `--space-*`/`--text-*` violations, document accepted exceptions `[Jord]` `[Comp]`
-- [ ] Zero-diff build/lint/test/tsc gates pass `[Comp]`
-- [ ] Decision(s) logged
+- [x] Replace hardcoded hex in 7 of 10 identified files with `--color-*` tokens / consolidated `src/lib/theme-colors.ts` `[Jord]` `[Comp]`
+- [x] 3 files (`TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx`) excluded — hex is load-bearing pending E129, see Decision 0051 `[Comp]`
+- [x] Resolve 3 `any` types (`AcknowledgmentWall.tsx`, `LoanTicketsAdminPage.tsx` ×2) `[Comp]`
+- [ ] Triage ~97 raw-`px` files — deferred (2 fixed incidentally in `index.css`) `[Jord]` `[Comp]`
+- [x] Zero-diff build/lint/test/tsc gates pass `[Comp]`
+- [x] Decision 0051 logged
+- [x] **E128 CLOSED (partial)** | 2026-08-13
 
-See `docs/projects/E128_DESIGN_TOKEN_CLEANUP.md` and `docs/reports/AUDIT_2026-08-13.md`.
+See `docs/projects/E128_DESIGN_TOKEN_CLEANUP.md`, `docs/reports/AUDIT_2026-08-13.md`, and `docs/reports/FINDING_2026-08-13_VIEW_TOKEN_CSS_GAP.md`.
+
+---
+
+### E129 · Per-View CSS Token Override System (Not Yet Spec'd)
+
+> **Persona Gate — E129 (preliminary):**
+> - **Tanya (Primary):** If `/fireworks` is rendering Pawn gold instead of Fireworks red in production, this is a live first-impression bug directly on her primary view.
+> - **Marie:** Cannabis is currently suspended (E123) so not customer-visible, but the same gap applies and must be fixed before any reactivation.
+> - **Jordan / Compliance:** The three-view theming system is a foundational guardrail (`CLAUDE.md`, `docs/design-system.md` §1) — if it was never actually wired up at the CSS layer, that's a correctness gap, not a style nit.
+
+**Status:** 🔴 NOT STARTED (flagged 2026-08-13, discovered during E128) · **Priority:** TBD — pending confirmation of production impact · **Cycle:** TBD
+
+- [ ] Confirm whether `/fireworks` on deployed dev renders red/amber or gold in practice
+- [ ] If confirmed: add `.view-cannabis`/`.view-fireworks` CSS override blocks to `src/index.css`, remapping every per-view token in `docs/design-system.md` §1
+- [ ] Visual regression pass on all three views
+- [ ] Unblocks formalizing the hex left in place by E128 (`TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx`)
+
+See `docs/reports/FINDING_2026-08-13_VIEW_TOKEN_CSS_GAP.md` for full evidence. Needs its own spec doc (`docs/projects/E129_...md`) and `/plan` before execution — not yet started.
 
 

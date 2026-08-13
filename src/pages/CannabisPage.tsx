@@ -171,6 +171,8 @@ export default function CannabisPage() {
               fontSize: '0.58rem',
               letterSpacing: '0.15em',
               textTransform: 'uppercase',
+              // NOTE (E128/E129): fallback is load-bearing — --color-primary-dim is undefined
+              // and there is no .view-cannabis CSS override. See E129.
               color: 'var(--color-primary-dim, #7A6030)',
             }}>
               <span style={{ color: 'var(--color-primary)' }}>{displayItems.length}</span> products

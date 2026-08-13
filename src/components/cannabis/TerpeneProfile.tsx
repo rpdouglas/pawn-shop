@@ -1,4 +1,7 @@
-
+// NOTE (E128/E129): the `var(--x, #hex)` fallbacks in this file are load-bearing —
+// there is no .view-cannabis CSS override for --color-primary/--color-border-subtle,
+// so removing the fallbacks would silently turn this chart gold instead of purple
+// when Cannabis is reactivated (E123). Left as-is pending E129 (per-view token gap).
 
 const STANDARD_TERPENES = ['Myrcene', 'Limonene', 'Caryophyllene', 'Linalool', 'Pinene']
 

@@ -3,6 +3,13 @@ import TagBadge from './TagBadge'
 import type { MerchandisingTag, CannabisProfile } from '../../lib/types'
 import type { LayoutMode } from '../ui/LayoutToggle'
 
+// NOTE (E128/E129): the `var(--color-primary-dim, #7A6030)` fallbacks and the raw
+// `#5a9e6a` savings-green below are load-bearing — --color-primary-dim is not
+// defined anywhere in src/index.css, and there is no .view-cannabis CSS override,
+// so these hex values are currently the only source of truth for this component's
+// coloring. Left as-is pending E129 (per-view token gap) rather than removed or
+// half-fixed here.
+
 interface LuxuryProductCardProps {
   title: string
   price: number
