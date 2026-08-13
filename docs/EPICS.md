@@ -1923,4 +1923,23 @@ was never migrated from the pre-E34 monolith — tracked as E98.
 - [x] Decision 0050 logged `[Comp]`
 - [x] **FIX_PAWN_HERO_DEAD_SPACE CLOSED** | 2026-07-08
 
+---
+
+### E128 · Design Token & Type-Safety Cleanup
+
+> **Persona Gate — E128:**
+> - **Jordan (Primary):** Editorial brand quality — inconsistent hardcoded colours drift from the token system over time.
+> - **Compliance:** `CLAUDE.md` guardrails ("Never hardcode hex values", "No `any` types") are explicit non-negotiables.
+> - **Makoonsii / All:** No user-facing behavior change intended — internal-quality pass only.
+
+**Status:** 🟡 SPEC · **Priority:** MEDIUM · **Cycle:** 34
+
+- [ ] Replace hardcoded hex in 10 identified files with `--color-*` tokens `[Jord]` `[Comp]`
+- [ ] Resolve 3 `any` types (`AcknowledgmentWall.tsx`, `LoanTicketsAdminPage.tsx` ×2) `[Comp]`
+- [ ] Triage ~97 raw-`px` files; fix real `--space-*`/`--text-*` violations, document accepted exceptions `[Jord]` `[Comp]`
+- [ ] Zero-diff build/lint/test/tsc gates pass `[Comp]`
+- [ ] Decision(s) logged
+
+See `docs/projects/E128_DESIGN_TOKEN_CLEANUP.md` and `docs/reports/AUDIT_2026-08-13.md`.
+
 
