@@ -50,17 +50,29 @@ sub-brands. This also matches the current suspension of Cannabis (E123) —
 when/if it's reactivated, it will use the same unified gold theme, not a
 separate purple palette.
 
-## Consequences for E128's Deferred Scope
+## Consequences for E128's Deferred Scope — Completed Same Day
 
 E128 excluded `TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, and
 `CannabisPage.tsx` from its hex cleanup because their `var(--x, #hex)`
 fallbacks (`#7B4FA0`, `#7A6030`, `#5a9e6a`) appeared load-bearing pending
-resolution of the per-view token question. With that question now resolved —
-there is no future divergent per-view palette to preserve — those fallbacks
-are provably dead weight (`--color-primary` is always defined at `:root` and
-always resolves to gold; `--color-primary-dim` was never defined at all and
-should either be formalized as a real token or the reference simplified). This
-unblocks finishing that piece of E128's original scope as a small follow-up.
+resolution of the per-view token question. With that question resolved, the
+follow-up was completed immediately:
+
+- `TerpeneProfile.tsx` — dead fallbacks removed (`--color-primary`,
+  `--color-text-muted` were already defined at `:root`); the never-defined
+  `--color-border-subtle` replaced with the existing `--color-border` token.
+- `LuxuryProductCard.tsx` and `CannabisPage.tsx` — `var(--color-primary-dim, #7A6030)`
+  replaced with the existing `--color-accent` token (`#B8963E`, already
+  documented as "Brass / muted bronze" — the semantically correct match, no
+  new token needed). The raw `#5a9e6a` savings-green replaced with the
+  existing `--color-success` token.
+- `src/lib/theme-colors.ts`'s `VIEW_META_THEME_COLORS` per-view map
+  (`cannabis: '#7B4FA0'`, `fireworks: '#C0392B'`) collapsed to a single
+  `META_THEME_COLOR` constant — the `<meta name="theme-color">` tag no longer
+  needs a per-view lookup either.
+
+Zero non-Pawn hex values remain anywhere in `src/`. Verified: `npm run build`,
+`npm run lint`, `npm run test` (29/29), `npx tsc -b` (functions) all pass.
 
 ## Documentation Corrected
 

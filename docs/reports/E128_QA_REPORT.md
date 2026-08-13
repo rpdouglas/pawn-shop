@@ -29,8 +29,7 @@ change confined to `src/**`. **Schema sync: complete — no changes to
 
 | Category | Rule | Result |
 |----------|------|--------|
-| Colours | No hardcoded hex in fixed files | ✅ `columns.tsx`, `IssueLoanModal.tsx`, `YouTubeFacade.tsx`, `ViewLayout.tsx`, `QRLabel.tsx` now token/constant-driven |
-| Colours (documented exception) | 3 files intentionally excluded | ⚠️ `TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx` left unchanged — hex is load-bearing pending E129 (see Decision 0051, code comments in each file) |
+| Colours | No hardcoded hex anywhere in `src/` | ✅ All 10 originally flagged files fixed. `columns.tsx`, `IssueLoanModal.tsx`, `YouTubeFacade.tsx`, `ViewLayout.tsx`, `QRLabel.tsx` fixed first pass; `TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx` completed same day once E129 confirmed no divergent per-view palette exists (reused `--color-accent`/`--color-success`, no new tokens) |
 | `any` types | None remain in target files | ✅ `AcknowledgmentWall.tsx` and `LoanTicketsAdminPage.tsx` both clean |
 | Spacing/font-size | 2 incidental fixes | ✅ `.portal-logo-wrap` width and `.portal-subtitle` font-size in `index.css` now use existing tokens |
 | `px` full triage | Not completed | ⚠️ Deferred — ~97 flagged files, only the 2 above fixed (found incidentally during Gate 2 file reads, not a full sweep) |

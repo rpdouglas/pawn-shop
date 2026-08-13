@@ -3,13 +3,6 @@ import TagBadge from './TagBadge'
 import type { MerchandisingTag, CannabisProfile } from '../../lib/types'
 import type { LayoutMode } from '../ui/LayoutToggle'
 
-// NOTE (E128/E129): the `var(--color-primary-dim, #7A6030)` fallbacks and the raw
-// `#5a9e6a` savings-green below are load-bearing — --color-primary-dim is not
-// defined anywhere in src/index.css, and there is no .view-cannabis CSS override,
-// so these hex values are currently the only source of truth for this component's
-// coloring. Left as-is pending E129 (per-view token gap) rather than removed or
-// half-fixed here.
-
 interface LuxuryProductCardProps {
   title: string
   price: number
@@ -125,7 +118,7 @@ export default function LuxuryProductCard({
                 <span style={{ color: 'var(--color-text)' }}>{thcLabel}{cbdLabel}</span>
               </div>
               <div style={{ height: '3px', background: 'rgba(200,161,74,0.12)', borderRadius: '2px', overflow: 'hidden' }}>
-                <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--color-primary-dim, #7A6030), var(--color-primary))', width: `${thcPct}%` }} />
+                <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--color-accent), var(--color-primary))', width: `${thcPct}%` }} />
               </div>
             </div>
           )}
@@ -154,7 +147,7 @@ export default function LuxuryProductCard({
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--color-text-muted)', textDecoration: 'line-through' }}>
             ~${(compareUsdPrice / 100).toFixed(2)} USD across the border
           </div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#5a9e6a', textTransform: 'uppercase', marginTop: '0.1rem' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--color-success)', textTransform: 'uppercase', marginTop: '0.1rem' }}>
             Save ~${(actualSavingsCad / 100).toFixed(2)} CAD
           </div>
         </div>
@@ -232,7 +225,7 @@ export default function LuxuryProductCard({
               <span style={{ color: 'var(--color-text)' }}>{thcLabel}{cbdLabel}</span>
             </div>
             <div style={{ height: '3px', background: 'rgba(200,161,74,0.12)', borderRadius: '2px', overflow: 'hidden' }}>
-              <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--color-primary-dim, #7A6030), var(--color-primary))', width: `${thcPct}%` }} />
+              <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--color-accent), var(--color-primary))', width: `${thcPct}%` }} />
             </div>
           </div>
         )}
@@ -268,7 +261,7 @@ export default function LuxuryProductCard({
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--color-text-muted)', textDecoration: 'line-through' }}>
               ~${(compareUsdPrice / 100).toFixed(2)} USD across the border
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#5a9e6a', textTransform: 'uppercase', marginTop: '0.1rem' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--color-success)', textTransform: 'uppercase', marginTop: '0.1rem' }}>
               Save ~${(actualSavingsCad / 100).toFixed(2)} CAD
             </div>
           </div>

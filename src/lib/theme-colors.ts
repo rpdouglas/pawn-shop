@@ -12,12 +12,12 @@ export const YOUTUBE_BRAND_COLORS = {
   playButtonWhite: '#fff',
 } as const
 
-/** <meta name="theme-color"> per view — mirrors --color-primary in src/index.css. Views without an entry (e.g. tobacco) fall back to VIEW_META_THEME_COLORS.pawn. */
-export const VIEW_META_THEME_COLORS: Record<'pawn' | 'cannabis' | 'fireworks', string> = {
-  pawn: '#C8A14A',
-  cannabis: '#7B4FA0',
-  fireworks: '#C0392B',
-}
+/**
+ * <meta name="theme-color"> — mirrors --color-primary in src/index.css.
+ * One unified Pawn Shop theme across all views (Decision 0052) — same value
+ * for every route, not a per-view lookup.
+ */
+export const META_THEME_COLOR = '#C8A14A'
 
 /** QR code generator contrast pair — literal values required by the `qrcode` library's color option, tuned for scan reliability rather than view theme. Mirrors Pawn --color-bg/--color-text. */
 export const QR_CODE_COLORS = {

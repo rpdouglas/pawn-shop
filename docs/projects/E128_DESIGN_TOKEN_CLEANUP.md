@@ -1,7 +1,7 @@
 # E128 — Design Token & Type-Safety Cleanup
-**Status:** ✅ CLOSED (partial — see Scope Adjustment) — 2026-08-13
+**Status:** ✅ CLOSED (hex + `any` complete; `px` triage deferred) — 2026-08-13
 **Priority:** MEDIUM
-**Effort:** 0.5 developer-days (actual)
+**Effort:** 0.75 developer-days (actual)
 **Cycle:** 34
 
 ---
@@ -68,13 +68,15 @@ same category of violation for a different file set.
 
 ## Acceptance Criteria
 
-- [x] Zero hardcoded hex values remain in 7 of the 10 identified files
-      (`InventoryTable/columns.tsx`, `IssueLoanModal.tsx`, `QRLabel.tsx`,
-      `YouTubeFacade.tsx`, `ViewLayout.tsx` fixed/consolidated;
+- [x] Zero hardcoded hex values remain in any of the 10 identified files.
+      7 fixed same-day (`InventoryTable/columns.tsx`, `IssueLoanModal.tsx`,
+      `QRLabel.tsx`, `YouTubeFacade.tsx`, `ViewLayout.tsx` fixed/consolidated;
       `SerialBlacklistManager.tsx` and `ItemQuickView.tsx` were false
       positives, no change needed). The remaining 3
-      (`TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx`) are
-      **documented exceptions** — see Scope Adjustment below and Decision 0051.
+      (`TerpeneProfile.tsx`, `LuxuryProductCard.tsx`, `CannabisPage.tsx`) were
+      initially excluded pending the E129 investigation, then completed the
+      same day once E129 confirmed no divergent per-view palette exists — see
+      Decisions 0051 and 0052.
 - [x] Zero `any` types remain in `AcknowledgmentWall.tsx` and
       `LoanTicketsAdminPage.tsx`.
 - [ ] `px`-value triage — **deferred**, not completed this cycle (beyond the
