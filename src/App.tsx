@@ -17,10 +17,11 @@ export default function App() {
 
         <footer className="site-footer">
           <nav aria-label="Footer navigation">
-            <Link to="/contact"       className="site-footer-link">Contact</Link>
-            <Link to="/accessibility" className="site-footer-link">Accessibility</Link>
-            <Link to="/privacy"       className="site-footer-link">Privacy Policy</Link>
-            <Link to="/terms"         className="site-footer-link">Terms of Use</Link>
+            <Link to="/contact"          className="site-footer-link">Contact</Link>
+            <Link to="/accessibility"    className="site-footer-link">Accessibility</Link>
+            <Link to="/privacy"          className="site-footer-link">Privacy Policy</Link>
+            <Link to="/terms"            className="site-footer-link">Terms of Use</Link>
+            <Link to="/border-crossing"  className="site-footer-link">Border Crossing</Link>
           </nav>
           <p className="site-footer-copy">
             © {new Date().getFullYear()} The Pawn Shop · Cornwall Island, Akwesasne

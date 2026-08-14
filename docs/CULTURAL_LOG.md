@@ -25,4 +25,10 @@ This log tracks manual community sign-offs for Kanien'kéha language content and
 - **Reviewer:** Antigravity (Linguistic_Auditor)
 - **Decision:** Approved (Place name usage is English proper noun)
 
+- **Date:** 2026-08-14
+- **Content:** Kawehno:ke (Cornwall Island), Kana:takon (St. Regis), Tsi Snaihne (Snye) — place names used in the Border Crossing Guide page. Content sourced verbatim from a source document (`Border_Crossing_Guide.docx`) supplied directly by the business owner, not AI-generated.
+- **Location:** [BorderCrossingPage.tsx](file:///workspaces/pawn-shop/src/pages/BorderCrossingPage.tsx)
+- **Reviewer:** Claude (session, per existing 2026-05-20 precedent)
+- **Decision:** Approved (Place name usage is English proper noun, consistent with prior baseline scan; content itself is user-supplied, not AI-authored)
+
 *Add new entries above this line.*

@@ -38,6 +38,8 @@ E129 · Per-View CSS Token "Gap" — Closed as non-bug; confirmed the single uni
 
 E130 · Raw `px` Value Triage — All 97 flagged files triaged by reading CSS context, not just grepped. 57 real violations fixed across 15 files using existing tokens; ~480 legitimate exceptions (borders, WCAG touch targets, one-off dimensions, no-scale-match values) documented, not touched. (COMPLETED)
 
+E131 · Border Crossing Guide Page — New static page at `/border-crossing`, linked in the global site footer, explaining the Cornwall CBSA domestic-lane crossing for customers travelling from Cornwall Island. (COMPLETED)
+
 ---
 
 ## In Progress
@@ -238,6 +240,8 @@ E130 · Raw `px` Value Triage — All 97 flagged files triaged by reading CSS co
 | `E128 hex cleanup follow-up` — With E129 resolved, finished `TerpeneProfile.tsx`/`LuxuryProductCard.tsx`/`CannabisPage.tsx`: reused existing `--color-accent` (brass/bronze) and `--color-success` tokens instead of inventing new ones. `theme-colors.ts`'s per-view `VIEW_META_THEME_COLORS` map collapsed to a single `META_THEME_COLOR` constant. Zero non-Pawn hex remains anywhere in `src/`. Decision 0052 updated. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E128 | 2026-08-13 |
 | `E130 Raw px Value Triage` — Read the CSS context around every `px` literal in the 97 flagged files rather than blind-grepping. Found 57 real `--space-*`/`--text-*`/`--radius-*` violations (across 15 files, all using existing tokens — no new tokens needed) and confirmed the remaining ~480 occurrences are legitimate: hairline borders, WCAG 44/48px touch targets (verified 100% via sampling), one-off component dimensions, and values with no exact scale match (left literal rather than approximated, per Decision 0051/0052 precedent). Decision 0053 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E130 | 2026-08-13 |
 | **E130 CLOSED** | E130 | 2026-08-13 |
+| `E131 Border Crossing Guide Page` — New static page at `/border-crossing`, content transcribed verbatim from a customer guide the business owner supplied. Structured like `AccessibilityPage.tsx` (the cleanest existing static-page precedent), new token-driven `.border-crossing-*` CSS classes. Footer link added to the global `<footer>` in `App.tsx` — appears on every route automatically. Cultural Log entry added for Kanien'kéha place names (Kawehno:ke, Kana:takon, Tsi Snaihne), consistent with the existing approved precedent. Decision 0054 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E131 | 2026-08-14 |
+| **E131 CLOSED** | E131 | 2026-08-14 |
 
 ---
 
@@ -268,4 +272,4 @@ E130 · Raw `px` Value Triage — All 97 flagged files triaged by reading CSS co
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-08-13 (Cycle 34 — E128 CLOSED, E129 CLOSED non-bug, E130 CLOSED)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-08-14 (Cycle 34 — E128 CLOSED, E129 CLOSED non-bug, E130 CLOSED, E131 CLOSED)*
