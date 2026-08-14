@@ -1984,4 +1984,25 @@ See `docs/reports/FINDING_2026-08-13_VIEW_TOKEN_CSS_GAP.md` and `docs/decisions/
 
 See `docs/projects/E130_PX_TRIAGE.md`, `docs/plans/E130_PX_TRIAGE_PLAN.md`, `docs/decisions/0053-e130-px-triage-execution.md`.
 
+---
+
+### E131 · Border Crossing Guide Page
+
+> **Persona Gate — E131:**
+> - **Dale (Primary):** This page exists specifically for him — removing uncertainty about the border crossing is a direct trust/friction-removal feature for the Cross-Border Bargain Hunter.
+> - **Makoonsii (Secondary):** Plain-language explanation, WCAG-compliant structure matching the Accessibility page's standard.
+> - **Compliance:** Content transcribed verbatim from a source document the business owner supplied. Kanien'kéha place names (Kawehno:ke, Kana:takon, Tsi Snaihne) are user-supplied proper nouns, not AI-generated, consistent with the existing `docs/CULTURAL_LOG.md` precedent.
+
+**Status:** ✅ CLOSED · **Priority:** MEDIUM · **Cycle:** 34
+
+- [x] `src/pages/BorderCrossingPage.tsx` — static page matching `AccessibilityPage.tsx` structure `[Dale]` `[Mak]`
+- [x] New `.border-crossing-*` CSS classes, token-driven, mirroring `.accessibility-*` `[Jord]` `[Comp]`
+- [x] Route `/border-crossing` added to `main.tsx`, no age gate `[All]`
+- [x] Footer link added to `App.tsx` (global — appears on every page) `[All]`
+- [x] Cultural Log entry for Kanien'kéha place names `[Comp]`
+- [x] Decision 0054 logged
+- [x] **E131 CLOSED** | 2026-08-14
+
+See `docs/projects/E131_BORDER_CROSSING_GUIDE.md`.
+
 
