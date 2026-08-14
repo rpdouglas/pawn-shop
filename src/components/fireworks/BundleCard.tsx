@@ -57,7 +57,7 @@ export default function BundleCard({
           }}>
             <span style={{
               fontFamily: 'var(--font-display)',
-              fontSize: '20px',
+              fontSize: 'var(--text-lead)',
               color: 'var(--color-text)',
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
@@ -85,7 +85,7 @@ export default function BundleCard({
           fontFamily: 'var(--font-body)',
           fontSize: '13px',
           color: 'var(--color-text-muted)',
-          margin: '0 0 16px',
+          margin: '0 0 var(--space-4)',
         }}>
           {itemCount} {itemCount === 1 ? 'item' : 'items'} included
         </p>
@@ -98,13 +98,13 @@ export default function BundleCard({
         }}>
           <span style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '24px',
+            fontSize: 'var(--text-subheading)',
             color: 'var(--color-primary)',
             letterSpacing: '0.02em',
           }}>
             {formatPrice(price)}
           </span>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
             <ShareButton 
               title={title} 
               url={`${window.location.origin}/item/${itemId}`} 

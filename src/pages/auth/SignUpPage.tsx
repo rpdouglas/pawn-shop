@@ -176,7 +176,7 @@ const pageStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: '24px 16px',
+  padding: 'var(--space-6) var(--space-4)',
 }
 
 const cardStyle: React.CSSProperties = {
@@ -185,14 +185,14 @@ const cardStyle: React.CSSProperties = {
   backgroundColor: 'var(--color-surface)',
   border: '1px solid var(--color-border)',
   borderRadius: 'var(--radius-lg)',
-  padding: '40px 32px',
+  padding: '40px var(--space-8)',
 }
 
 const headingStyle: React.CSSProperties = {
   fontFamily: 'var(--font-display)',
   fontSize: '28px',
   color: 'var(--color-text)',
-  marginBottom: '24px',
+  marginBottom: 'var(--space-6)',
 }
 
 const formStyle: React.CSSProperties = {
@@ -212,10 +212,10 @@ const consentLabelStyle: React.CSSProperties = {
 
 const footerStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
-  fontSize: '14px',
+  fontSize: 'var(--text-small)',
   color: 'var(--color-text-muted)',
   textAlign: 'center',
-  marginTop: '24px',
+  marginTop: 'var(--space-6)',
 }
 
 const linkStyle: React.CSSProperties = {

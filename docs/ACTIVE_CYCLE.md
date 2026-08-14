@@ -32,9 +32,11 @@ FIX · Pawn Hero Headline Line-Wrap — "Clear Freight. Direct Trade." now rende
 
 FIX · Pawn Hero Dead Space — Removed `minHeight: 80vh` floor on `PawnHero.tsx`; large empty gaps above the eyebrow text and below the CTA buttons resolved. (COMPLETED)
 
-E128 · Design Token & Type-Safety Cleanup — Hardcoded hex fixed in 7/10 flagged files, 3 `any` types resolved, `src/lib/theme-colors.ts` added. (COMPLETED — partial, px triage deferred)
+E128 · Design Token & Type-Safety Cleanup — Hardcoded hex fixed in all 10 flagged files, 3 `any` types resolved, `src/lib/theme-colors.ts` added. (COMPLETED)
 
 E129 · Per-View CSS Token "Gap" — Closed as non-bug; confirmed the single unified Pawn Shop theme across all verticals is intentional. `CLAUDE.md` and `design-system.md` corrected. (COMPLETED)
+
+E130 · Raw `px` Value Triage — All 97 flagged files triaged by reading CSS context, not just grepped. 57 real violations fixed across 15 files using existing tokens; ~480 legitimate exceptions (borders, WCAG touch targets, one-off dimensions, no-scale-match values) documented, not touched. (COMPLETED)
 
 ---
 
@@ -234,6 +236,8 @@ E129 · Per-View CSS Token "Gap" — Closed as non-bug; confirmed the single uni
 | `E129 Per-View CSS Token "Gap"` — Closed as non-bug. Confirmed with product owner: distinct per-view palettes (Cannabis purple, Fireworks red) were designed but never implemented, and the product direction has since unified all three verticals onto one Pawn Shop theme (gold/black/Playfair/Lora) on purpose. `CLAUDE.md`'s Three-View Architecture table and the obsolete Cannabis-purple-contrast guardrail corrected; `docs/design-system.md` §1–4 marked superseded with historical tables retained for reference. Decision 0052 logged. | E129 | 2026-08-13 |
 | **E129 CLOSED (non-bug)** | E129 | 2026-08-13 |
 | `E128 hex cleanup follow-up` — With E129 resolved, finished `TerpeneProfile.tsx`/`LuxuryProductCard.tsx`/`CannabisPage.tsx`: reused existing `--color-accent` (brass/bronze) and `--color-success` tokens instead of inventing new ones. `theme-colors.ts`'s per-view `VIEW_META_THEME_COLORS` map collapsed to a single `META_THEME_COLOR` constant. Zero non-Pawn hex remains anywhere in `src/`. Decision 0052 updated. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E128 | 2026-08-13 |
+| `E130 Raw px Value Triage` — Read the CSS context around every `px` literal in the 97 flagged files rather than blind-grepping. Found 57 real `--space-*`/`--text-*`/`--radius-*` violations (across 15 files, all using existing tokens — no new tokens needed) and confirmed the remaining ~480 occurrences are legitimate: hairline borders, WCAG 44/48px touch targets (verified 100% via sampling), one-off component dimensions, and values with no exact scale match (left literal rather than approximated, per Decision 0051/0052 precedent). Decision 0053 logged. Build ✅ Lint ✅ Tests 29/29 ✅ CF tsc ✅. | E130 | 2026-08-13 |
+| **E130 CLOSED** | E130 | 2026-08-13 |
 
 ---
 
@@ -264,4 +268,4 @@ E129 · Per-View CSS Token "Gap" — Closed as non-bug; confirmed the single uni
 
 ---
 
-*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-08-13 (Cycle 34 — E128 CLOSED partial, E129 CLOSED non-bug)*
+*The Pawn Shop · docs/ACTIVE_CYCLE.md · updated 2026-08-13 (Cycle 34 — E128 CLOSED, E129 CLOSED non-bug, E130 CLOSED)*

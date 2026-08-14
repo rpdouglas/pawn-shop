@@ -285,7 +285,7 @@ export function TagCellEditor({ initialTags, isAdmin, onSave }: TagCellEditorPro
         onClick={() => onSave(tags)}
         style={{
           marginTop: 'var(--space-1)',
-          minHeight: '32px',
+          minHeight: 'var(--space-8)',
           borderRadius: 'var(--radius-sm)',
           border: 'none',
           backgroundColor: 'var(--color-primary)',
@@ -330,7 +330,7 @@ export function PoliceHoldCell({ value, isAdmin, onSave }: PoliceHoldCellProps) 
       aria-checked={value}
       onClick={() => onSave(!value)}
       style={{
-        minHeight: '32px',
+        minHeight: 'var(--space-8)',
         padding: '0 var(--space-2)',
         borderRadius: 'var(--radius-sm)',
         border: '1px solid',

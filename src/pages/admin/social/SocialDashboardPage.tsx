@@ -84,7 +84,7 @@ export default function SocialDashboardPage() {
                 variant={post.status === 'published' ? 'active' : post.status === 'approved' ? 'tag' : post.status === 'pending_review' ? 'error' : 'archived'} 
                 label={post.status.replace('_', ' ').toUpperCase()} 
               />
-              <div style={{ display: 'flex', gap: '4px' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-1)' }}>
                 {post.platforms.map((plat: SocialPlatform) => (
                   <Badge key={plat} variant="tag" label={plat} />
                 ))}
@@ -96,9 +96,9 @@ export default function SocialDashboardPage() {
             </div>
 
             {post.mediaUrls && post.mediaUrls.length > 0 && (
-              <div style={{ display: 'flex', gap: '4px', overflowX: 'auto' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-1)', overflowX: 'auto' }}>
                 {post.mediaUrls.map((url, i) => (
-                  <img key={i} src={url} alt="media preview" style={{ height: '60px', width: '60px', objectFit: 'cover', borderRadius: '4px' }} />
+                  <img key={i} src={url} alt="media preview" style={{ height: '60px', width: '60px', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }} />
                 ))}
               </div>
             )}

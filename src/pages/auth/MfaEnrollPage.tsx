@@ -135,7 +135,7 @@ export default function MfaEnrollPage() {
             <Button
               variant="secondary"
               size="md"
-              style={{ width: '100%', marginBottom: '24px' }}
+              style={{ width: '100%', marginBottom: 'var(--space-6)' }}
               onClick={() => setStep('verify')}
             >
               I have added the key — continue
@@ -186,7 +186,7 @@ const pageStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: '24px 16px',
+  padding: 'var(--space-6) var(--space-4)',
 }
 
 const cardStyle: React.CSSProperties = {
@@ -195,14 +195,14 @@ const cardStyle: React.CSSProperties = {
   backgroundColor: 'var(--color-surface)',
   border: '1px solid var(--color-border)',
   borderRadius: 'var(--radius-lg)',
-  padding: '40px 32px',
+  padding: '40px var(--space-8)',
 }
 
 const headingStyle: React.CSSProperties = {
   fontFamily: 'var(--font-display)',
-  fontSize: '24px',
+  fontSize: 'var(--text-subheading)',
   color: 'var(--color-text)',
-  marginBottom: '16px',
+  marginBottom: 'var(--space-4)',
 }
 
 const subtextStyle: React.CSSProperties = {
@@ -223,16 +223,16 @@ const keyBoxStyle: React.CSSProperties = {
   backgroundColor: 'var(--color-bg)',
   border: '1px solid var(--color-border)',
   borderRadius: 'var(--radius-md)',
-  padding: '16px',
-  marginBottom: '16px',
+  padding: 'var(--space-4)',
+  marginBottom: 'var(--space-4)',
   display: 'flex',
   flexDirection: 'column',
-  gap: '8px',
+  gap: 'var(--space-2)',
 }
 
 const keyLabelStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
-  fontSize: '12px',
+  fontSize: 'var(--text-xs)',
   color: 'var(--color-text-muted)',
   textTransform: 'uppercase',
   letterSpacing: '0.06em',
@@ -240,7 +240,7 @@ const keyLabelStyle: React.CSSProperties = {
 
 const keyTextStyle: React.CSSProperties = {
   fontFamily: 'monospace',
-  fontSize: '16px',
+  fontSize: 'var(--text-body)',
   color: 'var(--color-primary)',
   wordBreak: 'break-all',
   userSelect: 'all',
@@ -269,7 +269,7 @@ const backLinkStyle: React.CSSProperties = {
   border: 'none',
   color: 'var(--color-text-muted)',
   fontFamily: 'var(--font-body)',
-  fontSize: '14px',
+  fontSize: 'var(--text-small)',
   cursor: 'pointer',
   padding: '12px 0',
   textAlign: 'left',
