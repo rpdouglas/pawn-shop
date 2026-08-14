@@ -43,8 +43,9 @@ export default function ContactPage() {
             <h2 className="contact-section-heading">Find Us</h2>
             <address className="contact-address">
               <strong>The Pawn Shop</strong><br />
-              Cornwall Island, Akwesasne<br />
-              Ontario, Canada
+              1-155 International Drive<br />
+              Akwesasne, Ontario<br />
+              Canada
             </address>
             <div className="contact-map-wrapper">
               <iframe
