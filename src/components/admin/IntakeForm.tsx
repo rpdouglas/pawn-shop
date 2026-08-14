@@ -509,7 +509,7 @@ export default function IntakeForm({ initialItemId }: IntakeFormProps = {}) {
             style={{
               position: 'relative',
               width: '44px',
-              height: '24px',
+              height: 'var(--space-6)',
               borderRadius: '12px',
               border: 'none',
               backgroundColor: aiEnabled ? 'var(--color-primary)' : 'var(--color-border)',

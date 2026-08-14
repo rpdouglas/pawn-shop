@@ -20,7 +20,7 @@ export default function UrgencyBadge({ type, label }: UrgencyBadgeProps) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: '6px',
-        padding: '4px 12px',
+        padding: 'var(--space-1) 12px',
         borderRadius: 'var(--radius-sm)',
         border: `1px solid ${styles.border}`,
         backgroundColor: styles.bg,

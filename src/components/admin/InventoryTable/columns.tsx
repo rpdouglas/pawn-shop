@@ -609,8 +609,8 @@ export function buildColumns(): ColumnDef<Item, unknown>[] {
               aria-label={`Generate AI description for ${item.title}`}
               onClick={e => { e.stopPropagation(); meta.triggerAi(item, 'description') }}
               style={{
-                minHeight: '32px',
-                minWidth: '32px',
+                minHeight: 'var(--space-8)',
+                minWidth: 'var(--space-8)',
                 border: '1px solid var(--color-border)',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--color-surface)',
@@ -627,8 +627,8 @@ export function buildColumns(): ColumnDef<Item, unknown>[] {
               aria-label={`Suggest AI price for ${item.title}`}
               onClick={e => { e.stopPropagation(); meta.triggerAi(item, 'price') }}
               style={{
-                minHeight: '32px',
-                minWidth: '32px',
+                minHeight: 'var(--space-8)',
+                minWidth: 'var(--space-8)',
                 border: '1px solid var(--color-border)',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--color-surface)',

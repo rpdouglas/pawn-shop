@@ -662,7 +662,7 @@ export default function InventoryTable({
               style={{
                 width: '1px',
                 alignSelf: 'stretch',
-                minHeight: '24px',
+                minHeight: 'var(--space-6)',
                 backgroundColor: 'var(--color-border)',
                 flexShrink: 0,
               }}

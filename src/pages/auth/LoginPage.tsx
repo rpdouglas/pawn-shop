@@ -229,7 +229,7 @@ const pageStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: '24px 16px',
+  padding: 'var(--space-6) var(--space-4)',
 }
 
 const cardStyle: React.CSSProperties = {
@@ -238,21 +238,21 @@ const cardStyle: React.CSSProperties = {
   backgroundColor: 'var(--color-surface)',
   border: '1px solid var(--color-border)',
   borderRadius: 'var(--radius-lg)',
-  padding: '40px 32px',
+  padding: '40px var(--space-8)',
 }
 
 const headingStyle: React.CSSProperties = {
   fontFamily: 'var(--font-display)',
   fontSize: '28px',
   color: 'var(--color-text)',
-  marginBottom: '24px',
+  marginBottom: 'var(--space-6)',
 }
 
 const subtextStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
   fontSize: '15px',
   color: 'var(--color-text-muted)',
-  marginBottom: '24px',
+  marginBottom: 'var(--space-6)',
   lineHeight: 1.6,
 }
 
@@ -267,7 +267,7 @@ const fullWidth: React.CSSProperties = { width: '100%' }
 const dividerStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  margin: '24px 0',
+  margin: 'var(--space-6) 0',
   gap: '12px',
 }
 
@@ -280,10 +280,10 @@ const dividerTextStyle: React.CSSProperties = {
 
 const footerStyle: React.CSSProperties = {
   fontFamily: 'var(--font-body)',
-  fontSize: '14px',
+  fontSize: 'var(--text-small)',
   color: 'var(--color-text-muted)',
   textAlign: 'center',
-  marginTop: '24px',
+  marginTop: 'var(--space-6)',
 }
 
 const linkStyle: React.CSSProperties = {
@@ -296,11 +296,11 @@ const backLinkStyle: React.CSSProperties = {
   border: 'none',
   color: 'var(--color-text-muted)',
   fontFamily: 'var(--font-body)',
-  fontSize: '14px',
+  fontSize: 'var(--text-small)',
   cursor: 'pointer',
   padding: '12px 0',
   display: 'block',
-  marginTop: '8px',
+  marginTop: 'var(--space-2)',
   minHeight: '48px',
   textAlign: 'left',
 }

@@ -32,7 +32,7 @@ export default function MoodCard({ mood, itemCount, onClick }: MoodCardProps) {
         backgroundColor: 'var(--color-surface)',
         border: '1px solid var(--color-border)',
         borderRadius: 'var(--radius-md)',
-        padding: '32px 24px',
+        padding: 'var(--space-8) var(--space-6)',
         cursor: isInteractive ? 'pointer' : 'default',
         transition: 'border-color var(--motion-speed-fast) var(--motion-easing), background-color var(--motion-speed-fast) var(--motion-easing)',
       }}
@@ -48,7 +48,7 @@ export default function MoodCard({ mood, itemCount, onClick }: MoodCardProps) {
         fontSize: '28px',
         fontWeight: 300,
         color: 'var(--color-text)',
-        marginBottom: '8px',
+        marginBottom: 'var(--space-2)',
         letterSpacing: '0.01em',
       }}>
         {config.label}
@@ -67,7 +67,7 @@ export default function MoodCard({ mood, itemCount, onClick }: MoodCardProps) {
           fontFamily: 'var(--font-body)',
           fontSize: '13px',
           color: 'var(--color-primary)',
-          marginTop: '16px',
+          marginTop: 'var(--space-4)',
           marginBottom: 0,
           fontWeight: 500,
         }}>

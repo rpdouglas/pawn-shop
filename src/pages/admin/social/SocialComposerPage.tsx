@@ -152,7 +152,7 @@ export default function SocialComposerPage() {
         <h3 style={{ fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)', color: 'var(--color-text)' }}>Mobile Preview</h3>
         <div style={{ border: '1px solid var(--color-border)', borderRadius: '24px', padding: 'var(--space-4)', backgroundColor: 'var(--color-bg)', minHeight: '400px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-border)' }} />
+            <div style={{ width: 'var(--space-8)', height: 'var(--space-8)', borderRadius: '50%', backgroundColor: 'var(--color-border)' }} />
             <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text)' }}>Pawn Shop Name</span>
           </div>
           {mediaUrls[0] && (

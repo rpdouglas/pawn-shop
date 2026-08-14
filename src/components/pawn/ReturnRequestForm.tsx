@@ -92,7 +92,7 @@ export default function ReturnRequestForm({ item, onClose, onSuccess }: ReturnRe
                 value="return" 
                 checked={type === 'return'} 
                 onChange={() => setType('return')} 
-                style={{ width: '24px', height: '24px' }}
+                style={{ width: 'var(--space-6)', height: 'var(--space-6)' }}
               />
               <span style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text)' }}>Returning an item</span>
             </label>
@@ -110,7 +110,7 @@ export default function ReturnRequestForm({ item, onClose, onSuccess }: ReturnRe
                 value="dispute" 
                 checked={type === 'dispute'} 
                 onChange={() => setType('dispute')} 
-                style={{ width: '24px', height: '24px' }}
+                style={{ width: 'var(--space-6)', height: 'var(--space-6)' }}
               />
               <span style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text)' }}>Disputing a charge</span>
             </label>

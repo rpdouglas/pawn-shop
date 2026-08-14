@@ -1965,4 +1965,23 @@ See `docs/projects/E128_DESIGN_TOKEN_CLEANUP.md`, `docs/reports/AUDIT_2026-08-13
 
 See `docs/reports/FINDING_2026-08-13_VIEW_TOKEN_CSS_GAP.md` and `docs/decisions/0052-unified-pawn-shop-theme.md`.
 
+---
+
+### E130 · Raw `px` Value Triage
+
+> **Persona Gate — E130:**
+> - **Jordan (Primary):** Token consistency is a brand-quality signal, continuing E128's cleanup.
+> - **Makoonsii:** WCAG touch-target values (44/48px) must be correctly identified as accepted exceptions, not miscategorized into a `--space-*` token that doesn't match.
+> - **Compliance:** `CLAUDE.md` guardrail restoration — deferred scope from E128.
+
+**Status:** ✅ CLOSED · **Priority:** MEDIUM · **Cycle:** 34
+
+- [x] Triage all 97 flagged files — classify every `px` occurrence as real `--space-*`/`--text-*`/`--radius-*` violation or accepted exception `[Jord]` `[Comp]`
+- [x] Fix real violations only (57 property-level fixes across 15 files, including 6 found incidentally during Gate 2 reading); document accepted exceptions in Decision 0053 `[Jord]` `[Mak]` `[Comp]`
+- [x] Zero-diff build/lint/test/tsc gates pass `[Comp]`
+- [x] Decision 0053 logged
+- [x] **E130 CLOSED** | 2026-08-13
+
+See `docs/projects/E130_PX_TRIAGE.md`, `docs/plans/E130_PX_TRIAGE_PLAN.md`, `docs/decisions/0053-e130-px-triage-execution.md`.
+
 

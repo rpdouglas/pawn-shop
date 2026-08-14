@@ -66,7 +66,7 @@ export default function Card({
           : <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)' }}>No image</span>
         }
         {displayTags.length > 0 && (
-          <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          <div style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', display: 'flex', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
             {displayTags.map((tag) => (
               <Badge key={tag} variant="tag" label={tag.replace(/-/g, ' ')} />
             ))}
@@ -75,10 +75,10 @@ export default function Card({
       </div>
 
       {/* Content */}
-      <div style={{ padding: '16px' }}>
+      <div style={{ padding: 'var(--space-4)' }}>
         <h3 style={{
           fontFamily: 'var(--font-display)',
-          fontSize: '16px',
+          fontSize: 'var(--text-body)',
           fontWeight: 600,
           color: 'var(--color-text)',
           margin: '0 0 6px',
@@ -95,7 +95,7 @@ export default function Card({
           marginBottom: '12px',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px'
+          gap: 'var(--space-2)'
         }}>
           {formatPrice(price)}
           {isPriceDropped && (
@@ -105,7 +105,7 @@ export default function Card({
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
           <Badge variant={`condition-${condition}`} label={CONDITION_LABELS[condition]} />
           {status !== 'active' && (
             <Badge variant={status} label={STATUS_LABELS[status]} />
